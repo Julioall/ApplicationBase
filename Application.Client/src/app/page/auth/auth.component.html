@@ -1,0 +1,75 @@
+<div class="outer d-flex align-items-center align-center">
+  <div class="container" [ngClass]="{'right-panel-active': rightPanelActive}">
+    <div class="form-container sign-up-container">
+      <form *ngIf="signupFormVisible" [formGroup]="signupForm">
+        <h1>Create Account</h1>
+        <div *ngIf="false" class="social-container">
+          <a type="button" class="social social-button" id="google-signup-btn"><i class="fa fa-google"></i></a>
+          <a class="social"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+          <a class="social"><i class="fa fa-twitter"></i></a>
+        </div>
+        <span *ngIf="false">or use your email to register</span>
+        <input type="text" placeholder="Full Name" formControlName="fullName" />
+        <div *ngIf="signupForm.get('fullName')?.invalid && (signupForm.get('fullName')?.touched || signupSubmitted)">
+          <small class="text-danger">Name is required.</small>
+        </div>
+
+        <input type="email" placeholder="Email" formControlName="email" />
+        <div *ngIf="(signupForm.get('email')?.invalid && (signupForm.get('email')?.touched || signupSubmitted))">
+          <small class="text-danger" *ngIf="signupForm.get('email')?.hasError('required')">Email is required.</small>
+          <small class="text-danger" *ngIf="signupForm.get('email')?.hasError('email')">Invalid email format.</small>
+        </div>
+
+        <input type="password" placeholder="Password" formControlName="password" />
+        <div *ngIf="signupForm.get('password')?.invalid && (signupForm.get('password')?.touched || signupSubmitted)">
+          <small class="text-danger" *ngIf="signupForm.get('password')?.hasError('required')">Password is required.</small>
+          <small class="text-danger" *ngIf="signupForm.get('password')?.hasError('minlength')">Password must be at least 6 characters.</small>
+        </div>
+
+        <button class="mt-2" type="submit" (click)="onSignup()">Register</button>
+      </form>
+    </div>
+    <div class="form-container login-container">
+      <form *ngIf="loginFormVisible" [formGroup]="loginForm">
+        <h1>Login</h1>
+
+        <div *ngIf="false" class="social-container">
+          <a type="button" class="social social-button" id="google-login-btn"><i class="fa fa-google"></i></a>
+          <a class="social"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+          <a class="social"><i class="fa fa-twitter"></i></a>
+        </div>
+
+        <span *ngIf="false">or use your account</span>
+
+        <input type="email" placeholder="Email" formControlName="email" />
+        <div *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.touched || loginSubmitted)">
+          <small class="text-danger" *ngIf="loginForm.get('email')?.hasError('required')">Email is required.</small>
+          <small class="text-danger" *ngIf="loginForm.get('email')?.hasError('email')">Invalid email format.</small>
+        </div>
+
+        <input type="password" placeholder="Password" formControlName="password" />
+        <div *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.touched || loginSubmitted)">
+          <small class="text-danger" *ngIf="loginForm.get('password')?.hasError('required')">Password is required.</small>
+          <small class="text-danger" *ngIf="loginForm.get('password')?.hasError('minlength')">Password must be at least 6 characters.</small>
+        </div>
+
+        <button class="my-2" type="submit" (click)="onLogin()">Login</button>
+        <a>Forgot your password?</a>
+      </form>
+    </div>
+    <div class="overlay-container">
+      <div class="overlay">
+        <div class="overlay-panel overlay-left">
+          <h1>Welcome Back!</h1>
+          <p>To stay connected, log in with your personal information</p>
+          <button class="mt-2" class="ghost" (click)="showSignIn()">Login</button>
+        </div>
+        <div class="overlay-panel overlay-right">
+          <h1>Hello, Friend!</h1>
+          <p>Enter your personal details and start your journey with us</p>
+          <button class="mt-2" class="ghost gradient-border" (click)="showSignUp()">Register</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
