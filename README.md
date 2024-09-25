@@ -1,4 +1,6 @@
 # Application Base - Aplicação Web com Angular e .NET
+![Tela de login](https://github.com/user-attachments/assets/195dccf8-56eb-4e14-a244-11930e5a9dc2)
+
 
 Este repositório contém o código-fonte do **Application Base**, um projeto que serve como uma base para futuros desenvolvimentos. O projeto segue as melhores práticas de desenvolvimento de software, incluindo:
 
