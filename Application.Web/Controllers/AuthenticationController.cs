@@ -1,4 +1,4 @@
-﻿using Application.Service.Dtos;
+﻿using Application.Domain.Model.Dtos;
 using Application.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

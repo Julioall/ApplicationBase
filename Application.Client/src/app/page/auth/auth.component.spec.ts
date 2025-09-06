@@ -1,5 +1,5 @@
 /* tslint:disable:no-unused-variable */
-import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/testing';
 
 import { AuthComponent } from './auth.component';
 

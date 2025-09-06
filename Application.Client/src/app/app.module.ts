@@ -9,7 +9,7 @@ import { AuthComponent } from './page/auth/auth.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { LoadingInterceptor } from './core/service/loading/loading.interceptor';
+import { LoadingInterceptor } from './service/loading/loading.interceptor';
 import { NgxSpinnerModule } from "ngx-spinner";
 
 @NgModule({

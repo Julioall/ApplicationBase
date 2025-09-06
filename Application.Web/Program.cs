@@ -1,4 +1,6 @@
 using Application.Api;
+using Application.Api.Middlewares;
+using Application.Domain;
 using Application.Domain.Model;
 using Application.Infrastructure;
 using Application.Service;
@@ -78,12 +80,15 @@ public class Program
         });
 
         // Register dependency injection modules
-        DependencyInjectionModuleInfra.RegisterServices(builder.Services);
-        DependencyInjectionModuleService.RegisterServices(builder.Services);
-        DependencyInjectionModuleWeb.RegisterServices(builder.Services);
+        DependencyInjectionModuleDomain.AddDomainDependencies(builder.Services);
+        DependencyInjectionModuleInfra.AddInfraDependencies(builder.Services);
+        DependencyInjectionModuleService.AddServiceDependencies(builder.Services);
+        DependencyInjectionModuleWeb.AddWebDependencies(builder.Services);
+
 
         var app = builder.Build();
 
+        app.UseMiddleware<MiddlewareServiceRavenDbStore>();
         app.UseDefaultFiles();
         app.UseStaticFiles();
 
@@ -102,7 +107,6 @@ public class Program
         // }
 
         app.UseHttpsRedirection();
-
         app.UseAuthentication();
         app.UseAuthorization();
 

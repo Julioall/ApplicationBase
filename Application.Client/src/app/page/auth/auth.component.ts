@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { User } from '../../core/model/User';
-import { NotificationService } from '../../core/service/notification/notification.service';
-import { AuthService } from '../../core/service/auth/auth.service';
+import { User } from '../../model/User';
+import { NotificationService } from '../../service/notification/notification.service';
+import { AuthService } from '../../service/auth/auth.service';
 import {
   FormGroup,
   FormBuilder,

@@ -7,10 +7,10 @@ namespace Application.Api
 {
     public static class DependencyInjectionModuleWeb
     {
-        public static void RegisterServices(IServiceCollection services)
+        public static void AddWebDependencies(IServiceCollection services)
         {
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IUserRepository, UserRepositoryRavenDB>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITokenService, TokenService>();
         }

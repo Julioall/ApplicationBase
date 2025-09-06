@@ -1,9 +1,4 @@
-﻿using Application.Service.Dtos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.Domain.Model.Dtos;
 
 namespace Application.Service.Interface
 {

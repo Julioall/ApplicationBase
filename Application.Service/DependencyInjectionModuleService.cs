@@ -1,15 +1,15 @@
 ﻿using Application.Domain.Interface;
-using Application.Infrastructure.Repository;
+using Application.Service.Service;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Service
 {
     public static class DependencyInjectionModuleService
     {
-        public static void RegisterServices(IServiceCollection services)
+        public static IServiceCollection AddServiceDependencies(this IServiceCollection services)
         {
-            services.AddRavenDB();
-            services.AddScoped<IUserRepository, UserRepositoryRavenDB>();
+            services.AddScoped<IServiceRavenDB, ServiceRavenDB>();
+            return services;
         }
     }
 }
