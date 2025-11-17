@@ -1,9 +1,0 @@
-{
-  "auth": {
-    "loginSuccess": "Login successfully!",
-    "loginError": "Login error. Please check your credentials.",
-    "signupSuccess": "Registration successful!",
-    "signupError": "Error during registration. Please try again.",
-    "formError": "Please fill out the form correctly."
-  }
-}

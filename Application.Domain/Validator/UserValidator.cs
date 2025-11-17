@@ -15,7 +15,7 @@ namespace Application.Domain.Validator
             RuleFor(user => user.Account.Email)
                 .NotEmpty().WithMessage("O email é obrigatório.")
                 .EmailAddress().WithMessage("O email deve ser válido.")
-                .Must(x => !EmailAlreadyExist(x)).WithMessage("Este e-mail já existe na nossa base de dados");
+                .Must((user, email) => !EmailAlreadyExist(email, user.Id)).WithMessage("Este e-mail já existe na nossa base de dados");
 
             RuleFor(user => user.Account.Password)
                 .NotEmpty().WithMessage("A senha é obrigatória.")
@@ -40,9 +40,11 @@ namespace Application.Domain.Validator
                 .WithMessage("Função inválida. Use 'User', 'Admin' ou 'Moderator'.");
         }
 
-        private bool EmailAlreadyExist(string email)
+        private bool EmailAlreadyExist(string email, string? currentUserId)
         {
-            return _serviceRavenDB.Session.Query<User>().Any(x => x.Account.Email == email);
+            return _serviceRavenDB.Session.Query<User>()
+                .Any(x => x.Account.Email == email && x.Id != currentUserId);
         }
     }
 }
+

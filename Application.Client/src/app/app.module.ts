@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+﻿import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
@@ -11,11 +11,12 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { LoadingInterceptor } from './service/loading/loading.interceptor';
 import { NgxSpinnerModule } from "ngx-spinner";
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { Observable } from 'rxjs';
 
 export class AppTranslateLoader implements TranslateLoader {
   constructor(private http: HttpClient) {}
-  public getTranslation(lang: string) {
-    return this.http.get(`/assets/i18n/${lang}.json`);
+  public getTranslation(lang: string): Observable<Record<string, string>> {
+    return this.http.get<Record<string, string>>(`i18n/${lang}.json`);
   }
 }
 
