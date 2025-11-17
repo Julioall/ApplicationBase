@@ -1,75 +1,58 @@
-<div class="outer d-flex align-items-center align-center">
-  <div class="container" [ngClass]="{'right-panel-active': rightPanelActive}">
-    <div class="form-container sign-up-container">
-      <form *ngIf="signupFormVisible" [formGroup]="signupForm">
-        <h1>Create Account</h1>
-        <div *ngIf="false" class="social-container">
-          <a type="button" class="social social-button" id="google-signup-btn"><i class="fa fa-google"></i></a>
-          <a class="social"><i class="fa fa-facebook" aria-hidden="true"></i></a>
-          <a class="social"><i class="fa fa-twitter"></i></a>
-        </div>
-        <span *ngIf="false">or use your email to register</span>
-        <input type="text" placeholder="Full Name" formControlName="fullName" />
-        <div *ngIf="signupForm.get('fullName')?.invalid && (signupForm.get('fullName')?.touched || signupSubmitted)">
-          <small class="text-danger">Name is required.</small>
-        </div>
+<div class="auth-wrapper">
+  <div class="card">
+    <header class="card-head">
+      <h1>Login</h1>
+      <p>Bem vindo de volta. Continue construindo seus apps com Angular + .NET.</p>
+    </header>
 
-        <input type="email" placeholder="Email" formControlName="email" />
-        <div *ngIf="(signupForm.get('email')?.invalid && (signupForm.get('email')?.touched || signupSubmitted))">
-          <small class="text-danger" *ngIf="signupForm.get('email')?.hasError('required')">Email is required.</small>
-          <small class="text-danger" *ngIf="signupForm.get('email')?.hasError('email')">Invalid email format.</small>
-        </div>
+    <button type="button" class="btn secondary w-100">
+      <span class="dot red"></span>
+      <span class="dot yellow"></span>
+      <span class="dot green"></span>
+      Entrar com Google
+    </button>
 
-        <input type="password" placeholder="Password" formControlName="password" />
-        <div *ngIf="signupForm.get('password')?.invalid && (signupForm.get('password')?.touched || signupSubmitted)">
-          <small class="text-danger" *ngIf="signupForm.get('password')?.hasError('required')">Password is required.</small>
-          <small class="text-danger" *ngIf="signupForm.get('password')?.hasError('minlength')">Password must be at least 6 characters.</small>
-        </div>
-
-        <button class="mt-2" type="submit" (click)="onSignup()">Register</button>
-      </form>
+    <div class="divider">
+      <span>ou entre com email</span>
     </div>
-    <div class="form-container login-container">
-      <form *ngIf="loginFormVisible" [formGroup]="loginForm">
-        <h1>Login</h1>
 
-        <div *ngIf="false" class="social-container">
-          <a type="button" class="social social-button" id="google-login-btn"><i class="fa fa-google"></i></a>
-          <a class="social"><i class="fa fa-facebook" aria-hidden="true"></i></a>
-          <a class="social"><i class="fa fa-twitter"></i></a>
-        </div>
+    <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+      <label class="field">
+        <span>Email</span>
+        <input type="email" placeholder="exemplo@empresa.com" formControlName="email" />
+        <small class="error" *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.touched || loginSubmitted)">
+          {{ loginForm.get('email')?.hasError('required') ? 'Informe seu email.' : 'Formato de email invalido.' }}
+        </small>
+      </label>
 
-        <span *ngIf="false">or use your account</span>
+      <label class="field">
+        <span>Senha</span>
+        <input type="password" placeholder="********" formControlName="password" />
+        <small class="error" *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.touched || loginSubmitted)">
+          {{ loginForm.get('password')?.hasError('required') ? 'Informe sua senha.' : 'A senha precisa de no minimo 6 caracteres.' }}
+        </small>
+      </label>
 
-        <input type="email" placeholder="Email" formControlName="email" />
-        <div *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.touched || loginSubmitted)">
-          <small class="text-danger" *ngIf="loginForm.get('email')?.hasError('required')">Email is required.</small>
-          <small class="text-danger" *ngIf="loginForm.get('email')?.hasError('email')">Invalid email format.</small>
-        </div>
-
-        <input type="password" placeholder="Password" formControlName="password" />
-        <div *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.touched || loginSubmitted)">
-          <small class="text-danger" *ngIf="loginForm.get('password')?.hasError('required')">Password is required.</small>
-          <small class="text-danger" *ngIf="loginForm.get('password')?.hasError('minlength')">Password must be at least 6 characters.</small>
-        </div>
-
-        <button class="my-2" type="submit" (click)="onLogin()">Login</button>
-        <a>Forgot your password?</a>
-      </form>
-    </div>
-    <div class="overlay-container">
-      <div class="overlay">
-        <div class="overlay-panel overlay-left">
-          <h1>Welcome Back!</h1>
-          <p>To stay connected, log in with your personal information</p>
-          <button class="mt-2" class="ghost" (click)="showSignIn()">Login</button>
-        </div>
-        <div class="overlay-panel overlay-right">
-          <h1>Hello, Friend!</h1>
-          <p>Enter your personal details and start your journey with us</p>
-          <button class="mt-2" class="ghost gradient-border" (click)="showSignUp()">Register</button>
-        </div>
+      <div class="support">
+        <label class="remember">
+          <input type="checkbox" />
+          <span>Lembrar de mim</span>
+        </label>
+        <a href="#" (click)="$event.preventDefault()">Esqueceu a senha?</a>
       </div>
-    </div>
+
+      <button class="btn primary w-100" type="submit">Entrar</button>
+    </form>
+
+    <footer class="card-footer">
+      <span>Nao tem conta?</span>
+      <button type="button" class="link-btn" (click)="goToRegister()">Criar conta</button>
+    </footer>
   </div>
+
+  <button type="button" class="theme-fab" (click)="toggleTheme()">
+    <span class="toggle-icon" [class.dark]="activeTheme === 'dark'">
+      {{ activeTheme === 'dark' ? '☀' : '☾' }}
+    </span>
+  </button>
 </div>

@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { AuthComponent } from './page/auth/auth.component';
+import { RegisterComponent } from './page/register/register.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -24,6 +25,7 @@ export class AppTranslateLoader implements TranslateLoader {
   declarations: [
     AppComponent,
     AuthComponent,
+    RegisterComponent,
   ],
   imports: [
     BrowserModule,

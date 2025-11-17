@@ -1,5 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --page-bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-alt: #f7f8fa;
+  --surface-blur: rgba(255, 255, 255, 0.85);
+  --border-soft: #dfe1e6;
+  --text-primary: #172b4d;
+  --text-subtle: #42526e;
+  --accent: #4c9aff;
+  --accent-strong: #1d7afc;
+  --shadow-soft: 0 10px 40px rgba(9, 30, 66, 0.12);
+}
+
+.dark-theme {
+  --page-bg: #0f172a;
+  --surface: #111827;
+  --surface-alt: #0b1220;
+  --surface-blur: rgba(17, 24, 39, 0.75);
+  --border-soft: #1f2a44;
+  --text-primary: #f5f7ff;
+  --text-subtle: #c7d4f5;
+  --accent: #4c9aff;
+  --accent-strong: #4c9aff;
+  --shadow-soft: 0 12px 48px rgba(0, 0, 0, 0.45);
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+body {
+  background: var(--page-bg);
+  color: var(--text-primary);
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }

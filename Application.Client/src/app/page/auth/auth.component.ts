@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { User } from '../../model/User';
 import { NotificationService } from '../../service/notification/notification.service';
 import { AuthService } from '../../service/auth/auth.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -9,6 +8,7 @@ import {
   FormBuilder,
   Validators,
 } from '@angular/forms';
+import { ThemeService } from '../../service/theme/theme.service';
 
 @Component({
   selector: 'app-auth',
@@ -18,13 +18,7 @@ import {
 export class AuthComponent implements OnInit {
   loginForm!: FormGroup;
   loginSubmitted: boolean = false;
-  signupForm!: FormGroup;
-  signupSubmitted: boolean = false;
-  rightPanelActive: string = '';
-  successMessage: string = '';
-  errorMessage: string = '';
-  loginFormVisible: boolean = true;
-  signupFormVisible: boolean = false;
+  activeTheme = this.themeService.getActiveTheme();
 
   constructor(
     private fb: FormBuilder,
@@ -32,6 +26,7 @@ export class AuthComponent implements OnInit {
     private router: Router,
     private notificationService: NotificationService,
     private translateService: TranslateService,
+    private themeService: ThemeService,
   ) {}
 
   ngOnInit() {
@@ -39,32 +34,14 @@ export class AuthComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
-
-    this.signupForm = this.fb.group({
-      fullName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-    });
   }
 
-  showSignUp(): void {
-    this.rightPanelActive = 'right-panel-active';
-    setTimeout(() => {
-      this.signupFormVisible = true;
-      this.loginFormVisible = false;
-      this.loginSubmitted = false;
-      this.loginForm.reset();
-    }, 350);
+  toggleTheme(): void {
+    this.activeTheme = this.themeService.toggleTheme();
   }
 
-  showSignIn(): void {
-    this.rightPanelActive = '';
-    setTimeout(() => {
-      this.loginFormVisible = true;
-      this.signupFormVisible = false;
-      this.signupSubmitted = false;
-      this.signupForm.reset();
-    }, 350);
+  goToRegister(): void {
+    this.router.navigate(['/register']);
   }
 
   onLogin(): void {
@@ -89,46 +66,5 @@ export class AuthComponent implements OnInit {
         );
       },
     });
-  }
-
-  onSignup(): void {
-    this.signupSubmitted = true;
-    if (this.signupForm.valid) {
-      const { fullName, email, password } = this.signupForm.value;
-
-      const newUser: User = {
-        Account: {
-          Email: email,
-          Password: password,
-          Role: 'User',
-          DateJoined: new Date(),
-        },
-        Profile: {
-          Name: fullName,
-          DateOfBirth: undefined,
-          ProfilePictureUrl: '',
-          AnimeList: [],
-        },
-      };
-
-      this.authService.signup(newUser).subscribe({
-        next: () => {
-          this.successMessage = this.translateService.instant('auth.signupSuccess');
-          this.errorMessage = '';
-          
-          this.notificationService.showSuccess(this.translateService.instant('auth.signupSuccess'));
-          
-          setTimeout(() => {
-            this.showSignIn();
-            this.loginForm?.patchValue({ email, password });
-          }, 2000);
-        },
-        error: () => {
-          this.notificationService.showError(this.translateService.instant('auth.signupError'));
-        },
-      });      
-    } else {
-      this.notificationService.showError(this.translateService.instant('auth.formError'));
-    }
   }
 }

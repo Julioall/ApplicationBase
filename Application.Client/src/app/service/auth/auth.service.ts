@@ -38,9 +38,7 @@ export class AuthService {
 
   signup(user: User): Observable<any> {
     return this.http.post<any>(this.apiUrl, user).pipe(
-      catchError(() => {
-        return throwError(() => new Error('Sign up failed'));
-      })
+      catchError((err) => throwError(() => err))
     );
   }
 

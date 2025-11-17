@@ -1,0 +1,61 @@
+<div class="auth-wrapper">
+  <div class="card">
+    <header class="card-head">
+      <h1>Criar conta</h1>
+      <p>Preencha os dados para iniciar novos projetos com Angular + .NET.</p>
+    </header>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <label class="field">
+        <span>Nome completo</span>
+        <input type="text" placeholder="Digite seu nome" formControlName="fullName" />
+        <small class="error" *ngIf="registerForm.get('fullName')?.invalid && (registerForm.get('fullName')?.touched || submitted)">
+          {{ registerForm.get('fullName')?.hasError('required') ? 'Nome e obrigatorio.' : 'Informe ao menos 3 caracteres.' }}
+        </small>
+      </label>
+
+      <label class="field">
+        <span>Email</span>
+        <input type="email" placeholder="seu@email.com" formControlName="email" />
+        <small class="error" *ngIf="registerForm.get('email')?.invalid && (registerForm.get('email')?.touched || submitted)">
+          {{ registerForm.get('email')?.hasError('required') ? 'Email e obrigatorio.' : 'Formato de email invalido.' }}
+        </small>
+      </label>
+
+      <div class="inline">
+        <label class="field">
+          <span>Senha</span>
+          <input type="password" placeholder="Minimo 8 caracteres" formControlName="password" />
+          <small class="error" *ngIf="registerForm.get('password')?.invalid && (registerForm.get('password')?.touched || submitted)">
+            {{ registerForm.get('password')?.hasError('required') ? 'Senha e obrigatoria.' : 'Use no minimo 8 caracteres.' }}
+          </small>
+        </label>
+        <label class="field">
+          <span>Confirmar senha</span>
+          <input type="password" placeholder="Repita a senha" formControlName="confirmPassword" />
+          <small class="error" *ngIf="(registerForm.get('confirmPassword')?.touched || submitted) && registerForm.hasError('passwordsMismatch')">
+            As senhas precisam ser iguais.
+          </small>
+        </label>
+      </div>
+
+      <label class="checkbox">
+        <input type="checkbox" formControlName="updates" />
+        <span>Quero receber novidades sobre evolucoes do template.</span>
+      </label>
+
+      <button class="btn primary w-100" type="submit" [disabled]="registerForm.invalid">Registrar</button>
+    </form>
+
+    <footer class="card-footer">
+      <span>Ja possui uma conta?</span>
+      <button type="button" class="link-btn" (click)="goToLogin()">Fazer login</button>
+    </footer>
+  </div>
+
+  <button type="button" class="theme-fab" (click)="toggleTheme()">
+    <span class="toggle-icon" [class.dark]="activeTheme === 'dark'">
+      {{ activeTheme === 'dark' ? '☀' : '☾' }}
+    </span>
+  </button>
+</div>
