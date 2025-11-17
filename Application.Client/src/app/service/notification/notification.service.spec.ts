@@ -1,7 +1,5 @@
-/* tslint:disable:no-unused-variable */
-
-import { TestBed, waitForAsync, inject } from '@angular/testing';
-import { NotificationService } from './notification.service';
+﻿import { TestBed, waitForAsync, inject } from "@angular/core/testing";
+import { NotificationService } from "./notification.service";
 import { ToastrModule } from 'ngx-toastr';
 
 describe('Service: Notification', () => {

@@ -1,9 +1,9 @@
-/* tslint:disable:no-unused-variable */
-import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-
+﻿import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NavbarComponent } from './navbar.component';
+import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ThemeService } from '../../service/theme/theme.service';
+import { AuthService } from '../../service/auth/auth.service';
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
@@ -11,9 +11,10 @@ describe('NavbarComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ NavbarComponent ]
-    })
-    .compileComponents();
+      declarations: [ NavbarComponent ],
+      imports: [RouterTestingModule, HttpClientTestingModule],
+      providers: [ThemeService, AuthService]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
