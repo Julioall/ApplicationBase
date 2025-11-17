@@ -18,15 +18,18 @@ namespace Application.Api.Middlewares
         {
             if (serviceRavenDB.Session is null)
             {
-                var nameDatebase = AplicationConstants.DATABASE_NAME;
-                serviceRavenDB.Session = DocumentStoreHolderAlternative.Store.OpenSession(nameDatebase);
-                serviceRavenDB.AsyncSession = DocumentStoreHolderAlternative.Store.OpenAsyncSession(nameDatebase);
+                var nameDatabase = ApplicationConstants.DATABASE_NAME;
+                serviceRavenDB.Session = DocumentStoreHolderAlternative.Store.OpenSession(nameDatabase);
+                serviceRavenDB.AsyncSession = DocumentStoreHolderAlternative.Store.OpenAsyncSession(nameDatabase);
                 serviceRavenDB.Store = DocumentStoreHolderAlternative.Store;
             }
 
             await _next(httpContext);
 
-            serviceRavenDB.AsyncSession?.SaveChangesAsync();
+            if (serviceRavenDB.AsyncSession != null)
+            {
+                await serviceRavenDB.AsyncSession.SaveChangesAsync();
+            }
         }
     }
 

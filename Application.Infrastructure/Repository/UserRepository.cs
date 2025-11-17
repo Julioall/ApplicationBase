@@ -1,6 +1,7 @@
 ﻿using Application.Domain.Interface;
 using Application.Domain.Model.User;
 using Raven.Client.Documents;
+using Raven.Client.Documents.Linq;
 
 namespace Application.Infrastructure.Repository
 {
@@ -16,7 +17,7 @@ namespace Application.Infrastructure.Repository
         public async Task AddAsync(User user)
         {
             await _serviceRavenDb.AsyncSession.StoreAsync(user);
-            var userDataBase = user;
+            await _serviceRavenDb.AsyncSession.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(string id)
@@ -24,13 +25,14 @@ namespace Application.Infrastructure.Repository
             var user = await _serviceRavenDb.AsyncSession.LoadAsync<User>(id.ToString());
             if (user != null)
             {
-                _serviceRavenDb.Session.Delete(user);
+                _serviceRavenDb.AsyncSession.Delete(user);
+                await _serviceRavenDb.AsyncSession.SaveChangesAsync();
             }
         }
 
         public async Task<IEnumerable<User>> GetAllAsync()
         {
-            return _serviceRavenDb.Session.Query<User>().ToList();
+            return await _serviceRavenDb.AsyncSession.Query<User>().ToListAsync();
         }
 
         public async Task<User> GetByIdAsync(string id)
@@ -52,9 +54,16 @@ namespace Application.Infrastructure.Repository
             return users.FirstOrDefault(u => u.Account.Email == email);
         }
 
+        public async Task<User> GetByRefreshTokenAsync(string refreshToken)
+        {
+            return await _serviceRavenDb.AsyncSession.Query<User>()
+                .FirstOrDefaultAsync(u => u.Account.RefreshToken == refreshToken);
+        }
+
         public async Task UpdateAsync(User user)
         {
             await _serviceRavenDb.AsyncSession.StoreAsync(user);
+            await _serviceRavenDb.AsyncSession.SaveChangesAsync();
         }
     }
 }

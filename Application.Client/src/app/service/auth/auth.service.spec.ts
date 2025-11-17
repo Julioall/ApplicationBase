@@ -1,18 +1,16 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { TestBed, inject } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AuthService } from './auth.service';
 
 describe('Service: Authentication', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       providers: [AuthService]
     });
   });
 
-  it('should ...', inject([AuthService], (service: AuthService) => {
+  it('should be created', inject([AuthService], (service: AuthService) => {
     expect(service).toBeTruthy();
   }));
 });
-function inject(arg0: (typeof AuthService)[], arg1: (service: AuthService) => void): jasmine.ImplementationCallback | undefined {
-  throw new Error('Function not implemented.');
-}
-

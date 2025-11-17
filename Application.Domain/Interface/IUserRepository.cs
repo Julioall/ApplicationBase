@@ -10,6 +10,7 @@ namespace Application.Domain.Interface
         Task<User> GetByIdAsync(string id);
         Task<User> GetByRoleAsync(string role);
         Task<User> GetByEmailAsync(string username);
+        Task<User> GetByRefreshTokenAsync(string refreshToken);
         Task UpdateAsync(User user);
     }
 }

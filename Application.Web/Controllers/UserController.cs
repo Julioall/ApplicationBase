@@ -1,7 +1,9 @@
-﻿using Application.Domain.Model.User;
+using Application.Domain.Model.User;
 using Application.Service.Interface;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Application.Api.Controllers
 {
@@ -18,17 +20,25 @@ namespace Application.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("add")]
-        public async Task<IActionResult> AddUser(User user)
+        public async Task<IActionResult> AddUser([FromBody] User user)
         {
             if (user == null)
                 return BadRequest("User cannot be null.");
 
-            var userDoBanco = await _userService.GetByEmailAsync(user.Account.Email);
-            if (userDoBanco != null)
-                return BadRequest("This email is already registered.");
+            try
+            {
+                await _userService.AddAsync(user);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
-            await _userService.AddAsync(user);
-            return CreatedAtAction(nameof(GetUserById), new { id = user.Profile.Name }, new { message = "User added successfully." });
+            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, new { message = "User added successfully." });
         }
 
         [Authorize(Roles = "Admin")]
@@ -76,12 +86,12 @@ namespace Application.Api.Controllers
 
         [Authorize(Roles = "Admin, User")]
         [HttpGet("username/{username}")]
-        public async Task<ActionResult<User>> GetUserByEmail(string email)
+        public async Task<ActionResult<User>> GetUserByEmail(string username)
         {
-            var user = await _userService.GetByEmailAsync(email);
+            var user = await _userService.GetByEmailAsync(username);
             if (user == null)
             {
-                return NotFound($"User with email {email} not found.");
+                return NotFound($"User with email {username} not found.");
             }
 
             return Ok(user);
@@ -89,20 +99,27 @@ namespace Application.Api.Controllers
 
         [Authorize(Roles = "Admin, User")]
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateUser(User user)
+        public async Task<IActionResult> UpdateUser([FromBody] User user)
         {
-            if (user == null)
+            try
             {
-                return BadRequest("User cannot be null.");
-            }
+                if (user.Id.IsNullOrEmpty())
+                {
+                    return BadRequest("User cannot be null.");
+                }
 
-            var existingUser = await _userService.GetByIdAsync(user.Id);
-            if (existingUser == null)
+                var existingUser = await _userService.GetByIdAsync(user.Id);
+                if (existingUser == null)
+                {
+                    return NotFound($"User with ID {user.Id} not found.");
+                }
+
+                await _userService.UpdateAsync(user);
+            }
+            catch (ValidationException ex)
             {
-                return NotFound($"User with ID {user.Id} not found.");
+                return BadRequest(ex.Message);
             }
-
-            await _userService.UpdateAsync(user);
             return Ok(new { message = "User updated successfully." });
         }
     }

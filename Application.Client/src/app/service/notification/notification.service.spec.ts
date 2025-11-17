@@ -2,10 +2,12 @@
 
 import { TestBed, waitForAsync, inject } from '@angular/testing';
 import { NotificationService } from './notification.service';
+import { ToastrModule } from 'ngx-toastr';
 
 describe('Service: Notification', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [ToastrModule.forRoot()],
       providers: [NotificationService]
     });
   });

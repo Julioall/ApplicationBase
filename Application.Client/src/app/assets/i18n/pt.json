@@ -1,0 +1,9 @@
+{
+  "auth": {
+    "loginSuccess": "Login realizado com sucesso!",
+    "loginError": "Erro no login. Verifique suas credenciais.",
+    "signupSuccess": "Cadastro realizado com sucesso!",
+    "signupError": "Erro durante o cadastro. Tente novamente.",
+    "formError": "Preencha o formulário corretamente."
+  }
+}

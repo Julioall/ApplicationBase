@@ -3,8 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { User } from '../../model/User';
-import { jwtDecode } from 'jwt-decode';  // Ajuste na importação
-import { environment } from '../../environment/environment.produ';
+import { jwtDecode } from 'jwt-decode';
+import { environment } from '../../environment/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -12,14 +12,8 @@ import { environment } from '../../environment/environment.produ';
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/User/add`;
 
-  constructor(private http: HttpClient) {} // Injeta o HttpClient para fazer requisições HTTP.
+  constructor(private http: HttpClient) {}
 
-  /**
-   * Faz o login do usuário enviando o nome de usuário e senha para o backend.
-   * @param email O nome de usuário ou email do usuário.
-   * @param password A senha do usuário.
-   * @returns Um Observable contendo a resposta da requisição.
-   */
   login(email: string, password: string): Observable<any> {
     const url = `${environment.apiUrl}/Authentication/login`;
     const body = {
@@ -30,93 +24,99 @@ export class AuthService {
       map((response) => {
         if (response && response.token) {
           this.saveToken(response.token);
+          if (response.refreshToken) {
+            this.saveRefreshToken(response.refreshToken);
+          }
         }
         return response;
       }),
-      catchError(error => {
+      catchError(() => {
         return throwError(() => new Error('Login failed'));
       })
     );
   }
 
-  /**
-   * Faz o cadastro de um novo usuário enviando seus dados para o backend.
-   * @param user O objeto User contendo os dados do novo usuário.
-   * @returns Um Observable contendo a resposta da requisição.
-   */
   signup(user: User): Observable<any> {
     return this.http.post<any>(this.apiUrl, user).pipe(
-      catchError(error => {
+      catchError(() => {
         return throwError(() => new Error('Sign up failed'));
       })
     );
   }
 
-  /**
-   * Faz o logout do usuário removendo o token do localStorage.
-   */
   logout(): void {
     this.removeToken();
   }
 
-  /**
-   * Salva o token no localStorage.
-   * @param token O token JWT a ser salvo.
-   */
   saveToken(token: string): void {
     localStorage.setItem('token', token);
   }
 
-  /**
-   * Recupera o token do localStorage.
-   * @returns O token JWT ou null se não estiver presente.
-   */
+  saveRefreshToken(token: string): void {
+    localStorage.setItem('refreshToken', token);
+  }
+
   getToken(): string | null {
     return localStorage.getItem('token');
   }
 
-  /**
-   * Remove o token do localStorage.
-   */
-  removeToken(): void {
-    localStorage.removeItem('token');
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refreshToken');
   }
 
-  /**
-   * Verifica se o token JWT está expirado.
-   * @param token O token JWT a ser verificado.
-   * @returns true se o token estiver expirado, caso contrário false.
-   */
+  refreshToken(): Observable<any> {
+    const refresh = this.getRefreshToken();
+    if (!refresh) {
+      return throwError(() => new Error('No refresh token available'));
+    }
+    const url = `${environment.apiUrl}/Authentication/refresh`;
+    return this.http.post<any>(url, { refreshToken: refresh }).pipe(
+      map(response => {
+        if (response?.token) {
+          this.saveToken(response.token);
+        }
+        if (response?.refreshToken) {
+          this.saveRefreshToken(response.refreshToken);
+        }
+        return response;
+      })
+    );
+  }
+
+  removeToken(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+  }
+
   isTokenExpired(token: string): boolean {
     try {
-      const decoded: any = jwtDecode(token); // Ajuste na utilização da função decode
+      const decoded: any = jwtDecode(token);
       if (decoded.exp === undefined) return false;
       const date = new Date(0);
       date.setUTCSeconds(decoded.exp);
       return date.valueOf() < new Date().valueOf();
-    } catch (err) {
-      return true; // Retorna true se houver um erro ao decodificar o token.
+    } catch {
+      return true;
     }
   }
 
-  /**
-   * Verifica se o usuário está logado checando a validade do token.
-   * @returns true se o usuário estiver logado e o token for válido, caso contrário false.
-   */
   isLoggedIn(): boolean {
     const token = this.getToken();
     return token !== null && !this.isTokenExpired(token);
   }
 
-  /**
-   * Obtém os cabeçalhos de autenticação com o token JWT.
-   * @returns Um HttpHeaders com o token de autenticação se estiver presente e válido.
-   */
   getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
     if (token && !this.isTokenExpired(token)) {
       return new HttpHeaders().set('Authorization', `Bearer ${token}`);
     }
     return new HttpHeaders();
+  }
+
+  getRole(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+    const decoded: any = jwtDecode(token);
+    return decoded['role'] || decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || null;
   }
 }

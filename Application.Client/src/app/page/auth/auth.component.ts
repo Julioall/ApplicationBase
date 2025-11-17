@@ -3,11 +3,12 @@ import { Router } from '@angular/router';
 import { User } from '../../model/User';
 import { NotificationService } from '../../service/notification/notification.service';
 import { AuthService } from '../../service/auth/auth.service';
+import { TranslateService } from '@ngx-translate/core';
 import {
   FormGroup,
   FormBuilder,
   Validators,
-} from '@angular/forms'; // Importações necessárias
+} from '@angular/forms';
 
 @Component({
   selector: 'app-auth',
@@ -30,6 +31,7 @@ export class AuthComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private notificationService: NotificationService,
+    private translateService: TranslateService,
   ) {}
 
   ngOnInit() {
@@ -68,7 +70,7 @@ export class AuthComponent implements OnInit {
   onLogin(): void {
     this.loginSubmitted = true;
     if (this.loginForm.invalid) {
-      this.notificationService.showError('Please fill out the form correctly.');
+      this.notificationService.showError(this.translateService.instant('auth.formError'));
       return;
     }
     const { email, password } = this.loginForm?.value;
@@ -76,14 +78,14 @@ export class AuthComponent implements OnInit {
       next: (response: { token: any }) => {
         if (response && response.token) {
           this.authService.saveToken(response.token);
-          this.notificationService.showSuccess('Login successfully!');
+          this.notificationService.showSuccess(this.translateService.instant('auth.loginSuccess'));
           this.loginForm?.reset();
           this.router.navigate(['/home']);
         }
       },
       error: () => {
         this.notificationService.showError(
-          'Login error. Please check your credentials.'
+          this.translateService.instant('auth.loginError')
         );
       },
     });
@@ -98,7 +100,7 @@ export class AuthComponent implements OnInit {
         Account: {
           Email: email,
           Password: password,
-          Role: 'user',
+          Role: 'User',
           DateJoined: new Date(),
         },
         Profile: {
@@ -111,10 +113,10 @@ export class AuthComponent implements OnInit {
 
       this.authService.signup(newUser).subscribe({
         next: () => {
-          this.successMessage = 'Registration successful!';
+          this.successMessage = this.translateService.instant('auth.signupSuccess');
           this.errorMessage = '';
           
-          this.notificationService.showSuccess('Registration successful!');
+          this.notificationService.showSuccess(this.translateService.instant('auth.signupSuccess'));
           
           setTimeout(() => {
             this.showSignIn();
@@ -122,11 +124,11 @@ export class AuthComponent implements OnInit {
           }, 2000);
         },
         error: () => {
-          this.notificationService.showError('Error during registration. Please try again.');
+          this.notificationService.showError(this.translateService.instant('auth.signupError'));
         },
       });      
     } else {
-      this.notificationService.showError('Please fill out the form correctly.');
+      this.notificationService.showError(this.translateService.instant('auth.formError'));
     }
   }
 }

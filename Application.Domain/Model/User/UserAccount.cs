@@ -13,5 +13,7 @@ namespace Application.Domain.Model.User
         public required string Role { get; set; }
         public DateTime? DateJoined { get; set; } = DateTime.Now.Date;
         public DateTime? LastLogin { get; set; }
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiry { get; set; }
     }
 }

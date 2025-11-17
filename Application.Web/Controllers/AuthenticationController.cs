@@ -25,13 +25,26 @@ namespace Application.Api.Controllers
                 return BadRequest("Login information is missing.");
             }
 
-            var token = await _tokenService.GenerateToken(loginDto);
-            if (string.IsNullOrEmpty(token))
+            var tokenResponse = await _tokenService.GenerateTokens(loginDto);
+            if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.Token))
             {
                 return Unauthorized("Invalid login credentials.");
             }
 
-            return Ok(new { Token = token });
+            return Ok(new { token = tokenResponse.Token, refreshToken = tokenResponse.RefreshToken, expiresAt = tokenResponse.ExpiresAt });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("refresh")]
+        public async Task<ActionResult> Refresh([FromBody] RefreshRequestDto request)
+        {
+            var tokenResponse = await _tokenService.RefreshAsync(request.RefreshToken);
+            if (tokenResponse == null)
+            {
+                return Unauthorized("Invalid refresh token.");
+            }
+
+            return Ok(new { token = tokenResponse.Token, refreshToken = tokenResponse.RefreshToken, expiresAt = tokenResponse.ExpiresAt });
         }
     }
 }

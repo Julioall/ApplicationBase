@@ -34,7 +34,8 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/app/assets"
             ],
             "styles": [
               "src/styles.scss",
@@ -102,7 +103,8 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/app/assets"
             ],
             "styles": [
               "src/styles.scss"

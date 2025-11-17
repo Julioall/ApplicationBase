@@ -23,6 +23,7 @@ namespace Application.Tests.Setup
 
         public IDocumentStore _store { get; set; }
         public IDocumentSession _session { get; set; }
+        public IAsyncDocumentSession _asyncSession { get; set; }
 
         private static bool _isAlreadyConfigured = false;
 
@@ -35,6 +36,7 @@ namespace Application.Tests.Setup
             {
                 Store = _store,
                 Session = _session,
+                AsyncSession = _asyncSession
             });
 
             _serviceCollection.AddScoped<IUserService, UserService>();
@@ -71,6 +73,7 @@ namespace Application.Tests.Setup
 
             _store = GetDocumentStore(null, Guid.NewGuid().ToString());
             _session = _store.OpenSession();
+            _asyncSession = _store.OpenAsyncSession();
         }
 
         protected override void PreInitialize(IDocumentStore documentStore)
