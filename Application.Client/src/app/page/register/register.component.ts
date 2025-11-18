@@ -54,12 +54,14 @@ export class RegisterComponent implements OnInit {
     this.router.navigate(['/auth']);
   }
 
-  private buildErrorMessage(error: HttpErrorResponse): string {
+  private buildErrorMessage(error: any): string {
+    const generic = this.translateService.instant('auth.signupError');
     if (!error) {
-      return this.translateService.instant('auth.signupError');
+      return generic;
     }
 
-    const apiError = (error.error ?? error) as any;
+    // Quando vem um HttpErrorResponse, a carga útil costuma estar em error.error
+    const apiError = (error instanceof HttpErrorResponse ? error.error : error) ?? error;
 
     if (typeof apiError === 'string') {
       return apiError;
@@ -72,11 +74,8 @@ export class RegisterComponent implements OnInit {
       }
     }
 
-    if (apiError?.message) {
-      return apiError.message;
-    }
-
-    return this.translateService.instant('auth.signupError');
+    const detail = apiError?.detail || apiError?.message || apiError?.title;
+    return detail || generic;
   }
 
   onSubmit(): void {

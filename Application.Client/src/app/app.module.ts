@@ -10,6 +10,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { LoadingInterceptor } from './service/loading/loading.interceptor';
+import { ProblemInterceptorProvider } from './service/http/problem.interceptor';
 import { NgxSpinnerModule } from "ngx-spinner";
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
@@ -46,6 +47,7 @@ export class AppTranslateLoader implements TranslateLoader {
     })
   ],
   providers: [
+    ProblemInterceptorProvider,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: LoadingInterceptor,

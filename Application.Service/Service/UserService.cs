@@ -1,4 +1,5 @@
-﻿using Application.Domain.Interface;
+using Application.Domain.Exceptions;
+using Application.Domain.Interface;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
 using FluentValidation;
@@ -23,7 +24,7 @@ namespace Application.Service.Service
             var existingUser = await _userRepository.GetByEmailAsync(user.Account.Email);
             if (existingUser != null)
             {
-                throw new InvalidOperationException("This email is already registered.");
+                throw new ConflictException("Este e-mail já existe na nossa base de dados.");
             }
 
             user.Account.DateJoined ??= DateTime.UtcNow;

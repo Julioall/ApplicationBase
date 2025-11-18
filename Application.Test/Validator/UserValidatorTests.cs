@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Application.Tests.Setup;
 using Application.Domain.Model.User;
+using Application.Service.Interface;
+using Application.Domain.Exceptions;
 using FluentValidation;
 
 namespace Application.Tests.Validator
@@ -8,11 +10,14 @@ namespace Application.Tests.Validator
     public class UserValidatorTests : BaseTest
     {
         private readonly IValidator<User> _userValidator;
+        private readonly IUserService _userService;
 
         public UserValidatorTests()
         {
             _userValidator = _serviceProvider.GetService<IValidator<User>>()
                 ?? throw new Exception($"{nameof(IValidator<User>)} não foi encontrado");
+            _userService = _serviceProvider.GetService<IUserService>()
+                ?? throw new Exception($"{nameof(IUserService)} não foi encontrado");
         }
 
         [Fact]
@@ -39,18 +44,18 @@ namespace Application.Tests.Validator
         }
 
         [Fact]
-        public void Should_Have_Error_When_Email_Already_Exists()
+        public async Task Should_Return_ValidationError_When_Email_Already_Exists()
         {
-            var user = CreateValidUser();
-            const string emailAlreadyExist = "existing@email.com";
-            user.Account.Email = emailAlreadyExist;
-            
-            _session.Store(user);
+            var existing = CreateValidUser();
+            existing.Account.Email = "existing@email.com";
+            _session.Store(existing);
             _session.SaveChanges();
 
-            var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
+            var duplicate = CreateValidUser();
+            duplicate.Account.Email = "existing@email.com";
 
-            Assert.Contains("Este e-mail já existe na nossa base de dados", result.Message);
+            var ex = await Assert.ThrowsAsync<ValidationException>(() => _userService.AddAsync(duplicate));
+            Assert.Contains("já existe", ex.Message, StringComparison.InvariantCultureIgnoreCase);
         }
 
         [Fact]

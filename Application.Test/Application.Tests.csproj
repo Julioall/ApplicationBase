@@ -25,6 +25,7 @@
     <ProjectReference Include="..\Application.Domain\Application.Domain.csproj" />
     <ProjectReference Include="..\Application.Infrastructure\Application.Infrastructure.csproj" />
     <ProjectReference Include="..\Application.Service\Application.Service.csproj" />
+    <ProjectReference Include="..\Application.Web\Application.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>

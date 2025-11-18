@@ -1,4 +1,5 @@
 using Application.Api;
+using Application.Api.Filters;
 using Application.Api.Middlewares;
 using Application.Domain;
 using Application.Domain.Model;
@@ -6,6 +7,7 @@ using Application.Infrastructure;
 using Application.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Mvc;
 using System.Text;
 
 public class Program
@@ -15,8 +17,15 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Service configuration
-        builder.Services.AddControllers();
+        builder.Services.AddControllers(options =>
+        {
+            options.Filters.Add<ValidationProblemDetailsFilter>();
+        });
         builder.Services.AddEndpointsApiExplorer();
+        builder.Services.Configure<ApiBehaviorOptions>(options =>
+        {
+            options.SuppressModelStateInvalidFilter = true;
+        });
 
         // Disable Swagger (if necessary)
         // If you do not want to activate it anymore, completely remove these lines
@@ -88,6 +97,7 @@ public class Program
 
         var app = builder.Build();
 
+        app.UseMiddleware<ProblemDetailsMiddleware>();
         app.UseMiddleware<MiddlewareServiceRavenDbStore>();
         app.UseDefaultFiles();
         app.UseStaticFiles();
