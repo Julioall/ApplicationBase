@@ -1,11 +1,20 @@
+using Application.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Localization;
 using System.Diagnostics;
 
 namespace Application.Api.Filters
 {
     public class ValidationProblemDetailsFilter : IActionFilter
     {
+        private readonly IStringLocalizer<SharedResource> _localizer;
+
+        public ValidationProblemDetailsFilter(IStringLocalizer<SharedResource> localizer)
+        {
+            _localizer = localizer;
+        }
+
         public void OnActionExecuting(ActionExecutingContext context)
         {
             if (context.ModelState.IsValid)
@@ -24,8 +33,8 @@ namespace Application.Api.Filters
             var problem = new ValidationProblemDetails(errors)
             {
                 Status = StatusCodes.Status400BadRequest,
-                Title = "Erro de validação",
-                Detail = "Um ou mais campos estão inválidos.",
+                Title = _localizer["ValidationTitle"],
+                Detail = _localizer["ValidationDetail"],
                 Instance = context.HttpContext.Request.Path,
                 Extensions = { ["traceId"] = traceId }
             };

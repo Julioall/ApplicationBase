@@ -1,7 +1,9 @@
-﻿using Application.Domain.Model.Dtos;
+using Application.Domain;
+using Application.Domain.Model.Dtos;
 using Application.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace Application.Api.Controllers
 {
@@ -10,10 +12,12 @@ namespace Application.Api.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly ITokenService _tokenService;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
-        public AuthenticationController(ITokenService tokenService)
+        public AuthenticationController(ITokenService tokenService, IStringLocalizer<SharedResource> localizer)
         {
             _tokenService = tokenService;
+            _localizer = localizer;
         }
 
         [AllowAnonymous]
@@ -22,13 +26,13 @@ namespace Application.Api.Controllers
         {
             if (loginDto == null)
             {
-                return BadRequest("Login information is missing.");
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["LoginInformationMissing"], statusCode: StatusCodes.Status400BadRequest);
             }
 
             var tokenResponse = await _tokenService.GenerateTokens(loginDto);
             if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.Token))
             {
-                return Unauthorized("Invalid login credentials.");
+                return Problem(title: _localizer["UnauthorizedTitle"], detail: _localizer["InvalidLoginCredentials"], statusCode: StatusCodes.Status401Unauthorized);
             }
 
             return Ok(new { token = tokenResponse.Token, refreshToken = tokenResponse.RefreshToken, expiresAt = tokenResponse.ExpiresAt });
@@ -41,7 +45,7 @@ namespace Application.Api.Controllers
             var tokenResponse = await _tokenService.RefreshAsync(request.RefreshToken);
             if (tokenResponse == null)
             {
-                return Unauthorized("Invalid refresh token.");
+                return Problem(title: _localizer["UnauthorizedTitle"], detail: _localizer["InvalidRefreshToken"], statusCode: StatusCodes.Status401Unauthorized);
             }
 
             return Ok(new { token = tokenResponse.Token, refreshToken = tokenResponse.RefreshToken, expiresAt = tokenResponse.ExpiresAt });

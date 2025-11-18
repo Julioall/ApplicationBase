@@ -1,5 +1,4 @@
 ﻿using Application.Domain.Interface;
-using Application.Infrastructure.Persistence;
 using Application.Infrastructure.Repository;
 using Microsoft.Extensions.DependencyInjection;
 

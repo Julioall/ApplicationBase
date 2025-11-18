@@ -1,9 +1,9 @@
 using System.Diagnostics;
-using System.Net;
+using Application.Domain;
 using Application.Domain.Exceptions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
+using Microsoft.Extensions.Localization;
 
 namespace Application.Api.Middlewares
 {
@@ -11,11 +11,13 @@ namespace Application.Api.Middlewares
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<ProblemDetailsMiddleware> _logger;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
-        public ProblemDetailsMiddleware(RequestDelegate next, ILogger<ProblemDetailsMiddleware> logger)
+        public ProblemDetailsMiddleware(RequestDelegate next, ILogger<ProblemDetailsMiddleware> logger, IStringLocalizer<SharedResource> localizer)
         {
             _next = next;
             _logger = logger;
+            _localizer = localizer;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -43,7 +45,7 @@ namespace Application.Api.Middlewares
             }
         }
 
-        private static ProblemDetails MapToProblemDetails(HttpContext context, Exception exception, string traceId)
+        private ProblemDetails MapToProblemDetails(HttpContext context, Exception exception, string traceId)
         {
             switch (exception)
             {
@@ -55,8 +57,8 @@ namespace Application.Api.Middlewares
                     return new ValidationProblemDetails(validationErrors)
                     {
                         Status = StatusCodes.Status400BadRequest,
-                        Title = "Erro de validação",
-                        Detail = "Um ou mais campos estão inválidos.",
+                        Title = _localizer["ValidationTitle"],
+                        Detail = _localizer["ValidationDetail"],
                         Instance = context.Request.Path,
                         Extensions = { ["traceId"] = traceId }
                     };
@@ -65,7 +67,7 @@ namespace Application.Api.Middlewares
                     return new ProblemDetails
                     {
                         Status = domainException.StatusCode,
-                        Title = "Operação inválida",
+                        Title = _localizer["InvalidOperationTitle"],
                         Detail = domainException.Message,
                         Instance = context.Request.Path,
                         Extensions = { ["traceId"] = traceId }
@@ -75,8 +77,8 @@ namespace Application.Api.Middlewares
                     return new ProblemDetails
                     {
                         Status = StatusCodes.Status401Unauthorized,
-                        Title = "Não autorizado",
-                        Detail = "Credenciais inválidas ou ausentes.",
+                        Title = _localizer["UnauthorizedTitle"],
+                        Detail = _localizer["UnauthorizedDetail"],
                         Instance = context.Request.Path,
                         Extensions = { ["traceId"] = traceId }
                     };
@@ -85,8 +87,8 @@ namespace Application.Api.Middlewares
                     return new ProblemDetails
                     {
                         Status = StatusCodes.Status500InternalServerError,
-                        Title = "Erro interno",
-                        Detail = "Ocorreu um erro inesperado.",
+                        Title = _localizer["InternalErrorTitle"],
+                        Detail = _localizer["InternalErrorDetail"],
                         Instance = context.Request.Path,
                         Extensions = { ["traceId"] = traceId }
                     };

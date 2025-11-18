@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="DateOfBirthPast" xml:space="preserve">
+    <value>Date of birth must be in the past.</value>
+  </data>
+  <data name="DateOfBirthTooOld" xml:space="preserve">
+    <value>Date of birth cannot be more than 120 years ago.</value>
+  </data>
+  <data name="EmailAlreadyExists" xml:space="preserve">
+    <value>This email already exists in our database.</value>
+  </data>
+  <data name="EmailInvalid" xml:space="preserve">
+    <value>Email must be valid.</value>
+  </data>
+  <data name="EmailRequired" xml:space="preserve">
+    <value>Email is required.</value>
+  </data>
+  <data name="InternalErrorDetail" xml:space="preserve">
+    <value>An unexpected error occurred.</value>
+  </data>
+  <data name="InternalErrorTitle" xml:space="preserve">
+    <value>Internal error</value>
+  </data>
+  <data name="InvalidLoginCredentials" xml:space="preserve">
+    <value>Invalid login credentials.</value>
+  </data>
+  <data name="InvalidOperationTitle" xml:space="preserve">
+    <value>Invalid operation</value>
+  </data>
+  <data name="InvalidRefreshToken" xml:space="preserve">
+    <value>Invalid refresh token.</value>
+  </data>
+  <data name="InvalidRequestTitle" xml:space="preserve">
+    <value>Invalid request</value>
+  </data>
+  <data name="LoginInformationMissing" xml:space="preserve">
+    <value>Login information is missing.</value>
+  </data>
+  <data name="NameMaxLength" xml:space="preserve">
+    <value>Name cannot have more than 100 characters.</value>
+  </data>
+  <data name="NameRequired" xml:space="preserve">
+    <value>Name is required.</value>
+  </data>
+  <data name="PasswordLowercase" xml:space="preserve">
+    <value>Password must contain at least one lowercase letter.</value>
+  </data>
+  <data name="PasswordMinLength" xml:space="preserve">
+    <value>Password must be at least 8 characters long.</value>
+  </data>
+  <data name="PasswordNumber" xml:space="preserve">
+    <value>Password must contain at least one number.</value>
+  </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>Password is required.</value>
+  </data>
+  <data name="PasswordSpecial" xml:space="preserve">
+    <value>Password must contain at least one special character (!@#$%^&amp;*()_+-=[]{};':"\|,.&lt;&gt;/?~`).</value>
+  </data>
+  <data name="PasswordUppercase" xml:space="preserve">
+    <value>Password must contain at least one uppercase letter.</value>
+  </data>
+  <data name="RoleInvalid" xml:space="preserve">
+    <value>Invalid role. Use 'User', 'Admin' or 'Moderator'.</value>
+  </data>
+  <data name="RoleRequired" xml:space="preserve">
+    <value>User role is required.</value>
+  </data>
+  <data name="UnauthorizedDetail" xml:space="preserve">
+    <value>Invalid or missing credentials.</value>
+  </data>
+  <data name="UnauthorizedTitle" xml:space="preserve">
+    <value>Unauthorized</value>
+  </data>
+  <data name="UserAddedSuccessfully" xml:space="preserve">
+    <value>User added successfully.</value>
+  </data>
+  <data name="UserCannotBeNullDetail" xml:space="preserve">
+    <value>User cannot be null.</value>
+  </data>
+  <data name="UserNotFoundByEmail" xml:space="preserve">
+    <value>User with email {0} not found.</value>
+  </data>
+  <data name="UserNotFoundById" xml:space="preserve">
+    <value>User with ID {0} not found.</value>
+  </data>
+  <data name="UserUpdatedSuccessfully" xml:space="preserve">
+    <value>User updated successfully.</value>
+  </data>
+  <data name="ValidationDetail" xml:space="preserve">
+    <value>One or more fields are invalid.</value>
+  </data>
+  <data name="ValidationTitle" xml:space="preserve">
+    <value>Validation error</value>
+  </data>
+</root>

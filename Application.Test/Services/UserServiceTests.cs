@@ -1,9 +1,9 @@
-﻿using Application.Domain.Model.User;
+using Application.Domain.Exceptions;
+using Application.Domain.Model.User;
 using Application.Service.Interface;
-using Application.Service.Service;
 using Application.Tests.Setup;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
 
 namespace Application.Tests.Services
 {
@@ -18,7 +18,7 @@ namespace Application.Tests.Services
         }
 
         [Fact]
-        public void GetAll_ShouldReturnListOfUsers()
+        public async Task GetAll_ShouldReturnListOfUsers()
         {
             // Arrange
             const string email1 = "sam@santos.com";
@@ -36,17 +36,135 @@ namespace Application.Tests.Services
             _session.SaveChanges();
 
             // Act
-            var list = _userService.GetAllAsync();
+            var list = await _userService.GetAllAsync();
 
             // Assert
             Assert.NotNull(list);
-            Assert.Equal(3, list.Result.Count());
-            Assert.Contains(list.Result, u => u.Account.Email == email1);
-            Assert.Collection(list.Result,
+            Assert.Equal(3, list.Count());
+            Assert.Contains(list, u => u.Account.Email == email1);
+            Assert.Collection(list,
                 u => Assert.Equal(email1, u.Account.Email),
                 u => Assert.Equal(email2, u.Account.Email),
                 u => Assert.Equal(email3, u.Account.Email));
+        }
 
+        [Fact]
+        public async Task AddAsync_Should_Set_DateJoined_When_Null()
+        {
+            var user = CreateValidUser("new@user.com");
+            user.Account.DateJoined = null;
+
+            await _userService.AddAsync(user);
+            await _asyncSession.SaveChangesAsync();
+
+            var saved = await _userService.GetByEmailAsync(user.Account.Email);
+            Assert.NotNull(saved?.Account.DateJoined);
+        }
+
+        [Fact]
+        public async Task AddAsync_Should_Throw_When_Duplicate_Email()
+        {
+            var existing = CreateValidUser("dup@user.com");
+            _session.Store(existing);
+            _session.SaveChanges();
+
+            var duplicate = CreateValidUser("dup@user.com");
+
+            await Assert.ThrowsAsync<ValidationException>(() => _userService.AddAsync(duplicate));
+        }
+
+        [Fact]
+        public async Task AddAsync_Should_Throw_When_User_Is_Null()
+        {
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _userService.AddAsync(null!));
+        }
+
+        [Fact]
+        public async Task UpdateAsync_Should_Throw_When_User_Is_Null()
+        {
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _userService.UpdateAsync(null!));
+        }
+
+        [Fact]
+        public async Task UpdateAsync_Should_Validate_And_Update()
+        {
+            var existing = CreateValidUser("existing@user.com");
+            _session.Store(existing);
+            _session.SaveChanges();
+
+            existing.Profile.Name = "Updated Name";
+
+            await _userService.UpdateAsync(existing);
+            await _asyncSession.SaveChangesAsync();
+
+            var updated = await _userService.GetByEmailAsync(existing.Account.Email);
+            Assert.Equal("Updated Name", updated?.Profile.Name);
+        }
+
+        [Fact]
+        public async Task UpdateAsync_Should_Throw_When_Invalid()
+        {
+            var existing = CreateValidUser("invalid@user.com");
+            _session.Store(existing);
+            _session.SaveChanges();
+
+            existing.Account.Password = "short";
+
+            await Assert.ThrowsAsync<ValidationException>(() => _userService.UpdateAsync(existing));
+        }
+
+        [Fact]
+        public async Task DeleteAsync_Should_Remove_User()
+        {
+            var existing = CreateValidUser("delete@user.com");
+            _session.Store(existing);
+            _session.SaveChanges();
+
+            await _userService.DeleteAsync(existing.Id);
+            await _asyncSession.SaveChangesAsync();
+
+            var missing = await _userService.GetByIdAsync(existing.Id);
+            Assert.Null(missing);
+        }
+
+        [Fact]
+        public async Task GetByIdAsync_Should_Return_User()
+        {
+            var existing = CreateValidUser("byid@user.com");
+            _session.Store(existing);
+            _session.SaveChanges();
+
+            var result = await _userService.GetByIdAsync(existing.Id);
+
+            Assert.NotNull(result);
+            Assert.Equal(existing.Id, result!.Id);
+        }
+
+        [Fact]
+        public async Task GetByEmailAsync_Should_Return_User()
+        {
+            var existing = CreateValidUser("bye@mail.com");
+            _session.Store(existing);
+            _session.SaveChanges();
+
+            var result = await _userService.GetByEmailAsync(existing.Account.Email);
+
+            Assert.NotNull(result);
+            Assert.Equal(existing.Account.Email, result!.Account.Email);
+        }
+
+        [Fact]
+        public async Task GetByRoleAsync_Should_Return_User()
+        {
+            var existing = CreateValidUser("role@user.com");
+            existing.Account.Role = "Admin";
+            _session.Store(existing);
+            _session.SaveChanges();
+
+            var result = await _userService.GetByRoleAsync("Admin");
+
+            Assert.NotNull(result);
+            Assert.Equal("Admin", result!.Account.Role);
         }
 
         private static User CreateValidUser(string email)

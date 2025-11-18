@@ -1,5 +1,4 @@
 ﻿using Application.Domain.Model;
-using Application.Infrastructure.Persistence;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Conventions;
 using Raven.Client.Documents.Operations;
@@ -106,7 +105,7 @@ namespace Application.Infrastructure.ConfigurationDb
 
                 try
                 {
-                    var urls = Environment.GetEnvironmentVariable(RavenDbConstants.DATABASE_URL)?.Split(',').ToList();
+                    var urls = Environment.GetEnvironmentVariable(ApplicationConstants.DATABASE_URL)?.Split(',').ToList();
                     int count = urls?.Count ?? 0;
                     Store.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(database), count == 0 ? 1 : count));
                 }

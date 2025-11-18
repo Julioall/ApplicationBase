@@ -1,43 +1,46 @@
-﻿using Application.Domain.Interface;
+using Application.Domain.Interface;
 using Application.Domain.Model.User;
 using FluentValidation;
+using Microsoft.Extensions.Localization;
 
 namespace Application.Domain.Validator
 {
     public class UserValidator : AbstractValidator<User>
     {
         private readonly IServiceRavenDB _serviceRavenDB;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
-        public UserValidator(IServiceRavenDB serviceRavenDB)
+        public UserValidator(IServiceRavenDB serviceRavenDB, IStringLocalizer<SharedResource> localizer)
         {
             _serviceRavenDB = serviceRavenDB;
+            _localizer = localizer;
 
             RuleFor(user => user.Account.Email)
-                .NotEmpty().WithMessage("O email é obrigatório.")
-                .EmailAddress().WithMessage("O email deve ser válido.")
-                .Must((user, email) => !EmailAlreadyExist(email, user.Id)).WithMessage("Este e-mail já existe na nossa base de dados");
+                .NotEmpty().WithMessage(_localizer["EmailRequired"])
+                .EmailAddress().WithMessage(_localizer["EmailInvalid"])
+                .Must((user, email) => !EmailAlreadyExist(email, user.Id)).WithMessage(_localizer["EmailAlreadyExists"]);
 
             RuleFor(user => user.Account.Password)
-                .NotEmpty().WithMessage("A senha é obrigatória.")
-                .MinimumLength(8).WithMessage("A senha deve ter pelo menos 8 caracteres.")
-                .Matches(@"[A-Z]").WithMessage("A senha deve conter pelo menos uma letra maiúscula.")
-                .Matches(@"[a-z]").WithMessage("A senha deve conter pelo menos uma letra minúscula.")
-                .Matches(@"[0-9]").WithMessage("A senha deve conter pelo menos um número.")
-                .Matches(@"[!@#$%^&*()_+\-=\[\]{};':""\\|,.<>\/?~`]").WithMessage("A senha deve conter pelo menos um caractere especial (!@#$%^&*()_+-=[]{};':\"\\|,.<>/?~`).");
+                .NotEmpty().WithMessage(_localizer["PasswordRequired"])
+                .MinimumLength(8).WithMessage(_localizer["PasswordMinLength"])
+                .Matches(@"[A-Z]").WithMessage(_localizer["PasswordUppercase"])
+                .Matches(@"[a-z]").WithMessage(_localizer["PasswordLowercase"])
+                .Matches(@"[0-9]").WithMessage(_localizer["PasswordNumber"])
+                .Matches(@"[!@#$%^&*()_+\-=\[\]{};':""\\|,.<>\/?~`]").WithMessage(_localizer["PasswordSpecial"]);
 
 
             RuleFor(user => user.Profile.Name)
-                .NotEmpty().WithMessage("O nome é obrigatório.")
-                .MaximumLength(100).WithMessage("O nome não pode ter mais de 100 caracteres.");
+                .NotEmpty().WithMessage(_localizer["NameRequired"])
+                .MaximumLength(100).WithMessage(_localizer["NameMaxLength"]);
 
             RuleFor(user => user.Profile.DateOfBirth)
-                .LessThan(DateTime.Now).WithMessage("A data de nascimento deve ser uma data passada.")
-                .GreaterThan(DateTime.Now.AddYears(-120)).WithMessage("A data de nascimento não pode ser superior a 120 anos.");
+                .LessThan(DateTime.Now).WithMessage(_localizer["DateOfBirthPast"])
+                .GreaterThan(DateTime.Now.AddYears(-120)).WithMessage(_localizer["DateOfBirthTooOld"]);
 
             RuleFor(user => user.Account.Role)
-                .NotEmpty().WithMessage("A função do usuário é obrigatória.")
+                .NotEmpty().WithMessage(_localizer["RoleRequired"])
                 .Must(role => new[] { "User", "Admin", "Moderator" }.Contains(role))
-                .WithMessage("Função inválida. Use 'User', 'Admin' ou 'Moderator'.");
+                .WithMessage(_localizer["RoleInvalid"]);
         }
 
         private bool EmailAlreadyExist(string email, string? currentUserId)
@@ -47,4 +50,3 @@ namespace Application.Domain.Validator
         }
     }
 }
-

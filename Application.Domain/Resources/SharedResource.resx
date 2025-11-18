@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="DateOfBirthPast" xml:space="preserve">
+    <value>A data de nascimento deve ser uma data passada.</value>
+  </data>
+  <data name="DateOfBirthTooOld" xml:space="preserve">
+    <value>A data de nascimento não pode ser superior a 120 anos.</value>
+  </data>
+  <data name="EmailAlreadyExists" xml:space="preserve">
+    <value>Este e-mail já existe na nossa base de dados.</value>
+  </data>
+  <data name="EmailInvalid" xml:space="preserve">
+    <value>O email deve ser válido.</value>
+  </data>
+  <data name="EmailRequired" xml:space="preserve">
+    <value>O email é obrigatório.</value>
+  </data>
+  <data name="InternalErrorDetail" xml:space="preserve">
+    <value>Ocorreu um erro inesperado.</value>
+  </data>
+  <data name="InternalErrorTitle" xml:space="preserve">
+    <value>Erro interno</value>
+  </data>
+  <data name="InvalidLoginCredentials" xml:space="preserve">
+    <value>Credenciais de login inválidas.</value>
+  </data>
+  <data name="InvalidOperationTitle" xml:space="preserve">
+    <value>Operação inválida</value>
+  </data>
+  <data name="InvalidRefreshToken" xml:space="preserve">
+    <value>Refresh token inválido.</value>
+  </data>
+  <data name="InvalidRequestTitle" xml:space="preserve">
+    <value>Requisição inválida</value>
+  </data>
+  <data name="LoginInformationMissing" xml:space="preserve">
+    <value>Informações de login ausentes.</value>
+  </data>
+  <data name="NameMaxLength" xml:space="preserve">
+    <value>O nome não pode ter mais de 100 caracteres.</value>
+  </data>
+  <data name="NameRequired" xml:space="preserve">
+    <value>O nome é obrigatório.</value>
+  </data>
+  <data name="PasswordLowercase" xml:space="preserve">
+    <value>A senha deve conter pelo menos uma letra minúscula.</value>
+  </data>
+  <data name="PasswordMinLength" xml:space="preserve">
+    <value>A senha deve ter pelo menos 8 caracteres.</value>
+  </data>
+  <data name="PasswordNumber" xml:space="preserve">
+    <value>A senha deve conter pelo menos um número.</value>
+  </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>A senha é obrigatória.</value>
+  </data>
+  <data name="PasswordSpecial" xml:space="preserve">
+    <value>A senha deve conter pelo menos um caractere especial (!@#$%^&amp;*()_+-=[]{};':"\|,.&lt;&gt;/?~`).</value>
+  </data>
+  <data name="PasswordUppercase" xml:space="preserve">
+    <value>A senha deve conter pelo menos uma letra maiúscula.</value>
+  </data>
+  <data name="RoleInvalid" xml:space="preserve">
+    <value>Função inválida. Use 'User', 'Admin' ou 'Moderator'.</value>
+  </data>
+  <data name="RoleRequired" xml:space="preserve">
+    <value>A função do usuário é obrigatória.</value>
+  </data>
+  <data name="UnauthorizedDetail" xml:space="preserve">
+    <value>Credenciais inválidas ou ausentes.</value>
+  </data>
+  <data name="UnauthorizedTitle" xml:space="preserve">
+    <value>Não autorizado</value>
+  </data>
+  <data name="UserAddedSuccessfully" xml:space="preserve">
+    <value>Usuário adicionado com sucesso.</value>
+  </data>
+  <data name="UserCannotBeNullDetail" xml:space="preserve">
+    <value>Usuário não pode ser nulo.</value>
+  </data>
+  <data name="UserNotFoundByEmail" xml:space="preserve">
+    <value>Usuário com email {0} não encontrado.</value>
+  </data>
+  <data name="UserNotFoundById" xml:space="preserve">
+    <value>Usuário com ID {0} não encontrado.</value>
+  </data>
+  <data name="UserUpdatedSuccessfully" xml:space="preserve">
+    <value>Usuário atualizado com sucesso.</value>
+  </data>
+  <data name="ValidationDetail" xml:space="preserve">
+    <value>Um ou mais campos estão inválidos.</value>
+  </data>
+  <data name="ValidationTitle" xml:space="preserve">
+    <value>Erro de validação</value>
+  </data>
+</root>

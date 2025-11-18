@@ -1,8 +1,10 @@
+using Application.Domain;
 using Application.Domain.Exceptions;
 using Application.Domain.Interface;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
 using FluentValidation;
+using Microsoft.Extensions.Localization;
 
 namespace Application.Service.Service
 {
@@ -10,21 +12,25 @@ namespace Application.Service.Service
     {
         private readonly IUserRepository _userRepository;
         private readonly IValidator<User> _userValidator;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
-        public UserService(IUserRepository userRepository, IValidator<User> userValidator)
+        public UserService(IUserRepository userRepository, IValidator<User> userValidator, IStringLocalizer<SharedResource> localizer)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _userValidator = userValidator ?? throw new ArgumentNullException(nameof(userValidator));
+            _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
         }
 
         public async Task AddAsync(User user)
         {
+            ArgumentNullException.ThrowIfNull(user);
+
             _userValidator.ValidateAndThrow(user);
 
             var existingUser = await _userRepository.GetByEmailAsync(user.Account.Email);
             if (existingUser != null)
             {
-                throw new ConflictException("Este e-mail já existe na nossa base de dados.");
+                throw new ConflictException(_localizer["EmailAlreadyExists"]);
             }
 
             user.Account.DateJoined ??= DateTime.UtcNow;
@@ -38,6 +44,8 @@ namespace Application.Service.Service
 
         public async Task UpdateAsync(User user)
         {
+            ArgumentNullException.ThrowIfNull(user);
+
             _userValidator.ValidateAndThrow(user);
             await _userRepository.UpdateAsync(user);
         }

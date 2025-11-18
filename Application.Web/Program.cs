@@ -6,8 +6,11 @@ using Application.Domain.Model;
 using Application.Infrastructure;
 using Application.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using System.Globalization;
 using System.Text;
 
 public class Program
@@ -16,15 +19,33 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
         // Service configuration
+        builder.Services.AddScoped<ValidationProblemDetailsFilter>();
         builder.Services.AddControllers(options =>
         {
-            options.Filters.Add<ValidationProblemDetailsFilter>();
+            options.Filters.AddService<ValidationProblemDetailsFilter>();
         });
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.Configure<ApiBehaviorOptions>(options =>
         {
             options.SuppressModelStateInvalidFilter = true;
+        });
+        builder.Services.Configure<RequestLocalizationOptions>(options =>
+        {
+            var supportedCultures = new[]
+            {
+                new CultureInfo("pt-BR"),
+                new CultureInfo("pt"),
+                new CultureInfo("en-US"),
+                new CultureInfo("en")
+            };
+
+            options.DefaultRequestCulture = new RequestCulture("pt-BR");
+            options.SupportedCultures = supportedCultures;
+            options.SupportedUICultures = supportedCultures;
+            options.ApplyCurrentCultureToResponseHeaders = true;
         });
 
         // Disable Swagger (if necessary)
@@ -96,6 +117,9 @@ public class Program
 
 
         var app = builder.Build();
+
+        var localizationOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value;
+        app.UseRequestLocalization(localizationOptions);
 
         app.UseMiddleware<ProblemDetailsMiddleware>();
         app.UseMiddleware<MiddlewareServiceRavenDbStore>();

@@ -8,6 +8,7 @@ using Application.Service.Interface;
 using Application.Service.Service;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using System.Globalization;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
 using Raven.Embedded;
@@ -29,6 +30,10 @@ namespace Application.Tests.Setup
 
         public BaseTest()
         {
+            var culture = new CultureInfo("pt");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+
             InitializeDataBase();
             _serviceCollection = InicializeServices();
 
@@ -49,6 +54,8 @@ namespace Application.Tests.Setup
         private static ServiceCollection InicializeServices()
         {
             var serviceCollection = new ServiceCollection();
+            serviceCollection.AddLocalization(options => options.ResourcesPath = "Resources");
+            serviceCollection.AddLogging();
             serviceCollection.AddInfraDependencies();
             serviceCollection.AddServiceDependencies();
             serviceCollection.AddDomainDependencies();

@@ -1,9 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Application.Tests.Setup;
+using Application.Domain;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
-using Application.Domain.Exceptions;
 using FluentValidation;
+using Microsoft.Extensions.Localization;
 
 namespace Application.Tests.Validator
 {
@@ -11,6 +12,7 @@ namespace Application.Tests.Validator
     {
         private readonly IValidator<User> _userValidator;
         private readonly IUserService _userService;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
         public UserValidatorTests()
         {
@@ -18,6 +20,8 @@ namespace Application.Tests.Validator
                 ?? throw new Exception($"{nameof(IValidator<User>)} não foi encontrado");
             _userService = _serviceProvider.GetService<IUserService>()
                 ?? throw new Exception($"{nameof(IUserService)} não foi encontrado");
+            _localizer = _serviceProvider.GetService<IStringLocalizer<SharedResource>>()
+                ?? throw new Exception($"{nameof(IStringLocalizer<SharedResource>)} não foi encontrado");
         }
 
         [Fact]
@@ -28,8 +32,8 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains("O email é obrigatório.", result.Message);
-            Assert.Contains("O email deve ser válido.", result.Message);
+            Assert.Contains(_localizer["EmailRequired"], result.Message);
+            Assert.Contains(_localizer["EmailInvalid"], result.Message);
         }
 
         [Fact]
@@ -40,7 +44,7 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains("O email deve ser válido.", result.Message);
+            Assert.Contains(_localizer["EmailInvalid"], result.Message);
         }
 
         [Fact]
@@ -55,7 +59,7 @@ namespace Application.Tests.Validator
             duplicate.Account.Email = "existing@email.com";
 
             var ex = await Assert.ThrowsAsync<ValidationException>(() => _userService.AddAsync(duplicate));
-            Assert.Contains("já existe", ex.Message, StringComparison.InvariantCultureIgnoreCase);
+            Assert.Contains(_localizer["EmailAlreadyExists"], ex.Message, StringComparison.InvariantCultureIgnoreCase);
         }
 
         [Fact]
@@ -66,7 +70,7 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains("A senha é obrigatória.", result.Message);
+            Assert.Contains(_localizer["PasswordRequired"], result.Message);
         }
 
         [Fact]
@@ -77,7 +81,7 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains("A senha deve ter pelo menos 8 caracteres.", result.Message);
+            Assert.Contains(_localizer["PasswordMinLength"], result.Message);
         }
 
         [Fact]
@@ -88,7 +92,7 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains("A senha deve conter pelo menos uma letra maiúscula.", result.Message);
+            Assert.Contains(_localizer["PasswordUppercase"], result.Message);
         }
 
         [Fact]
@@ -99,7 +103,7 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains("A senha deve conter pelo menos uma letra minúscula.", result.Message);
+            Assert.Contains(_localizer["PasswordLowercase"], result.Message);
         }
 
         [Fact]
@@ -110,7 +114,7 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains("A senha deve conter pelo menos um número.", result.Message);
+            Assert.Contains(_localizer["PasswordNumber"], result.Message);
         }
 
         [Fact]
@@ -121,7 +125,7 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains("A senha deve conter pelo menos um caractere especial", result.Message);
+            Assert.Contains(_localizer["PasswordSpecial"], result.Message);
         }
 
         [Fact]
@@ -132,7 +136,7 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains("O nome é obrigatório.", result.Message);
+            Assert.Contains(_localizer["NameRequired"], result.Message);
         }
 
         [Fact]
@@ -143,7 +147,7 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains("O nome não pode ter mais de 100 caracteres.", result.Message);
+            Assert.Contains(_localizer["NameMaxLength"], result.Message);
         }
 
         [Fact]
@@ -154,7 +158,7 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains("A data de nascimento deve ser uma data passada.", result.Message);
+            Assert.Contains(_localizer["DateOfBirthPast"], result.Message);
         }
 
         [Fact]
@@ -165,7 +169,7 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains("A data de nascimento não pode ser superior a 120 anos.", result.Message);
+            Assert.Contains(_localizer["DateOfBirthTooOld"], result.Message);
         }
 
         [Fact]
@@ -176,7 +180,7 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains("A função do usuário é obrigatória.", result.Message);
+            Assert.Contains(_localizer["RoleRequired"], result.Message);
         }
 
         [Fact]
@@ -187,7 +191,7 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains("Função inválida. Use 'User', 'Admin' ou 'Moderator'.", result.Message);
+            Assert.Contains(_localizer["RoleInvalid"], result.Message);
         }
 
         [Fact]

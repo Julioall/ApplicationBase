@@ -1,8 +1,10 @@
+using Application.Domain;
 using Application.Domain.Exceptions;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Application.Api.Controllers
@@ -12,10 +14,12 @@ namespace Application.Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IStringLocalizer<SharedResource> localizer)
         {
             _userService = userService;
+            _localizer = localizer;
         }
 
         [AllowAnonymous]
@@ -26,11 +30,11 @@ namespace Application.Api.Controllers
         {
             if (user == null)
             {
-                return Problem(title: "Requisição inválida", detail: "User não pode ser nulo.", statusCode: StatusCodes.Status400BadRequest);
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["UserCannotBeNullDetail"], statusCode: StatusCodes.Status400BadRequest);
             }
 
             await _userService.AddAsync(user);
-            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, new { message = "User added successfully." });
+            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, new { message = _localizer["UserAddedSuccessfully"] });
         }
 
         [Authorize(Roles = "Admin")]
@@ -42,7 +46,7 @@ namespace Application.Api.Controllers
             var user = await _userService.GetByIdAsync(id);
             if (user == null)
             {
-                throw new NotFoundException($"User with ID {id} not found.");
+                throw new NotFoundException(_localizer["UserNotFoundById", id]);
             }
 
             await _userService.DeleteAsync(id);
@@ -66,7 +70,7 @@ namespace Application.Api.Controllers
             var user = await _userService.GetByIdAsync(id);
             if (user == null)
             {
-                throw new NotFoundException($"User with ID {id} not found.");
+                throw new NotFoundException(_localizer["UserNotFoundById", id]);
             }
 
             return Ok(user);
@@ -89,7 +93,7 @@ namespace Application.Api.Controllers
             var user = await _userService.GetByEmailAsync(username);
             if (user == null)
             {
-                throw new NotFoundException($"User with email {username} not found.");
+                throw new NotFoundException(_localizer["UserNotFoundByEmail", username]);
             }
 
             return Ok(user);
@@ -104,17 +108,17 @@ namespace Application.Api.Controllers
         {
             if (user.Id.IsNullOrEmpty())
             {
-                return Problem(title: "Requisição inválida", detail: "User não pode ser nulo.", statusCode: StatusCodes.Status400BadRequest);
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["UserCannotBeNullDetail"], statusCode: StatusCodes.Status400BadRequest);
             }
 
             var existingUser = await _userService.GetByIdAsync(user.Id);
             if (existingUser == null)
             {
-                throw new NotFoundException($"User with ID {user.Id} not found.");
+                throw new NotFoundException(_localizer["UserNotFoundById", user.Id]);
             }
 
             await _userService.UpdateAsync(user);
-            return Ok(new { message = "User updated successfully." });
+            return Ok(new { message = _localizer["UserUpdatedSuccessfully"] });
         }
     }
 }
