@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { of, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-import { RouterTestingModule } from '@angular/router/testing';
+import { Router } from '@angular/router';
 
 import { RegisterComponent } from './register.component';
 import { AuthService } from '../../service/auth/auth.service';
@@ -15,17 +15,20 @@ describe('RegisterComponent', () => {
   let fixture: ComponentFixture<RegisterComponent>;
   let authService: jasmine.SpyObj<AuthService>;
   let notificationService: jasmine.SpyObj<NotificationService>;
+  let router: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
     authService = jasmine.createSpyObj<AuthService>('AuthService', ['signup']);
     notificationService = jasmine.createSpyObj<NotificationService>('NotificationService', ['showSuccess', 'showError']);
+    router = jasmine.createSpyObj<Router>('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, RouterTestingModule],
+      imports: [ReactiveFormsModule],
       declarations: [RegisterComponent],
       providers: [
         { provide: AuthService, useValue: authService },
         { provide: NotificationService, useValue: notificationService },
+        { provide: Router, useValue: router },
         {
           provide: TranslateService,
           useValue: {
