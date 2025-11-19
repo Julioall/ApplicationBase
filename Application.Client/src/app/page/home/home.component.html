@@ -35,6 +35,13 @@
         <span>{{ link.label }}</span>
       </a>
     </div>
+
+    <div class="nav-footer">
+      <a class="nav-link settings-link" href="#" (click)="closeNav()">
+        <i class="fa-solid fa-gear" aria-hidden="true"></i>
+        <span>Configurações</span>
+      </a>
+    </div>
   </aside>
   <div class="nav-scrim" *ngIf="isNavOpen" (click)="closeNav()"></div>
 
@@ -53,73 +60,15 @@
         <input type="search" placeholder="Pesquisar no workspace" aria-label="Pesquisar" />
       </div>
 
-      <div class="top-actions">
-        <button class="ghost">Modo foco</button>
-        <button class="primary">
-          <i class="fa-solid fa-plus"></i>
-          Criar
-        </button>
-      </div>
-
       <div class="topbar-user">
-        <button class="icon-btn ghost" type="button" aria-label="Abrir ajuda">
-          <i class="fa-regular fa-circle-question"></i>
-        </button>
         <button class="icon-btn ghost" type="button" aria-label="Ver notificações">
           <span class="dot"></span>
           <i class="fa-regular fa-bell"></i>
         </button>
         <div class="profile">
           <div class="avatar">JA</div>
-          <div class="profile-meta">
-            <span class="profile-name">Julio Alves</span>
-            <span class="profile-role">Admin</span>
-          </div>
-          <i class="fa-solid fa-chevron-up"></i>
         </div>
       </div>
     </header>
-
-    <section class="welcome-card">
-      <div>
-        <p class="eyebrow">Visão geral</p>
-        <h1>Menu inspirado no Jira</h1>
-        <p>Use o menu lateral para navegar rapidamente entre projetos, times e relatórios. Ícones do FontAwesome deixam a experiência familiar.</p>
-        <div class="chips">
-          <span class="chip"><i class="fa-regular fa-star"></i> Favoritos</span>
-          <span class="chip"><i class="fa-solid fa-clock-rotate-left"></i> Recentes</span>
-          <span class="chip"><i class="fa-solid fa-rocket"></i> Releases</span>
-        </div>
-      </div>
-      <div class="summary">
-        <div class="summary-item">
-          <span class="summary-label">Projetos ativos</span>
-          <span class="summary-value">8</span>
-        </div>
-        <div class="summary-item">
-          <span class="summary-label">Boards</span>
-          <span class="summary-value">5</span>
-        </div>
-        <div class="summary-item">
-          <span class="summary-label">Automação</span>
-          <span class="summary-value">12 fluxos</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="panel-grid">
-      <article *ngFor="let card of cards" class="panel">
-        <div class="panel-icon">
-          <i class="{{ card.icon }}" aria-hidden="true"></i>
-        </div>
-        <div class="panel-content">
-          <h3>{{ card.title }}</h3>
-          <p>{{ card.description }}</p>
-        </div>
-        <button class="icon-btn ghost" aria-label="Abrir atalhos">
-          <i class="fa-solid fa-angle-right"></i>
-        </button>
-      </article>
-    </section>
   </main>
 </div>
