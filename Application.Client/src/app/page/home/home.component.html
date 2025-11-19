@@ -69,8 +69,45 @@
           <span class="dot"></span>
           <i class="fa-regular fa-bell"></i>
         </button>
-        <div class="profile">
-          <div class="avatar">JA</div>
+        <div #profileMenu class="profile-menu" [class.is-open]="isProfileMenuOpen">
+          <button
+            class="profile-trigger"
+            type="button"
+            (click)="toggleProfileMenu($event)"
+            [attr.aria-expanded]="isProfileMenuOpen"
+            [attr.aria-label]="
+              (isProfileMenuOpen ? 'home.profileMenu.closeLabel' : 'home.profileMenu.openLabel') | translate
+            "
+          >
+            <div class="avatar">JA</div>
+            <i class="fa-solid" [ngClass]="isProfileMenuOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+          </button>
+
+          <div class="profile-dropdown" *ngIf="isProfileMenuOpen">
+            <button class="dropdown-item" type="button" (click)="navigateToProfile()">
+              <i class="fa-regular fa-user"></i>
+              <div>
+                <span class="item-title">{{ 'home.profileMenu.profile' | translate }}</span>
+                <span class="item-subtitle">{{ 'home.profileMenu.profileSubtitle' | translate }}</span>
+              </div>
+            </button>
+
+            <button class="dropdown-item" type="button" (click)="navigateToProfile()">
+              <i class="fa-solid fa-sliders"></i>
+              <div>
+                <span class="item-title">{{ 'home.profileMenu.settings' | translate }}</span>
+                <span class="item-subtitle">{{ 'home.profileMenu.settingsSubtitle' | translate }}</span>
+              </div>
+            </button>
+
+            <button class="dropdown-item destructive" type="button" (click)="logout()">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <div>
+                <span class="item-title">{{ 'home.profileMenu.logout' | translate }}</span>
+                <span class="item-subtitle">{{ 'home.profileMenu.logoutSubtitle' | translate }}</span>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
     </header>

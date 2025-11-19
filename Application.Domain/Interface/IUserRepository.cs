@@ -1,4 +1,5 @@
-﻿using Application.Domain.Model.User;
+using Application.Domain.Model.User;
+using System.IO;
 
 namespace Application.Domain.Interface
 {
@@ -12,5 +13,8 @@ namespace Application.Domain.Interface
         Task<User> GetByEmailAsync(string username);
         Task<User> GetByRefreshTokenAsync(string refreshToken);
         Task UpdateAsync(User user);
+        Task UploadProfilePictureAsync(string userId, Stream stream, string contentType);
+        Task<(byte[] Data, string ContentType)?> GetProfilePictureAsync(string userId);
+        Task DeleteProfilePictureAsync(string userId);
     }
 }

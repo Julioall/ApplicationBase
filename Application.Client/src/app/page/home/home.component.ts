@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../service/auth/auth.service';
 
@@ -18,6 +18,7 @@ export class HomeComponent implements OnInit {
   token: string | null | undefined;
   isLoggedIn = false;
   isNavOpen = false;
+  isProfileMenuOpen = false;
   primaryNav: NavItem[] = [
     { icon: 'fa-solid fa-compass', label: 'home.primaryNav.overview', active: true },
     { icon: 'fa-solid fa-list-check', label: 'home.primaryNav.projects' },
@@ -39,6 +40,8 @@ export class HomeComponent implements OnInit {
     { icon: 'fa-solid fa-flag', label: 'home.quickLinks.roadmap' },
   ];
 
+  @ViewChild('profileMenu') profileMenu?: ElementRef<HTMLDivElement>;
+
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
@@ -49,11 +52,47 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    if (!this.isProfileMenuOpen) {
+      return;
+    }
+    const target = event.target as HTMLElement | null;
+    if (this.profileMenu && target && !this.profileMenu.nativeElement.contains(target)) {
+      this.isProfileMenuOpen = false;
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.isProfileMenuOpen = false;
+  }
+
   toggleNav(): void {
     this.isNavOpen = !this.isNavOpen;
   }
 
   closeNav(): void {
     this.isNavOpen = false;
+  }
+
+  toggleProfileMenu(event: Event): void {
+    event.stopPropagation();
+    this.isProfileMenuOpen = !this.isProfileMenuOpen;
+  }
+
+  closeProfileMenu(): void {
+    this.isProfileMenuOpen = false;
+  }
+
+  navigateToProfile(): void {
+    this.closeProfileMenu();
+    this.router.navigate(['/profile']);
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.closeProfileMenu();
+    this.router.navigate(['/auth']);
   }
 }

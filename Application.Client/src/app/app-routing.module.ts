@@ -8,6 +8,7 @@ import { RegisterComponent } from './page/register/register.component';
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', loadChildren: () => import('./page/home/home.module').then(m => m.HomeModule), canActivate: [AuthGuard, RoleGuard], data: { roles: ['User', 'Admin'] } },
+  { path: 'profile', loadChildren: () => import('./page/profile/profile.module').then(m => m.ProfileModule), canActivate: [AuthGuard, RoleGuard], data: { roles: ['User', 'Admin'] } },
   { path: 'auth', component: AuthComponent },
   { path: 'register', component: RegisterComponent },
 ];

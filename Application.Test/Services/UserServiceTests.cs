@@ -1,3 +1,4 @@
+using System;
 using Application.Domain.Exceptions;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
@@ -165,6 +166,61 @@ namespace Application.Tests.Services
 
             Assert.NotNull(result);
             Assert.Equal("Admin", result!.Account.Role);
+        }
+
+        [Fact]
+        public async Task UpdateProfileAsync_Should_Update_Profile_Fields()
+        {
+            var existing = CreateValidUser("profile@user.com");
+            _session.Store(existing);
+            _session.SaveChanges();
+
+            var newDate = new DateTime(1992, 5, 10);
+            const string newName = "Updated Profile";
+            var imageBytes = new byte[] { 1, 2, 3, 4 };
+            var picture = $"data:image/png;base64,{Convert.ToBase64String(imageBytes)}";
+
+            await _userService.UpdateProfileAsync(existing.Account.Email, newName, newDate, picture);
+            await _asyncSession.SaveChangesAsync();
+
+            var updated = await _userService.GetByEmailAsync(existing.Account.Email);
+            Assert.NotNull(updated);
+            Assert.Equal(newName, updated!.Profile.Name);
+            Assert.Equal(newDate, updated.Profile.DateOfBirth);
+            Assert.Null(updated.Profile.ProfilePictureUrl);
+
+            var attachment = await _userService.GetProfilePictureAsync(updated.Id);
+            Assert.NotNull(attachment);
+            Assert.Equal("image/png", attachment!.Value.ContentType);
+            Assert.Equal(imageBytes, attachment.Value.Data);
+        }
+
+        [Fact]
+        public async Task ChangePasswordAsync_Should_Update_When_CurrentPassword_Is_Correct()
+        {
+            var existing = CreateValidUser("changepass@user.com");
+            existing.Account.Password = "OldPass123!";
+            _session.Store(existing);
+            _session.SaveChanges();
+
+            await _userService.ChangePasswordAsync(existing.Account.Email, "OldPass123!", "NewPass123!");
+            await _asyncSession.SaveChangesAsync();
+
+            var updated = await _userService.GetByEmailAsync(existing.Account.Email);
+            Assert.NotNull(updated);
+            Assert.Equal("NewPass123!", updated!.Account.Password);
+        }
+
+        [Fact]
+        public async Task ChangePasswordAsync_Should_Throw_When_CurrentPassword_Invalid()
+        {
+            var existing = CreateValidUser("wrongpass@user.com");
+            existing.Account.Password = "Correct123!";
+            _session.Store(existing);
+            _session.SaveChanges();
+
+            await Assert.ThrowsAsync<BusinessException>(() =>
+                _userService.ChangePasswordAsync(existing.Account.Email, "Wrong123!", "Another123!"));
         }
 
         private static User CreateValidUser(string email)

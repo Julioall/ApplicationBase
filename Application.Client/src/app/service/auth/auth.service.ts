@@ -117,4 +117,22 @@ export class AuthService {
     const decoded: any = jwtDecode(token);
     return decoded['role'] || decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || null;
   }
+
+  getEmail(): string | null {
+    const token = this.getToken();
+    if (!token) {
+      return null;
+    }
+    try {
+      const decoded: any = jwtDecode(token);
+      return (
+        decoded['email'] ||
+        decoded['unique_name'] ||
+        decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] ||
+        null
+      );
+    } catch {
+      return null;
+    }
+  }
 }

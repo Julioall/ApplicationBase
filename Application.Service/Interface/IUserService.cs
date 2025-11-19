@@ -1,4 +1,4 @@
-﻿using Application.Domain.Model.User;
+using Application.Domain.Model.User;
 
 namespace Application.Service.Interface
 {
@@ -19,5 +19,11 @@ namespace Application.Service.Interface
         Task<User> GetByRoleAsync(string role);
 
         Task<User> GetByRefreshTokenAsync(string refreshToken);
+
+        Task UpdateProfileAsync(string email, string? name, DateTime? dateOfBirth, string? profilePictureUrl);
+
+        Task ChangePasswordAsync(string email, string currentPassword, string newPassword);
+
+        Task<(byte[] Data, string ContentType)?> GetProfilePictureAsync(string userId);
     }
 }

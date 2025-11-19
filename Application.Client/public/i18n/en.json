@@ -48,6 +48,67 @@
       "automation": "Automation",
       "roadmap": "Roadmap"
     },
-    "openShortcuts": "Open shortcuts"
+    "openShortcuts": "Open shortcuts",
+    "profileMenu": {
+      "openLabel": "Open profile menu",
+      "closeLabel": "Close profile menu",
+      "profile": "View profile",
+      "profileSubtitle": "See your public information",
+      "settings": "Account settings",
+      "settingsSubtitle": "Manage preferences and security",
+      "logout": "Log out",
+      "logoutSubtitle": "Switch accounts or leave"
+    }
+  },
+  "profile": {
+    "title": "Your profile",
+    "subtitle": "Keep your personal information and security preferences up to date.",
+    "loading": "Loading your profile...",
+    "actions": {
+      "back": "Back to workspace",
+      "retry": "Try again"
+    },
+    "avatar": {
+      "title": "Profile photo",
+      "helper": "Upload a square JPG or PNG up to 2 MB.",
+      "change": "Change photo",
+      "remove": "Remove photo"
+    },
+    "form": {
+      "personalTitle": "Personal information",
+      "description": "These details help teammates recognize you across the workspace.",
+      "nameLabel": "Full name",
+      "namePlaceholder": "Jane Doe",
+      "nameError": "Please enter at least 3 characters.",
+      "emailLabel": "Email",
+      "birthLabel": "Date of birth",
+      "birthHelper": "Optional, used to personalize recommendations.",
+      "cancel": "Discard changes",
+      "save": "Save changes",
+      "saving": "Saving..."
+    },
+    "password": {
+      "title": "Change password",
+      "description": "Update your password regularly to keep your account secure.",
+      "currentLabel": "Current password",
+      "newLabel": "New password",
+      "confirmLabel": "Confirm password",
+      "requirements": "Must contain at least 6 characters.",
+      "save": "Update password",
+      "saving": "Updating..."
+    },
+    "messages": {
+      "profileUpdated": "Profile updated successfully!",
+      "passwordUpdated": "Password updated successfully!",
+      "passwordMismatch": "New password and confirmation must match.",
+      "currentPasswordInvalid": "Current password does not match our records.",
+      "profileLoadError": "We couldn't load your profile information right now.",
+      "genericError": "Something went wrong. Please try again.",
+      "missingUser": "We could not find the logged in user information.",
+      "avatarInvalid": "Please choose a valid image file.",
+      "avatarTooLarge": "Images must be 2 MB or less.",
+      "formInvalid": "Fix the highlighted fields before saving.",
+      "passwordFormInvalid": "Fill out every password field to continue."
+    }
   }
 }
