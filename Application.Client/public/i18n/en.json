@@ -1,9 +1,53 @@
-{
+﻿{
   "auth": {
     "loginSuccess": "Login successfully!",
     "loginError": "Login error. Please check your credentials.",
     "signupSuccess": "Registration successful!",
     "signupError": "Error during registration. Please try again.",
     "formError": "Please fill out the form correctly."
+  },
+  "home": {
+    "brandSubtitle": "Workspace",
+    "navigation": "Navigation",
+    "favorites": "Favorites",
+    "shortcuts": "Shortcuts",
+    "settings": "Settings",
+    "openMenu": "Open menu",
+    "viewNotifications": "View notifications",
+    "dashboard": "Dashboard",
+    "searchPlaceholder": "Search the workspace",
+    "searchAria": "Search",
+    "overview": "Overview",
+    "heroTitle": "Menu inspired by Jira",
+    "heroBody": "Use the sidebar to navigate quickly between projects, teams, and reports. FontAwesome icons keep the experience familiar.",
+    "chips": {
+      "favorites": "Favorites",
+      "recents": "Recent",
+      "releases": "Releases"
+    },
+    "primaryNav": {
+      "overview": "Overview",
+      "projects": "Projects",
+      "boards": "Boards",
+      "teams": "Teams",
+      "reports": "Reports",
+      "automation": "Automation"
+    },
+    "favoriteNav": {
+      "designSystem": "Design System",
+      "mobileApp": "Mobile App",
+      "serviceDesk": "Service Desk"
+    },
+    "badges": {
+      "ui": "UI",
+      "sprint": "Sprint",
+      "support": "Support"
+    },
+    "quickLinks": {
+      "docs": "Documentation",
+      "automation": "Automation",
+      "roadmap": "Roadmap"
+    },
+    "openShortcuts": "Open shortcuts"
   }
 }

@@ -19,40 +19,29 @@ export class HomeComponent implements OnInit {
   isLoggedIn = false;
   isNavOpen = false;
   primaryNav: NavItem[] = [
-    { icon: 'fa-solid fa-compass', label: 'Visão geral', active: true },
-    { icon: 'fa-solid fa-list-check', label: 'Projetos' },
-    { icon: 'fa-solid fa-table-columns', label: 'Boards' },
-    { icon: 'fa-solid fa-users', label: 'Times' },
-    { icon: 'fa-solid fa-chart-simple', label: 'Relatórios' },
-    { icon: 'fa-solid fa-robot', label: 'Automação' },
+    { icon: 'fa-solid fa-compass', label: 'home.primaryNav.overview', active: true },
+    { icon: 'fa-solid fa-list-check', label: 'home.primaryNav.projects' },
+    { icon: 'fa-solid fa-table-columns', label: 'home.primaryNav.boards' },
+    { icon: 'fa-solid fa-users', label: 'home.primaryNav.teams' },
+    { icon: 'fa-solid fa-chart-simple', label: 'home.primaryNav.reports' },
+    { icon: 'fa-solid fa-robot', label: 'home.primaryNav.automation' },
   ];
 
   favoriteNav: NavItem[] = [
-    { icon: 'fa-regular fa-star', label: 'Design System', badge: 'UI' },
-    { icon: 'fa-regular fa-star', label: 'Mobile App', badge: 'Sprint' },
-    { icon: 'fa-regular fa-star', label: 'Service Desk', badge: 'Suporte' }
+    { icon: 'fa-regular fa-star', label: 'home.favoriteNav.designSystem', badge: 'home.badges.ui' },
+    { icon: 'fa-regular fa-star', label: 'home.favoriteNav.mobileApp', badge: 'home.badges.sprint' },
+    { icon: 'fa-regular fa-star', label: 'home.favoriteNav.serviceDesk', badge: 'home.badges.support' },
   ];
 
   quickLinks: NavItem[] = [
-    { icon: 'fa-regular fa-note-sticky', label: 'Documentação' },
-    { icon: 'fa-solid fa-bolt', label: 'Automação' },
-    { icon: 'fa-solid fa-flag', label: 'Roadmap' }
+    { icon: 'fa-regular fa-note-sticky', label: 'home.quickLinks.docs' },
+    { icon: 'fa-solid fa-bolt', label: 'home.quickLinks.automation' },
+    { icon: 'fa-solid fa-flag', label: 'home.quickLinks.roadmap' },
   ];
 
-  cards = [
-    { icon: 'fa-solid fa-diagram-project', title: 'Projetos', description: 'Gerencie iniciativas, backlogs e releases sem sair do dashboard.' },
-    { icon: 'fa-solid fa-layer-group', title: 'Boards Kanban', description: 'Visualize o fluxo das tarefas e veja gargalos rapidamente.' },
-    { icon: 'fa-solid fa-users-gear', title: 'Times e permissões', description: 'Controle acesso e visibilidade dos times com poucos cliques.' },
-    { icon: 'fa-solid fa-chart-pie', title: 'Relatórios', description: 'Métricas de throughput, lead time e burndown sempre atualizadas.' }
-  ];
+  constructor(private authService: AuthService, private router: Router) {}
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-
-  ) {}
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.isLoggedIn = this.authService.isLoggedIn();
     this.token = this.authService.getToken();
     if (!this.isLoggedIn) {

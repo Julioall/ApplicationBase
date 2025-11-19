@@ -8,9 +8,11 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  title = 'Anime TV';
+  title = 'Application Base';
   constructor(private translateService: TranslateService) {}
   ngOnInit() {
-    this.translateService.setDefaultLang('en');
+    const browserLang = this.translateService.getBrowserLang();
+    this.translateService.setFallbackLang('en');
+    this.translateService.use(browserLang ?? 'en');
   }
 }

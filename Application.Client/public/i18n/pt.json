@@ -5,5 +5,49 @@
     "signupSuccess": "Cadastro realizado com sucesso!",
     "signupError": "Erro durante o cadastro. Tente novamente.",
     "formError": "Preencha o formulário corretamente."
+  },
+  "home": {
+    "brandSubtitle": "Workspace",
+    "navigation": "Navegação",
+    "favorites": "Favoritos",
+    "shortcuts": "Atalhos",
+    "settings": "Configurações",
+    "openMenu": "Abrir menu",
+    "viewNotifications": "Ver notificações",
+    "dashboard": "Dashboard",
+    "searchPlaceholder": "Pesquisar no workspace",
+    "searchAria": "Pesquisar",
+    "overview": "Visão geral",
+    "heroTitle": "Menu inspirado no Jira",
+    "heroBody": "Use o menu lateral para navegar rapidamente entre projetos, times e relatórios. Ícones do FontAwesome deixam a experiência familiar.",
+    "chips": {
+      "favorites": "Favoritos",
+      "recents": "Recentes",
+      "releases": "Releases"
+    },
+    "primaryNav": {
+      "overview": "Visão geral",
+      "projects": "Projetos",
+      "boards": "Quadros",
+      "teams": "Times",
+      "reports": "Relatórios",
+      "automation": "Automação"
+    },
+    "favoriteNav": {
+      "designSystem": "Design System",
+      "mobileApp": "Aplicativo mobile",
+      "serviceDesk": "Service Desk"
+    },
+    "badges": {
+      "ui": "UI",
+      "sprint": "Sprint",
+      "support": "Suporte"
+    },
+    "quickLinks": {
+      "docs": "Documentação",
+      "automation": "Automação",
+      "roadmap": "Roadmap"
+    },
+    "openShortcuts": "Abrir atalhos"
   }
 }
