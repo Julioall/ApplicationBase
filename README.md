@@ -114,4 +114,62 @@ Base monolítica em camadas com autenticação JWT, CRUD de usuários, i18n (pt-
 
 ---
 
+# Tipos de Commit
+
+## feat
+Nova funcionalidade.
+Exemplo:
+`feat(api): adicionar endpoint de autenticação`
+
+## fix
+Correção de bug.
+Exemplo:
+`fix(domain): corrigir cálculo de validação`
+
+## docs
+Alterações na documentação.
+Exemplo:
+`docs: atualizar guia de instalação`
+
+## style
+Mudanças que não afetam lógica (espaços, formatação, lint).
+Exemplo:
+`style: aplicar padrão de formatação no projeto`
+
+## refactor
+Refatoração sem mudar comportamento.
+Exemplo:
+`refactor(service): simplificar método de processamento`
+
+## perf
+Melhorias de performance.
+Exemplo:
+`perf(api): reduzir tempo de resposta`
+
+## test
+Adição ou atualização de testes.
+Exemplo:
+`test(app): incluir testes de integração`
+
+## build
+Mudanças em build, dependências ou ferramentas.
+Exemplo:
+`build: atualizar dependências do Angular`
+
+## ci
+Alterações em pipelines de CI/CD.
+Exemplo:
+`ci: ajustar workflow do GitHub Actions`
+
+## chore
+Tarefas internas sem alteração funcional.
+Exemplo:
+`chore: ajustar scripts de automação`
+
+## revert
+Reversão de commit anterior.
+Exemplo:
+`revert: desfazer commit da feature de login`
+
+
 MIT — contribuições são bem-vindas!﻿
