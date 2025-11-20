@@ -11,5 +11,12 @@ namespace Application.Domain.Model.User
         public required string Name { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string? ProfilePictureUrl { get; set; }
+        public double ProfilePictureOffsetX { get; set; }
+        public double ProfilePictureOffsetY { get; set; }
+        public double ProfilePictureScale { get; set; } = 1;
+        public string? JobTitle { get; set; }
+        public string? Department { get; set; }
+        public string? Organization { get; set; }
+        public string? Location { get; set; }
     }
 }

@@ -96,8 +96,7 @@ export class RegisterComponent implements OnInit {
       Profile: {
         Name: fullName,
         DateOfBirth: undefined,
-        ProfilePictureUrl: '',
-        AnimeList: [],
+        ProfilePictureUrl: ''
       },
     };
 

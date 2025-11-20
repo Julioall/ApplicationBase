@@ -76,7 +76,7 @@ namespace Application.Service.Service
             return _userRepository.GetByRefreshTokenAsync(refreshToken);
         }
 
-        public async Task UpdateProfileAsync(string email, string? name, DateTime? dateOfBirth, string? profilePictureUrl)
+        public async Task UpdateProfileAsync(string email, string? name, DateTime? dateOfBirth, Stream? profilePictureStream, string? profilePictureContentType, bool removeProfilePicture, double? profilePictureOffsetX, double? profilePictureOffsetY, string? jobTitle, string? department, string? organization, string? location, double? profilePictureScale)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(email);
 
@@ -95,8 +95,26 @@ namespace Application.Service.Service
             }
 
             user.Profile.DateOfBirth = dateOfBirth;
+            if (profilePictureOffsetX.HasValue)
+            {
+                user.Profile.ProfilePictureOffsetX = profilePictureOffsetX.Value;
+            }
 
-            await HandleProfilePictureAsync(user, profilePictureUrl);
+            if (profilePictureOffsetY.HasValue)
+            {
+                user.Profile.ProfilePictureOffsetY = profilePictureOffsetY.Value;
+            }
+
+            user.Profile.JobTitle = Normalize(jobTitle);
+            user.Profile.Department = Normalize(department);
+            user.Profile.Organization = Normalize(organization);
+            user.Profile.Location = Normalize(location);
+            if (profilePictureScale.HasValue)
+            {
+                user.Profile.ProfilePictureScale = profilePictureScale.Value;
+            }
+
+            await HandleProfilePictureAsync(user, profilePictureStream, profilePictureContentType, removeProfilePicture);
 
             _userValidator.ValidateAndThrow(user);
             await _userRepository.UpdateAsync(user);
@@ -131,63 +149,44 @@ namespace Application.Service.Service
             return _userRepository.GetProfilePictureAsync(userId);
         }
 
-        private async Task HandleProfilePictureAsync(User user, string? profilePictureUrl)
+        private async Task HandleProfilePictureAsync(User user, Stream? profilePictureStream, string? profilePictureContentType, bool removeProfilePicture)
         {
             if (string.IsNullOrEmpty(user.Id))
             {
                 return;
             }
 
-            if (profilePictureUrl == null)
+            if (removeProfilePicture)
             {
                 await _userRepository.DeleteProfilePictureAsync(user.Id);
                 user.Profile!.ProfilePictureUrl = null;
                 return;
             }
 
-            if (!TryParseDataUrl(profilePictureUrl, out var contentType, out var data))
+            if (profilePictureStream == null)
             {
                 return;
             }
 
-            await using var stream = new MemoryStream(data);
-            await _userRepository.UploadProfilePictureAsync(user.Id, stream, contentType);
+            if (profilePictureStream.CanSeek)
+            {
+                profilePictureStream.Seek(0, SeekOrigin.Begin);
+            }
+
+            var contentType = string.IsNullOrWhiteSpace(profilePictureContentType) ? "application/octet-stream" : profilePictureContentType;
+            await _userRepository.UploadProfilePictureAsync(user.Id, profilePictureStream, contentType);
             user.Profile!.ProfilePictureUrl = null;
         }
 
-        private static bool TryParseDataUrl(string dataUrl, out string contentType, out byte[] data)
+        private static string? Normalize(string? value)
         {
-            contentType = "application/octet-stream";
-            data = Array.Empty<byte>();
-            if (string.IsNullOrWhiteSpace(dataUrl) || !dataUrl.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(value))
             {
-                return false;
+                return null;
             }
 
-            var commaIndex = dataUrl.IndexOf(',');
-            if (commaIndex < 0)
-            {
-                return false;
-            }
-
-            var metadata = dataUrl.Substring(5, commaIndex - 5);
-            var payload = dataUrl[(commaIndex + 1)..];
-            var metaParts = metadata.Split(';', StringSplitOptions.RemoveEmptyEntries);
-            if (metaParts.Length > 0)
-            {
-                contentType = metaParts[0];
-            }
-
-            try
-            {
-                data = Convert.FromBase64String(payload);
-                return true;
-            }
-            catch
-            {
-                data = Array.Empty<byte>();
-                return false;
-            }
+            var trimmed = value.Trim();
+            return trimmed.Length == 0 ? null : trimmed;
         }
     }
 }

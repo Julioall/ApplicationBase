@@ -8,7 +8,15 @@ import { environment } from "../../environment/environment";
 export interface UpdateProfilePayload {
   Name?: string;
   DateOfBirth?: string | null;
-  ProfilePictureUrl?: string | null;
+  ProfilePicture?: File | null;
+  RemoveProfilePicture?: boolean;
+  ProfilePictureOffsetX?: number;
+  ProfilePictureOffsetY?: number;
+  ProfilePictureScale?: number;
+  JobTitle?: string | null;
+  Department?: string | null;
+  Organization?: string | null;
+  Location?: string | null;
 }
 
 export interface ChangePasswordPayload {
@@ -77,7 +85,42 @@ export class UserService {
   }
 
   updateProfile(payload: UpdateProfilePayload): Observable<any> {
-    return this.http.put(`${this.apiUrl}/profile`, payload, { headers: this.getAuthHeaders() })
+    const formData = new FormData();
+    if (payload.Name !== undefined) {
+      formData.append('Name', payload.Name);
+    }
+    if (payload.DateOfBirth !== undefined && payload.DateOfBirth !== null) {
+      formData.append('DateOfBirth', payload.DateOfBirth);
+    }
+    if (payload.ProfilePicture) {
+      formData.append('ProfilePicture', payload.ProfilePicture);
+    }
+    if (payload.RemoveProfilePicture) {
+      formData.append('RemoveProfilePicture', payload.RemoveProfilePicture.toString());
+    }
+    if (payload.ProfilePictureOffsetX !== undefined && payload.ProfilePictureOffsetX !== null) {
+      formData.append('ProfilePictureOffsetX', payload.ProfilePictureOffsetX.toString());
+    }
+    if (payload.ProfilePictureOffsetY !== undefined && payload.ProfilePictureOffsetY !== null) {
+      formData.append('ProfilePictureOffsetY', payload.ProfilePictureOffsetY.toString());
+    }
+    if (payload.ProfilePictureScale !== undefined && payload.ProfilePictureScale !== null) {
+      formData.append('ProfilePictureScale', payload.ProfilePictureScale.toString());
+    }
+    if (payload.JobTitle !== undefined) {
+      formData.append('JobTitle', payload.JobTitle ?? '');
+    }
+    if (payload.Department !== undefined) {
+      formData.append('Department', payload.Department ?? '');
+    }
+    if (payload.Organization !== undefined) {
+      formData.append('Organization', payload.Organization ?? '');
+    }
+    if (payload.Location !== undefined) {
+      formData.append('Location', payload.Location ?? '');
+    }
+
+    return this.http.put(`${this.apiUrl}/profile`, formData, { headers: this.getAuthHeaders(false) })
       .pipe(catchError(this.handleError));
   }
 

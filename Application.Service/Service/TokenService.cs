@@ -88,6 +88,8 @@ namespace Application.Service.Service
                 claims: new[]
                 {
                     new Claim(type: ClaimTypes.Name, user.Account.Email),
+                    new Claim(type: ClaimTypes.Email, user.Account.Email),
+                    new Claim(type: JwtRegisteredClaimNames.Email, user.Account.Email),
                     new Claim(type: ClaimTypes.Role, user.Account.Role)
                 },
                 expires: DateTime.UtcNow.AddHours(2),

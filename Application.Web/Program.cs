@@ -26,6 +26,11 @@ public class Program
         builder.Services.AddControllers(options =>
         {
             options.Filters.AddService<ValidationProblemDetailsFilter>();
+        })
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.PropertyNamingPolicy = null;
+            options.JsonSerializerOptions.DictionaryKeyPolicy = null;
         });
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.Configure<ApiBehaviorOptions>(options =>

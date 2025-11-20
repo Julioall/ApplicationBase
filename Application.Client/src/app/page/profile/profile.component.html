@@ -1,10 +1,10 @@
 <div class="profile-container">
-  <div class="page-header">
+  <div class="profile-hero">
     <div>
-      <p class="eyebrow">{{ 'profile.title' | translate }}</p>
-      <h1>{{ 'profile.subtitle' | translate }}</h1>
+      <p class="hero-eyebrow">{{ 'profile.hero.eyebrow' | translate }}</p>
+      
     </div>
-    <button class="btn ghost" type="button" (click)="goBack()">
+    <button class="btn back-link" type="button" (click)="goBack()">
       <i class="fa-solid fa-arrow-left-long" aria-hidden="true"></i>
       <span>{{ 'profile.actions.back' | translate }}</span>
     </button>
@@ -16,56 +16,214 @@
   </div>
 
   <ng-container *ngIf="!isLoading">
-    <div class="profile-grid" *ngIf="user; else profileFallback">
-      <section class="card profile-details">
-      <div class="avatar-panel">
-        <div class="avatar" [class.has-image]="avatarPreview">
-          <ng-container *ngIf="avatarPreview; else placeholderAvatar">
-            <img [src]="avatarPreview" alt="{{ 'profile.avatar.title' | translate }}" />
-          </ng-container>
+    <ng-container *ngIf="user as currentUser; else profileFallback">
+      <div class="profile-column">
+      <section class="card photo-card">
+        <div class="photo-header">
+          <h2>{{ 'profile.photo.title' | translate }}</h2>
         </div>
-        <ng-template #placeholderAvatar>
-          <span class="initials">{{ userInitials }}</span>
-        </ng-template>
-        <p class="avatar-helper">{{ 'profile.avatar.helper' | translate }}</p>
-        <div class="avatar-actions">
-          <label class="btn primary" for="avatarUpload">
-            <i class="fa-solid fa-camera" aria-hidden="true"></i>
-            <span>{{ 'profile.avatar.change' | translate }}</span>
-          </label>
-          <input type="file" id="avatarUpload" accept="image/*" hidden (change)="handleAvatarChange($event)" />
-          <button class="btn ghost" type="button" (click)="removeAvatar()" [disabled]="!avatarPreview">
-            <i class="fa-solid fa-trash" aria-hidden="true"></i>
-            <span>{{ 'profile.avatar.remove' | translate }}</span>
-          </button>
+        <div class="photo-banner">
+          <div class="banner"></div>
+          <div class="photo-avatar">
+            <div class="avatar-shell" #avatarFrame>
+              <div class="avatar" [class.has-image]="avatarPreview">
+                <ng-container *ngIf="avatarPreview; else placeholderAvatar">
+                  <img [src]="avatarPreview" alt="{{ 'profile.photo.alt' | translate }}" [style.object-position]="avatarObjectPosition" [style.transform]="'scale(' + avatarZoom + ')'"/>
+              </ng-container>
+              </div>
+              <button class="avatar-trigger" type="button" (click)="toggleAvatarMenu($event)">
+                <i class="fa-solid fa-camera" aria-hidden="true"></i>
+              </button>
+              <div class="avatar-menu" *ngIf="avatarMenuOpen">
+                <button type="button" (click)="openAvatarModal()">
+                  <i class="fa-solid fa-image" aria-hidden="true"></i>
+                  <span>{{ 'profile.photo.menu.add' | translate }}</span>
+                </button>
+                <button type="button" (click)="removeAvatar()" [disabled]="!avatarPreview">
+                  <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                  <span>{{ 'profile.photo.menu.remove' | translate }}</span>
+                </button>
+              </div>
+            </div>
+            <ng-template #placeholderAvatar>
+              <span class="initials">{{ userInitials }}</span>
+            </ng-template>
+          </div>
+          <input #avatarInput type="file" accept="image/*" hidden (change)="handleAvatarChange($event)" />
+        </div>
+      </section>
+
+      <div class="avatar-modal-backdrop" *ngIf="isAvatarModalOpen" (click)="closeAvatarModal()">
+        <div class="avatar-modal" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3>{{ 'profile.photo.modalTitle' | translate }}</h3>
+            <button class="modal-close" type="button" (click)="closeAvatarModal()">
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <ng-container *ngIf="avatarDraftPreview; else uploadPrompt">
+              <button
+                class="modal-image-clear"
+                type="button"
+                (click)="clearAvatarDraft($event)"
+                [attr.aria-label]="'profile.photo.clear' | translate"
+              >
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+              </button>
+              <div class="avatar-preview-box" (pointerdown)="startAvatarDrag($event)" (pointermove)="onAvatarDrag($event)" (pointerup)="endAvatarDrag()" (pointerleave)="endAvatarDrag()" (pointercancel)="endAvatarDrag()">
+                <div class="crop-area" #cropArea>
+                  <img [src]="avatarDraftPreview" [style.object-position]="avatarDraftObjectPosition" [style.transform]="'scale(' + draftZoom + ')'"/>
+                </div>
+              </div>
+              <div class="zoom-slider">
+                <i class="fa-solid fa-image"></i>
+                <input type="range" min="1" max="2" step="0.01" [(ngModel)]="draftZoom" [ngModelOptions]="{standalone: true}"/>
+                <i class="fa-solid fa-magnifying-glass-plus"></i>
+              </div>
+            </ng-container>
+            <ng-template #uploadPrompt>
+              <div class="upload-prompt">
+                <div class="upload-icon">
+                  <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
+                </div>
+                <p>{{ 'profile.photo.prompt' | translate }}</p>
+                <button class="btn subtle" type="button" (click)="triggerAvatarSelection()">{{ 'profile.photo.uploadButton' | translate }}</button>
+              </div>
+            </ng-template>
+          </div>
+          <div class="modal-actions">
+            <button class="btn subtle" type="button" (click)="closeAvatarModal()">{{ 'profile.form.cancel' | translate }}</button>
+            <button class="btn primary" type="button" (click)="saveAvatarChanges()" [disabled]="isSavingAvatar || !avatarDraftPreview">
+              {{ 'profile.photo.upload' | translate }}
+            </button>
+          </div>
         </div>
       </div>
 
-      <form class="profile-form" [formGroup]="profileForm" (ngSubmit)="onProfileSubmit()">
-        <h2>{{ 'profile.form.personalTitle' | translate }}</h2>
-        <p class="form-description">{{ 'profile.form.description' | translate }}</p>
-
-        <div class="form-field" [class.has-error]="profileForm.get('name')?.invalid && profileForm.get('name')?.touched">
-          <label for="profileName">{{ 'profile.form.nameLabel' | translate }}</label>
-          <input id="profileName" type="text" formControlName="name" [placeholder]="'profile.form.namePlaceholder' | translate" />
-          <small *ngIf="profileForm.get('name')?.invalid && profileForm.get('name')?.touched">
-            {{ 'profile.form.nameError' | translate }}
-          </small>
+      <form class="card about-card" [formGroup]="profileForm" (ngSubmit)="onProfileSubmit()">
+        <div class="card-header">
+          <div>
+            <h2>{{ 'profile.about.title' | translate }}</h2>
+            <p class="section-helper">{{ 'profile.about.description' | translate }}</p>
+          </div>
+          <button *ngIf="!isEditingProfile" class="btn subtle" type="button" (click)="startProfileEdit()">
+            <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
+            <span>{{ 'profile.actions.edit' | translate }}</span>
+          </button>
         </div>
 
-        <div class="form-field">
-          <label for="profileEmail">{{ 'profile.form.emailLabel' | translate }}</label>
-          <input id="profileEmail" type="email" formControlName="email" />
+        <div class="about-list">
+          <div class="about-row" [class.editing]="isEditingProfile">
+            <div class="about-label">{{ 'profile.form.nameLabel' | translate }}</div>
+            <div class="about-value">
+              <ng-container *ngIf="isEditingProfile; else nameValue">
+                <input
+                  id="profileName"
+                  type="text"
+                  formControlName="name"
+                  [placeholder]="'profile.form.namePlaceholder' | translate"
+                />
+                <small *ngIf="profileForm.get('name')?.invalid && profileForm.get('name')?.touched">
+                  {{ 'profile.form.nameError' | translate }}
+                </small>
+              </ng-container>
+              <ng-template #nameValue>
+                <span>{{ currentUser.Profile.Name }}</span>
+              </ng-template>
+            </div>
+          </div>
+
+          <div class="about-row">
+            <div class="about-label">{{ 'profile.form.emailLabel' | translate }}</div>
+            <div class="about-value">
+              <span>{{ currentUser.Account.Email }}</span>
+            </div>
+          </div>
+
+          <div class="about-row" [class.editing]="isEditingProfile">
+            <div class="about-label">{{ 'profile.form.birthLabel' | translate }}</div>
+            <div class="about-value">
+              <ng-container *ngIf="isEditingProfile; else birthValue">
+                <input id="profileBirth" type="date" formControlName="dateOfBirth" />
+              </ng-container>
+              <ng-template #birthValue>
+                <span>{{ safeDate(currentUser.Profile.DateOfBirth) || ('profile.form.birthHelper' | translate) }}</span>
+              </ng-template>
+            </div>
+          </div>
+
+          <div class="about-row" [class.editing]="isEditingProfile">
+            <div class="about-label">{{ 'profile.about.jobTitle' | translate }}</div>
+            <div class="about-value">
+              <ng-container *ngIf="isEditingProfile; else jobTitleValue">
+                <input
+                  id="jobTitle"
+                  type="text"
+                  formControlName="jobTitle"
+                  [placeholder]="'profile.about.jobTitlePlaceholder' | translate"
+                />
+              </ng-container>
+              <ng-template #jobTitleValue>
+                <span>{{ currentUser.Profile.JobTitle || ('profile.about.jobTitlePlaceholder' | translate) }}</span>
+              </ng-template>
+            </div>
+          </div>
+
+          <div class="about-row" [class.editing]="isEditingProfile">
+            <div class="about-label">{{ 'profile.about.department' | translate }}</div>
+            <div class="about-value">
+              <ng-container *ngIf="isEditingProfile; else departmentValue">
+                <input
+                  id="department"
+                  type="text"
+                  formControlName="department"
+                  [placeholder]="'profile.about.departmentPlaceholder' | translate"
+                />
+              </ng-container>
+              <ng-template #departmentValue>
+                <span>{{ currentUser.Profile.Department || ('profile.about.departmentPlaceholder' | translate) }}</span>
+              </ng-template>
+            </div>
+          </div>
+
+          <div class="about-row" [class.editing]="isEditingProfile">
+            <div class="about-label">{{ 'profile.about.organization' | translate }}</div>
+            <div class="about-value">
+              <ng-container *ngIf="isEditingProfile; else organizationValue">
+                <input
+                  id="organization"
+                  type="text"
+                  formControlName="organization"
+                  [placeholder]="'profile.about.organizationPlaceholder' | translate"
+                />
+              </ng-container>
+              <ng-template #organizationValue>
+                <span>{{ currentUser.Profile.Organization || ('profile.about.organizationPlaceholder' | translate) }}</span>
+              </ng-template>
+            </div>
+          </div>
+
+          <div class="about-row" [class.editing]="isEditingProfile">
+            <div class="about-label">{{ 'profile.about.location' | translate }}</div>
+            <div class="about-value">
+              <ng-container *ngIf="isEditingProfile; else locationValue">
+                <input
+                  id="location"
+                  type="text"
+                  formControlName="location"
+                  [placeholder]="'profile.about.locationPlaceholder' | translate"
+                />
+              </ng-container>
+              <ng-template #locationValue>
+                <span>{{ currentUser.Profile.Location || ('profile.about.locationPlaceholder' | translate) }}</span>
+              </ng-template>
+            </div>
+          </div>
         </div>
 
-        <div class="form-field">
-          <label for="profileBirth">{{ 'profile.form.birthLabel' | translate }}</label>
-          <input id="profileBirth" type="date" formControlName="dateOfBirth" />
-          <small class="helper">{{ 'profile.form.birthHelper' | translate }}</small>
-        </div>
-
-        <div class="form-actions">
-          <button class="btn ghost" type="button" (click)="resetProfileForm()" [disabled]="profileForm.pristine || isSavingProfile">
+        <div class="form-actions" *ngIf="isEditingProfile">
+          <button class="btn subtle" type="button" (click)="cancelProfileEdit()" [disabled]="isSavingProfile">
             {{ 'profile.form.cancel' | translate }}
           </button>
           <button class="btn primary" type="submit" [disabled]="profileForm.invalid || isSavingProfile">
@@ -78,46 +236,57 @@
           </button>
         </div>
       </form>
-    </section>
 
-    <section class="card password-card">
-      <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
-        <h2>{{ 'profile.password.title' | translate }}</h2>
-        <p class="form-description">{{ 'profile.password.description' | translate }}</p>
-
-        <div class="form-field" [class.has-error]="passwordForm.get('currentPassword')?.invalid && passwordForm.get('currentPassword')?.touched">
-          <label for="currentPassword">{{ 'profile.password.currentLabel' | translate }}</label>
-          <input id="currentPassword" type="password" formControlName="currentPassword" autocomplete="current-password" />
-        </div>
-
-        <div class="form-field" [class.has-error]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched">
-          <label for="newPassword">{{ 'profile.password.newLabel' | translate }}</label>
-          <input id="newPassword" type="password" formControlName="newPassword" autocomplete="new-password" />
-          <small class="helper">{{ 'profile.password.requirements' | translate }}</small>
-        </div>
-
-        <div class="form-field" [class.has-error]="passwordForm.get('confirmPassword')?.invalid && passwordForm.get('confirmPassword')?.touched">
-          <label for="confirmPassword">{{ 'profile.password.confirmLabel' | translate }}</label>
-          <input id="confirmPassword" type="password" formControlName="confirmPassword" autocomplete="new-password" />
-        </div>
-
-        <small class="error" *ngIf="passwordForm.hasError('passwordMismatch') && passwordForm.touched">
-          {{ 'profile.messages.passwordMismatch' | translate }}
-        </small>
-
-        <div class="form-actions">
-          <button class="btn primary" type="submit" [disabled]="passwordForm.invalid || isSavingPassword">
-            <ng-container *ngIf="isSavingPassword; else savePassword">
-              <span>{{ 'profile.password.saving' | translate }}</span>
-            </ng-container>
-            <ng-template #savePassword>
-              <span>{{ 'profile.password.save' | translate }}</span>
-            </ng-template>
+      <section class="card password-card">
+        <div class="card-header">
+          <div>
+            <h2>{{ 'profile.password.title' | translate }}</h2>
+            <p class="section-helper">{{ 'profile.password.description' | translate }}</p>
+          </div>
+          <button *ngIf="!isEditingPassword" class="btn subtle" type="button" (click)="startPasswordEdit()">
+            <i class="fa-solid fa-lock" aria-hidden="true"></i>
+            <span>{{ 'profile.actions.edit' | translate }}</span>
           </button>
         </div>
-      </form>
-    </section>
-    </div>
+
+        <form *ngIf="isEditingPassword" [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
+          <div class="form-field" [class.has-error]="passwordForm.get('currentPassword')?.invalid && passwordForm.get('currentPassword')?.touched">
+            <label for="currentPassword">{{ 'profile.password.currentLabel' | translate }}</label>
+            <input id="currentPassword" type="password" formControlName="currentPassword" autocomplete="current-password" />
+          </div>
+
+          <div class="form-field" [class.has-error]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched">
+            <label for="newPassword">{{ 'profile.password.newLabel' | translate }}</label>
+            <input id="newPassword" type="password" formControlName="newPassword" autocomplete="new-password" />
+            <small class="helper">{{ 'profile.password.requirements' | translate }}</small>
+          </div>
+
+          <div class="form-field" [class.has-error]="passwordForm.get('confirmPassword')?.invalid && passwordForm.get('confirmPassword')?.touched">
+            <label for="confirmPassword">{{ 'profile.password.confirmLabel' | translate }}</label>
+            <input id="confirmPassword" type="password" formControlName="confirmPassword" autocomplete="new-password" />
+          </div>
+
+          <small class="error" *ngIf="passwordForm.hasError('passwordMismatch') && passwordForm.touched">
+            {{ 'profile.messages.passwordMismatch' | translate }}
+          </small>
+
+          <div class="form-actions">
+            <button class="btn subtle" type="button" (click)="cancelPasswordEdit()" [disabled]="isSavingPassword">
+              {{ 'profile.form.cancel' | translate }}
+            </button>
+            <button class="btn primary" type="submit" [disabled]="passwordForm.invalid || isSavingPassword">
+              <ng-container *ngIf="isSavingPassword; else savePassword">
+                <span>{{ 'profile.password.saving' | translate }}</span>
+              </ng-container>
+              <ng-template #savePassword>
+                <span>{{ 'profile.password.save' | translate }}</span>
+              </ng-template>
+            </button>
+          </div>
+        </form>
+      </section>
+      </div>
+    </ng-container>
   </ng-container>
 
   <ng-template #profileFallback>

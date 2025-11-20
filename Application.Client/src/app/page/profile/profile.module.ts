@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { ProfileComponent } from './profile.component';
 
@@ -11,6 +11,6 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [ProfileComponent],
-  imports: [CommonModule, ReactiveFormsModule, RouterModule.forChild(routes), TranslateModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule.forChild(routes), TranslateModule],
 })
 export class ProfileModule {}

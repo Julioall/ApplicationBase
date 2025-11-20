@@ -61,19 +61,30 @@
     }
   },
   "profile": {
-    "title": "Your profile",
-    "subtitle": "Keep your personal information and security preferences up to date.",
+    "hero": {
+      "eyebrow": "Profile & visibility",
+      "title": "Manage what teammates see about you",
+      "description": "Update your personal details and choose how others recognize you across the workspace."
+    },
     "loading": "Loading your profile...",
     "actions": {
-      "back": "Back to workspace",
-      "retry": "Try again"
+      "back": "Back",
+      "retry": "Try again",
+      "edit": "Edit profile"
     },
-    "avatar": {
-      "title": "Profile photo",
-      "helper": "Upload a square JPG or PNG up to 2 MB.",
-      "change": "Change photo",
+  "photo": {
+    "title": "Profile photo and header image",
+    "alt": "Profile photo",
+    "menu": {
+      "add": "Change photo",
       "remove": "Remove photo"
     },
+    "modalTitle": "Add profile photo",
+    "prompt": "Drag and drop your images here or upload a photo.",
+    "uploadButton": "Upload a photo",
+    "upload": "Upload",
+    "clear": "Remove photo"
+  },
     "form": {
       "personalTitle": "Personal information",
       "description": "These details help teammates recognize you across the workspace.",
@@ -96,6 +107,18 @@
       "requirements": "Must contain at least 6 characters.",
       "save": "Update password",
       "saving": "Updating..."
+    },
+    "about": {
+      "title": "About you",
+      "description": "Keep these fields up to date so your teammates know how to reach you.",
+      "jobTitle": "Job title",
+      "jobTitlePlaceholder": "Your job title",
+      "department": "Department",
+      "departmentPlaceholder": "Your department",
+      "organization": "Organization",
+      "organizationPlaceholder": "Your organization",
+      "location": "Location",
+      "locationPlaceholder": "Your location"
     },
     "messages": {
       "profileUpdated": "Profile updated successfully!",

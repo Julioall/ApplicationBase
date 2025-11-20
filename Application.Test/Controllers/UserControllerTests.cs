@@ -54,7 +54,8 @@ using Microsoft.AspNetCore.Mvc;
 
 
 
-using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Localization;
+using System.IO;
 
 
 
@@ -256,7 +257,7 @@ namespace Application.Tests.Controllers
 
             public Func<string, Task<(byte[] Data, string ContentType)?>>? GetProfilePictureFunc { get; set; }
 
-            public Func<string, string?, DateTime?, string?, Task>? UpdateProfileFunc { get; set; }
+            public Func<string, string?, DateTime?, System.IO.Stream?, string?, bool, double?, double?, string?, string?, string?, string?, double?, Task>? UpdateProfileFunc { get; set; }
 
             public Func<string, string, string, Task>? ChangePasswordFunc { get; set; }
 
@@ -334,7 +335,7 @@ namespace Application.Tests.Controllers
 
 
 
-            public Task UpdateProfileAsync(string email, string? name, DateTime? dateOfBirth, string? profilePictureUrl) => UpdateProfileFunc?.Invoke(email, name, dateOfBirth, profilePictureUrl) ?? Task.CompletedTask;
+            public Task UpdateProfileAsync(string email, string? name, DateTime? dateOfBirth, System.IO.Stream? profilePictureStream, string? profilePictureContentType, bool removeProfilePicture, double? profilePictureOffsetX, double? profilePictureOffsetY, string? jobTitle, string? department, string? organization, string? location, double? profilePictureScale) => UpdateProfileFunc?.Invoke(email, name, dateOfBirth, profilePictureStream, profilePictureContentType, removeProfilePicture, profilePictureOffsetX, profilePictureOffsetY, jobTitle, department, organization, location, profilePictureScale) ?? Task.CompletedTask;
             public Task ChangePasswordAsync(string email, string currentPassword, string newPassword) => ChangePasswordFunc?.Invoke(email, currentPassword, newPassword) ?? Task.CompletedTask;
             public Task<(byte[] Data, string ContentType)?> GetProfilePictureAsync(string userId) => GetProfilePictureFunc?.Invoke(userId) ?? Task.FromResult<(byte[] Data, string ContentType)?>(null);
 

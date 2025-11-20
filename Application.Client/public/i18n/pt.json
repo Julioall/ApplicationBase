@@ -61,18 +61,29 @@
     }
   },
   "profile": {
-    "title": "Seu perfil",
-    "subtitle": "Atualize suas informa\u00e7\u00f5es pessoais e de seguran\u00e7a.",
+    "hero": {
+      "eyebrow": "Perfil e visibilidade",
+      "title": "Controle o que seus colegas veem sobre voc\u00ea",
+      "description": "Atualize seus dados pessoais e mantenha o perfil consistente em todo o workspace."
+    },
     "loading": "Carregando seu perfil...",
     "actions": {
-      "back": "Voltar para o workspace",
-      "retry": "Tentar novamente"
+      "back": "Voltar",
+      "retry": "Tentar novamente",
+      "edit": "Editar perfil"
     },
-    "avatar": {
-      "title": "Foto do perfil",
-      "helper": "Envie uma imagem quadrada (JPG ou PNG) de at\u00e9 2 MB.",
-      "change": "Trocar foto",
-      "remove": "Remover foto"
+    "photo": {
+      "title": "Foto do perfil e imagem de capa",
+      "alt": "Foto do perfil",
+      "menu": {
+        "add": "Trocar foto",
+        "remove": "Remover foto"
+      },
+      "modalTitle": "Adicionar foto do perfil",
+      "prompt": "Arraste e solte sua imagem aqui ou envie uma foto.",
+      "uploadButton": "Enviar foto",
+      "upload": "Salvar",
+      "clear": "Remover foto"
     },
     "form": {
       "personalTitle": "Informa\u00e7\u00f5es pessoais",
@@ -96,6 +107,18 @@
       "requirements": "Precisa ter pelo menos 6 caracteres.",
       "save": "Atualizar senha",
       "saving": "Atualizando..."
+    },
+    "about": {
+      "title": "Sobre você",
+      "description": "Mantenha estes campos atualizados para que todos saibam como te encontrar.",
+      "jobTitle": "Cargo",
+      "jobTitlePlaceholder": "Seu cargo",
+      "department": "Departamento",
+      "departmentPlaceholder": "Seu departamento",
+      "organization": "Organização",
+      "organizationPlaceholder": "Sua organização",
+      "location": "Localização",
+      "locationPlaceholder": "Sua localização"
     },
     "messages": {
       "profileUpdated": "Perfil atualizado com sucesso!",

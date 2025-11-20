@@ -1,12 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { Router } from '@angular/router';
 import { User } from '../../model/User';
 import { UserAccount } from '../../model/UserAccount';
 import { UserProfile } from '../../model/UserProfile';
 import { ChangePasswordPayload, UpdateProfilePayload, UserService } from '../../service/user/user.service';
 import { NotificationService } from '../../service/notification/notification.service';
+
+type HydratedUser = User & { Account: UserAccount; Profile: UserProfile };
 
 @Component({
   selector: 'app-profile',
@@ -16,11 +18,32 @@ import { NotificationService } from '../../service/notification/notification.ser
 export class ProfileComponent implements OnInit {
   profileForm: FormGroup;
   passwordForm: FormGroup;
-  user: User | null = null;
+  user: HydratedUser | null = null;
   isLoading = false;
   isSavingProfile = false;
   isSavingPassword = false;
+  isSavingAvatar = false;
+  isEditingProfile = false;
+  isEditingPassword = false;
   avatarPreview: string | null = null;
+  private selectedAvatarFile: File | null = null;
+  avatarDraftPreview: string | null = null;
+  private avatarDraftFile: File | null = null;
+  isAvatarModalOpen = false;
+  avatarZoom = 1;
+  draftZoom = 1;
+  avatarOffsetX = 0;
+  avatarOffsetY = 0;
+  draftOffsetX = 0;
+  draftOffsetY = 0;
+  @ViewChild('cropArea') private cropArea?: ElementRef<HTMLDivElement>;
+  @ViewChild('avatarInput') private avatarInput?: ElementRef<HTMLInputElement>;
+  isDraggingAvatar = false;
+  avatarMenuOpen = false;
+  private dragStartX = 0;
+  private dragStartY = 0;
+  private initialOffsetX = 0;
+  private initialOffsetY = 0;
   private readonly maxAvatarSize = 2 * 1024 * 1024; // 2MB
 
   private readonly passwordsMatchValidator = (group: AbstractControl): ValidationErrors | null => {
@@ -37,12 +60,16 @@ export class ProfileComponent implements OnInit {
     private readonly userService: UserService,
     private readonly notificationService: NotificationService,
     private readonly translate: TranslateService,
-    private readonly router: Router
+    private readonly router: Router,
   ) {
     this.profileForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       email: [{ value: '', disabled: true }],
       dateOfBirth: [''],
+      jobTitle: [''],
+      department: [''],
+      organization: [''],
+      location: [''],
     });
 
     this.passwordForm = this.fb.group(
@@ -53,6 +80,8 @@ export class ProfileComponent implements OnInit {
       },
       { validators: [this.passwordsMatchValidator] }
     );
+
+    this.setProfileControlsState(false);
   }
 
   ngOnInit(): void {
@@ -94,18 +123,89 @@ export class ProfileComponent implements OnInit {
 
     const reader = new FileReader();
     reader.onload = () => {
-      this.avatarPreview = reader.result as string;
-      this.profileForm.markAsDirty();
+      this.avatarDraftPreview = reader.result as string;
+      this.avatarDraftFile = file;
+      this.draftOffsetX = 0;
+      this.draftOffsetY = 0;
+      this.draftZoom = 1;
+      this.isAvatarModalOpen = true;
+      this.avatarMenuOpen = false;
     };
     reader.readAsDataURL(file);
+    fileInput.value = '';
   }
 
   removeAvatar(): void {
+    if (!this.user) {
+      this.notificationService.showError(this.translate.instant('profile.messages.missingUser'));
+      return;
+    }
+
     this.avatarPreview = null;
-    this.profileForm.markAsDirty();
+    this.selectedAvatarFile = null;
+    this.avatarDraftPreview = null;
+    this.avatarDraftFile = null;
+    this.avatarOffsetX = 0;
+    this.avatarOffsetY = 0;
+    this.avatarZoom = 1;
+    this.avatarMenuOpen = false;
+    this.isAvatarModalOpen = false;
+    this.submitAvatarUpdate(true);
+  }
+
+  get avatarObjectPosition(): string {
+    const x = 50 + this.clampOffset(this.avatarOffsetX);
+    const y = 50 + this.clampOffset(this.avatarOffsetY);
+    return `${x}% ${y}%`;
+  }
+
+  get avatarDraftObjectPosition(): string {
+    const x = 50 + this.clampOffset(this.draftOffsetX);
+    const y = 50 + this.clampOffset(this.draftOffsetY);
+    return `${x}% ${y}%`;
+  }
+
+  startAvatarDrag(event: PointerEvent): void {
+    if (!this.isAvatarModalOpen || !this.avatarDraftPreview || !this.cropArea) {
+      return;
+    }
+
+    event.preventDefault();
+    this.isDraggingAvatar = true;
+    this.dragStartX = event.clientX;
+    this.dragStartY = event.clientY;
+    this.initialOffsetX = this.draftOffsetX;
+    this.initialOffsetY = this.draftOffsetY;
+  }
+
+  onAvatarDrag(event: PointerEvent): void {
+    if (!this.isDraggingAvatar || !this.cropArea || !this.isAvatarModalOpen) {
+      return;
+    }
+
+    event.preventDefault();
+    const rect = this.cropArea.nativeElement.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      return;
+    }
+
+    const deltaX = ((event.clientX - this.dragStartX) / rect.width) * 100;
+    const deltaY = ((event.clientY - this.dragStartY) / rect.height) * 100;
+
+    this.draftOffsetX = this.clampOffset(this.initialOffsetX + deltaX);
+    this.draftOffsetY = this.clampOffset(this.initialOffsetY - deltaY);
+  }
+
+  endAvatarDrag(): void {
+    if (this.isDraggingAvatar) {
+      this.isDraggingAvatar = false;
+    }
   }
 
   onProfileSubmit(): void {
+    if (!this.isEditingProfile) {
+      return;
+    }
     if (!this.user) {
       this.notificationService.showError(this.translate.instant('profile.messages.missingUser'));
       return;
@@ -126,6 +226,8 @@ export class ProfileComponent implements OnInit {
     this.userService.updateProfile(payload).subscribe({
       next: () => {
         this.notificationService.showSuccess(this.translate.instant('profile.messages.profileUpdated'));
+        this.isEditingProfile = false;
+        this.setProfileControlsState(false);
         this.loadUser(false);
       },
       error: (error) => {
@@ -139,6 +241,9 @@ export class ProfileComponent implements OnInit {
   }
 
   onPasswordSubmit(): void {
+    if (!this.isEditingPassword) {
+      return;
+    }
     if (!this.user) {
       this.notificationService.showError(this.translate.instant('profile.messages.missingUser'));
       return;
@@ -164,6 +269,7 @@ export class ProfileComponent implements OnInit {
       next: () => {
         this.notificationService.showSuccess(this.translate.instant('profile.messages.passwordUpdated'));
         this.passwordForm.reset();
+        this.isEditingPassword = false;
       },
       error: (error) => {
         this.handleApiError(error);
@@ -175,8 +281,28 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  resetProfileForm(): void {
+  startProfileEdit(): void {
+    if (!this.user) {
+      return;
+    }
+    this.isEditingProfile = true;
+    this.setProfileControlsState(true);
+  }
+
+  cancelProfileEdit(): void {
+    this.isEditingProfile = false;
     this.patchProfileForm();
+    this.setProfileControlsState(false);
+  }
+
+  startPasswordEdit(): void {
+    this.isEditingPassword = true;
+    this.passwordForm.reset();
+  }
+
+  cancelPasswordEdit(): void {
+    this.isEditingPassword = false;
+    this.passwordForm.reset();
   }
 
   goBack(): void {
@@ -192,6 +318,9 @@ export class ProfileComponent implements OnInit {
       next: (user) => {
         this.user = this.ensureUserShape(user);
         this.patchProfileForm();
+        this.setProfileControlsState(false);
+        this.isEditingProfile = false;
+        this.isEditingPassword = false;
         this.isLoading = false;
       },
       error: (error) => {
@@ -199,19 +328,22 @@ export class ProfileComponent implements OnInit {
           this.user = null;
         }
         this.handleApiError(error, 'profile.messages.profileLoadError');
+        this.isEditingProfile = false;
+        this.isEditingPassword = false;
+        this.setProfileControlsState(false);
         this.isLoading = false;
       },
     });
   }
 
-  private ensureUserShape(user: User): User {
+  private ensureUserShape(user: User): HydratedUser {
     const account: UserAccount = { ...(user.Account ?? {}) };
     const profile: UserProfile = { ...(user.Profile ?? {}) };
     return {
       ...user,
       Account: account,
       Profile: profile,
-    };
+    } as HydratedUser;
   }
 
   private patchProfileForm(): void {
@@ -223,18 +355,26 @@ export class ProfileComponent implements OnInit {
       {
         name: this.user.Profile?.Name ?? '',
         email: this.user.Account?.Email ?? '',
-        dateOfBirth: this.formatDateInput(this.user.Profile?.DateOfBirth),
+        dateOfBirth: this.safeDate(this.user.Profile?.DateOfBirth),
+        jobTitle: this.user.Profile?.JobTitle ?? '',
+        department: this.user.Profile?.Department ?? '',
+        organization: this.user.Profile?.Organization ?? '',
+        location: this.user.Profile?.Location ?? '',
       },
       { emitEvent: false }
     );
     this.profileForm.get('email')?.disable({ emitEvent: false });
 
     this.avatarPreview = this.user.Profile?.ProfilePictureUrl ?? null;
+    this.selectedAvatarFile = null;
+    this.avatarZoom = this.user.Profile?.ProfilePictureScale ?? 1;
+    this.applyServerOrCachedOffsets();
     this.profileForm.markAsPristine();
     this.profileForm.markAsUntouched();
+    this.setProfileControlsState(this.isEditingProfile);
   }
 
-  private formatDateInput(value: string | Date | null | undefined): string {
+  safeDate(value: string | Date | null | undefined): string {
     if (!value) {
       return '';
     }
@@ -249,10 +389,17 @@ export class ProfileComponent implements OnInit {
 
     const dateValue = this.profileForm.get('dateOfBirth')?.value;
     const trimmedName = (this.profileForm.get('name')?.value || '').trim();
+    const jobTitle = (this.profileForm.get('jobTitle')?.value || '').trim();
+    const department = (this.profileForm.get('department')?.value || '').trim();
+    const organization = (this.profileForm.get('organization')?.value || '').trim();
+    const location = (this.profileForm.get('location')?.value || '').trim();
     return {
       Name: trimmedName || this.user.Profile?.Name || '',
       DateOfBirth: dateValue ? new Date(dateValue).toISOString() : null,
-      ProfilePictureUrl: this.avatarPreview ?? null,
+      JobTitle: jobTitle || null,
+      Department: department || null,
+      Organization: organization || null,
+      Location: location || null,
     };
   }
 
@@ -260,5 +407,197 @@ export class ProfileComponent implements OnInit {
     const fallback = this.translate.instant(fallbackKey);
     const detail = error?.error?.detail || error?.error?.title || error?.message || fallback;
     this.notificationService.showError(detail);
+  }
+
+  private clampOffset(value: number): number {
+    return Math.max(-50, Math.min(50, value));
+  }
+
+  private applyServerOrCachedOffsets(): void {
+    const serverX = Number(this.user?.Profile?.ProfilePictureOffsetX ?? 0);
+    const serverY = Number(this.user?.Profile?.ProfilePictureOffsetY ?? 0);
+    this.avatarOffsetX = serverX;
+    this.avatarOffsetY = serverY;
+
+    if (this.hasNonZeroOffsets(serverX, serverY, this.avatarZoom)) {
+      this.saveOffsetsToCache();
+      return;
+    }
+
+    this.restoreOffsetsFromCache();
+  }
+
+  private hasNonZeroOffsets(x: number, y: number, scale: number = 1): boolean {
+    const tolerance = 0.001;
+    return Math.abs(x) > tolerance || Math.abs(y) > tolerance || Math.abs(scale - 1) > tolerance;
+  }
+
+  private saveOffsetsToCache(): void {
+    const key = this.getOffsetCacheKey();
+    if (!key) {
+      return;
+    }
+
+    try {
+      localStorage.setItem(key, JSON.stringify({ x: this.avatarOffsetX, y: this.avatarOffsetY, z: this.avatarZoom }));
+    } catch {
+      // ignore storage failures
+    }
+  }
+
+  private submitAvatarUpdate(isRemoval: boolean): void {
+    if (!this.user) {
+      this.notificationService.showError(this.translate.instant('profile.messages.missingUser'));
+      return;
+    }
+
+    const payload: UpdateProfilePayload = {};
+    if (isRemoval) {
+      payload.RemoveProfilePicture = true;
+    } else {
+      if (this.selectedAvatarFile) {
+        payload.ProfilePicture = this.selectedAvatarFile;
+      }
+      payload.ProfilePictureOffsetX = this.avatarOffsetX;
+      payload.ProfilePictureOffsetY = this.avatarOffsetY;
+      payload.ProfilePictureScale = this.avatarZoom;
+    }
+
+    this.isSavingAvatar = true;
+    this.userService.updateProfile(payload).subscribe({
+      next: () => {
+        if (isRemoval) {
+          this.clearOffsetCache();
+        } else {
+          this.saveOffsetsToCache();
+        }
+        this.selectedAvatarFile = null;
+        this.notificationService.showSuccess(this.translate.instant('profile.messages.profileUpdated'));
+      },
+      error: (error) => {
+        this.handleApiError(error);
+        this.isSavingAvatar = false;
+      },
+      complete: () => {
+        this.isSavingAvatar = false;
+      },
+    });
+  }
+
+  private restoreOffsetsFromCache(): void {
+    const key = this.getOffsetCacheKey();
+    if (!key) {
+      return;
+    }
+
+    try {
+      const cached = localStorage.getItem(key);
+      if (!cached) {
+        return;
+      }
+
+      const parsed = JSON.parse(cached);
+      if (typeof parsed?.x === 'number') {
+        this.avatarOffsetX = parsed.x;
+      }
+
+      if (typeof parsed?.y === 'number') {
+        this.avatarOffsetY = parsed.y;
+      }
+
+      if (typeof parsed?.z === 'number') {
+        this.avatarZoom = parsed.z;
+      }
+    } catch {
+      // ignore invalid cache
+    }
+  }
+
+  private clearOffsetCache(): void {
+    const key = this.getOffsetCacheKey();
+    if (!key) {
+      return;
+    }
+
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      // ignore
+    }
+  }
+
+  private getOffsetCacheKey(): string | null {
+    return this.user?.Id ? `profile-avatar-offset:${this.user.Id}` : null;
+  }
+
+  private setProfileControlsState(enabled: boolean): void {
+    const method = enabled ? 'enable' : 'disable';
+    ['name', 'dateOfBirth', 'jobTitle', 'department', 'organization', 'location'].forEach((controlName) =>
+    {
+      this.profileForm.get(controlName)?.[method]({ emitEvent: false });
+    });
+    this.profileForm.get('email')?.disable({ emitEvent: false });
+  }
+
+  triggerAvatarSelection(): void {
+    this.avatarInput?.nativeElement.click();
+  }
+
+  toggleAvatarMenu(event: Event): void {
+    event.stopPropagation();
+    this.avatarMenuOpen = !this.avatarMenuOpen;
+  }
+
+  @HostListener('document:click')
+  handleDocumentClick(): void {
+    this.avatarMenuOpen = false;
+  }
+
+  openAvatarModal(): void {
+    this.avatarMenuOpen = false;
+    this.isAvatarModalOpen = true;
+    if (this.avatarPreview) {
+      this.avatarDraftPreview = this.avatarPreview;
+      this.draftOffsetX = this.avatarOffsetX;
+      this.draftOffsetY = this.avatarOffsetY;
+      this.draftZoom = this.avatarZoom;
+      this.avatarDraftFile = this.selectedAvatarFile;
+    } else {
+      this.avatarDraftPreview = null;
+      this.avatarDraftFile = null;
+      this.draftOffsetX = 0;
+      this.draftOffsetY = 0;
+      this.draftZoom = 1;
+    }
+  }
+
+  closeAvatarModal(): void {
+    this.isAvatarModalOpen = false;
+    this.avatarDraftPreview = null;
+    this.avatarDraftFile = null;
+  }
+
+  clearAvatarDraft(event?: Event): void {
+    event?.stopPropagation();
+    this.avatarDraftPreview = null;
+    this.avatarDraftFile = null;
+    this.draftOffsetX = 0;
+    this.draftOffsetY = 0;
+    this.draftZoom = 1;
+  }
+
+  saveAvatarChanges(): void {
+    if (this.avatarDraftPreview) {
+      this.avatarPreview = this.avatarDraftPreview;
+      if (this.avatarDraftFile) {
+        this.selectedAvatarFile = this.avatarDraftFile;
+      }
+      this.avatarOffsetX = this.draftOffsetX;
+      this.avatarOffsetY = this.draftOffsetY;
+      this.avatarZoom = this.draftZoom;
+    }
+
+    this.closeAvatarModal();
+    this.submitAvatarUpdate(false);
   }
 }

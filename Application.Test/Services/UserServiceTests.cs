@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Application.Domain.Exceptions;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
@@ -178,15 +179,33 @@ namespace Application.Tests.Services
             var newDate = new DateTime(1992, 5, 10);
             const string newName = "Updated Profile";
             var imageBytes = new byte[] { 1, 2, 3, 4 };
-            var picture = $"data:image/png;base64,{Convert.ToBase64String(imageBytes)}";
 
-            await _userService.UpdateProfileAsync(existing.Account.Email, newName, newDate, picture);
+            await using var stream = new MemoryStream(imageBytes);
+
+            const double offsetX = 10;
+            const double offsetY = -5;
+
+            const string jobTitle = "Lead Engineer";
+            const string department = "R&D";
+            const string organization = "ApplicationBase";
+            const string location = "Goiânia";
+
+            const double scale = 1.3;
+
+            await _userService.UpdateProfileAsync(existing.Account.Email, newName, newDate, stream, "image/png", false, offsetX, offsetY, jobTitle, department, organization, location, scale);
             await _asyncSession.SaveChangesAsync();
 
             var updated = await _userService.GetByEmailAsync(existing.Account.Email);
             Assert.NotNull(updated);
             Assert.Equal(newName, updated!.Profile.Name);
             Assert.Equal(newDate, updated.Profile.DateOfBirth);
+            Assert.Equal(offsetX, updated.Profile.ProfilePictureOffsetX);
+            Assert.Equal(offsetY, updated.Profile.ProfilePictureOffsetY);
+            Assert.Equal(jobTitle, updated.Profile.JobTitle);
+            Assert.Equal(department, updated.Profile.Department);
+            Assert.Equal(organization, updated.Profile.Organization);
+            Assert.Equal(location, updated.Profile.Location);
+            Assert.Equal(scale, updated.Profile.ProfilePictureScale);
             Assert.Null(updated.Profile.ProfilePictureUrl);
 
             var attachment = await _userService.GetProfilePictureAsync(updated.Id);

@@ -1,12 +1,17 @@
+using Application.Api.Models.User;
 using Application.Domain;
 using Application.Domain.Exceptions;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
+using System.Globalization;
+using System.IO;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace Application.Api.Controllers
@@ -151,21 +156,100 @@ namespace Application.Api.Controllers
         [HttpPut("profile")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto profileDto)
+        public async Task<IActionResult> UpdateProfile()
         {
-            if (profileDto == null)
-            {
-                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["UserCannotBeNullDetail"], statusCode: StatusCodes.Status400BadRequest);
-            }
-
             var email = GetAuthenticatedEmail();
             if (string.IsNullOrWhiteSpace(email))
             {
                 return Problem(title: _localizer["UnauthorizedTitle"], detail: _localizer["UnauthorizedDetail"], statusCode: StatusCodes.Status401Unauthorized);
             }
 
-            await _userService.UpdateProfileAsync(email, profileDto.Name, profileDto.DateOfBirth, profileDto.ProfilePictureUrl);
-            return Ok(new { message = _localizer["UserProfileUpdatedSuccessfully"] });
+            Stream? profilePictureStream = null;
+            string? contentType = null;
+            string? name = null;
+            DateTime? dateOfBirth = null;
+            bool removeProfilePicture = false;
+            double? profilePictureOffsetX = null;
+            double? profilePictureOffsetY = null;
+            double? profilePictureScale = null;
+            string? jobTitle = null;
+            string? department = null;
+            string? organization = null;
+            string? location = null;
+
+            try
+            {
+                if (Request.HasFormContentType)
+                {
+                    var formRequest = MapFormRequest(await Request.ReadFormAsync());
+                    name = formRequest.Name;
+                    dateOfBirth = formRequest.DateOfBirth;
+                    removeProfilePicture = formRequest.RemoveProfilePicture;
+                    profilePictureOffsetX = formRequest.ProfilePictureOffsetX;
+                    profilePictureOffsetY = formRequest.ProfilePictureOffsetY;
+                    profilePictureScale = formRequest.ProfilePictureScale;
+                    jobTitle = formRequest.JobTitle;
+                    department = formRequest.Department;
+                    organization = formRequest.Organization;
+                    location = formRequest.Location;
+
+                    if (formRequest.ProfilePicture is { Length: > 0 })
+                    {
+                        profilePictureStream = formRequest.ProfilePicture.OpenReadStream();
+                        contentType = formRequest.ProfilePicture.ContentType;
+                    }
+                }
+                else
+                {
+                    var profileDto = await Request.ReadFromJsonAsync<UpdateProfileDto>();
+                    if (profileDto == null)
+                    {
+                        return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["UserCannotBeNullDetail"], statusCode: StatusCodes.Status400BadRequest);
+                    }
+
+                    name = profileDto.Name;
+                    dateOfBirth = profileDto.DateOfBirth;
+                    removeProfilePicture = profileDto.RemoveProfilePicture;
+                    profilePictureOffsetX = profileDto.ProfilePictureOffsetX;
+                    profilePictureOffsetY = profileDto.ProfilePictureOffsetY;
+                    profilePictureScale = profileDto.ProfilePictureScale;
+                    jobTitle = profileDto.JobTitle;
+                    department = profileDto.Department;
+                    organization = profileDto.Organization;
+                    location = profileDto.Location;
+
+                    if (!removeProfilePicture &&
+                        !string.IsNullOrWhiteSpace(profileDto.ProfilePictureUrl) &&
+                        TryParseDataUrl(profileDto.ProfilePictureUrl, out var dtoContentType, out var data))
+                    {
+                        profilePictureStream = new MemoryStream(data);
+                        contentType = dtoContentType;
+                    }
+                }
+
+                await _userService.UpdateProfileAsync(
+                    email,
+                    name,
+                    dateOfBirth,
+                    profilePictureStream,
+                    contentType,
+                    removeProfilePicture,
+                    profilePictureOffsetX,
+                    profilePictureOffsetY,
+                    jobTitle,
+                    department,
+                    organization,
+                    location,
+                    profilePictureScale);
+                return Ok(new { message = _localizer["UserProfileUpdatedSuccessfully"] });
+            }
+            finally
+            {
+                if (profilePictureStream != null)
+                {
+                    await profilePictureStream.DisposeAsync();
+                }
+            }
         }
 
         [Authorize(Roles = "Admin, User")]
@@ -212,9 +296,107 @@ namespace Application.Api.Controllers
 
         private string? GetAuthenticatedEmail()
         {
-            return User.FindFirstValue(ClaimTypes.Email)
-                   ?? User.FindFirstValue(ClaimTypes.Name)
-                   ?? User.Identity?.Name;
+            var claimOrder = new[]
+            {
+                ClaimTypes.Email,
+                JwtRegisteredClaimNames.Email,
+                "email",
+                ClaimTypes.Name,
+                ClaimTypes.NameIdentifier,
+                ClaimTypes.Upn,
+                JwtRegisteredClaimNames.UniqueName
+            };
+
+            foreach (var claimType in claimOrder)
+            {
+                var value = User.FindFirstValue(claimType);
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    return value;
+                }
+            }
+
+            return User.Identity?.Name;
+        }
+
+        private static bool TryParseDataUrl(string dataUrl, out string contentType, out byte[] data)
+        {
+            contentType = "application/octet-stream";
+            data = Array.Empty<byte>();
+            if (string.IsNullOrWhiteSpace(dataUrl) || !dataUrl.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            var commaIndex = dataUrl.IndexOf(',');
+            if (commaIndex < 0)
+            {
+                return false;
+            }
+
+            var metadata = dataUrl.Substring(5, commaIndex - 5);
+            var payload = dataUrl[(commaIndex + 1)..];
+            var metaParts = metadata.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            if (metaParts.Length > 0)
+            {
+                contentType = metaParts[0];
+            }
+
+            try
+            {
+                data = Convert.FromBase64String(payload);
+                return true;
+            }
+            catch
+            {
+                data = Array.Empty<byte>();
+                return false;
+            }
+        }
+
+        private static UpdateProfileRequest MapFormRequest(IFormCollection form)
+        {
+            var request = new UpdateProfileRequest
+            {
+                Name = form.TryGetValue("Name", out var nameValues) ? nameValues.ToString() : null,
+                RemoveProfilePicture = form.TryGetValue("RemoveProfilePicture", out var removeValues) && bool.TryParse(removeValues.ToString(), out var removeFlag) && removeFlag,
+                ProfilePicture = form.Files.GetFile("ProfilePicture") ?? form.Files.GetFile("ProfilePictureUrl"),
+                ProfilePictureOffsetX = TryParseDouble(form, "ProfilePictureOffsetX"),
+                ProfilePictureOffsetY = TryParseDouble(form, "ProfilePictureOffsetY"),
+                ProfilePictureScale = TryParseDouble(form, "ProfilePictureScale"),
+                JobTitle = GetValue(form, "JobTitle"),
+                Department = GetValue(form, "Department"),
+                Organization = GetValue(form, "Organization"),
+                Location = GetValue(form, "Location")
+            };
+
+            if (form.TryGetValue("DateOfBirth", out var dateValues) && DateTime.TryParse(dateValues.ToString(), out var parsedDate))
+            {
+                request.DateOfBirth = parsedDate;
+            }
+
+            return request;
+        }
+
+        private static string? GetValue(IFormCollection form, string key)
+        {
+            return form.TryGetValue(key, out var values) ? values.ToString() : null;
+        }
+
+        private static double? TryParseDouble(IFormCollection form, string key)
+        {
+            if (!form.TryGetValue(key, out var values))
+            {
+                return null;
+            }
+
+            var raw = values.ToString();
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return null;
+            }
+
+            return double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed) ? parsed : null;
         }
     }
 }

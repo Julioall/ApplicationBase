@@ -1,12 +1,14 @@
-namespace Application.Domain.Model.Dtos
+using Microsoft.AspNetCore.Http;
+
+namespace Application.Api.Models.User
 {
-    public class UpdateProfileDto
+    public class UpdateProfileRequest
     {
         public string? Name { get; set; }
 
         public DateTime? DateOfBirth { get; set; }
 
-        public string? ProfilePictureUrl { get; set; }
+        public IFormFile? ProfilePicture { get; set; }
 
         public bool RemoveProfilePicture { get; set; }
 
