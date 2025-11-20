@@ -86,8 +86,6 @@
     "clear": "Remove photo"
   },
     "form": {
-      "personalTitle": "Personal information",
-      "description": "These details help teammates recognize you across the workspace.",
       "nameLabel": "Full name",
       "namePlaceholder": "Jane Doe",
       "nameError": "Please enter at least 3 characters.",
@@ -124,7 +122,6 @@
       "profileUpdated": "Profile updated successfully!",
       "passwordUpdated": "Password updated successfully!",
       "passwordMismatch": "New password and confirmation must match.",
-      "currentPasswordInvalid": "Current password does not match our records.",
       "profileLoadError": "We couldn't load your profile information right now.",
       "genericError": "Something went wrong. Please try again.",
       "missingUser": "We could not find the logged in user information.",

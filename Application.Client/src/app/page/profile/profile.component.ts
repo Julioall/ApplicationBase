@@ -451,7 +451,11 @@ export class ProfileComponent implements OnInit {
       return;
     }
 
-    const payload: UpdateProfilePayload = {};
+    const payload = this.buildProfilePayload();
+    if (!payload) {
+      return;
+    }
+
     if (isRemoval) {
       payload.RemoveProfilePicture = true;
     } else {

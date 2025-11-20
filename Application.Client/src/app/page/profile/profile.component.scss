@@ -11,35 +11,43 @@
   color: #111827;
 }
 
-.page-header {
+.profile-hero {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1.5rem;
   margin-bottom: 2rem;
+  background: #fff;
+  border-radius: 1.25rem;
+  padding: 2rem;
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
 }
 
-.page-header h1 {
-  font-size: 1.75rem;
-  margin: 0.25rem 0 0;
-}
-
-.page-header .header-text {
+.hero-text {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.35rem;
 }
 
-.eyebrow {
+.profile-hero h1 {
+  margin: 0;
+  font-size: 1.9rem;
+  color: #0f172a;
+}
+
+.hero-description {
+  margin: 0;
+  color: #6b7280;
+  max-width: 560px;
+  line-height: 1.5;
+}
+
+.hero-eyebrow {
   font-size: 0.85rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #6b7280;
+  color: #6366f1;
   margin: 0;
-}
-
-.eyebrow i {
-  margin-right: 0.35rem;
 }
 
 .profile-column {
@@ -68,20 +76,6 @@
   margin-bottom: 1.5rem;
 }
 
-.profile-card {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.avatar-panel {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-}
-
 .avatar {
   width: 160px;
   height: 160px;
@@ -105,10 +99,6 @@
   cursor: grab;
 }
 
-.avatar.dragging {
-  cursor: grabbing;
-}
-
 .avatar img {
   width: 100%;
   height: 100%;
@@ -118,16 +108,6 @@
 
 .avatar .initials {
   letter-spacing: 0.05em;
-}
-
-.avatar-helper {
-  font-size: 0.9rem;
-  color: #6b7280;
-  margin-bottom: 1rem;
-}
-
-.avatar-helper.disabled {
-  color: #9ca3af;
 }
 
 .password-card form {
@@ -140,15 +120,9 @@
   margin-top: 1rem;
 }
 
-.profile-form h2,
 .password-card h2 {
   margin: 0 0 0.25rem;
   font-size: 1.2rem;
-}
-
-.form-description {
-  margin: 0 0 1.5rem;
-  color: #6b7280;
 }
 
 .form-field {
@@ -168,13 +142,6 @@
   padding: 0.65rem 0.9rem;
   font-size: 1rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.read-only-password input {
-  background: #f8fafc;
-  border-color: rgba(15, 23, 42, 0.12);
-  color: #475569;
-  cursor: default;
 }
 
 .form-field input:disabled {

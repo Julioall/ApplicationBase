@@ -1,8 +1,9 @@
 <div class="profile-container">
   <div class="profile-hero">
-    <div>
+    <div class="hero-text">
       <p class="hero-eyebrow">{{ 'profile.hero.eyebrow' | translate }}</p>
-      
+      <h1>{{ 'profile.hero.title' | translate }}</h1>
+      <p class="hero-description">{{ 'profile.hero.description' | translate }}</p>
     </div>
     <button class="btn back-link" type="button" (click)="goBack()">
       <i class="fa-solid fa-arrow-left-long" aria-hidden="true"></i>
@@ -25,7 +26,7 @@
         <div class="photo-banner">
           <div class="banner"></div>
           <div class="photo-avatar">
-            <div class="avatar-shell" #avatarFrame>
+            <div class="avatar-shell">
               <div class="avatar" [class.has-image]="avatarPreview">
                 <ng-container *ngIf="avatarPreview; else placeholderAvatar">
                   <img [src]="avatarPreview" alt="{{ 'profile.photo.alt' | translate }}" [style.object-position]="avatarObjectPosition" [style.transform]="'scale(' + avatarZoom + ')'"/>

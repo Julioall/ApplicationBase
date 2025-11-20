@@ -86,8 +86,6 @@
       "clear": "Remover foto"
     },
     "form": {
-      "personalTitle": "Informa\u00e7\u00f5es pessoais",
-      "description": "Esses dados ajudam outras pessoas a reconhecer voc\u00ea na plataforma.",
       "nameLabel": "Nome completo",
       "namePlaceholder": "Fulano de Tal",
       "nameError": "Informe pelo menos 3 caracteres.",
@@ -124,7 +122,6 @@
       "profileUpdated": "Perfil atualizado com sucesso!",
       "passwordUpdated": "Senha atualizada com sucesso!",
       "passwordMismatch": "As senhas precisam ser iguais.",
-      "currentPasswordInvalid": "A senha atual n\u00e3o confere com a registrada.",
       "profileLoadError": "N\u00e3o foi poss\u00edvel carregar seu perfil agora.",
       "genericError": "Algo deu errado. Tente novamente.",
       "missingUser": "N\u00e3o encontramos informa\u00e7\u00f5es do usu\u00e1rio logado.",
