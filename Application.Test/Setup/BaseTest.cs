@@ -1,19 +1,20 @@
-﻿using Application.Domain.Interface;
-using Application.Domain.Model.User;
 using Application.Domain;
+using Application.Domain.Model.User;
+using Application.Domain.Interface;
+using Application.Domain.Validator;
 using Application.Infrastructure;
 using Application.Infrastructure.Repository;
+using Application.Infrastructure.Interface;
 using Application.Service;
 using Application.Service.Interface;
 using Application.Service.Service;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using System.Globalization;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
 using Raven.Embedded;
 using Raven.TestDriver;
-using Application.Domain.Validator;
+using System.Globalization;
 
 namespace Application.Tests.Setup
 {
@@ -74,7 +75,7 @@ namespace Application.Tests.Setup
                         ThrowOnInvalidOrMissingLicense = false
                     }
                 });
-                
+
                 _isAlreadyConfigured = true;
             }
 

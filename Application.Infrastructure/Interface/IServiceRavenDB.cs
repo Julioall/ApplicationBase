@@ -1,9 +1,11 @@
-﻿
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
 
-namespace Application.Domain.Interface
+namespace Application.Infrastructure.Interface
 {
+    /// <summary>
+    /// Infra provider for RavenDB sessions (fora do domínio).
+    /// </summary>
     public interface IServiceRavenDB
     {
         IDocumentStore Store { get; set; }

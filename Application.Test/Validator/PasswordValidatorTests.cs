@@ -1,26 +1,11 @@
-using Application.Domain;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Validator;
-using Microsoft.Extensions.Localization;
 
 namespace Application.Tests.Validator
 {
     public class PasswordValidatorTests
     {
-        private readonly PasswordValidator _validator;
-
-        private sealed class FakeLocalizer : IStringLocalizer<SharedResource>
-        {
-            public LocalizedString this[string name] => new(name, name);
-            public LocalizedString this[string name, params object[] arguments] => new(name, string.Format(name, arguments));
-            public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures) => Array.Empty<LocalizedString>();
-            public IStringLocalizer WithCulture(System.Globalization.CultureInfo culture) => this;
-        }
-
-        public PasswordValidatorTests()
-        {
-            _validator = new PasswordValidator(new FakeLocalizer());
-        }
+        private readonly PasswordValidator _validator = new PasswordValidator();
 
         [Theory]
         [InlineData("")]

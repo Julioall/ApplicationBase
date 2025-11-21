@@ -9,7 +9,7 @@ namespace Application.Domain.Model.User
         [JsonIgnore]
         public string? PasswordHash { get; set; }
         public required string Role { get; set; }
-        public DateTime? DateJoined { get; set; } = DateTime.Now.Date;
+        public DateTime? DateJoined { get; set; } = DateTime.UtcNow.Date;
         public DateTime? LastLogin { get; set; }
         [JsonIgnore]
         public string? RefreshTokenHash { get; set; }

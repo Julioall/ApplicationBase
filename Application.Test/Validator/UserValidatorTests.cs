@@ -1,11 +1,9 @@
-using Microsoft.Extensions.DependencyInjection;
-using Application.Tests.Setup;
-using Application.Domain;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
-using FluentValidation;
-using Microsoft.Extensions.Localization;
 using Application.Service.Service.Security;
+using Application.Tests.Setup;
+using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Tests.Validator
 {
@@ -13,7 +11,6 @@ namespace Application.Tests.Validator
     {
         private readonly IValidator<User> _userValidator;
         private readonly IUserService _userService;
-        private readonly IStringLocalizer<SharedResource> _localizer;
 
         public UserValidatorTests()
         {
@@ -21,8 +18,6 @@ namespace Application.Tests.Validator
                 ?? throw new Exception($"{nameof(IValidator<User>)} não foi encontrado");
             _userService = _serviceProvider.GetService<IUserService>()
                 ?? throw new Exception($"{nameof(IUserService)} não foi encontrado");
-            _localizer = _serviceProvider.GetService<IStringLocalizer<SharedResource>>()
-                ?? throw new Exception($"{nameof(IStringLocalizer<SharedResource>)} não foi encontrado");
         }
 
         [Fact]
@@ -33,8 +28,8 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains(_localizer["EmailRequired"], result.Message);
-            Assert.Contains(_localizer["EmailInvalid"], result.Message);
+            Assert.Contains("EmailRequired", result.Message);
+            Assert.Contains("EmailInvalid", result.Message);
         }
 
         [Fact]
@@ -45,11 +40,11 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains(_localizer["EmailInvalid"], result.Message);
+            Assert.Contains("EmailInvalid", result.Message);
         }
 
         [Fact]
-        public async Task Should_Return_ValidationError_When_Email_Already_Exists()
+        public async Task Should_Return_Error_When_Email_Already_Exists()
         {
             var existing = CreateValidUser();
             existing.Account.Email = "existing@email.com";
@@ -59,8 +54,7 @@ namespace Application.Tests.Validator
             var duplicate = CreateValidUser();
             duplicate.Account.Email = "existing@email.com";
 
-            var ex = await Assert.ThrowsAsync<ValidationException>(() => _userService.AddAsync(duplicate, "Valid123!"));
-            Assert.Contains(_localizer["EmailAlreadyExists"], ex.Message, StringComparison.InvariantCultureIgnoreCase);
+            await Assert.ThrowsAsync<Application.Domain.Exceptions.ConflictException>(() => _userService.AddAsync(duplicate, "Valid123!"));
         }
 
         [Fact]
@@ -71,7 +65,7 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains(_localizer["NameRequired"], result.Message);
+            Assert.Contains("NameRequired", result.Message);
         }
 
         [Fact]
@@ -82,29 +76,29 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains(_localizer["NameMaxLength"], result.Message);
+            Assert.Contains("NameMaxLength", result.Message);
         }
 
         [Fact]
         public void Should_Have_Error_When_DateOfBirth_Is_Future()
         {
             var user = CreateValidUser();
-            user.Profile.DateOfBirth = DateTime.Now.AddDays(1);
+            user.Profile.DateOfBirth = DateTime.UtcNow.AddDays(1);
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains(_localizer["DateOfBirthPast"], result.Message);
+            Assert.Contains("DateOfBirthPast", result.Message);
         }
 
         [Fact]
         public void Should_Have_Error_When_DateOfBirth_Is_Too_Old()
         {
             var user = CreateValidUser();
-            user.Profile.DateOfBirth = DateTime.Now.AddYears(-121);
+            user.Profile.DateOfBirth = DateTime.UtcNow.AddYears(-121);
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains(_localizer["DateOfBirthTooOld"], result.Message);
+            Assert.Contains("DateOfBirthTooOld", result.Message);
         }
 
         [Fact]
@@ -115,7 +109,7 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains(_localizer["RoleRequired"], result.Message);
+            Assert.Contains("RoleRequired", result.Message);
         }
 
         [Fact]
@@ -126,7 +120,7 @@ namespace Application.Tests.Validator
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains(_localizer["RoleInvalid"], result.Message);
+            Assert.Contains("RoleInvalid", result.Message);
         }
 
         [Fact]
@@ -156,7 +150,7 @@ namespace Application.Tests.Validator
                 Profile = new UserProfile
                 {
                     Name = "Valid Name",
-                    DateOfBirth = DateTime.Now.AddYears(-25)
+                    DateOfBirth = DateTime.UtcNow.AddYears(-25)
                 },
             };
         }

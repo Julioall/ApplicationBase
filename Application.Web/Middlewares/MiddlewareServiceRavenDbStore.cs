@@ -1,6 +1,6 @@
-﻿using Application.Domain.Interface;
 using Application.Domain.Model;
 using Application.Infrastructure.ConfigurationDb;
+using Application.Infrastructure.Interface;
 
 namespace Application.Api.Middlewares
 {
@@ -17,7 +17,7 @@ namespace Application.Api.Middlewares
         {
             if (serviceRavenDB.Session is null)
             {
-                var nameDatabase = ApplicationConstants.DATABASE_NAME;
+                var nameDatabase = Environment.GetEnvironmentVariable(ApplicationConstants.DATABASE_NAME_KEY);
                 serviceRavenDB.Session = DocumentStoreHolderAlternative.Store.OpenSession(nameDatabase);
                 serviceRavenDB.AsyncSession = DocumentStoreHolderAlternative.Store.OpenAsyncSession(nameDatabase);
                 serviceRavenDB.Store = DocumentStoreHolderAlternative.Store;

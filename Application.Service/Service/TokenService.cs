@@ -91,16 +91,17 @@ namespace Application.Service.Service
 
         private static JwtSecurityToken CreateJwt(User user)
         {
-            if (string.IsNullOrWhiteSpace(ApplicationConstants.JWT_SIGNING_KEY))
+            var signingKeyValue = Environment.GetEnvironmentVariable(ApplicationConstants.JWT_SIGNING_KEY);
+            if (string.IsNullOrWhiteSpace(signingKeyValue))
             {
                 throw new ArgumentNullException(nameof(ApplicationConstants.JWT_SIGNING_KEY), "JWT signing key is not configured.");
             }
 
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ApplicationConstants.JWT_SIGNING_KEY));
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKeyValue));
             var signinCredentials = new SigningCredentials(secretKey, algorithm: SecurityAlgorithms.HmacSha256);
             return new JwtSecurityToken(
-                issuer: ApplicationConstants.JWT_ISSUER,
-                audience: ApplicationConstants.JWT_AUDIENCE,
+                issuer: Environment.GetEnvironmentVariable(ApplicationConstants.JWT_ISSUER_KEY),
+                audience: Environment.GetEnvironmentVariable(ApplicationConstants.JWT_AUDIENCE_KEY),
                 claims: new[]
                 {
                     new Claim(type: ClaimTypes.Name, user.Account.Email),

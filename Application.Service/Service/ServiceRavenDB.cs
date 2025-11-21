@@ -1,4 +1,4 @@
-using Application.Domain.Interface;
+using Application.Infrastructure.Interface;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
 

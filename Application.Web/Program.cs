@@ -91,9 +91,9 @@ public class Program
         })
         .AddJwtBearer(options =>
         {
-            var issuer = ApplicationConstants.JWT_ISSUER;
-            var audience = ApplicationConstants.JWT_AUDIENCE;
-            var signingKey = ApplicationConstants.JWT_SIGNING_KEY;
+            var issuer = Environment.GetEnvironmentVariable(ApplicationConstants.JWT_ISSUER_KEY);
+            var audience = Environment.GetEnvironmentVariable(ApplicationConstants.JWT_AUDIENCE_KEY);
+            var signingKey = Environment.GetEnvironmentVariable(ApplicationConstants.JWT_SIGNING_KEY);
 
             if (string.IsNullOrEmpty(issuer))
                 throw new ArgumentNullException(nameof(issuer), "JWT issuer is not configured.");

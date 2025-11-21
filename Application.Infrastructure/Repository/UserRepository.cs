@@ -1,5 +1,6 @@
 using Application.Domain.Interface;
 using Application.Domain.Model.User;
+using Application.Infrastructure.Interface;
 using Raven.Client.Documents;
 using System.IO;
 

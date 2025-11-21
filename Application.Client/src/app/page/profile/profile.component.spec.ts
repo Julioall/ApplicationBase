@@ -38,7 +38,6 @@ describe('ProfileComponent', () => {
     Id: '1',
     Account: {
       Email: 'tester@app.com',
-      Password: 'OldPass123!',
       Role: 'User',
     },
     Profile: {

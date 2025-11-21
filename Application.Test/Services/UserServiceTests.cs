@@ -86,7 +86,7 @@ namespace Application.Tests.Services
 
             var duplicate = CreateValidUser("dup@user.com", withHash: false);
 
-            await Assert.ThrowsAsync<ValidationException>(() => _userService.AddAsync(duplicate, "Valid123!"));
+            await Assert.ThrowsAsync<Application.Domain.Exceptions.ConflictException>(() => _userService.AddAsync(duplicate, "Valid123!"));
         }
 
         [Fact]

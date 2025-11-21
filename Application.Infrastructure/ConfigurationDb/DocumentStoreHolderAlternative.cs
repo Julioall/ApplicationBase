@@ -25,10 +25,9 @@ namespace Application.Infrastructure.ConfigurationDb
 
         public static IDocumentStore CreateStore(string? db = null)
         {
-            db ??= ApplicationConstants.DATABASE_NAME;
+            db ??= Environment.GetEnvironmentVariable(ApplicationConstants.DATABASE_NAME_KEY);
 
-
-            var url = ApplicationConstants.DATABASE_URL
+            var url = Environment.GetEnvironmentVariable(ApplicationConstants.DATABASE_URL_KEY)
                 ?? throw new Exception($"Environment variable [{ApplicationConstants.DATABASE_URL_KEY}] is not defined");
 
             var urls = url.Split(',').ToArray();
@@ -44,7 +43,8 @@ namespace Application.Infrastructure.ConfigurationDb
 
         private static X509Certificate2 GetCertificateFromStore()
         {
-            if (string.IsNullOrWhiteSpace(ApplicationConstants.CERTIFICATE_SUBJECT))
+            var certificateSubject = Environment.GetEnvironmentVariable(ApplicationConstants.CERTIFICATE_SUBJECT_KEY);
+            if (string.IsNullOrWhiteSpace(certificateSubject))
             {
                 return null;
             }
@@ -52,19 +52,19 @@ namespace Application.Infrastructure.ConfigurationDb
             using (var store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
             {
                 store.Open(OpenFlags.ReadOnly);
-                var certs = store.Certificates.Find(X509FindType.FindBySubjectDistinguishedName, ApplicationConstants.CERTIFICATE_SUBJECT, false);
+                var certs = store.Certificates.Find(X509FindType.FindBySubjectDistinguishedName, certificateSubject, false);
                 if (certs.Count > 0)
                 {
                     var certificate = certs.FirstOrDefault();
                     if (!certificate.HasPrivateKey)
                     {
-                        throw new Exception($"Certificate with subject '{ApplicationConstants.CERTIFICATE_SUBJECT}' does not have a private key.");
+                        throw new Exception($"Certificate with subject '{certificateSubject}' does not have a private key.");
                     }
                     return certificate;
                 }
                 else
                 {
-                    throw new Exception($"Certificate with subject '{ApplicationConstants.CERTIFICATE_SUBJECT}' not found in the LocalMachine certificate store.");
+                    throw new Exception($"Certificate with subject '{certificateSubject}' not found in the LocalMachine certificate store.");
                 }
             }
         }
@@ -105,7 +105,7 @@ namespace Application.Infrastructure.ConfigurationDb
 
                 try
                 {
-                    var urls = Environment.GetEnvironmentVariable(ApplicationConstants.DATABASE_URL)?.Split(',').ToList();
+                    var urls = Environment.GetEnvironmentVariable(ApplicationConstants.DATABASE_URL_KEY)?.Split(',').ToList();
                     int count = urls?.Count ?? 0;
                     Store.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(database), count == 0 ? 1 : count));
                 }
