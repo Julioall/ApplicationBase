@@ -37,6 +37,7 @@ namespace Application.Tests.Setup
 
             InitializeDataBase();
             _serviceCollection = InicializeServices();
+            _serviceCollection.AddSingleton<IDocumentStore>(_store);
 
             _serviceCollection.AddScoped<IServiceRavenDB>((provider) => new ServiceRavenDB
             {

@@ -20,6 +20,7 @@ namespace Application.Infrastructure.ConfigurationDb
         {
             IDocumentStore documentStore = CreateStore();
             documentStore.Initialize();
+            CreateDatabaseIfDontExist(documentStore.Database);
             return documentStore;
         }
 
@@ -46,6 +47,7 @@ namespace Application.Infrastructure.ConfigurationDb
             var certificateSubject = Environment.GetEnvironmentVariable(ApplicationConstants.CERTIFICATE_SUBJECT_KEY);
             if (string.IsNullOrWhiteSpace(certificateSubject))
             {
+                Console.Error.WriteLine("RavenDB certificate subject not configured; proceeding without certificate.");
                 return null;
             }
 

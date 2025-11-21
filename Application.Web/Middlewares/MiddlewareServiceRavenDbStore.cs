@@ -18,16 +18,29 @@ namespace Application.Api.Middlewares
             if (serviceRavenDB.Session is null)
             {
                 var nameDatabase = Environment.GetEnvironmentVariable(ApplicationConstants.DATABASE_NAME_KEY);
-                serviceRavenDB.Session = DocumentStoreHolderAlternative.Store.OpenSession(nameDatabase);
-                serviceRavenDB.AsyncSession = DocumentStoreHolderAlternative.Store.OpenAsyncSession(nameDatabase);
-                serviceRavenDB.Store = DocumentStoreHolderAlternative.Store;
+                var store = DocumentStoreHolderAlternative.Store;
+                serviceRavenDB.Store = store;
+                serviceRavenDB.Session = store.OpenSession(nameDatabase);
+                serviceRavenDB.AsyncSession = store.OpenAsyncSession(nameDatabase);
             }
 
-            await _next(httpContext);
-
-            if (serviceRavenDB.AsyncSession != null)
+            try
             {
-                await serviceRavenDB.AsyncSession.SaveChangesAsync();
+                await _next(httpContext);
+
+                serviceRavenDB.Session?.SaveChanges();
+                if (serviceRavenDB.AsyncSession != null)
+                {
+                    await serviceRavenDB.AsyncSession.SaveChangesAsync();
+                }
+            }
+            finally
+            {
+                serviceRavenDB.Session?.Dispose();
+                if (serviceRavenDB.AsyncSession is IAsyncDisposable asyncSessionDisposable)
+                {
+                    await asyncSessionDisposable.DisposeAsync();
+                }
             }
         }
     }
