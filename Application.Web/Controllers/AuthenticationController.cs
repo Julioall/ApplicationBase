@@ -42,6 +42,11 @@ namespace Application.Api.Controllers
         [HttpPost("refresh")]
         public async Task<ActionResult> Refresh([FromBody] RefreshRequestDto request)
         {
+            if (request == null || string.IsNullOrWhiteSpace(request.RefreshToken))
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["InvalidRefreshToken"], statusCode: StatusCodes.Status400BadRequest);
+            }
+
             var tokenResponse = await _tokenService.RefreshAsync(request.RefreshToken);
             if (tokenResponse == null)
             {

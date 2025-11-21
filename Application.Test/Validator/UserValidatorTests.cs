@@ -5,6 +5,7 @@ using Application.Domain.Model.User;
 using Application.Service.Interface;
 using FluentValidation;
 using Microsoft.Extensions.Localization;
+using Application.Service.Service.Security;
 
 namespace Application.Tests.Validator
 {
@@ -58,74 +59,8 @@ namespace Application.Tests.Validator
             var duplicate = CreateValidUser();
             duplicate.Account.Email = "existing@email.com";
 
-            var ex = await Assert.ThrowsAsync<ValidationException>(() => _userService.AddAsync(duplicate));
+            var ex = await Assert.ThrowsAsync<ValidationException>(() => _userService.AddAsync(duplicate, "Valid123!"));
             Assert.Contains(_localizer["EmailAlreadyExists"], ex.Message, StringComparison.InvariantCultureIgnoreCase);
-        }
-
-        [Fact]
-        public void Should_Have_Error_When_Password_Is_Empty()
-        {
-            var user = CreateValidUser();
-            user.Account.Password = "";
-
-            var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
-
-            Assert.Contains(_localizer["PasswordRequired"], result.Message);
-        }
-
-        [Fact]
-        public void Should_Have_Error_When_Password_Is_Too_Short()
-        {
-            var user = CreateValidUser();
-            user.Account.Password = "Ab1!";
-
-            var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
-
-            Assert.Contains(_localizer["PasswordMinLength"], result.Message);
-        }
-
-        [Fact]
-        public void Should_Have_Error_When_Password_Missing_Uppercase()
-        {
-            var user = CreateValidUser();
-            user.Account.Password = "valid123!";
-
-            var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
-
-            Assert.Contains(_localizer["PasswordUppercase"], result.Message);
-        }
-
-        [Fact]
-        public void Should_Have_Error_When_Password_Missing_Lowercase()
-        {
-            var user = CreateValidUser();
-            user.Account.Password = "VALID123!";
-
-            var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
-
-            Assert.Contains(_localizer["PasswordLowercase"], result.Message);
-        }
-
-        [Fact]
-        public void Should_Have_Error_When_Password_Missing_Number()
-        {
-            var user = CreateValidUser();
-            user.Account.Password = "ValidPass!";
-
-            var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
-
-            Assert.Contains(_localizer["PasswordNumber"], result.Message);
-        }
-
-        [Fact]
-        public void Should_Have_Error_When_Password_Missing_Special_Character()
-        {
-            var user = CreateValidUser();
-            user.Account.Password = "Valid123";
-
-            var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
-
-            Assert.Contains(_localizer["PasswordSpecial"], result.Message);
         }
 
         [Fact]
@@ -215,7 +150,7 @@ namespace Application.Tests.Validator
                 Account = new UserAccount
                 {
                     Email = "valid@email.com",
-                    Password = "Valid123!",
+                    PasswordHash = SecureHash.HashSecret("Valid123!"),
                     Role = "User"
                 },
                 Profile = new UserProfile

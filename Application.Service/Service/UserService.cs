@@ -1,8 +1,10 @@
 using Application.Domain;
 using Application.Domain.Exceptions;
 using Application.Domain.Interface;
+using Application.Domain.Model.Dtos;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
+using Application.Service.Service.Security;
 using FluentValidation;
 using Microsoft.Extensions.Localization;
 using System.IO;
@@ -13,18 +15,25 @@ namespace Application.Service.Service
     {
         private readonly IUserRepository _userRepository;
         private readonly IValidator<User> _userValidator;
+        private readonly IValidator<PasswordInput> _passwordValidator;
         private readonly IStringLocalizer<SharedResource> _localizer;
 
-        public UserService(IUserRepository userRepository, IValidator<User> userValidator, IStringLocalizer<SharedResource> localizer)
+        public UserService(IUserRepository userRepository, IValidator<User> userValidator, IValidator<PasswordInput> passwordValidator, IStringLocalizer<SharedResource> localizer)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _userValidator = userValidator ?? throw new ArgumentNullException(nameof(userValidator));
+            _passwordValidator = passwordValidator ?? throw new ArgumentNullException(nameof(passwordValidator));
             _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
         }
 
-        public async Task AddAsync(User user)
+        public async Task AddAsync(User user, string password)
         {
             ArgumentNullException.ThrowIfNull(user);
+            ArgumentException.ThrowIfNullOrWhiteSpace(password);
+
+            _passwordValidator.ValidateAndThrow(new PasswordInput { Password = password });
+            user.Account.PasswordHash = SecureHash.HashSecret(password);
+            user.Account.DateJoined ??= DateTime.UtcNow;
 
             _userValidator.ValidateAndThrow(user);
 
@@ -34,7 +43,6 @@ namespace Application.Service.Service
                 throw new ConflictException(_localizer["EmailAlreadyExists"]);
             }
 
-            user.Account.DateJoined ??= DateTime.UtcNow;
             await _userRepository.AddAsync(user);
         }
 
@@ -71,9 +79,9 @@ namespace Application.Service.Service
             return _userRepository.GetByRoleAsync(role);
         }
 
-        public Task<User> GetByRefreshTokenAsync(string refreshToken)
+        public Task<User> GetByRefreshTokenAsync(string refreshTokenId)
         {
-            return _userRepository.GetByRefreshTokenAsync(refreshToken);
+            return _userRepository.GetByRefreshTokenAsync(refreshTokenId);
         }
 
         public async Task UpdateProfileAsync(string email, string? name, DateTime? dateOfBirth, Stream? profilePictureStream, string? profilePictureContentType, bool removeProfilePicture, double? profilePictureOffsetX, double? profilePictureOffsetY, string? jobTitle, string? department, string? organization, string? location, double? profilePictureScale)
@@ -132,12 +140,16 @@ namespace Application.Service.Service
                 throw new NotFoundException(_localizer["UserNotFoundByEmail", email]);
             }
 
-            if (!string.Equals(user.Account.Password, currentPassword, StringComparison.Ordinal))
+            if (!SecureHash.Verify(currentPassword, user.Account.PasswordHash))
             {
                 throw new BusinessException(_localizer["InvalidCurrentPassword"]);
             }
 
-            user.Account.Password = newPassword;
+            _passwordValidator.ValidateAndThrow(new PasswordInput { Password = newPassword });
+            user.Account.PasswordHash = SecureHash.HashSecret(newPassword);
+            user.Account.RefreshTokenHash = null;
+            user.Account.RefreshTokenId = null;
+            user.Account.RefreshTokenExpiry = null;
 
             _userValidator.ValidateAndThrow(user);
             await _userRepository.UpdateAsync(user);

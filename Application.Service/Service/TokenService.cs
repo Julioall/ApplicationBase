@@ -2,9 +2,11 @@ using Application.Domain.Model;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
+using Application.Service.Service.Security;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Application.Service.Service
@@ -20,9 +22,16 @@ namespace Application.Service.Service
 
         public async Task<TokenResponseDto?> GenerateTokens(LoginDto loginDto)
         {
+            if (loginDto == null)
+            {
+                return null;
+            }
+
             var userDataBase = await _userService.GetByEmailAsync(loginDto.Email);
 
-            if (userDataBase is null || loginDto is null || userDataBase.Account.Email != loginDto.Email || userDataBase.Account.Password != loginDto.Password)
+            if (userDataBase is null ||
+                userDataBase.Account.PasswordHash == null ||
+                !SecureHash.Verify(loginDto.Password, userDataBase.Account.PasswordHash))
             {
                 return null;
             }
@@ -31,7 +40,8 @@ namespace Application.Service.Service
             var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
 
             var refreshToken = GenerateRefreshToken();
-            userDataBase.Account.RefreshToken = refreshToken;
+            userDataBase.Account.RefreshTokenId = refreshToken.Id;
+            userDataBase.Account.RefreshTokenHash = refreshToken.Hash;
             userDataBase.Account.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
             userDataBase.Account.LastLogin = DateTime.UtcNow;
             await _userService.UpdateAsync(userDataBase);
@@ -39,20 +49,25 @@ namespace Application.Service.Service
             return new TokenResponseDto
             {
                 Token = accessToken,
-                RefreshToken = refreshToken,
+                RefreshToken = refreshToken.Token,
                 ExpiresAt = jwtSecurityToken.ValidTo
             };
         }
 
         public async Task<TokenResponseDto?> RefreshAsync(string refreshToken)
         {
-            if (string.IsNullOrWhiteSpace(refreshToken))
+            if (!TryParseRefreshToken(refreshToken, out var tokenId, out var tokenSecret))
             {
                 return null;
             }
 
-            var user = await _userService.GetByRefreshTokenAsync(refreshToken);
+            var user = await _userService.GetByRefreshTokenAsync(tokenId);
             if (user == null || user.Account.RefreshTokenExpiry <= DateTime.UtcNow)
+            {
+                return null;
+            }
+
+            if (!SecureHash.Verify(tokenSecret, user.Account.RefreshTokenHash))
             {
                 return null;
             }
@@ -61,14 +76,15 @@ namespace Application.Service.Service
             var newAccessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
 
             var newRefreshToken = GenerateRefreshToken();
-            user.Account.RefreshToken = newRefreshToken;
+            user.Account.RefreshTokenId = newRefreshToken.Id;
+            user.Account.RefreshTokenHash = newRefreshToken.Hash;
             user.Account.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
             await _userService.UpdateAsync(user);
 
             return new TokenResponseDto
             {
                 Token = newAccessToken,
-                RefreshToken = newRefreshToken,
+                RefreshToken = newRefreshToken.Token,
                 ExpiresAt = jwtSecurityToken.ValidTo
             };
         }
@@ -97,9 +113,35 @@ namespace Application.Service.Service
                 );
         }
 
-        private static string GenerateRefreshToken()
+        private static RefreshTokenPayload GenerateRefreshToken()
         {
-            return Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+            var tokenId = Guid.NewGuid().ToString("N");
+            var secret = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+            var hash = SecureHash.HashSecret(secret);
+            var token = $"{tokenId}.{secret}";
+            return new RefreshTokenPayload(tokenId, secret, hash, token);
         }
+
+        private static bool TryParseRefreshToken(string refreshToken, out string tokenId, out string tokenSecret)
+        {
+            tokenId = string.Empty;
+            tokenSecret = string.Empty;
+            if (string.IsNullOrWhiteSpace(refreshToken))
+            {
+                return false;
+            }
+
+            var parts = refreshToken.Split('.', 2, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length != 2)
+            {
+                return false;
+            }
+
+            tokenId = parts[0];
+            tokenSecret = parts[1];
+            return !string.IsNullOrWhiteSpace(tokenId) && !string.IsNullOrWhiteSpace(tokenSecret);
+        }
+
+        private readonly record struct RefreshTokenPayload(string Id, string Secret, string Hash, string Token);
     }
 }

@@ -51,10 +51,10 @@ namespace Application.Infrastructure.Repository
             return users.FirstOrDefault(u => u.Account.Email == email);
         }
 
-        public async Task<User> GetByRefreshTokenAsync(string refreshToken)
+        public async Task<User> GetByRefreshTokenAsync(string refreshTokenId)
         {
             return await _serviceRavenDb.AsyncSession.Query<User>()
-                .FirstOrDefaultAsync(u => u.Account.RefreshToken == refreshToken);
+                .FirstOrDefaultAsync(u => u.Account.RefreshTokenId == refreshTokenId);
         }
 
         public async Task UpdateAsync(User user)

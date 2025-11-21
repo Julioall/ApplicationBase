@@ -20,14 +20,6 @@ namespace Application.Domain.Validator
                 .EmailAddress().WithMessage(_localizer["EmailInvalid"])
                 .Must((user, email) => !EmailAlreadyExist(email, user.Id)).WithMessage(_localizer["EmailAlreadyExists"]);
 
-            RuleFor(user => user.Account.Password)
-                .NotEmpty().WithMessage(_localizer["PasswordRequired"])
-                .MinimumLength(8).WithMessage(_localizer["PasswordMinLength"])
-                .Matches(@"[A-Z]").WithMessage(_localizer["PasswordUppercase"])
-                .Matches(@"[a-z]").WithMessage(_localizer["PasswordLowercase"])
-                .Matches(@"[0-9]").WithMessage(_localizer["PasswordNumber"])
-                .Matches(@"[!@#$%^&*()_+\-=\[\]{};':""\\|,.<>\/?~`]").WithMessage(_localizer["PasswordSpecial"]);
-
 
             RuleFor(user => user.Profile.Name)
                 .NotEmpty().WithMessage(_localizer["NameRequired"])

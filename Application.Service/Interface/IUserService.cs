@@ -5,7 +5,7 @@ namespace Application.Service.Interface
 {
     public interface IUserService
     {
-        Task AddAsync(User user);
+        Task AddAsync(User user, string password);
 
         Task DeleteAsync(string id);
 
@@ -19,7 +19,7 @@ namespace Application.Service.Interface
 
         Task<User> GetByRoleAsync(string role);
 
-        Task<User> GetByRefreshTokenAsync(string refreshToken);
+        Task<User> GetByRefreshTokenAsync(string refreshTokenId);
 
         Task UpdateProfileAsync(string email, string? name, DateTime? dateOfBirth, Stream? profilePictureStream, string? profilePictureContentType, bool removeProfilePicture, double? profilePictureOffsetX, double? profilePictureOffsetY, string? jobTitle, string? department, string? organization, string? location, double? profilePictureScale);
 

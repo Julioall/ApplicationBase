@@ -33,14 +33,21 @@ namespace Application.Api.Controllers
         [HttpPost("add")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddUser([FromBody] User user)
+        public async Task<IActionResult> AddUser([FromBody] CreateUserDto request)
         {
-            if (user == null)
+            if (request == null)
             {
                 return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["UserCannotBeNullDetail"], statusCode: StatusCodes.Status400BadRequest);
             }
 
-            await _userService.AddAsync(user);
+            if (string.IsNullOrWhiteSpace(request.Account?.Password))
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["PasswordRequired"], statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            var user = MapToUser(request);
+
+            await _userService.AddAsync(user, request.Account.Password);
             return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, new { message = _localizer["UserAddedSuccessfully"] });
         }
 
@@ -397,6 +404,29 @@ namespace Application.Api.Controllers
             }
 
             return double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed) ? parsed : null;
+        }
+
+        private static User MapToUser(CreateUserDto dto)
+        {
+            return new User
+            {
+                Account = new UserAccount
+                {
+                    Email = dto.Account.Email,
+                    Role = dto.Account.Role,
+                    DateJoined = dto.Account.DateJoined ?? DateTime.UtcNow
+                },
+                Profile = new UserProfile
+                {
+                    Name = dto.Profile.Name,
+                    DateOfBirth = dto.Profile.DateOfBirth,
+                    ProfilePictureUrl = dto.Profile.ProfilePictureUrl,
+                    JobTitle = dto.Profile.JobTitle,
+                    Department = dto.Profile.Department,
+                    Organization = dto.Profile.Organization,
+                    Location = dto.Profile.Location
+                }
+            };
         }
     }
 }

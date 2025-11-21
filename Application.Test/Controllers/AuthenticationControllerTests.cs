@@ -78,11 +78,27 @@ namespace Application.Tests.Controllers
         {
             var controller = new AuthenticationController(_tokenService, _localizer);
 
-            var result = await controller.Refresh(new RefreshRequestDto()) as ObjectResult;
+            var result = await controller.Refresh(new RefreshRequestDto { RefreshToken = "invalid" }) as ObjectResult;
 
             Assert.NotNull(result);
             Assert.Equal(StatusCodes.Status401Unauthorized, result!.StatusCode);
             Assert.Equal("UnauthorizedTitle", ((ProblemDetails)result.Value!).Title);
+        }
+
+        [Fact]
+        public async Task Refresh_Should_Return_BadRequest_When_Payload_Is_Null_Or_Empty()
+        {
+            var controller = new AuthenticationController(_tokenService, _localizer);
+
+            var result = await controller.Refresh(null!) as ObjectResult;
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status400BadRequest, result!.StatusCode);
+            Assert.Equal("InvalidRequestTitle", ((ProblemDetails)result.Value!).Title);
+
+            result = await controller.Refresh(new RefreshRequestDto { RefreshToken = "" }) as ObjectResult;
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status400BadRequest, result!.StatusCode);
+            Assert.Equal("InvalidRequestTitle", ((ProblemDetails)result.Value!).Title);
         }
 
         [Fact]

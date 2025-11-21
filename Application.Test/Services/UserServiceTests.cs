@@ -3,6 +3,7 @@ using System.IO;
 using Application.Domain.Exceptions;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
+using Application.Service.Service.Security;
 using Application.Tests.Setup;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -53,14 +54,27 @@ namespace Application.Tests.Services
         [Fact]
         public async Task AddAsync_Should_Set_DateJoined_When_Null()
         {
-            var user = CreateValidUser("new@user.com");
+            var user = CreateValidUser("new@user.com", withHash: false);
             user.Account.DateJoined = null;
 
-            await _userService.AddAsync(user);
+            await _userService.AddAsync(user, "Valid123!");
             await _asyncSession.SaveChangesAsync();
 
             var saved = await _userService.GetByEmailAsync(user.Account.Email);
             Assert.NotNull(saved?.Account.DateJoined);
+        }
+
+        [Fact]
+        public async Task AddAsync_Should_Hash_Password_And_Clear_Plaintext()
+        {
+            var user = CreateValidUser("hash@user.com", withHash: false);
+
+            await _userService.AddAsync(user, "Valid123!");
+            await _asyncSession.SaveChangesAsync();
+
+            var saved = await _userService.GetByEmailAsync(user.Account.Email);
+            Assert.NotNull(saved);
+            Assert.False(string.IsNullOrWhiteSpace(saved!.Account.PasswordHash));
         }
 
         [Fact]
@@ -70,15 +84,22 @@ namespace Application.Tests.Services
             _session.Store(existing);
             _session.SaveChanges();
 
-            var duplicate = CreateValidUser("dup@user.com");
+            var duplicate = CreateValidUser("dup@user.com", withHash: false);
 
-            await Assert.ThrowsAsync<ValidationException>(() => _userService.AddAsync(duplicate));
+            await Assert.ThrowsAsync<ValidationException>(() => _userService.AddAsync(duplicate, "Valid123!"));
         }
 
         [Fact]
         public async Task AddAsync_Should_Throw_When_User_Is_Null()
         {
-            await Assert.ThrowsAsync<ArgumentNullException>(() => _userService.AddAsync(null!));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _userService.AddAsync(null!, "Valid123!"));
+        }
+
+        [Fact]
+        public async Task AddAsync_Should_Throw_When_Password_Invalid()
+        {
+            var user = CreateValidUser("weak@user.com", withHash: false);
+            await Assert.ThrowsAsync<ValidationException>(() => _userService.AddAsync(user, "weak"));
         }
 
         [Fact]
@@ -110,7 +131,7 @@ namespace Application.Tests.Services
             _session.Store(existing);
             _session.SaveChanges();
 
-            existing.Account.Password = "short";
+            existing.Profile.Name = "";
 
             await Assert.ThrowsAsync<ValidationException>(() => _userService.UpdateAsync(existing));
         }
@@ -218,7 +239,7 @@ namespace Application.Tests.Services
         public async Task ChangePasswordAsync_Should_Update_When_CurrentPassword_Is_Correct()
         {
             var existing = CreateValidUser("changepass@user.com");
-            existing.Account.Password = "OldPass123!";
+            existing.Account.PasswordHash = SecureHash.HashSecret("OldPass123!");
             _session.Store(existing);
             _session.SaveChanges();
 
@@ -227,14 +248,17 @@ namespace Application.Tests.Services
 
             var updated = await _userService.GetByEmailAsync(existing.Account.Email);
             Assert.NotNull(updated);
-            Assert.Equal("NewPass123!", updated!.Account.Password);
+            Assert.False(string.IsNullOrWhiteSpace(updated.Account.PasswordHash));
+            Assert.Null(updated.Account.RefreshTokenHash);
+            Assert.Null(updated.Account.RefreshTokenId);
+            Assert.Null(updated.Account.RefreshTokenExpiry);
         }
 
         [Fact]
         public async Task ChangePasswordAsync_Should_Throw_When_CurrentPassword_Invalid()
         {
             var existing = CreateValidUser("wrongpass@user.com");
-            existing.Account.Password = "Correct123!";
+            existing.Account.PasswordHash = SecureHash.HashSecret("Correct123!");
             _session.Store(existing);
             _session.SaveChanges();
 
@@ -242,14 +266,15 @@ namespace Application.Tests.Services
                 _userService.ChangePasswordAsync(existing.Account.Email, "Wrong123!", "Another123!"));
         }
 
-        private static User CreateValidUser(string email)
+        private static User CreateValidUser(string email, bool withHash = true)
         {
+            const string defaultPassword = "Valid123!";
             return new User
             {
                 Account = new UserAccount
                 {
                     Email = email,
-                    Password = "Valid123!",
+                    PasswordHash = withHash ? SecureHash.HashSecret(defaultPassword) : null,
                     Role = "User"
                 },
                 Profile = new UserProfile

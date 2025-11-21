@@ -160,7 +160,11 @@ describe('ProfileComponent', () => {
     component.removeAvatar();
 
     expect(component.avatarPreview).toBeNull();
-    expect(userServiceSpy.updateProfile).toHaveBeenCalledWith({ RemoveProfilePicture: true });
+    expect(userServiceSpy.updateProfile).toHaveBeenCalledWith(
+      jasmine.objectContaining({
+        RemoveProfilePicture: true
+      })
+    );
   });
 
   it('should handle avatar uploads via modal and persist after saving', fakeAsync(() => {

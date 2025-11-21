@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
+using System.Text.Json.Serialization;
 
 namespace Application.Domain.Model.User
 {
     public class UserAccount
     {
         public required string Email { get; set; }
-        public required string Password { get; set; }
+        [JsonIgnore]
+        public string? PasswordHash { get; set; }
         public required string Role { get; set; }
         public DateTime? DateJoined { get; set; } = DateTime.Now.Date;
         public DateTime? LastLogin { get; set; }
-        public string? RefreshToken { get; set; }
+        [JsonIgnore]
+        public string? RefreshTokenHash { get; set; }
+        public string? RefreshTokenId { get; set; }
         public DateTime? RefreshTokenExpiry { get; set; }
     }
 }

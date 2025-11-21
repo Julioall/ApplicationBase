@@ -11,7 +11,7 @@ namespace Application.Domain.Interface
         Task<User> GetByIdAsync(string id);
         Task<User> GetByRoleAsync(string role);
         Task<User> GetByEmailAsync(string username);
-        Task<User> GetByRefreshTokenAsync(string refreshToken);
+        Task<User> GetByRefreshTokenAsync(string refreshTokenId);
         Task UpdateAsync(User user);
         Task UploadProfilePictureAsync(string userId, Stream stream, string contentType);
         Task<(byte[] Data, string ContentType)?> GetProfilePictureAsync(string userId);
