@@ -129,23 +129,6 @@ export class UserService {
       .pipe(catchError(this.handleError));
   }
 
-  uploadProfilePicture(file: File): Observable<any> {
-    const formData = new FormData();
-    formData.append('file', file);
-    return this.http.post(`${this.apiUrl}/profile-picture`, formData, { headers: this.getAuthHeaders(false) })
-      .pipe(catchError(this.handleError));
-  }
-
-  deleteProfilePicture(): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/profile-picture`, { headers: this.getAuthHeaders(false) })
-      .pipe(catchError(this.handleError));
-  }
-
-  getProfilePicture(): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/profile-picture`, { headers: this.getAuthHeaders(false), responseType: 'blob' as const })
-      .pipe(catchError(this.handleError));
-  }
-
   private handleError(error: unknown): Observable<never> {
     console.error('An error occurred:', error);
     return throwError(() => error);
