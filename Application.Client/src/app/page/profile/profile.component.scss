@@ -281,14 +281,6 @@
   color: #f3f4f6;
 }
 
-.profile-loading {
-  background: #1a1a1a;
-  border-radius: 1.25rem;
-  padding: 2rem;
-  text-align: center;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-}
-
 .profile-empty {
   text-align: center;
   display: flex;
@@ -398,7 +390,6 @@
   display: flex;
   flex-direction: column;
   gap: 1.1rem;
-  margin-top: 1rem;
 }
 
 .about-row {
@@ -414,6 +405,17 @@
 }
 
 .about-value span {
+  color: #f8fafc;
+}
+
+.about-value select {
+  width: 100%;
+  max-width: 260px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.95rem;
+  background: rgba(255, 255, 255, 0.02);
   color: #f8fafc;
 }
 
@@ -505,13 +507,47 @@
 .account-value.password-preview {
   flex-direction: column;
   gap: 0.4rem;
-  align-items: start;
-  text-align: right;
+  align-items: flex-start;
 }
 
 .account-value.password-preview small {
   font-size: 0.8rem;
   color: #94a3b8;
+}
+
+.password-mask {
+  letter-spacing: 0.45rem;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.password-grid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.password-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.password-field span {
+  font-size: 0.85rem;
+  color: #d4dbe8;
+}
+
+.password-field input {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 0.45rem 0.8rem;
+  color: #f8fafc;
+}
+
+.password-field.has-error input {
+  border-color: #f87171;
 }
 
 .account-form {
@@ -553,6 +589,17 @@
   color: #f8fafc;
 }
 
+:host-context(.dark-theme) .about-value select {
+  background: var(--surface);
+  border-color: rgba(248, 250, 252, 0.15);
+  color: #f8fafc;
+}
+
+:host-context(.dark-theme) .password-field input {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
 :host-context(.dark-theme) .account-list {
   background: var(--surface-alt);
   border-color: rgba(248, 250, 252, 0.08);
@@ -585,6 +632,16 @@
   box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
 }
 
+:host-context(.light-theme) .password-field span {
+  color: #334155;
+}
+
+:host-context(.light-theme) .password-field input {
+  background: #f8fafc;
+  border-color: rgba(15, 23, 42, 0.12);
+  color: #111827;
+}
+
 :host-context(.light-theme) .profile-hero {
   background: #fff;
   box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
@@ -599,36 +656,35 @@
 }
 
 :host-context(.light-theme) .btn {
-  color: #1f2937;
-  background: transparent;
+  color: #0f172a;
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(15, 23, 42, 0.12);
+  box-shadow: none;
 }
 
 :host-context(.light-theme) .btn:not(:disabled):hover {
-  border-color: #0052cc;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.15);
-  color: #0052cc;
+  border-color: #1d4ed8;
+  color: #0f172a;
+  background: rgba(15, 23, 42, 0.08);
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.12);
 }
 
 :host-context(.light-theme) .btn.primary {
   color: #fff;
-  background: linear-gradient(135deg, #fafafa, #dcdcdc);
-  border-color: #f8fafc;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  border-color: transparent;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
 }
 
 :host-context(.light-theme) .btn.primary:not(:disabled):hover {
-  box-shadow: 0 12px 26px rgba(0, 82, 204, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.3);
   color: #fff;
 }
 
 :host-context(.light-theme) .btn.back-link {
   border-color: rgba(15, 23, 42, 0.08);
   color: #1f2937;
-}
-
-:host-context(.light-theme) .profile-loading {
-  background: #fff;
-  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
 }
 
 :host-context(.light-theme) .profile-empty p {
@@ -677,6 +733,12 @@
 :host-context(.light-theme) .account-value select,
 :host-context(.light-theme) .account-value input,
 :host-context(.light-theme) .form-field input {
+  background: #fff;
+  border-color: #d1d5db;
+  color: #0f172a;
+}
+
+:host-context(.light-theme) .about-value select {
   background: #fff;
   border-color: #d1d5db;
   color: #0f172a;
@@ -747,22 +809,6 @@
 .about-card,
 .password-card {
   border: 1px solid rgba(15, 23, 42, 0.08);
-}
-
-.spinner {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 4px solid rgba(99, 102, 241, 0.2);
-  border-top-color: #6366f1;
-  margin: 0 auto 1rem;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .avatar-modal-backdrop {

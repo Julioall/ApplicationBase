@@ -61,7 +61,7 @@
     }
   },
   "profile": {
-    "loading": "Loading your profile...",
+    "pageTitle": "Profile",
     "actions": {
       "back": "Back",
       "retry": "Try again",
@@ -103,7 +103,6 @@
     },
     "about": {
       "title": "Profile",
-      "description": "Keep these fields up to date so your teammates know how to reach you.",
       "jobTitle": "Job title",
       "jobTitlePlaceholder": "Your job title",
       "department": "Department",
@@ -115,7 +114,6 @@
     },
     "account": {
       "title": "Account",
-      "description": "Manage how you sign in and personalize the workspace.",
       "languageLabel": "Language",
       "themeLabel": "Theme",
       "passwordLabel": "Password",

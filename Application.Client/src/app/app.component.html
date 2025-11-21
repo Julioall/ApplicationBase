@@ -53,10 +53,10 @@
         <button class="icon-btn ghost menu-toggle" type="button" [attr.aria-label]="'home.openMenu' | translate" (click)="toggleNav()">
           <i class="fa-solid" [ngClass]="isNavOpen ? 'fa-xmark' : 'fa-bars'"></i>
         </button>
-        <div class="breadcrumbs">
-          <i class="fa-solid fa-house"></i>
-          <span>{{ 'home.dashboard' | translate }}</span>
-        </div>
+      <div class="breadcrumbs">
+        <i [class]="breadcrumbIconClass"></i>
+        <span>{{ breadcrumbLabelKey | translate }}</span>
+      </div>
 
         <div class="search-bar">
           <i class="fa-solid fa-magnifying-glass"></i>
@@ -76,13 +76,16 @@
             <button
               class="profile-trigger"
               type="button"
-              (click)="toggleProfileMenu($event)"
-              [attr.aria-expanded]="isProfileMenuOpen"
-              [attr.aria-label]="
-                (isProfileMenuOpen ? 'home.profileMenu.closeLabel' : 'home.profileMenu.openLabel') | translate
-              "
-            >
-              <div class="avatar">{{ userInitials }}</div>
+            (click)="toggleProfileMenu($event)"
+            [attr.aria-expanded]="isProfileMenuOpen"
+            [attr.aria-label]="
+              (isProfileMenuOpen ? 'home.profileMenu.closeLabel' : 'home.profileMenu.openLabel') | translate
+            "
+          >
+              <div class="avatar">
+                <img *ngIf="userAvatarUrl; else fallbackInitials" [src]="userAvatarUrl" alt="User avatar" />
+                <ng-template #fallbackInitials>{{ userInitials }}</ng-template>
+              </div>
               <i class="fa-solid" [ngClass]="isProfileMenuOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
             </button>
 

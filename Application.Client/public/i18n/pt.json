@@ -61,7 +61,7 @@
     }
   },
   "profile": {
-    "loading": "Carregando seu perfil...",
+    "pageTitle": "Perfil",
     "actions": {
       "back": "Voltar",
       "retry": "Tentar novamente",
@@ -103,7 +103,6 @@
     },
     "about": {
       "title": "Perfil",
-      "description": "Mantenha estes campos atualizados para que todos saibam como te encontrar.",
       "jobTitle": "Cargo",
       "jobTitlePlaceholder": "Seu cargo",
       "department": "Departamento",
@@ -115,7 +114,6 @@
     },
     "account": {
       "title": "Conta",
-      "description": "Gerencie acesso, idioma e tema do workspace.",
       "languageLabel": "Idioma",
       "themeLabel": "Tema",
       "passwordLabel": "Senha",

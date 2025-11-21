@@ -1,9 +1,4 @@
 ﻿<div class="profile-container">
-  <div *ngIf="isLoading" class="profile-loading">
-    <div class="spinner" aria-hidden="true"></div>
-    <p>{{ 'profile.loading' | translate }}</p>
-  </div>
-
   <ng-container *ngIf="!isLoading">
     <ng-container *ngIf="user as currentUser; else profileFallback">
       <div class="profile-column">
@@ -51,7 +46,6 @@
               <div class="section-header">
                 <div>
                   <h2>{{ 'profile.about.title' | translate }}</h2>
-                  <p class="section-helper">{{ 'profile.about.description' | translate }}</p>
                 </div>
                 <button *ngIf="!isEditingProfile" class="btn subtle" type="button" (click)="startProfileEdit()">
                   <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
@@ -159,6 +153,38 @@
                     </ng-template>
                   </div>
                 </div>
+
+                <div class="about-row">
+                  <div class="about-label">{{ 'profile.account.languageLabel' | translate }}</div>
+                  <div class="about-value">
+                    <select
+                      class="account-field interactive"
+                      [(ngModel)]="selectedLanguage"
+                      (ngModelChange)="onLanguageChange($event)"
+                      [ngModelOptions]="{ standalone: true }"
+                    >
+                      <option *ngFor="let language of languages" [value]="language.value">
+                        {{ language.label | translate }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="about-row">
+                  <div class="about-label">{{ 'profile.account.themeLabel' | translate }}</div>
+                  <div class="about-value">
+                    <select
+                      class="account-field interactive"
+                      [(ngModel)]="selectedTheme"
+                      (ngModelChange)="onThemeChange($event)"
+                      [ngModelOptions]="{ standalone: true }"
+                    >
+                      <option *ngFor="let theme of themes" [value]="theme.value">
+                        {{ theme.label | translate }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
               </div>
 
               <div class="form-actions account-form" *ngIf="isEditingProfile">
@@ -180,7 +206,6 @@
               <div class="section-header">
                 <div>
                   <h2>{{ 'profile.account.title' | translate }}</h2>
-                  <p class="section-helper">{{ 'profile.account.description' | translate }}</p>
                 </div>
                 <button *ngIf="!isEditingPassword" class="btn subtle" type="button" (click)="startPasswordEdit()">
                   <i class="fa-solid fa-user-gear" aria-hidden="true"></i>
@@ -210,90 +235,56 @@
                 <div class="account-row password-row">
                   <div class="account-label">{{ 'profile.account.passwordLabel' | translate }}</div>
                   <div class="account-value password-preview">
-                    <ng-container *ngIf="isEditingPassword; else passwordPreview">
-                      <input
-                        class="account-field masked-input read-only-input"
-                        type="password"
-                        [value]="'profile.account.passwordPlaceholder' | translate"
-                        disabled
-                        [attr.aria-label]="'profile.account.passwordLabel' | translate"
-                      />
+                    <ng-container *ngIf="isEditingPassword; else passwordConfigured">
+                      <div class="password-grid" [formGroup]="passwordForm">
+                        <label class="password-field" [class.has-error]="passwordForm.get('currentPassword')?.invalid && passwordForm.get('currentPassword')?.touched">
+                          <span>{{ 'profile.password.currentLabel' | translate }}</span>
+                          <input
+                            class="account-field interactive"
+                            type="password"
+                            formControlName="currentPassword"
+                            autocomplete="current-password"
+                          />
+                        </label>
+                        <label class="password-field" [class.has-error]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched">
+                          <span>{{ 'profile.password.newLabel' | translate }}</span>
+                          <input
+                            class="account-field interactive"
+                            type="password"
+                            formControlName="newPassword"
+                            autocomplete="new-password"
+                          />
+                        </label>
+                        <label class="password-field" [class.has-error]="passwordForm.get('confirmPassword')?.invalid && passwordForm.get('confirmPassword')?.touched">
+                          <span>{{ 'profile.password.confirmLabel' | translate }}</span>
+                          <input
+                            class="account-field interactive"
+                            type="password"
+                            formControlName="confirmPassword"
+                            autocomplete="new-password"
+                          />
+                        </label>
+                      </div>
+                      <small class="helper">{{ 'profile.password.requirements' | translate }}</small>
                     </ng-container>
-                    <ng-template #passwordPreview>
-                      <span>{{ 'profile.account.passwordPlaceholder' | translate }}</span>
+                    <ng-template #passwordConfigured>
+                      <span class="password-mask">{{ 'profile.account.passwordPlaceholder' | translate }}</span>
                     </ng-template>
                   </div>
                 </div>
 
-                <div class="account-row">
-                  <div class="account-label">{{ 'profile.account.languageLabel' | translate }}</div>
-                  <div class="account-value">
-                    <ng-container *ngIf="isEditingPassword; else languagePreview">
-                      <select
-                        class="account-field"
-                        [(ngModel)]="selectedLanguage"
-                        (ngModelChange)="onLanguageChange($event)"
-                        [ngModelOptions]="{ standalone: true }"
-                      >
-                        <option *ngFor="let language of languages" [value]="language.value">
-                          {{ language.label | translate }}
-                        </option>
-                      </select>
-                    </ng-container>
-                    <ng-template #languagePreview>
-                      <span>{{ ('profile.account.languages.' + selectedLanguage) | translate }}</span>
-                    </ng-template>
-                  </div>
-                </div>
-
-                <div class="account-row">
-                  <div class="account-label">{{ 'profile.account.themeLabel' | translate }}</div>
-                  <div class="account-value">
-                    <ng-container *ngIf="isEditingPassword; else themePreview">
-                      <select
-                        class="account-field"
-                        [(ngModel)]="selectedTheme"
-                        (ngModelChange)="onThemeChange($event)"
-                        [ngModelOptions]="{ standalone: true }"
-                      >
-                        <option *ngFor="let theme of themes" [value]="theme.value">
-                          {{ theme.label | translate }}
-                        </option>
-                      </select>
-                    </ng-container>
-                    <ng-template #themePreview>
-                      <span>{{ ('profile.account.themes.' + selectedTheme) | translate }}</span>
-                    </ng-template>
-                  </div>
-                </div>
               </div>
 
-              <form class="account-form" *ngIf="isEditingPassword" [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
-                <div class="form-field" [class.has-error]="passwordForm.get('currentPassword')?.invalid && passwordForm.get('currentPassword')?.touched">
-                  <label for="currentPassword">{{ 'profile.password.currentLabel' | translate }}</label>
-                  <input id="currentPassword" type="password" formControlName="currentPassword" autocomplete="current-password" />
-                </div>
-
-                <div class="form-field" [class.has-error]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched">
-                  <label for="newPassword">{{ 'profile.password.newLabel' | translate }}</label>
-                  <input id="newPassword" type="password" formControlName="newPassword" autocomplete="new-password" />
-                  <small class="helper">{{ 'profile.password.requirements' | translate }}</small>
-                </div>
-
-                <div class="form-field" [class.has-error]="passwordForm.get('confirmPassword')?.invalid && passwordForm.get('confirmPassword')?.touched">
-                  <label for="confirmPassword">{{ 'profile.password.confirmLabel' | translate }}</label>
-                  <input id="confirmPassword" type="password" formControlName="confirmPassword" autocomplete="new-password" />
-                </div>
-
+              <ng-container *ngIf="isEditingPassword">
                 <small class="error" *ngIf="passwordForm.hasError('passwordMismatch') && passwordForm.touched">
                   {{ 'profile.messages.passwordMismatch' | translate }}
                 </small>
 
-                <div class="form-actions">
+                <div class="form-actions account-form">
                   <button class="btn subtle" type="button" (click)="cancelPasswordEdit()" [disabled]="isSavingPassword">
                     {{ 'profile.form.cancel' | translate }}
                   </button>
-                  <button class="btn primary" type="submit" [disabled]="passwordForm.invalid || isSavingPassword">
+                  <button class="btn primary" type="button" (click)="onPasswordSubmit()" [disabled]="passwordForm.invalid || isSavingPassword">
                     <ng-container *ngIf="isSavingPassword; else savePassword">
                       <span>{{ 'profile.password.saving' | translate }}</span>
                     </ng-container>
@@ -302,7 +293,7 @@
                     </ng-template>
                   </button>
                 </div>
-              </form>
+              </ng-container>
             </section>
           </div>
         </section>
