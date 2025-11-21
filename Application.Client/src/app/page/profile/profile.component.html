@@ -192,56 +192,78 @@
                 <div class="account-row">
                   <div class="account-label">{{ 'profile.form.emailLabel' | translate }}</div>
                   <div class="account-value">
-                    <input
-                      class="account-field read-only-input"
-                      type="email"
-                      [value]="currentUser.Account.Email"
-                      disabled
-                      [attr.aria-label]="'profile.form.emailLabel' | translate"
-                    />
+                    <ng-container *ngIf="isEditingPassword; else emailPreview">
+                      <input
+                        class="account-field read-only-input"
+                        type="email"
+                        [value]="currentUser.Account.Email"
+                        disabled
+                        [attr.aria-label]="'profile.form.emailLabel' | translate"
+                      />
+                    </ng-container>
+                    <ng-template #emailPreview>
+                      <span>{{ currentUser.Account.Email }}</span>
+                    </ng-template>
                   </div>
                 </div>
 
                 <div class="account-row password-row">
                   <div class="account-label">{{ 'profile.account.passwordLabel' | translate }}</div>
                   <div class="account-value password-preview">
-                    <input
-                      class="account-field masked-input"
-                      type="password"
-                      [value]="'profile.account.passwordPlaceholder' | translate"
-                      disabled
-                      [attr.aria-label]="'profile.account.passwordLabel' | translate"
-                    />
+                    <ng-container *ngIf="isEditingPassword; else passwordPreview">
+                      <input
+                        class="account-field masked-input read-only-input"
+                        type="password"
+                        [value]="'profile.account.passwordPlaceholder' | translate"
+                        disabled
+                        [attr.aria-label]="'profile.account.passwordLabel' | translate"
+                      />
+                    </ng-container>
+                    <ng-template #passwordPreview>
+                      <span>{{ 'profile.account.passwordPlaceholder' | translate }}</span>
+                    </ng-template>
                   </div>
                 </div>
 
                 <div class="account-row">
                   <div class="account-label">{{ 'profile.account.languageLabel' | translate }}</div>
                   <div class="account-value">
-                    <select
-                      [(ngModel)]="selectedLanguage"
-                      (ngModelChange)="onLanguageChange($event)"
-                      [ngModelOptions]="{ standalone: true }"
-                    >
-                      <option *ngFor="let language of languages" [value]="language.value">
-                        {{ language.label | translate }}
-                      </option>
-                    </select>
+                    <ng-container *ngIf="isEditingPassword; else languagePreview">
+                      <select
+                        class="account-field"
+                        [(ngModel)]="selectedLanguage"
+                        (ngModelChange)="onLanguageChange($event)"
+                        [ngModelOptions]="{ standalone: true }"
+                      >
+                        <option *ngFor="let language of languages" [value]="language.value">
+                          {{ language.label | translate }}
+                        </option>
+                      </select>
+                    </ng-container>
+                    <ng-template #languagePreview>
+                      <span>{{ ('profile.account.languages.' + selectedLanguage) | translate }}</span>
+                    </ng-template>
                   </div>
                 </div>
 
                 <div class="account-row">
                   <div class="account-label">{{ 'profile.account.themeLabel' | translate }}</div>
                   <div class="account-value">
-                    <select
-                      [(ngModel)]="selectedTheme"
-                      (ngModelChange)="onThemeChange($event)"
-                      [ngModelOptions]="{ standalone: true }"
-                    >
-                      <option *ngFor="let theme of themes" [value]="theme.value">
-                        {{ theme.label | translate }}
-                      </option>
-                    </select>
+                    <ng-container *ngIf="isEditingPassword; else themePreview">
+                      <select
+                        class="account-field"
+                        [(ngModel)]="selectedTheme"
+                        (ngModelChange)="onThemeChange($event)"
+                        [ngModelOptions]="{ standalone: true }"
+                      >
+                        <option *ngFor="let theme of themes" [value]="theme.value">
+                          {{ theme.label | translate }}
+                        </option>
+                      </select>
+                    </ng-container>
+                    <ng-template #themePreview>
+                      <span>{{ ('profile.account.themes.' + selectedTheme) | translate }}</span>
+                    </ng-template>
                   </div>
                 </div>
               </div>
