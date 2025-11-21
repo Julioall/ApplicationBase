@@ -5,6 +5,7 @@ using Application.Domain.Model.User;
 using Application.Service.Interface;
 using Application.Service.Service;
 using Application.Service.Service.Security;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Application.Tests.Services
 {
@@ -50,7 +51,7 @@ namespace Application.Tests.Services
         public async Task GenerateTokens_Should_Return_Tokens_When_Password_Is_Valid()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user));
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
 
             var tokens = await service.GenerateTokens(loginDto);
@@ -66,7 +67,7 @@ namespace Application.Tests.Services
         public async Task GenerateTokens_Should_Return_Null_When_Password_Is_Invalid()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user));
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Wrong!" };
 
             var tokens = await service.GenerateTokens(loginDto);
@@ -78,7 +79,7 @@ namespace Application.Tests.Services
         public async Task RefreshAsync_Should_Rotate_RefreshToken_When_Valid()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user));
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
 
             var initial = await service.GenerateTokens(loginDto);
@@ -96,10 +97,42 @@ namespace Application.Tests.Services
         public async Task RefreshAsync_Should_Return_Null_For_Invalid_Format()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user));
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
 
             var refreshed = await service.RefreshAsync("invalid-token");
 
+            Assert.Null(refreshed);
+        }
+
+        [Fact]
+        public async Task RefreshAsync_Should_Return_Null_When_Token_Expired()
+        {
+            var user = CreateUser();
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
+            var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
+
+            var initial = await service.GenerateTokens(loginDto);
+            Assert.NotNull(initial);
+
+            user.Account.RefreshTokenExpiry = DateTime.UtcNow.AddMinutes(-1);
+
+            var refreshed = await service.RefreshAsync(initial!.RefreshToken);
+            Assert.Null(refreshed);
+        }
+
+        [Fact]
+        public async Task RefreshAsync_Should_Return_Null_When_Expiry_Null()
+        {
+            var user = CreateUser();
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
+            var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
+
+            var initial = await service.GenerateTokens(loginDto);
+            Assert.NotNull(initial);
+
+            user.Account.RefreshTokenExpiry = null;
+
+            var refreshed = await service.RefreshAsync(initial!.RefreshToken);
             Assert.Null(refreshed);
         }
 

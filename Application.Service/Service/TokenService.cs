@@ -4,6 +4,7 @@ using Application.Domain.Model.User;
 using Application.Service.Interface;
 using Application.Service.Service.Security;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -14,10 +15,12 @@ namespace Application.Service.Service
     public class TokenService : ITokenService
     {
         private readonly IUserService _userService;
+        private readonly ILogger<TokenService> _logger;
 
-        public TokenService(IUserService userService)
+        public TokenService(IUserService userService, ILogger<TokenService> logger)
         {
             _userService = userService;
+            _logger = logger;
         }
 
         public async Task<TokenResponseDto?> GenerateTokens(LoginDto loginDto)
@@ -58,17 +61,20 @@ namespace Application.Service.Service
         {
             if (!TryParseRefreshToken(refreshToken, out var tokenId, out var tokenSecret))
             {
+                _logger.LogWarning("Refresh token rejected: invalid format");
                 return null;
             }
 
             var user = await _userService.GetByRefreshTokenAsync(tokenId);
-            if (user == null || user.Account.RefreshTokenExpiry <= DateTime.UtcNow)
+            if (user == null || user.Account.RefreshTokenExpiry is null || user.Account.RefreshTokenExpiry <= DateTime.UtcNow)
             {
+                _logger.LogWarning("Refresh token rejected: user missing or token expired");
                 return null;
             }
 
             if (!SecureHash.Verify(tokenSecret, user.Account.RefreshTokenHash))
             {
+                _logger.LogWarning("Refresh token rejected: hash mismatch");
                 return null;
             }
 
@@ -114,6 +120,9 @@ namespace Application.Service.Service
                 );
         }
 
+        /// <summary>
+        /// Gera refresh token composto (id.cs) + hash, usado para rotação e revogação.
+        /// </summary>
         private static RefreshTokenPayload GenerateRefreshToken()
         {
             var tokenId = Guid.NewGuid().ToString("N");
