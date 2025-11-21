@@ -61,19 +61,14 @@
     }
   },
   "profile": {
-    "hero": {
-      "eyebrow": "Perfil e visibilidade",
-      "title": "Controle o que seus colegas veem sobre voc\u00ea",
-      "description": "Atualize seus dados pessoais e mantenha o perfil consistente em todo o workspace."
-    },
     "loading": "Carregando seu perfil...",
     "actions": {
       "back": "Voltar",
       "retry": "Tentar novamente",
-      "edit": "Editar perfil"
+      "editProfile": "Editar perfil",
+      "editAccount": "Editar conta"
     },
     "photo": {
-      "title": "Foto do perfil e imagem de capa",
       "alt": "Foto do perfil",
       "menu": {
         "add": "Trocar foto",
@@ -107,7 +102,7 @@
       "saving": "Atualizando..."
     },
     "about": {
-      "title": "Sobre você",
+      "title": "Perfil",
       "description": "Mantenha estes campos atualizados para que todos saibam como te encontrar.",
       "jobTitle": "Cargo",
       "jobTitlePlaceholder": "Seu cargo",
@@ -117,6 +112,22 @@
       "organizationPlaceholder": "Sua organização",
       "location": "Localização",
       "locationPlaceholder": "Sua localização"
+    },
+    "account": {
+      "title": "Conta",
+      "description": "Gerencie acesso, idioma e tema do workspace.",
+      "languageLabel": "Idioma",
+      "themeLabel": "Tema",
+      "passwordLabel": "Senha",
+      "passwordPlaceholder": "************",
+      "languages": {
+        "en": "Inglês",
+        "pt": "Português"
+      },
+      "themes": {
+        "light": "Claro",
+        "dark": "Escuro"
+      }
     },
     "messages": {
       "profileUpdated": "Perfil atualizado com sucesso!",
@@ -132,3 +143,4 @@
     }
   }
 }
+

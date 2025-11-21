@@ -30,7 +30,9 @@ describe('ProfileComponent', () => {
 
   const translateStub = {
     instant: (key: string) => key,
-  } as TranslateService;
+    use: jasmine.createSpy('use'),
+    currentLang: 'en',
+  } as unknown as TranslateService;
 
   const sampleUser: TestHydratedUser = {
     Id: '1',

@@ -7,6 +7,7 @@ import { UserAccount } from '../../model/UserAccount';
 import { UserProfile } from '../../model/UserProfile';
 import { ChangePasswordPayload, UpdateProfilePayload, UserService } from '../../service/user/user.service';
 import { NotificationService } from '../../service/notification/notification.service';
+import { ThemeService } from '../../service/theme/theme.service';
 
 type HydratedUser = User & { Account: UserAccount; Profile: UserProfile };
 
@@ -40,6 +41,16 @@ export class ProfileComponent implements OnInit {
   @ViewChild('avatarInput') private avatarInput?: ElementRef<HTMLInputElement>;
   isDraggingAvatar = false;
   avatarMenuOpen = false;
+  languages = [
+    { value: 'en', label: 'profile.account.languages.en' },
+    { value: 'pt', label: 'profile.account.languages.pt' },
+  ];
+  themes: Array<{ value: 'light' | 'dark'; label: string }> = [
+    { value: 'light', label: 'profile.account.themes.light' },
+    { value: 'dark', label: 'profile.account.themes.dark' },
+  ];
+  selectedLanguage = 'en';
+  selectedTheme: 'light' | 'dark' = 'light';
   private dragStartX = 0;
   private dragStartY = 0;
   private initialOffsetX = 0;
@@ -61,6 +72,7 @@ export class ProfileComponent implements OnInit {
     private readonly notificationService: NotificationService,
     private readonly translate: TranslateService,
     private readonly router: Router,
+    private readonly themeService: ThemeService,
   ) {
     this.profileForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -85,6 +97,7 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.initializePreferences();
     this.loadUser();
   }
 
@@ -196,7 +209,7 @@ export class ProfileComponent implements OnInit {
     this.draftOffsetY = this.clampOffset(this.initialOffsetY - deltaY);
   }
 
-  endAvatarDrag(): void {
+  endAvatarDrag(event?: PointerEvent): void {
     if (this.isDraggingAvatar) {
       this.isDraggingAvatar = false;
     }
@@ -401,6 +414,47 @@ export class ProfileComponent implements OnInit {
       Organization: organization || null,
       Location: location || null,
     };
+  }
+
+  onLanguageChange(value: string): void {
+    this.selectedLanguage = value;
+    this.translate.use(value);
+    this.setLocalStorageItem('preferredLanguage', value);
+  }
+
+  onThemeChange(value: string): void {
+    const theme = value === 'dark' ? 'dark' : 'light';
+    this.selectedTheme = theme;
+    this.themeService.setTheme(theme);
+  }
+
+  private initializePreferences(): void {
+    const storedLanguage = this.getLocalStorageItem('preferredLanguage');
+    if (storedLanguage) {
+      this.selectedLanguage = storedLanguage;
+      this.translate.use(storedLanguage);
+    } else if (this.translate.currentLang) {
+      this.selectedLanguage = this.translate.currentLang;
+    }
+
+    this.selectedTheme = this.themeService.getActiveTheme();
+    this.themeService.setTheme(this.selectedTheme);
+  }
+
+  private getLocalStorageItem(key: string): string | null {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  }
+
+  private setLocalStorageItem(key: string, value: string): void {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // ignore storage issues
+    }
   }
 
   private handleApiError(error: any, fallbackKey: string = 'profile.messages.genericError'): void {

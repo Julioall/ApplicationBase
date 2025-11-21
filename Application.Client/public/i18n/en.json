@@ -61,19 +61,14 @@
     }
   },
   "profile": {
-    "hero": {
-      "eyebrow": "Profile & visibility",
-      "title": "Manage what teammates see about you",
-      "description": "Update your personal details and choose how others recognize you across the workspace."
-    },
     "loading": "Loading your profile...",
     "actions": {
       "back": "Back",
       "retry": "Try again",
-      "edit": "Edit profile"
+      "editProfile": "Edit profile",
+      "editAccount": "Edit account"
     },
   "photo": {
-    "title": "Profile photo and header image",
     "alt": "Profile photo",
     "menu": {
       "add": "Change photo",
@@ -107,7 +102,7 @@
       "saving": "Updating..."
     },
     "about": {
-      "title": "About you",
+      "title": "Profile",
       "description": "Keep these fields up to date so your teammates know how to reach you.",
       "jobTitle": "Job title",
       "jobTitlePlaceholder": "Your job title",
@@ -117,6 +112,22 @@
       "organizationPlaceholder": "Your organization",
       "location": "Location",
       "locationPlaceholder": "Your location"
+    },
+    "account": {
+      "title": "Account",
+      "description": "Manage how you sign in and personalize the workspace.",
+      "languageLabel": "Language",
+      "themeLabel": "Theme",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "************",
+      "languages": {
+        "en": "English",
+        "pt": "Portuguese"
+      },
+      "themes": {
+        "light": "Light",
+        "dark": "Dark"
+      }
     },
     "messages": {
       "profileUpdated": "Profile updated successfully!",
