@@ -1,6 +1,6 @@
 using Application.Domain.Model;
-using Application.Infrastructure.ConfigurationDb;
 using Application.Infrastructure.Interface;
+using Raven.Client.Documents;
 
 namespace Application.Api.Middlewares
 {
@@ -13,16 +13,15 @@ namespace Application.Api.Middlewares
             _next = next;
         }
 
-        public async Task Invoke(HttpContext httpContext, IServiceRavenDB serviceRavenDB)
+        public async Task Invoke(HttpContext httpContext, IServiceRavenDB serviceRavenDB, IDocumentStore documentStore)
         {
             if (serviceRavenDB.Session is null)
             {
                 var nameDatabase = Environment.GetEnvironmentVariable(ApplicationConstants.DATABASE_NAME_KEY);
-                var store = DocumentStoreHolderAlternative.Store;
-                serviceRavenDB.Store = store;
-                var dbNameToUse = string.IsNullOrWhiteSpace(nameDatabase) ? store.Database : nameDatabase;
-                serviceRavenDB.Session = store.OpenSession(dbNameToUse);
-                serviceRavenDB.AsyncSession = store.OpenAsyncSession(dbNameToUse);
+                var dbNameToUse = string.IsNullOrWhiteSpace(nameDatabase) ? documentStore.Database : nameDatabase;
+                serviceRavenDB.Store = documentStore;
+                serviceRavenDB.Session = documentStore.OpenSession(dbNameToUse);
+                serviceRavenDB.AsyncSession = documentStore.OpenAsyncSession(dbNameToUse);
             }
 
             try

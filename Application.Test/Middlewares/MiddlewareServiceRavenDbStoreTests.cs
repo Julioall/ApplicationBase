@@ -45,7 +45,8 @@ namespace Application.Test.Middlewares
                 RequestServices = scope.ServiceProvider
             };
 
-            await middleware.Invoke(context, scope.ServiceProvider.GetRequiredService<IServiceRavenDB>());
+            var documentStore = scope.ServiceProvider.GetRequiredService<IDocumentStore>();
+            await middleware.Invoke(context, scope.ServiceProvider.GetRequiredService<IServiceRavenDB>(), documentStore);
 
             var ravenService = (TestRavenService)scope.ServiceProvider.GetRequiredService<IServiceRavenDB>();
             Assert.NotNull(ravenService.Session);

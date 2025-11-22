@@ -7,23 +7,12 @@ using Raven.Client.Exceptions.Database;
 using Raven.Client.ServerWide;
 using Raven.Client.ServerWide.Operations;
 using System.Security.Cryptography.X509Certificates;
+using System.Linq;
 
 namespace Application.Infrastructure.ConfigurationDb
 {
     public static class DocumentStoreHolderAlternative
     {
-        private static Lazy<IDocumentStore> store = new Lazy<IDocumentStore>(InitializeStore);
-        public static IDocumentStore Store => store.Value;
-        public static bool StoreIsAlreadyCreated => store.IsValueCreated;
-
-        private static IDocumentStore InitializeStore()
-        {
-            IDocumentStore documentStore = CreateStore();
-            documentStore.Initialize();
-            CreateDatabaseIfDontExist(documentStore.Database, true, documentStore);
-            return documentStore;
-        }
-
         public static IDocumentStore CreateStore(string? db = null)
         {
             db ??= Environment.GetEnvironmentVariable(ApplicationConstants.DATABASE_NAME_KEY);
@@ -33,13 +22,16 @@ namespace Application.Infrastructure.ConfigurationDb
 
             var urls = url.Split(',').ToArray();
 
-            return new DocumentStore
+            var documentStore = new DocumentStore
             {
                 Urls = urls,
                 Certificate = GetCertificateFromStore(),
                 Conventions = GetConventions(),
                 Database = db
             };
+
+            documentStore.Initialize();
+            return documentStore;
         }
 
         private static X509Certificate2 GetCertificateFromStore()
@@ -82,31 +74,20 @@ namespace Application.Infrastructure.ConfigurationDb
             };
         }
 
-        public static void CreateDatabaseIfDontExist(string? database = null, bool createDatabaseIfNotExists = true, IDocumentStore? storeInstance = null)
+        public static void CreateDatabaseIfDontExist(IDocumentStore storeInstance, string? database = null, bool createDatabaseIfNotExists = true)
         {
-            var targetStore = storeInstance;
-            if (targetStore == null)
-            {
-                if (!store.IsValueCreated)
-                {
-                    throw new InvalidOperationException("DocumentStore must be created before calling CreateDatabaseIfDontExist.");
-                }
-                targetStore = Store;
-            }
+            ArgumentNullException.ThrowIfNull(storeInstance);
 
-            if (database == null)
-            {
-                database = targetStore.Database;
-            }
+            var dbName = string.IsNullOrWhiteSpace(database) ? storeInstance.Database : database;
 
-            if (string.IsNullOrWhiteSpace(database))
+            if (string.IsNullOrWhiteSpace(dbName))
             {
                 throw new ArgumentException("Create database dont find definition to database name");
             }
 
             try
             {
-                targetStore.Maintenance.ForDatabase(database).Send(new GetStatisticsOperation());
+                storeInstance.Maintenance.ForDatabase(dbName).Send(new GetStatisticsOperation());
             }
             catch (DatabaseDoesNotExistException)
             {
@@ -119,7 +100,7 @@ namespace Application.Infrastructure.ConfigurationDb
                 {
                     var urls = Environment.GetEnvironmentVariable(ApplicationConstants.DATABASE_URL_KEY)?.Split(',').ToList();
                     int count = urls?.Count ?? 0;
-                    targetStore.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(database), count == 0 ? 1 : count));
+                    storeInstance.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(dbName), count == 0 ? 1 : count));
                 }
                 catch (ConcurrencyException)
                 {
