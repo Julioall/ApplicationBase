@@ -7,7 +7,8 @@ using Raven.Client.Exceptions.Database;
 using Raven.Client.ServerWide;
 using Raven.Client.ServerWide.Operations;
 using System.Security.Cryptography.X509Certificates;
-using System.Linq;
+using Application.Infrastructure.Indexes;
+using Raven.Client.Documents.Indexes;
 
 namespace Application.Infrastructure.ConfigurationDb
 {
@@ -31,6 +32,7 @@ namespace Application.Infrastructure.ConfigurationDb
             };
 
             documentStore.Initialize();
+            IndexCreation.CreateIndexes(typeof(User_ByEmail).Assembly, documentStore);
             return documentStore;
         }
 

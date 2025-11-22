@@ -178,6 +178,21 @@ namespace Application.Tests.Services
         }
 
         [Fact]
+        public async Task GetByEmailAsync_Should_Return_Correct_User_When_Multiple_Exist()
+        {
+            var first = CreateValidUser("first@mail.com");
+            var second = CreateValidUser("second@mail.com");
+            _session.Store(first);
+            _session.Store(second);
+            _session.SaveChanges();
+
+            var result = await _userService.GetByEmailAsync(second.Account.Email);
+
+            Assert.NotNull(result);
+            Assert.Equal(second.Account.Email, result!.Account.Email);
+        }
+
+        [Fact]
         public async Task GetByRoleAsync_Should_Return_Users()
         {
             var admin1 = CreateValidUser("role@user.com");

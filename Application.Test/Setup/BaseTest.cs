@@ -3,6 +3,7 @@ using Application.Domain.Model.User;
 using Application.Domain.Interface;
 using Application.Domain.Validator;
 using Application.Infrastructure;
+using Application.Infrastructure.Indexes;
 using Application.Infrastructure.Repository;
 using Application.Infrastructure.Interface;
 using Application.Service;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
 using Raven.Embedded;
+using Raven.Client.Documents.Indexes;
 using Raven.TestDriver;
 using System.Globalization;
 
@@ -81,6 +83,7 @@ namespace Application.Tests.Setup
             }
 
             _store = GetDocumentStore(null, Guid.NewGuid().ToString());
+            IndexCreation.CreateIndexes(typeof(User_ByEmail).Assembly, _store);
             _session = _store.OpenSession();
             _asyncSession = _store.OpenAsyncSession();
         }

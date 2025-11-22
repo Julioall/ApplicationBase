@@ -1,6 +1,7 @@
 using Application.Domain.Interface;
 using Application.Domain.Model.User;
 using Application.Infrastructure.Interface;
+using Application.Infrastructure.Indexes;
 using Raven.Client.Documents;
 using System.IO;
 using System.Linq;
@@ -50,8 +51,9 @@ namespace Application.Infrastructure.Repository
 
         public async Task<User> GetByEmailAsync(string email)
         {
-            var users = await _serviceRavenDb.AsyncSession.Query<User>().ToListAsync();
-            return users.FirstOrDefault(u => u.Account.Email == email);
+            return await _serviceRavenDb.AsyncSession.Query<User, User_ByEmail>()
+                                   .Customize(x => x.WaitForNonStaleResults())
+                                   .FirstOrDefaultAsync(u => u.Account.Email == email);
         }
 
         public async Task<User> GetByRefreshTokenAsync(string refreshTokenId)

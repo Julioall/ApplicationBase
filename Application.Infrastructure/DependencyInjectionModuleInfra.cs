@@ -1,9 +1,11 @@
 using Application.Domain.Interface;
 using Application.Infrastructure.ConfigurationDb;
 using Application.Infrastructure.Interface;
+using Application.Infrastructure.Indexes;
 using Application.Infrastructure.Repository;
 using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents;
+using Raven.Client.Documents.Indexes;
 using System.Linq;
 
 namespace Application.Infrastructure
@@ -18,6 +20,7 @@ namespace Application.Infrastructure
                 {
                     var store = DocumentStoreHolderAlternative.CreateStore();
                     DocumentStoreHolderAlternative.CreateDatabaseIfDontExist(store, store.Database, true);
+                    IndexCreation.CreateIndexes(typeof(User_ByEmail).Assembly, store);
                     return store;
                 });
             }
