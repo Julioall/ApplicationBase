@@ -1,15 +1,9 @@
 using Application.Domain;
-using Application.Domain.Model.User;
 using Application.Domain.Interface;
-using Application.Domain.Validator;
 using Application.Infrastructure;
 using Application.Infrastructure.Indexes;
-using Application.Infrastructure.Repository;
 using Application.Infrastructure.Service;
 using Application.Service;
-using Application.Service.Interface;
-using Application.Service.Service;
-using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
@@ -38,28 +32,23 @@ namespace Application.Tests.Setup
             CultureInfo.DefaultThreadCurrentUICulture = culture;
 
             InitializeDataBase();
-            _serviceCollection = InicializeServices();
-            _serviceCollection.AddSingleton<IDocumentStore>(_store);
-
-            _serviceCollection.AddScoped<IServiceRavenDB>((provider) => new ServiceRavenDB
-            {
-                Store = _store,
-                Session = _session,
-                AsyncSession = _asyncSession
-            });
-
-            _serviceCollection.AddScoped<IUserService, UserService>();
-            _serviceCollection.AddScoped<IValidator<User>, UserValidator>();
-            _serviceCollection.AddScoped<IUserRepository, UserRepository>();
+            _serviceCollection = InicializeServices(_store, _session, _asyncSession);
 
             _serviceProvider = _serviceCollection.BuildServiceProvider();
         }
 
-        private static ServiceCollection InicializeServices()
+        private static ServiceCollection InicializeServices(IDocumentStore documentStore, IDocumentSession session, IAsyncDocumentSession asyncSession)
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddLocalization(options => options.ResourcesPath = "Resources");
             serviceCollection.AddLogging();
+            serviceCollection.AddSingleton<IDocumentStore>(documentStore);
+            serviceCollection.AddScoped<IServiceRavenDB>(_ => new ServiceRavenDB
+            {
+                Store = documentStore,
+                Session = session,
+                AsyncSession = asyncSession
+            });
             serviceCollection.AddInfraDependencies();
             serviceCollection.AddServiceDependencies();
             serviceCollection.AddDomainDependencies();

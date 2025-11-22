@@ -4,9 +4,9 @@ using Application.Infrastructure.Indexes;
 using Application.Infrastructure.Repository;
 using Application.Infrastructure.Service;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Indexes;
-using System.Linq;
 
 namespace Application.Infrastructure
 {
@@ -14,19 +14,16 @@ namespace Application.Infrastructure
     {
         public static IServiceCollection AddInfraDependencies(this IServiceCollection services)
         {
-            if (!services.Any(sd => sd.ServiceType == typeof(IDocumentStore)))
+            services.TryAddSingleton<IDocumentStore>(_ =>
             {
-                services.AddSingleton<IDocumentStore>(_ =>
-                {
-                    var store = DocumentStoreHolderAlternative.CreateStore();
-                    DocumentStoreHolderAlternative.CreateDatabaseIfDontExist(store, store.Database, true);
-                    IndexCreation.CreateIndexes(typeof(User_ByEmail).Assembly, store);
-                    return store;
-                });
-            }
+                var store = DocumentStoreHolderAlternative.CreateStore();
+                DocumentStoreHolderAlternative.CreateDatabaseIfDontExist(store, store.Database, true);
+                IndexCreation.CreateIndexes(typeof(User_ByEmail).Assembly, store);
+                return store;
+            });
 
-            services.AddScoped<IServiceRavenDB, ServiceRavenDB>();
-            services.AddScoped<IUserRepository, UserRepository>();
+            services.TryAddScoped<IServiceRavenDB, ServiceRavenDB>();
+            services.TryAddScoped<IUserRepository, UserRepository>();
 
             return services;
         }
