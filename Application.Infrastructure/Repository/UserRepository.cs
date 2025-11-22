@@ -3,6 +3,7 @@ using Application.Domain.Model.User;
 using Application.Infrastructure.Interface;
 using Raven.Client.Documents;
 using System.IO;
+using System.Linq;
 
 namespace Application.Infrastructure.Repository
 {
@@ -40,10 +41,11 @@ namespace Application.Infrastructure.Repository
             return await _serviceRavenDb.AsyncSession.LoadAsync<User>(id.ToString());
         }
 
-        public async Task<User> GetByRoleAsync(string role)
+        public async Task<IEnumerable<User>> GetByRoleAsync(string role)
         {
             return await _serviceRavenDb.AsyncSession.Query<User>()
-                                   .FirstOrDefaultAsync(u => u.Account.Role == role);
+                                   .Where(u => u.Account.Role == role)
+                                   .ToListAsync();
         }
 
         public async Task<User> GetByEmailAsync(string email)

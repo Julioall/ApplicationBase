@@ -74,7 +74,7 @@ namespace Application.Service.Service
             return _userRepository.GetByEmailAsync(email);
         }
 
-        public Task<User> GetByRoleAsync(string role)
+        public Task<IEnumerable<User>> GetByRoleAsync(string role)
         {
             return _userRepository.GetByRoleAsync(role);
         }

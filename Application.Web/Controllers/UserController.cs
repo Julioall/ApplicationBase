@@ -10,6 +10,7 @@ using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 
 namespace Application.Api.Controllers
@@ -94,7 +95,7 @@ namespace Application.Api.Controllers
         [HttpGet("role/{role}")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsersByRole(string role)
         {
-            var users = await _userService.GetByRoleAsync(role);
+            var users = await _userService.GetByRoleAsync(role) ?? Enumerable.Empty<User>();
             return Ok(users);
         }
 

@@ -42,6 +42,19 @@ namespace Application.Api.Middlewares
                 {
                     await asyncSessionDisposable.DisposeAsync();
                 }
+                else
+                {
+                    serviceRavenDB.AsyncSession?.Dispose();
+                }
+
+                if (serviceRavenDB is IAsyncDisposable serviceDisposable)
+                {
+                    await serviceDisposable.DisposeAsync();
+                }
+                else if (serviceRavenDB is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
             }
         }
     }

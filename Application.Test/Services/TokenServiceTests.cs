@@ -33,7 +33,7 @@ namespace Application.Tests.Services
             public Task<User> GetByEmailAsync(string email) => Task.FromResult(email == _user.Account.Email ? _user : null)!;
             public Task<User> GetByIdAsync(string id) => Task.FromResult(id == _user.Id ? _user : null)!;
             public Task<User> GetByRefreshTokenAsync(string refreshTokenId) => Task.FromResult(refreshTokenId == _user.Account.RefreshTokenId ? _user : null)!;
-            public Task<User> GetByRoleAsync(string role) => Task.FromResult(role == _user.Account.Role ? _user : null)!;
+            public Task<IEnumerable<User>> GetByRoleAsync(string role) => Task.FromResult<IEnumerable<User>>(role == _user.Account.Role ? new[] { _user } : Array.Empty<User>());
             public Task UpdateAsync(User user)
             {
                 _user.Account = user.Account;

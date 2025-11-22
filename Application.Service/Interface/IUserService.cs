@@ -17,7 +17,7 @@ namespace Application.Service.Interface
 
         Task<User> GetByEmailAsync(string email);
 
-        Task<User> GetByRoleAsync(string role);
+        Task<IEnumerable<User>> GetByRoleAsync(string role);
 
         Task<User> GetByRefreshTokenAsync(string refreshTokenId);
 

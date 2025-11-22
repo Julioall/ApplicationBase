@@ -7,6 +7,7 @@ using Application.Service.Service.Security;
 using Application.Tests.Setup;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
 
 namespace Application.Tests.Services
 {
@@ -177,17 +178,30 @@ namespace Application.Tests.Services
         }
 
         [Fact]
-        public async Task GetByRoleAsync_Should_Return_User()
+        public async Task GetByRoleAsync_Should_Return_Users()
         {
-            var existing = CreateValidUser("role@user.com");
-            existing.Account.Role = "Admin";
-            _session.Store(existing);
+            var admin1 = CreateValidUser("role@user.com");
+            admin1.Account.Role = "Admin";
+            var admin2 = CreateValidUser("role2@user.com");
+            admin2.Account.Role = "Admin";
+            _session.Store(admin1);
+            _session.Store(admin2);
             _session.SaveChanges();
 
             var result = await _userService.GetByRoleAsync("Admin");
 
             Assert.NotNull(result);
-            Assert.Equal("Admin", result!.Account.Role);
+            Assert.Equal(2, result!.Count());
+            Assert.All(result, u => Assert.Equal("Admin", u.Account.Role));
+        }
+
+        [Fact]
+        public async Task GetByRoleAsync_Should_Return_Empty_When_No_Users()
+        {
+            var result = await _userService.GetByRoleAsync("NonExistingRole");
+
+            Assert.NotNull(result);
+            Assert.Empty(result);
         }
 
         [Fact]

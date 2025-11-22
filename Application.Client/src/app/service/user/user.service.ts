@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable, throwError } from "rxjs";
-import { catchError } from "rxjs/operators";
+import { catchError, map } from "rxjs/operators";
 import { User } from "../../model/User";
 import { environment } from "../../environment/environment";
 
@@ -65,8 +65,16 @@ export class UserService {
   }
 
   getUsersByRole(role: string): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/role/${role}`, { headers: this.getAuthHeaders() })
-      .pipe(catchError(this.handleError));
+    return this.http.get<User[] | User | null>(`${this.apiUrl}/role/${role}`, { headers: this.getAuthHeaders() })
+      .pipe(
+        map(response => {
+          if (!response) {
+            return [];
+          }
+          return Array.isArray(response) ? response : [response];
+        }),
+        catchError(this.handleError)
+      );
   }
 
   getUserByUsername(username: string): Observable<User> {

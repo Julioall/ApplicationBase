@@ -27,7 +27,7 @@ namespace Application.Tests.Controllers
             public Func<Task<IEnumerable<User>>>? GetAllFunc { get; set; }
             public Func<string, Task<User?>>? GetByIdFunc { get; set; }
             public Func<string, Task<User?>>? GetByEmailFunc { get; set; }
-            public Func<string, Task<User?>>? GetByRoleFunc { get; set; }
+            public Func<string, Task<IEnumerable<User>>?>? GetByRoleFunc { get; set; }
             public Func<string, Task<User?>>? GetByRefreshTokenFunc { get; set; }
             public Func<User, Task>? UpdateFunc { get; set; }
             public Func<string, Task<(byte[] Data, string ContentType)?>>? GetProfilePictureFunc { get; set; }
@@ -39,7 +39,7 @@ namespace Application.Tests.Controllers
             public Task<IEnumerable<User>> GetAllAsync() => GetAllFunc?.Invoke() ?? Task.FromResult<IEnumerable<User>>(Array.Empty<User>());
             public async Task<User> GetByIdAsync(string id) => (await (GetByIdFunc?.Invoke(id) ?? Task.FromResult<User?>(null)))!;
             public async Task<User> GetByEmailAsync(string email) => (await (GetByEmailFunc?.Invoke(email) ?? Task.FromResult<User?>(null)))!;
-            public async Task<User> GetByRoleAsync(string role) => (await (GetByRoleFunc?.Invoke(role) ?? Task.FromResult<User?>(null)))!;
+            public Task<IEnumerable<User>> GetByRoleAsync(string role) => GetByRoleFunc?.Invoke(role) ?? Task.FromResult<IEnumerable<User>>(Array.Empty<User>());
             public async Task<User> GetByRefreshTokenAsync(string refreshToken) => (await (GetByRefreshTokenFunc?.Invoke(refreshToken) ?? Task.FromResult<User?>(null)))!;
             public Task UpdateAsync(User user) => UpdateFunc?.Invoke(user) ?? Task.CompletedTask;
             public Task UpdateProfileAsync(string email, string? name, DateTime? dateOfBirth, Stream? profilePictureStream, string? profilePictureContentType, bool removeProfilePicture, double? profilePictureOffsetX, double? profilePictureOffsetY, string? jobTitle, string? department, string? organization, string? location, double? profilePictureScale) => UpdateProfileFunc?.Invoke(email, name, dateOfBirth, profilePictureStream, profilePictureContentType, removeProfilePicture, profilePictureOffsetX, profilePictureOffsetY, jobTitle, department, organization, location, profilePictureScale) ?? Task.CompletedTask;
@@ -233,30 +233,34 @@ namespace Application.Tests.Controllers
         {
             var user = CreateUser("role-id");
             user.Account.Role = "Admin";
+            var second = CreateUser("role-id-2");
+            second.Account.Role = "Admin";
             var service = new FakeUserService
             {
-                GetByRoleFunc = _ => Task.FromResult<User?>(user)
+                GetByRoleFunc = _ => Task.FromResult<IEnumerable<User>>(new[] { user, second })
             };
             var controller = new UserController(service, new FakeLocalizer());
 
             var actionResult = await controller.GetUsersByRole("Admin");
             var ok = Assert.IsType<OkObjectResult>(actionResult.Result);
-            var returnedUser = Assert.IsType<User>(ok.Value);
-            Assert.Equal("Admin", returnedUser.Account.Role);
+            var returnedUsers = Assert.IsAssignableFrom<IEnumerable<User>>(ok.Value);
+            Assert.Equal(2, returnedUsers.Count());
+            Assert.All(returnedUsers, u => Assert.Equal("Admin", u.Account.Role));
         }
 
         [Fact]
-        public async Task GetUsersByRole_Should_Return_Ok_When_NotFound()
+        public async Task GetUsersByRole_Should_Return_Ok_With_Empty_List_When_NotFound()
         {
             var service = new FakeUserService
             {
-                GetByRoleFunc = _ => Task.FromResult<User?>(null)
+                GetByRoleFunc = _ => Task.FromResult<IEnumerable<User>>(Array.Empty<User>())
             };
             var controller = new UserController(service, new FakeLocalizer());
 
             var actionResult = await controller.GetUsersByRole("Missing");
             var ok = Assert.IsType<OkObjectResult>(actionResult.Result);
-            Assert.Null(ok.Value);
+            var users = Assert.IsAssignableFrom<IEnumerable<User>>(ok.Value);
+            Assert.Empty(users);
         }
 
         [Fact]

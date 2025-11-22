@@ -32,12 +32,26 @@ describe('UserService', () => {
     req.flush({});
   });
 
-  it('should call getUsersByRole with role path', () => {
-    service.getUsersByRole('Admin').subscribe();
+  it('should call getUsersByRole with role path and map single response to array', () => {
+    let result: any;
+    service.getUsersByRole('Admin').subscribe(res => result = res);
 
     const req = httpMock.expectOne(`${environment.apiUrl}/user/role/Admin`);
     expect(req.request.method).toBe('GET');
-    req.flush([]);
+    req.flush({ id: '1' });
+    expect(Array.isArray(result)).toBeTrue();
+    expect(result.length).toBe(1);
+  });
+
+  it('should return empty array when getUsersByRole returns null', () => {
+    let result: any;
+    service.getUsersByRole('User').subscribe(res => result = res);
+
+    const req = httpMock.expectOne(`${environment.apiUrl}/user/role/User`);
+    expect(req.request.method).toBe('GET');
+    req.flush(null);
+    expect(Array.isArray(result)).toBeTrue();
+    expect(result.length).toBe(0);
   });
 
   it('should send FormData for updateProfile without password', () => {
