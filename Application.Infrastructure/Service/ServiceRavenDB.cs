@@ -1,8 +1,8 @@
-using Application.Infrastructure.Interface;
+using Application.Domain.Interface;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
 
-namespace Application.Service.Service;
+namespace Application.Infrastructure.Service;
 
 public class ServiceRavenDB : IServiceRavenDB
 {

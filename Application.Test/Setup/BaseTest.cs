@@ -5,7 +5,7 @@ using Application.Domain.Validator;
 using Application.Infrastructure;
 using Application.Infrastructure.Indexes;
 using Application.Infrastructure.Repository;
-using Application.Infrastructure.Interface;
+using Application.Infrastructure.Service;
 using Application.Service;
 using Application.Service.Interface;
 using Application.Service.Service;

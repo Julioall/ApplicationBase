@@ -1,10 +1,10 @@
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
 
-namespace Application.Infrastructure.Interface
+namespace Application.Domain.Interface
 {
     /// <summary>
-    /// Infra provider for RavenDB sessions (fora do domínio).
+    /// Abstração para sessões RavenDB utilizada pelas camadas superiores.
     /// </summary>
     public interface IServiceRavenDB
     {

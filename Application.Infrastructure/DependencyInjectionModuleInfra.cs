@@ -1,8 +1,8 @@
 using Application.Domain.Interface;
 using Application.Infrastructure.ConfigurationDb;
-using Application.Infrastructure.Interface;
 using Application.Infrastructure.Indexes;
 using Application.Infrastructure.Repository;
+using Application.Infrastructure.Service;
 using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Indexes;
@@ -25,6 +25,7 @@ namespace Application.Infrastructure
                 });
             }
 
+            services.AddScoped<IServiceRavenDB, ServiceRavenDB>();
             services.AddScoped<IUserRepository, UserRepository>();
 
             return services;

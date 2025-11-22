@@ -1,7 +1,7 @@
 using Application.Api.Middlewares;
+using Application.Domain.Interface;
 using Application.Domain.Model;
 using Application.Infrastructure.ConfigurationDb;
-using Application.Infrastructure.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents;

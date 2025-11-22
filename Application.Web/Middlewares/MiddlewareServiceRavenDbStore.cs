@@ -1,5 +1,5 @@
+using Application.Domain.Interface;
 using Application.Domain.Model;
-using Application.Infrastructure.Interface;
 using Raven.Client.Documents;
 
 namespace Application.Api.Middlewares
