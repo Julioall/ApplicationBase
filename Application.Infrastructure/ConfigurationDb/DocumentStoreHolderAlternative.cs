@@ -20,7 +20,7 @@ namespace Application.Infrastructure.ConfigurationDb
         {
             IDocumentStore documentStore = CreateStore();
             documentStore.Initialize();
-            CreateDatabaseIfDontExist(documentStore.Database);
+            CreateDatabaseIfDontExist(documentStore.Database, true, documentStore);
             return documentStore;
         }
 
@@ -82,11 +82,21 @@ namespace Application.Infrastructure.ConfigurationDb
             };
         }
 
-        public static void CreateDatabaseIfDontExist(string? database = null, bool createDatabaseIfNotExists = true)
+        public static void CreateDatabaseIfDontExist(string? database = null, bool createDatabaseIfNotExists = true, IDocumentStore? storeInstance = null)
         {
+            var targetStore = storeInstance;
+            if (targetStore == null)
+            {
+                if (!store.IsValueCreated)
+                {
+                    throw new InvalidOperationException("DocumentStore must be created before calling CreateDatabaseIfDontExist.");
+                }
+                targetStore = Store;
+            }
+
             if (database == null)
             {
-                database = Store.Database;
+                database = targetStore.Database;
             }
 
             if (string.IsNullOrWhiteSpace(database))
@@ -96,7 +106,7 @@ namespace Application.Infrastructure.ConfigurationDb
 
             try
             {
-                Store.Maintenance.ForDatabase(database).Send(new GetStatisticsOperation());
+                targetStore.Maintenance.ForDatabase(database).Send(new GetStatisticsOperation());
             }
             catch (DatabaseDoesNotExistException)
             {
@@ -109,7 +119,7 @@ namespace Application.Infrastructure.ConfigurationDb
                 {
                     var urls = Environment.GetEnvironmentVariable(ApplicationConstants.DATABASE_URL_KEY)?.Split(',').ToList();
                     int count = urls?.Count ?? 0;
-                    Store.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(database), count == 0 ? 1 : count));
+                    targetStore.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(database), count == 0 ? 1 : count));
                 }
                 catch (ConcurrencyException)
                 {

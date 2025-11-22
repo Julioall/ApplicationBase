@@ -246,6 +246,20 @@ namespace Application.Tests.Controllers
         }
 
         [Fact]
+        public async Task GetUsersByRole_Should_Return_Ok_When_NotFound()
+        {
+            var service = new FakeUserService
+            {
+                GetByRoleFunc = _ => Task.FromResult<User?>(null)
+            };
+            var controller = new UserController(service, new FakeLocalizer());
+
+            var actionResult = await controller.GetUsersByRole("Missing");
+            var ok = Assert.IsType<OkObjectResult>(actionResult.Result);
+            Assert.Null(ok.Value);
+        }
+
+        [Fact]
         public async Task UpdateUser_Should_Return_BadRequest_When_Id_Empty()
         {
             var controller = new UserController(new FakeUserService(), new FakeLocalizer());

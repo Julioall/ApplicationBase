@@ -17,7 +17,7 @@ namespace Application.Infrastructure
                 services.AddSingleton<IDocumentStore>(_ =>
                 {
                     var store = DocumentStoreHolderAlternative.CreateStore();
-                    DocumentStoreHolderAlternative.CreateDatabaseIfDontExist(store.Database);
+                    DocumentStoreHolderAlternative.CreateDatabaseIfDontExist(store.Database, true, store);
                     return store;
                 });
             }

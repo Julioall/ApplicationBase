@@ -20,8 +20,9 @@ namespace Application.Api.Middlewares
                 var nameDatabase = Environment.GetEnvironmentVariable(ApplicationConstants.DATABASE_NAME_KEY);
                 var store = DocumentStoreHolderAlternative.Store;
                 serviceRavenDB.Store = store;
-                serviceRavenDB.Session = store.OpenSession(nameDatabase);
-                serviceRavenDB.AsyncSession = store.OpenAsyncSession(nameDatabase);
+                var dbNameToUse = string.IsNullOrWhiteSpace(nameDatabase) ? store.Database : nameDatabase;
+                serviceRavenDB.Session = store.OpenSession(dbNameToUse);
+                serviceRavenDB.AsyncSession = store.OpenAsyncSession(dbNameToUse);
             }
 
             try

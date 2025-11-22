@@ -5,12 +5,10 @@ using Application.Domain.Model.Dtos;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
-using System.IO;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 

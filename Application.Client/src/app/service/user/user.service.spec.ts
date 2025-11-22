@@ -32,6 +32,14 @@ describe('UserService', () => {
     req.flush({});
   });
 
+  it('should call getUsersByRole with role path', () => {
+    service.getUsersByRole('Admin').subscribe();
+
+    const req = httpMock.expectOne(`${environment.apiUrl}/user/role/Admin`);
+    expect(req.request.method).toBe('GET');
+    req.flush([]);
+  });
+
   it('should send FormData for updateProfile without password', () => {
     localStorage.setItem('token', 'abc');
     const dob = '2000-01-01T00:00:00.000Z';
