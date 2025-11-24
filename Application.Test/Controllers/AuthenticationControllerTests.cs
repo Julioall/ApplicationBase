@@ -68,9 +68,9 @@ namespace Application.Tests.Controllers
             var result = await controller.Login(new LoginDto { Email = "a@b.com", Password = "pwd" }) as OkObjectResult;
 
             Assert.NotNull(result);
-            var payload = result!.Value!;
-            Assert.Equal("token", payload.GetType().GetProperty("token")?.GetValue(payload) as string);
-            Assert.Equal("refresh", payload.GetType().GetProperty("refreshToken")?.GetValue(payload) as string);
+            dynamic payload = result!.Value!;
+            Assert.Equal("token", (string)payload.token);
+            Assert.Equal("refresh", (string)payload.refreshToken);
         }
 
         [Fact]
@@ -115,9 +115,13 @@ namespace Application.Tests.Controllers
             var result = await controller.Refresh(new RefreshRequestDto { RefreshToken = "refresh" }) as OkObjectResult;
 
             Assert.NotNull(result);
-            var payload = result!.Value!;
-            Assert.Equal("token2", payload.GetType().GetProperty("token")?.GetValue(payload) as string);
-            Assert.Equal("refresh2", payload.GetType().GetProperty("refreshToken")?.GetValue(payload) as string);
+            dynamic payload = result!.Value!;
+            Assert.Equal("token2", (string)payload.token);
+            Assert.Equal("refresh2", (string)payload.refreshToken);
+            Assert.NotEqual(default, (DateTime)payload.expiresAt);
+
+            var expectedExpiresAt = _tokenService.RefreshResponse!.ExpiresAt;
+            Assert.Equal(expectedExpiresAt, (DateTime)payload.expiresAt, TimeSpan.FromSeconds(1));
         }
     }
 }
