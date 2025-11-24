@@ -264,6 +264,20 @@ namespace Application.Tests.Controllers
         }
 
         [Fact]
+        public async Task UpdateUser_Should_Return_BadRequest_When_User_Null()
+        {
+            var controller = new UserController(new FakeUserService(), new FakeLocalizer());
+
+            var result = await controller.UpdateUser(null) as ObjectResult;
+
+            Assert.NotNull(result);
+            var problem = Assert.IsType<ProblemDetails>(result!.Value);
+            Assert.Equal(StatusCodes.Status400BadRequest, result.StatusCode);
+            Assert.Equal("InvalidRequestTitle", problem.Title);
+            Assert.Equal("UserCannotBeNullDetail", problem.Detail);
+        }
+
+        [Fact]
         public async Task UpdateUser_Should_Return_BadRequest_When_Id_Empty()
         {
             var controller = new UserController(new FakeUserService(), new FakeLocalizer());
