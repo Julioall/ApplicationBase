@@ -43,6 +43,34 @@ namespace Application.Tests.Controllers
         }
 
         [Fact]
+        public async Task Login_Should_Return_BadRequest_When_Email_Is_Empty()
+        {
+            var controller = new AuthenticationController(_tokenService, _localizer);
+
+            var result = await controller.Login(new LoginDto { Email = "   ", Password = "pwd" }) as ObjectResult;
+
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status400BadRequest, result!.StatusCode);
+            var problemDetails = (ProblemDetails)result.Value!;
+            Assert.Equal("InvalidRequestTitle", problemDetails.Title);
+            Assert.Equal("EmailRequired", problemDetails.Detail);
+        }
+
+        [Fact]
+        public async Task Login_Should_Return_BadRequest_When_Password_Is_Empty()
+        {
+            var controller = new AuthenticationController(_tokenService, _localizer);
+
+            var result = await controller.Login(new LoginDto { Email = "a@b.com", Password = "" }) as ObjectResult;
+
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status400BadRequest, result!.StatusCode);
+            var problemDetails = (ProblemDetails)result.Value!;
+            Assert.Equal("InvalidRequestTitle", problemDetails.Title);
+            Assert.Equal("PasswordRequired", problemDetails.Detail);
+        }
+
+        [Fact]
         public async Task Login_Should_Return_Unauthorized_When_Service_Returns_Null()
         {
             var controller = new AuthenticationController(_tokenService, _localizer);

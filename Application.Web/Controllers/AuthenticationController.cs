@@ -29,6 +29,16 @@ namespace Application.Api.Controllers
                 return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["LoginInformationMissing"], statusCode: StatusCodes.Status400BadRequest);
             }
 
+            if (string.IsNullOrWhiteSpace(loginDto.Email))
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["EmailRequired"], statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            if (string.IsNullOrWhiteSpace(loginDto.Password))
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["PasswordRequired"], statusCode: StatusCodes.Status400BadRequest);
+            }
+
             var tokenResponse = await _tokenService.GenerateTokens(loginDto);
             if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.Token))
             {
