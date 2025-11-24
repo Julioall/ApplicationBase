@@ -41,10 +41,10 @@ namespace Application.Infrastructure.Repository
             return await _serviceRavenDb.AsyncSession.LoadAsync<User>(id.ToString());
         }
 
-        public async Task<IEnumerable<User>> GetByRoleAsync(string role)
+        public async Task<IEnumerable<User>> GetByPermissionAsync(string permission)
         {
             return await _serviceRavenDb.AsyncSession.Query<User>()
-                                   .Where(u => u.Account.Role == role)
+                                   .Where(u => u.Account.Permissions != null && u.Account.Permissions.Contains(permission))
                                    .ToListAsync();
         }
 

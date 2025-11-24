@@ -6,6 +6,7 @@ using Application.Service.Interface;
 using Application.Service.Service;
 using Application.Service.Service.Security;
 using Microsoft.Extensions.Logging.Abstractions;
+using System.Linq;
 
 namespace Application.Tests.Services
 {
@@ -33,7 +34,7 @@ namespace Application.Tests.Services
             public Task<User> GetByEmailAsync(string email) => Task.FromResult(email == _user.Account.Email ? _user : null)!;
             public Task<User> GetByIdAsync(string id) => Task.FromResult(id == _user.Id ? _user : null)!;
             public Task<User> GetByRefreshTokenAsync(string refreshTokenId) => Task.FromResult(refreshTokenId == _user.Account.RefreshTokenId ? _user : null)!;
-            public Task<IEnumerable<User>> GetByRoleAsync(string role) => Task.FromResult<IEnumerable<User>>(role == _user.Account.Role ? new[] { _user } : Array.Empty<User>());
+            public Task<IEnumerable<User>> GetByPermissionAsync(string permission) => Task.FromResult<IEnumerable<User>>(_user.Account.Permissions.Contains(permission) ? new[] { _user } : Array.Empty<User>());
             public Task UpdateAsync(User user)
             {
                 _user.Account = user.Account;
@@ -146,7 +147,7 @@ namespace Application.Tests.Services
                 {
                     Email = "user@test.com",
                     PasswordHash = SecureHash.HashSecret(password),
-                    Role = "User"
+                    Permissions = new() { "view:home", "view:profile" }
                 },
                 Profile = new UserProfile
                 {

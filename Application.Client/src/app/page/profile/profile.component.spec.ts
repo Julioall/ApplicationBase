@@ -38,7 +38,7 @@ describe('ProfileComponent', () => {
     Id: '1',
     Account: {
       Email: 'tester@app.com',
-      Role: 'User',
+      Permissions: ['view:home', 'view:profile'],
     },
     Profile: {
       Name: 'Tester',

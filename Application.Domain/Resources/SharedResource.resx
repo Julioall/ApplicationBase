@@ -72,11 +72,11 @@
   <data name="PasswordUppercase" xml:space="preserve">
     <value>A senha deve conter pelo menos uma letra maiúscula.</value>
   </data>
-  <data name="RoleInvalid" xml:space="preserve">
-    <value>Função inválida. Use 'User', 'Admin' ou 'Moderator'.</value>
+  <data name="PermissionsInvalid" xml:space="preserve">
+    <value>Permissões inválidas.</value>
   </data>
-  <data name="RoleRequired" xml:space="preserve">
-    <value>A função do usuário é obrigatória.</value>
+  <data name="PermissionsRequired" xml:space="preserve">
+    <value>É necessário informar ao menos uma permissão.</value>
   </data>
   <data name="UnauthorizedDetail" xml:space="preserve">
     <value>Credenciais inválidas ou ausentes.</value>

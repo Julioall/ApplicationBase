@@ -1,0 +1,159 @@
+.admin-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  h2 {
+    margin: 0;
+  }
+
+  .subtitle {
+    margin: 0.25rem 0 0;
+    color: #6b7280;
+  }
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .hint {
+    color: #6b7280;
+    font-size: 0.9rem;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.user-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h3 {
+      margin: 0;
+    }
+
+    .muted {
+      margin: 0.15rem 0 0;
+      color: #6b7280;
+    }
+  }
+}
+
+.permissions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.permission {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.5rem;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 999px;
+  font-size: 0.9rem;
+
+  .icon {
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-weight: 600;
+  }
+
+  select {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #d1d5db;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+
+  button {
+    padding: 0.45rem 0.8rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .secondary {
+    background: #f3f4f6;
+    color: #111827;
+  }
+
+  button:not(.secondary) {
+    background: #2563eb;
+    color: #fff;
+  }
+}
+
+.badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  background: #e5e7eb;
+}
+
+.badge.default {
+  background: #ecfdf3;
+  color: #15803d;
+}
+
+.pill {
+  padding: 0.25rem 0.6rem;
+  background: #f3f4f6;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.empty {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+}

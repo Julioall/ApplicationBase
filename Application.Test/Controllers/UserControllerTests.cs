@@ -7,6 +7,8 @@ using Application.Service.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Application.Tests.Controllers
 {
@@ -27,7 +29,7 @@ namespace Application.Tests.Controllers
             public Func<Task<IEnumerable<User>>>? GetAllFunc { get; set; }
             public Func<string, Task<User?>>? GetByIdFunc { get; set; }
             public Func<string, Task<User?>>? GetByEmailFunc { get; set; }
-            public Func<string, Task<IEnumerable<User>>?>? GetByRoleFunc { get; set; }
+            public Func<string, Task<IEnumerable<User>>?>? GetByPermissionFunc { get; set; }
             public Func<string, Task<User?>>? GetByRefreshTokenFunc { get; set; }
             public Func<User, Task>? UpdateFunc { get; set; }
             public Func<string, Task<(byte[] Data, string ContentType)?>>? GetProfilePictureFunc { get; set; }
@@ -39,7 +41,7 @@ namespace Application.Tests.Controllers
             public Task<IEnumerable<User>> GetAllAsync() => GetAllFunc?.Invoke() ?? Task.FromResult<IEnumerable<User>>(Array.Empty<User>());
             public async Task<User> GetByIdAsync(string id) => (await (GetByIdFunc?.Invoke(id) ?? Task.FromResult<User?>(null)))!;
             public async Task<User> GetByEmailAsync(string email) => (await (GetByEmailFunc?.Invoke(email) ?? Task.FromResult<User?>(null)))!;
-            public Task<IEnumerable<User>> GetByRoleAsync(string role) => GetByRoleFunc?.Invoke(role) ?? Task.FromResult<IEnumerable<User>>(Array.Empty<User>());
+            public Task<IEnumerable<User>> GetByPermissionAsync(string permission) => GetByPermissionFunc?.Invoke(permission) ?? Task.FromResult<IEnumerable<User>>(Array.Empty<User>());
             public async Task<User> GetByRefreshTokenAsync(string refreshToken) => (await (GetByRefreshTokenFunc?.Invoke(refreshToken) ?? Task.FromResult<User?>(null)))!;
             public Task UpdateAsync(User user) => UpdateFunc?.Invoke(user) ?? Task.CompletedTask;
             public Task UpdateProfileAsync(string email, string? name, DateTime? dateOfBirth, Stream? profilePictureStream, string? profilePictureContentType, bool removeProfilePicture, double? profilePictureOffsetX, double? profilePictureOffsetY, string? jobTitle, string? department, string? organization, string? location, double? profilePictureScale) => UpdateProfileFunc?.Invoke(email, name, dateOfBirth, profilePictureStream, profilePictureContentType, removeProfilePicture, profilePictureOffsetX, profilePictureOffsetY, jobTitle, department, organization, location, profilePictureScale) ?? Task.CompletedTask;
@@ -50,11 +52,11 @@ namespace Application.Tests.Controllers
         private static User CreateUser(string id = "1") => new User
         {
             Id = id,
-            Account = new UserAccount { Email = "mail@test.com", PasswordHash = "hash", Role = "User" },
+            Account = new UserAccount { Email = "mail@test.com", PasswordHash = "hash", Permissions = new() { "view:home" } },
             Profile = new UserProfile { Name = "Tester" }
         };
 
-        private static CreateUserDto CreateUserRequest(string? name = null, string? email = null, string password = "Valid123!", string role = "User")
+        private static CreateUserDto CreateUserRequest(string? name = null, string? email = null, string password = "Valid123!", IEnumerable<string>? permissions = null)
         {
             return new CreateUserDto
             {
@@ -62,7 +64,7 @@ namespace Application.Tests.Controllers
                 {
                     Email = email ?? "mail@test.com",
                     Password = password,
-                    Role = role
+                    Permissions = permissions?.ToList() ?? new List<string> { "view:home", "view:profile" }
                 },
                 Profile = new CreateUserProfileDto
                 {
@@ -241,35 +243,35 @@ namespace Application.Tests.Controllers
         }
 
         [Fact]
-        public async Task GetUsersByRole_Should_Return_Ok_With_List()
+        public async Task GetUsersByPermission_Should_Return_Ok_With_List()
         {
             var user = CreateUser("role-id");
-            user.Account.Role = "Admin";
+            user.Account.Permissions = new() { "manage:users" };
             var second = CreateUser("role-id-2");
-            second.Account.Role = "Admin";
+            second.Account.Permissions = new() { "manage:users" };
             var service = new FakeUserService
             {
-                GetByRoleFunc = _ => Task.FromResult<IEnumerable<User>>(new[] { user, second })
+                GetByPermissionFunc = _ => Task.FromResult<IEnumerable<User>>(new[] { user, second })
             };
             var controller = new UserController(service, new FakeLocalizer());
 
-            var actionResult = await controller.GetUsersByRole("Admin");
+            var actionResult = await controller.GetUsersByPermission("manage:users");
             var ok = Assert.IsType<OkObjectResult>(actionResult.Result);
             var returnedUsers = Assert.IsAssignableFrom<IEnumerable<User>>(ok.Value);
             Assert.Equal(2, returnedUsers.Count());
-            Assert.All(returnedUsers, u => Assert.Equal("Admin", u.Account.Role));
+            Assert.All(returnedUsers, u => Assert.Contains("manage:users", u.Account.Permissions));
         }
 
         [Fact]
-        public async Task GetUsersByRole_Should_Return_Ok_With_Empty_List_When_NotFound()
+        public async Task GetUsersByPermission_Should_Return_Ok_With_Empty_List_When_NotFound()
         {
             var service = new FakeUserService
             {
-                GetByRoleFunc = _ => Task.FromResult<IEnumerable<User>>(Array.Empty<User>())
+                GetByPermissionFunc = _ => Task.FromResult<IEnumerable<User>>(Array.Empty<User>())
             };
             var controller = new UserController(service, new FakeLocalizer());
 
-            var actionResult = await controller.GetUsersByRole("Missing");
+            var actionResult = await controller.GetUsersByPermission("Missing");
             var ok = Assert.IsType<OkObjectResult>(actionResult.Result);
             var users = Assert.IsAssignableFrom<IEnumerable<User>>(ok.Value);
             Assert.Empty(users);

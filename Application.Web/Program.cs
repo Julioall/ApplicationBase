@@ -114,6 +114,15 @@ public class Program
             };
         });
 
+        builder.Services.AddAuthorization(options =>
+        {
+            foreach (var permission in ApplicationPermissions.All)
+            {
+                options.AddPolicy(permission, policy =>
+                    policy.RequireClaim(ApplicationPermissions.PermissionClaimType, permission));
+            }
+        });
+
         // Register dependency injection modules
         DependencyInjectionModuleDomain.AddDomainDependencies(builder.Services);
         DependencyInjectionModuleInfra.AddInfraDependencies(builder.Services);

@@ -1,13 +1,16 @@
 using Application.Domain;
 using Application.Domain.Exceptions;
 using Application.Domain.Interface;
+using Application.Domain.Model;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
 using Application.Service.Service.Security;
 using FluentValidation;
 using Microsoft.Extensions.Localization;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Application.Service.Service
 {
@@ -35,6 +38,8 @@ namespace Application.Service.Service
             user.Account.PasswordHash = SecureHash.HashSecret(password);
             user.Account.DateJoined ??= DateTime.UtcNow;
 
+            EnsurePermissions(user);
+
             _userValidator.ValidateAndThrow(user);
 
             var existingUser = await _userRepository.GetByEmailAsync(user.Account.Email);
@@ -55,6 +60,7 @@ namespace Application.Service.Service
         {
             ArgumentNullException.ThrowIfNull(user);
 
+            EnsurePermissions(user);
             _userValidator.ValidateAndThrow(user);
             await _userRepository.UpdateAsync(user);
         }
@@ -74,9 +80,9 @@ namespace Application.Service.Service
             return _userRepository.GetByEmailAsync(email);
         }
 
-        public Task<IEnumerable<User>> GetByRoleAsync(string role)
+        public Task<IEnumerable<User>> GetByPermissionAsync(string permission)
         {
-            return _userRepository.GetByRoleAsync(role);
+            return _userRepository.GetByPermissionAsync(permission);
         }
 
         public Task<User> GetByRefreshTokenAsync(string refreshTokenId)
@@ -124,6 +130,7 @@ namespace Application.Service.Service
 
             await HandleProfilePictureAsync(user, profilePictureStream, profilePictureContentType, removeProfilePicture);
 
+            EnsurePermissions(user);
             _userValidator.ValidateAndThrow(user);
             await _userRepository.UpdateAsync(user);
         }
@@ -199,6 +206,30 @@ namespace Application.Service.Service
 
             var trimmed = value.Trim();
             return trimmed.Length == 0 ? null : trimmed;
+        }
+
+        private static void EnsurePermissions(User user)
+        {
+            user.Account.Permissions = NormalizePermissions(user.Account.Permissions);
+
+            if (!user.Account.Permissions.Any())
+            {
+                user.Account.Permissions = ApplicationPermissions.DefaultUserPermissions.ToList();
+            }
+        }
+
+        private static List<string> NormalizePermissions(IEnumerable<string>? permissions)
+        {
+            if (permissions == null)
+            {
+                return new List<string>();
+            }
+
+            return permissions
+                .Where(p => !string.IsNullOrWhiteSpace(p))
+                .Select(p => p.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
         }
     }
 }

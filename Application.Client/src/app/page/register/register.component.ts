@@ -7,6 +7,7 @@ import { AuthService } from '../../service/auth/auth.service';
 import { NotificationService } from '../../service/notification/notification.service';
 import { ThemeService } from '../../service/theme/theme.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { DEFAULT_USER_PERMISSIONS } from '../../model/permissions';
 
 @Component({
   selector: 'app-register',
@@ -90,7 +91,7 @@ export class RegisterComponent implements OnInit {
       Account: {
         Email: email,
         Password: password,
-        Role: 'User',
+        Permissions: [...DEFAULT_USER_PERMISSIONS],
         DateJoined: new Date(),
       },
       Profile: {

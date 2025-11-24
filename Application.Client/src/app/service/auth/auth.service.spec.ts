@@ -28,7 +28,7 @@ describe('AuthService', () => {
       Account: {
         Email: 'new@test.com',
         Password: 'Password123!',
-        Role: 'User',
+        Permissions: ['view:home'],
         DateJoined: new Date(),
       },
       Profile: {

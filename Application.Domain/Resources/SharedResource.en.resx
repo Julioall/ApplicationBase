@@ -72,11 +72,11 @@
   <data name="PasswordUppercase" xml:space="preserve">
     <value>Password must contain at least one uppercase letter.</value>
   </data>
-  <data name="RoleInvalid" xml:space="preserve">
-    <value>Invalid role. Use 'User', 'Admin' or 'Moderator'.</value>
+  <data name="PermissionsInvalid" xml:space="preserve">
+    <value>Invalid permissions.</value>
   </data>
-  <data name="RoleRequired" xml:space="preserve">
-    <value>User role is required.</value>
+  <data name="PermissionsRequired" xml:space="preserve">
+    <value>At least one permission must be provided.</value>
   </data>
   <data name="UnauthorizedDetail" xml:space="preserve">
     <value>Invalid or missing credentials.</value>

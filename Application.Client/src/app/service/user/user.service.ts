@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable, throwError } from "rxjs";
-import { catchError, map } from "rxjs/operators";
+import { catchError } from "rxjs/operators";
 import { User } from "../../model/User";
 import { environment } from "../../environment/environment";
 
@@ -64,17 +64,19 @@ export class UserService {
       .pipe(catchError(this.handleError));
   }
 
-  getUsersByRole(role: string): Observable<User[]> {
-    return this.http.get<User[] | User | null>(`${this.apiUrl}/role/${role}`, { headers: this.getAuthHeaders() })
-      .pipe(
-        map(response => {
-          if (!response) {
-            return [];
-          }
-          return Array.isArray(response) ? response : [response];
-        }),
-        catchError(this.handleError)
-      );
+  getUsersByPermission(permission: string): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/permission/${permission}`, { headers: this.getAuthHeaders() })
+      .pipe(catchError(this.handleError));
+  }
+
+  getAvailablePermissions(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/permissions`, { headers: this.getAuthHeaders() })
+      .pipe(catchError(this.handleError));
+  }
+
+  updatePermissions(id: string, permissions: string[]): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/permissions`, { permissions }, { headers: this.getAuthHeaders() })
+      .pipe(catchError(this.handleError));
   }
 
   getUserByEmail(email: string): Observable<User> {

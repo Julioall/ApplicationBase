@@ -1,0 +1,59 @@
+<section class="admin-panel" *ngIf="!loading; else loadingState">
+  <div class="header">
+    <div>
+      <h2>Permissões e rotas</h2>
+      <p class="subtitle">Adicione ou remova permissões para liberar páginas, rotas e endpoints.</p>
+    </div>
+    <div class="legend">
+      <span class="badge default">Padrão</span>
+      <span class="hint">Permissões atribuídas automaticamente aos novos usuários.</span>
+    </div>
+  </div>
+
+  <div class="grid" *ngIf="users.length; else emptyState">
+    <article class="user-card" *ngFor="let user of users; trackBy: trackByUserId">
+      <header>
+        <div>
+          <h3>{{ user.Profile?.Name || 'Usuário' }}</h3>
+          <p class="muted">{{ user.Account?.Email }}</p>
+        </div>
+        <div class="pill">{{ getUserPermissions(user).length }} permissões</div>
+      </header>
+
+      <div class="permissions">
+        <span class="permission" *ngFor="let permission of getUserPermissions(user)">
+          {{ permission }}
+          <button type="button" class="icon" (click)="removePermission(user, permission)" aria-label="Remover permissão">
+            ×
+          </button>
+        </span>
+      </div>
+
+      <div class="controls">
+        <label>
+          Nova permissão
+          <select [(ngModel)]="selectedPermission[user.Id || '']">
+            <option value="">Selecione</option>
+            <option *ngFor="let permission of availablePermissions" [value]="permission">{{ permission }}</option>
+          </select>
+        </label>
+        <div class="actions">
+          <button type="button" class="secondary" (click)="resetToDefault(user)">Restaurar padrão</button>
+          <button type="button" (click)="addPermission(user)">Adicionar</button>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<ng-template #emptyState>
+  <div class="empty">
+    <p>Nenhum usuário encontrado para gerenciar.</p>
+  </div>
+</ng-template>
+
+<ng-template #loadingState>
+  <div class="empty">
+    <p>Carregando usuários...</p>
+  </div>
+</ng-template>
