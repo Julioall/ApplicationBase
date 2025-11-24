@@ -100,15 +100,15 @@ namespace Application.Api.Controllers
         }
 
         [Authorize(Roles = "Admin, User")]
-        [HttpGet("username/{username}")]
+        [HttpGet("email/{email}")]
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<User>> GetUserByEmail(string username)
+        public async Task<ActionResult<User>> GetUserByEmail(string email)
         {
-            var user = await _userService.GetByEmailAsync(username);
+            var user = await _userService.GetByEmailAsync(email);
             if (user == null)
             {
-                throw new NotFoundException(_localizer["UserNotFoundByEmail", username]);
+                throw new NotFoundException(_localizer["UserNotFoundByEmail", email]);
             }
 
             await PopulateProfilePictureAsync(user);

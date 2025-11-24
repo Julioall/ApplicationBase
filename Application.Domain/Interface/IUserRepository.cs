@@ -10,7 +10,7 @@ namespace Application.Domain.Interface
         Task<IEnumerable<User>> GetAllAsync();
         Task<User> GetByIdAsync(string id);
         Task<IEnumerable<User>> GetByRoleAsync(string role);
-        Task<User> GetByEmailAsync(string username);
+        Task<User> GetByEmailAsync(string email);
         Task<User> GetByRefreshTokenAsync(string refreshTokenId);
         Task UpdateAsync(User user);
         Task UploadProfilePictureAsync(string userId, Stream stream, string contentType);
