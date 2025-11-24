@@ -204,28 +204,40 @@ namespace Application.Tests.Controllers
         [Fact]
         public async Task GetUserByEmail_Should_Return_Ok_When_Found()
         {
+            string? receivedEmail = null;
             var service = new FakeUserService
             {
-                GetByEmailFunc = _ => Task.FromResult<User?>(CreateUser("email-id"))
+                GetByEmailFunc = email =>
+                {
+                    receivedEmail = email;
+                    return Task.FromResult<User?>(CreateUser("email-id"));
+                }
             };
             var controller = new UserController(service, new FakeLocalizer());
 
             var actionResult = await controller.GetUserByEmail("mail@test.com");
             var ok = Assert.IsType<OkObjectResult>(actionResult.Result);
             var user = Assert.IsType<User>(ok.Value);
+            Assert.Equal("mail@test.com", receivedEmail);
             Assert.Equal("email-id", user.Id);
         }
 
         [Fact]
         public async Task GetUserByEmail_Should_Throw_NotFound_When_Missing()
         {
+            string? receivedEmail = null;
             var service = new FakeUserService
             {
-                GetByEmailFunc = _ => Task.FromResult<User?>(null)
+                GetByEmailFunc = email =>
+                {
+                    receivedEmail = email;
+                    return Task.FromResult<User?>(null);
+                }
             };
             var controller = new UserController(service, new FakeLocalizer());
 
             await Assert.ThrowsAsync<NotFoundException>(() => controller.GetUserByEmail("none@test.com"));
+            Assert.Equal("none@test.com", receivedEmail);
         }
 
         [Fact]

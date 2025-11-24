@@ -57,7 +57,7 @@ Base monolítica em camadas com autenticação JWT, CRUD de usuários, i18n (pt-
 
 ## 5. Fluxos Importantes
 - Autenticação: `POST /api/authentication/login` (200 tokens | 400 se payload nulo | 401 se credencial inválida); `POST /api/authentication/refresh` (200 novo par | 401 inválido/expirado).
-- Usuários: `POST /api/user/add` (201 sucesso | 400 payload | 409 e-mail duplicado via ConflictException → ProblemDetails); `PUT /api/user/update` (400 id vazio | 404 se não existe | 200 sucesso); `GET /api/user/get/{id|username|role|all}` (200 ou 404); `DELETE /api/user/delete/{id}` (204 ou 404).
+- Usuários: `POST /api/user/add` (201 sucesso | 400 payload | 409 e-mail duplicado via ConflictException → ProblemDetails); `PUT /api/user/update` (400 id vazio | 404 se não existe | 200 sucesso); `GET /api/user/get/{id|email|role|all}` (200 ou 404); `DELETE /api/user/delete/{id}` (204 ou 404).
 - Erros: ModelState inválido → 400 ValidationProblemDetails (filtro); exceções → ProblemDetails (middleware) com status apropriado e i18n; inclui `traceId`.
 - Localização: `RequestLocalization` aplica cultura do `Accept-Language` (default pt-BR) e propaga nos headers/respostas.
 
@@ -81,8 +81,8 @@ Base monolítica em camadas com autenticação JWT, CRUD de usuários, i18n (pt-
 
 ## 9. Rotas Principais
 - Auth: `POST /api/authentication/login`, `POST /api/authentication/refresh`
-- Usuários: `POST /api/user/add`, `PUT /api/user/update`, `DELETE /api/user/delete/{id}`,  
-  `GET /api/user/get/{id}`, `GET /api/user/username/{username}`, `GET /api/user/role/{role}`, `GET /api/user/all`
+- Usuários: `POST /api/user/add`, `PUT /api/user/update`, `DELETE /api/user/delete/{id}`,
+  `GET /api/user/get/{id}`, `GET /api/user/email/{email}`, `GET /api/user/role/{role}`, `GET /api/user/all`
 
 ## 10. Como Estender (exemplo Product)
 1) Domain: `Product.cs`, `ProductValidator.cs`, mensagens em resx, `IProductRepository`.  

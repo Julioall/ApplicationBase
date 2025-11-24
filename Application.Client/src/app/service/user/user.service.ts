@@ -77,8 +77,8 @@ export class UserService {
       );
   }
 
-  getUserByUsername(username: string): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/username/${username}`, { headers: this.getAuthHeaders() })
+  getUserByEmail(email: string): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/email/${email}`, { headers: this.getAuthHeaders() })
       .pipe(catchError(this.handleError));
   }
 
