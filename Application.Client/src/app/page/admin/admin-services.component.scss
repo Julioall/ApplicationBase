@@ -1,0 +1,147 @@
+.admin-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1rem;
+  color: var(--text-primary);
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  h2 {
+    margin: 0.1rem 0 0;
+  }
+
+  .subtitle {
+    margin: 0.25rem 0 0;
+    color: var(--text-subtle);
+  }
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  color: var(--text-subtle);
+  margin: 0;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+
+  h3 {
+    margin: 0.1rem 0 0;
+  }
+
+  .muted {
+    margin: 0.2rem 0 0;
+    color: var(--text-subtle);
+  }
+}
+
+.pill {
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  color: var(--text-primary);
+  border: 1px solid var(--border-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+}
+
+.pill.ghost {
+  background: transparent;
+}
+
+.muted {
+  color: var(--text-subtle);
+}
+
+.summary {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+
+  li {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 0.5rem;
+    align-items: start;
+    color: var(--text-primary);
+  }
+
+  i {
+    color: var(--accent-strong);
+  }
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.65rem;
+}
+
+.status {
+  border: 1px solid var(--border-soft);
+  border-radius: 0.65rem;
+  padding: 0.65rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
+  align-items: center;
+  background: var(--surface-alt);
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot.green {
+  background: #4bce97;
+}
+
+.dot.yellow {
+  background: #ffb020;
+}
+
+.dot.red {
+  background: #ff5630;
+}
+
+@media (max-width: 480px) {
+  .admin-page {
+    padding: 0.75rem;
+  }
+}

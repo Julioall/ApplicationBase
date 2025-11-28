@@ -1,0 +1,94 @@
+<section class="user-detail" *ngIf="!loading && user; else loadingState">
+  <header class="detail-head">
+    <div class="identity">
+      <div class="avatar-dot">{{ (user.Profile?.Name || user.Account?.Email || '?') | slice:0:1 }}</div>
+      <div>
+        <p class="eyebrow">Admin · Usuário</p>
+        <h2>{{ user.Profile?.Name || 'Usuário' }}</h2>
+        <p class="muted">{{ user.Account?.Email }}</p>
+      </div>
+    </div>
+    <div class="actions">
+      <button type="button" class="ghost" (click)="goBack()">
+        <i class="fa-solid fa-chevron-left"></i>
+        Voltar
+      </button>
+      <button type="button" class="ghost" (click)="showResetPassword()">
+        <i class="fa-solid fa-key"></i>
+        Resetar senha
+      </button>
+    </div>
+  </header>
+
+  <div class="detail-grid">
+    <article class="card">
+      <header class="card-head">
+        <div>
+          <p class="eyebrow">Permissões</p>
+          <h3>Controle de acesso</h3>
+          <p class="muted">Adicione ou remova permissões específicas para este usuário.</p>
+        </div>
+        <span class="pill ghost">
+          <i class="fa-solid fa-shield-halved"></i>
+          Apenas administradores
+        </span>
+      </header>
+
+      <div class="permissions" *ngIf="getUserPermissions().length; else noPermissions">
+        <span class="permission" *ngFor="let permission of getUserPermissions()">
+          {{ permission }}
+          <button type="button" class="icon" (click)="removePermission(permission)" aria-label="Remover permissão">
+            ×
+          </button>
+        </span>
+      </div>
+      <ng-template #noPermissions>
+        <p class="muted">Nenhuma permissão atribuída.</p>
+      </ng-template>
+
+      <div class="controls">
+        <label>
+          Nova permissão
+          <select [(ngModel)]="selectedPermission">
+            <option value="">Selecione</option>
+            <option *ngFor="let permission of availablePermissions" [value]="permission">{{ permission }}</option>
+          </select>
+        </label>
+        <div class="actions">
+          <button type="button" class="secondary" (click)="resetToDefault()">Restaurar padrão</button>
+          <button type="button" (click)="addPermission()" [disabled]="!selectedPermission">Adicionar</button>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <header class="card-head">
+        <div>
+          <p class="eyebrow">Conta</p>
+          <h3>Resumo</h3>
+          <p class="muted">Dados básicos do usuário para conferência rápida.</p>
+        </div>
+      </header>
+      <dl class="meta">
+        <div>
+          <dt>Nome</dt>
+          <dd>{{ user.Profile?.Name || 'Não informado' }}</dd>
+        </div>
+        <div>
+          <dt>E-mail</dt>
+          <dd>{{ user.Account?.Email || 'Não informado' }}</dd>
+        </div>
+        <div>
+          <dt>Permissões</dt>
+          <dd>{{ getUserPermissions().length }}</dd>
+        </div>
+      </dl>
+    </article>
+  </div>
+</section>
+
+<ng-template #loadingState>
+  <div class="empty">
+    <p>Carregando usuário...</p>
+  </div>
+</ng-template>

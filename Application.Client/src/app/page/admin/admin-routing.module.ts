@@ -1,9 +1,16 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AdminComponent } from './admin.component';
+import { AdminUsersComponent } from './admin-users.component';
+import { AdminUserDetailComponent } from './admin-user-detail.component';
+import { AdminEmailSettingsComponent } from './admin-email-settings.component';
+import { AdminServicesComponent } from './admin-services.component';
 
 const routes: Routes = [
-  { path: '', component: AdminComponent }
+  { path: '', pathMatch: 'full', redirectTo: 'permissions' },
+  { path: 'permissions', component: AdminUsersComponent },
+  { path: 'permissions/:id', component: AdminUserDetailComponent },
+  { path: 'email', component: AdminEmailSettingsComponent },
+  { path: 'services', component: AdminServicesComponent },
 ];
 
 @NgModule({

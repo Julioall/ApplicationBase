@@ -1,0 +1,73 @@
+<section class="admin-panel" *ngIf="!loading; else loadingState">
+  <header class="header">
+    <div>
+      <p class="eyebrow">Admin</p>
+      <h2>Usuários</h2>
+      <p class="subtitle">Visualize, pesquise e abra o painel individual para gerenciar permissões.</p>
+    </div>
+    <div class="legend">
+      <span class="pill ghost">
+        <i class="fa-solid fa-shield-halved"></i>
+        Apenas administradores
+      </span>
+      <span class="hint">Clique em um usuário para abrir a página de gestão.</span>
+    </div>
+  </header>
+
+  <div class="list-shell" *ngIf="users.length; else emptyState">
+    <div class="list-header">
+      <span class="col name">Usuário</span>
+      <span class="col email">E-mail</span>
+      <span class="col roles">Permissões</span>
+      <span class="col actions">Ações</span>
+    </div>
+
+    <div class="list-body">
+      <button
+        class="list-row"
+        *ngFor="let user of paginatedUsers; trackBy: trackByUserId"
+        type="button"
+        (click)="goToUser(user)"
+        aria-label="Abrir gestão de permissões do usuário"
+      >
+        <span class="col name">
+          <span class="avatar-dot">{{ (user.Profile?.Name || user.Account?.Email || '?') | slice:0:1 }}</span>
+          <span class="text">
+            <strong>{{ user.Profile?.Name || 'Usuário' }}</strong>
+            <small class="muted">{{ user.Account?.Email }}</small>
+          </span>
+        </span>
+        <span class="col email muted">{{ user.Account?.Email }}</span>
+        <span class="col roles">
+          <span class="pill small">{{ (user.Account?.Permissions?.length || 0) + ' permissões' }}</span>
+        </span>
+        <span class="col actions">
+          <span class="link">Gerenciar</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </span>
+      </button>
+    </div>
+
+    <div class="pagination" *ngIf="users.length > pageSize">
+      <button type="button" class="ghost" [disabled]="page === 1" (click)="changePage(-1)">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <span>Página {{ page }} de {{ totalPages }}</span>
+      <button type="button" class="ghost" [disabled]="page === totalPages" (click)="changePage(1)">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</section>
+
+<ng-template #emptyState>
+  <div class="empty">
+    <p>Nenhum usuário encontrado para gerenciar.</p>
+  </div>
+</ng-template>
+
+<ng-template #loadingState>
+  <div class="empty">
+    <p>Carregando usuários...</p>
+  </div>
+</ng-template>
