@@ -8,7 +8,7 @@ namespace Application.Domain.Model.User
         public required string Email { get; set; }
         [JsonIgnore]
         public string? PasswordHash { get; set; }
-        public required string Role { get; set; }
+        public List<string> Permissions { get; set; } = new();
         public DateTime? DateJoined { get; set; } = DateTime.UtcNow.Date;
         public DateTime? LastLogin { get; set; }
         [JsonIgnore]

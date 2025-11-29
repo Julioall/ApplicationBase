@@ -1,6 +1,7 @@
 using Application.Api.Models.User;
 using Application.Domain;
 using Application.Domain.Exceptions;
+using Application.Domain.Model;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
@@ -8,6 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -51,7 +54,7 @@ namespace Application.Api.Controllers
             return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, new { message = _localizer["UserAddedSuccessfully"] });
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = ApplicationPermissions.ManageUsers)]
         [HttpDelete("delete/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -67,7 +70,7 @@ namespace Application.Api.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = "Admin, User")]
+        [Authorize(Policy = ApplicationPermissions.ManageUsers)]
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
         {
@@ -75,7 +78,7 @@ namespace Application.Api.Controllers
             return Ok(users);
         }
 
-        [Authorize(Roles = "Admin, User")]
+        [Authorize(Policy = ApplicationPermissions.ManageUsers)]
         [HttpGet("get/{id}")]
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -91,15 +94,22 @@ namespace Application.Api.Controllers
             return Ok(user);
         }
 
-        [Authorize(Roles = "Admin, User")]
-        [HttpGet("role/{role}")]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsersByRole(string role)
+        [Authorize(Policy = ApplicationPermissions.ManageUsers)]
+        [HttpGet("permission/{permission}")]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsersByPermission(string permission)
         {
-            var users = await _userService.GetByRoleAsync(role) ?? Enumerable.Empty<User>();
+            var users = await _userService.GetByPermissionAsync(permission) ?? Enumerable.Empty<User>();
             return Ok(users);
         }
 
-        [Authorize(Roles = "Admin, User")]
+        [Authorize(Policy = ApplicationPermissions.ManageUsers)]
+        [HttpGet("permissions")]
+        public ActionResult<IEnumerable<string>> GetAvailablePermissions()
+        {
+            return Ok(ApplicationPermissions.All);
+        }
+
+        [Authorize(Policy = ApplicationPermissions.ManageUsers)]
         [HttpGet("email/{email}")]
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -115,7 +125,7 @@ namespace Application.Api.Controllers
             return Ok(user);
         }
 
-        [Authorize(Roles = "Admin, User")]
+        [Authorize(Policy = ApplicationPermissions.ViewProfile)]
         [HttpGet("me")]
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
@@ -137,7 +147,7 @@ namespace Application.Api.Controllers
             return Ok(user);
         }
 
-        [Authorize(Roles = "Admin, User")]
+        [Authorize(Policy = ApplicationPermissions.ManageUsers)]
         [HttpPut("update")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -164,7 +174,36 @@ namespace Application.Api.Controllers
             return Ok(new { message = _localizer["UserUpdatedSuccessfully"] });
         }
 
-        [Authorize(Roles = "Admin, User")]
+        [Authorize(Policy = ApplicationPermissions.ManageUsers)]
+        [HttpPut("{id}/permissions")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdatePermissions(string id, [FromBody] UpdateUserPermissionsRequest? request)
+        {
+            if (string.IsNullOrWhiteSpace(id) || request == null)
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["UserCannotBeNullDetail"], statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            var user = await _userService.GetByIdAsync(id);
+            if (user == null)
+            {
+                throw new NotFoundException(_localizer["UserNotFoundById", id]);
+            }
+
+            var normalizedPermissions = NormalizePermissions(request.Permissions);
+            if (!normalizedPermissions.Any())
+            {
+                normalizedPermissions = ApplicationPermissions.DefaultUserPermissions.ToList();
+            }
+
+            user.Account.Permissions = normalizedPermissions;
+            await _userService.UpdateAsync(user);
+            return Ok(new { message = _localizer["UserUpdatedSuccessfully"], permissions = normalizedPermissions });
+        }
+
+        [Authorize(Policy = ApplicationPermissions.ViewProfile)]
         [HttpPut("profile")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -281,7 +320,7 @@ namespace Application.Api.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin, User")]
+        [Authorize(Policy = ApplicationPermissions.ViewProfile)]
         [HttpPut("change-password")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -428,14 +467,34 @@ namespace Application.Api.Controllers
             return double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed) ? parsed : null;
         }
 
+        private static List<string> NormalizePermissions(IEnumerable<string>? permissions)
+        {
+            if (permissions == null)
+            {
+                return new List<string>();
+            }
+
+            return permissions
+                .Where(p => !string.IsNullOrWhiteSpace(p))
+                .Select(p => p.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
         private static User MapToUser(CreateUserDto dto)
         {
+            var permissions = NormalizePermissions(dto.Account.Permissions);
+            if (!permissions.Any())
+            {
+                permissions = ApplicationPermissions.DefaultUserPermissions.ToList();
+            }
+
             return new User
             {
                 Account = new UserAccount
                 {
                     Email = dto.Account.Email,
-                    Role = dto.Account.Role,
+                    Permissions = permissions,
                     DateJoined = dto.Account.DateJoined ?? DateTime.UtcNow
                 },
                 Profile = new UserProfile

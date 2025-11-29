@@ -9,7 +9,7 @@ namespace Application.Domain.Interface
         Task DeleteAsync(string id);
         Task<IEnumerable<User>> GetAllAsync();
         Task<User> GetByIdAsync(string id);
-        Task<IEnumerable<User>> GetByRoleAsync(string role);
+        Task<IEnumerable<User>> GetByPermissionAsync(string permission);
         Task<User> GetByEmailAsync(string email);
         Task<User> GetByRefreshTokenAsync(string refreshTokenId);
         Task UpdateAsync(User user);

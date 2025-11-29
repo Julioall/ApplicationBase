@@ -58,6 +58,11 @@
       "settingsSubtitle": "Gerencie preferências e segurança",
       "logout": "Sair",
       "logoutSubtitle": "Trocar de conta ou encerrar sessão"
+    },
+    "adminNav": {
+      "permissions": "Usuários e permissões",
+      "emailSettings": "Configurações de e-mail",
+      "services": "Serviços e integrações"
     }
   },
   "profile": {
@@ -86,9 +91,9 @@
       "nameError": "Informe pelo menos 3 caracteres.",
       "emailLabel": "E-mail",
       "birthLabel": "Data de nascimento",
-      "birthHelper": "Opcional, usado para personalizar experi\u00eancias.",
-      "cancel": "Descartar altera\u00e7\u00f5es",
-      "save": "Salvar altera\u00e7\u00f5es",
+      "birthHelper": "Opcional, usado para personalizar experiências.",
+      "cancel": "Descartar alterações",
+      "save": "Salvar alterações",
       "saving": "Salvando..."
     },
     "password": {
@@ -131,14 +136,16 @@
       "profileUpdated": "Perfil atualizado com sucesso!",
       "passwordUpdated": "Senha atualizada com sucesso!",
       "passwordMismatch": "As senhas precisam ser iguais.",
-      "profileLoadError": "N\u00e3o foi poss\u00edvel carregar seu perfil agora.",
+      "profileLoadError": "Não foi possível carregar seu perfil agora.",
       "genericError": "Algo deu errado. Tente novamente.",
-      "missingUser": "N\u00e3o encontramos informa\u00e7\u00f5es do usu\u00e1rio logado.",
-      "avatarInvalid": "Escolha um arquivo de imagem v\u00e1lido.",
-      "avatarTooLarge": "A imagem deve ter no m\u00e1ximo 2 MB.",
+      "missingUser": "Não encontramos informações do usuário logado.",
+      "avatarInvalid": "Escolha um arquivo de imagem válido.",
+      "avatarTooLarge": "A imagem deve ter no máximo 2 MB.",
       "formInvalid": "Corrija os campos antes de salvar.",
       "passwordFormInvalid": "Preencha todos os campos para atualizar a senha."
     }
+  },
+  "admin": {
+    "pageTitle": "Administração"
   }
 }
-

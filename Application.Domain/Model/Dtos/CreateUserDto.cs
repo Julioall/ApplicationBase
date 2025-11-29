@@ -10,7 +10,7 @@ namespace Application.Domain.Model.Dtos
     {
         public required string Email { get; set; }
         public required string Password { get; set; }
-        public required string Role { get; set; }
+        public List<string>? Permissions { get; set; }
         public DateTime? DateJoined { get; set; }
     }
 

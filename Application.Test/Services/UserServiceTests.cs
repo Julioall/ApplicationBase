@@ -193,27 +193,27 @@ namespace Application.Tests.Services
         }
 
         [Fact]
-        public async Task GetByRoleAsync_Should_Return_Users()
+        public async Task GetByPermissionAsync_Should_Return_Users()
         {
             var admin1 = CreateValidUser("role@user.com");
-            admin1.Account.Role = "Admin";
+            admin1.Account.Permissions = new() { "manage:users" };
             var admin2 = CreateValidUser("role2@user.com");
-            admin2.Account.Role = "Admin";
+            admin2.Account.Permissions = new() { "manage:users" };
             _session.Store(admin1);
             _session.Store(admin2);
             _session.SaveChanges();
 
-            var result = await _userService.GetByRoleAsync("Admin");
+            var result = await _userService.GetByPermissionAsync("manage:users");
 
             Assert.NotNull(result);
             Assert.Equal(2, result!.Count());
-            Assert.All(result, u => Assert.Equal("Admin", u.Account.Role));
+            Assert.All(result, u => Assert.Contains("manage:users", u.Account.Permissions));
         }
 
         [Fact]
-        public async Task GetByRoleAsync_Should_Return_Empty_When_No_Users()
+        public async Task GetByPermissionAsync_Should_Return_Empty_When_No_Users()
         {
-            var result = await _userService.GetByRoleAsync("NonExistingRole");
+            var result = await _userService.GetByPermissionAsync("missing:permission");
 
             Assert.NotNull(result);
             Assert.Empty(result);
@@ -304,7 +304,7 @@ namespace Application.Tests.Services
                 {
                     Email = email,
                     PasswordHash = withHash ? SecureHash.HashSecret(defaultPassword) : null,
-                    Role = "User"
+                    Permissions = new() { "view:home", "view:profile" }
                 },
                 Profile = new UserProfile
                 {

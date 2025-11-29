@@ -5,6 +5,7 @@ using Application.Service.Interface;
 using Application.Service.Service.Security;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -105,16 +106,24 @@ namespace Application.Service.Service
 
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKeyValue));
             var signinCredentials = new SigningCredentials(secretKey, algorithm: SecurityAlgorithms.HmacSha256);
+            var claims = new List<Claim>
+            {
+                new(type: ClaimTypes.Name, user.Account.Email),
+                new(type: ClaimTypes.Email, user.Account.Email),
+                new(type: JwtRegisteredClaimNames.Email, user.Account.Email)
+            };
+
+            user.Account.Permissions ??= new List<string>();
+
+            foreach (var permission in user.Account.Permissions)
+            {
+                claims.Add(new Claim(ApplicationPermissions.PermissionClaimType, permission));
+            }
+
             return new JwtSecurityToken(
                 issuer: Environment.GetEnvironmentVariable(ApplicationConstants.JWT_ISSUER_KEY),
                 audience: Environment.GetEnvironmentVariable(ApplicationConstants.JWT_AUDIENCE_KEY),
-                claims: new[]
-                {
-                    new Claim(type: ClaimTypes.Name, user.Account.Email),
-                    new Claim(type: ClaimTypes.Email, user.Account.Email),
-                    new Claim(type: JwtRegisteredClaimNames.Email, user.Account.Email),
-                    new Claim(type: ClaimTypes.Role, user.Account.Role)
-                },
+                claims: claims,
                 expires: DateTime.UtcNow.AddHours(2),
                 signingCredentials: signinCredentials
                 );

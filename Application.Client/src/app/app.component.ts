@@ -6,12 +6,14 @@ import { Subscription } from 'rxjs';
 import { ThemeService } from './service/theme/theme.service';
 import { UserService } from './service/user/user.service';
 import { User } from './model/User';
+import { ADMIN_PERMISSION } from './model/permissions';
 
 type NavItem = {
   icon: string;
   label: string;
   badge?: string;
   active?: boolean;
+  path?: string;
 };
 
 @Component({
@@ -41,19 +43,21 @@ export class AppComponent implements OnInit, OnDestroy {
     { icon: 'fa-regular fa-star', label: 'home.favoriteNav.mobileApp', badge: 'home.badges.sprint' },
     { icon: 'fa-regular fa-star', label: 'home.favoriteNav.serviceDesk', badge: 'home.badges.support' },
   ];
-  quickLinks: NavItem[] = [
-    { icon: 'fa-regular fa-note-sticky', label: 'home.quickLinks.docs' },
-    { icon: 'fa-solid fa-bolt', label: 'home.quickLinks.automation' },
-    { icon: 'fa-solid fa-flag', label: 'home.quickLinks.roadmap' },
+  adminShortcuts: NavItem[] = [
+    { icon: 'fa-solid fa-user-shield', label: 'home.adminNav.permissions', path: '/admin/permissions' },
+    { icon: 'fa-solid fa-envelope-circle-check', label: 'home.adminNav.emailSettings', path: '/admin/email' },
+    { icon: 'fa-solid fa-gears', label: 'home.adminNav.services', path: '/admin/services' },
   ];
   private readonly routeBreadcrumbMap: Record<string, { label: string; icon: string }> = {
     home: { label: 'home.dashboard', icon: 'fa-solid fa-house' },
     profile: { label: 'profile.pageTitle', icon: 'fa-regular fa-user' },
+    admin: { label: 'admin.pageTitle', icon: 'fa-solid fa-user-shield' },
   };
   private routerSubscription?: Subscription;
   private hasLoadedUser = false;
   private isFetchingUser = false;
   private readonly defaultInitials = 'AB';
+  hasAdminAccess = false;
 
   @ViewChild('profileMenu') profileMenu?: ElementRef<HTMLDivElement>;
 
@@ -70,6 +74,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.translateService.setFallbackLang('en');
     this.translateService.use(browserLang ?? 'en');
     this.themeService.setTheme(this.themeService.getActiveTheme());
+    this.refreshAdminAccess();
     this.updateShellVisibility(this.router.url);
     this.updateBreadcrumb(this.router.url);
     if (this.authService.isLoggedIn()) {
@@ -131,6 +136,7 @@ export class AppComponent implements OnInit, OnDestroy {
   logout(): void {
     this.authService.logout();
     this.closeProfileMenu();
+    this.refreshAdminAccess();
     this.resetUserMetadata();
     this.router.navigate(['/auth']);
   }
@@ -139,11 +145,19 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.userInitialsValue;
   }
 
+  isRouteActive(path?: string): boolean {
+    if (!path) {
+      return false;
+    }
+    return this.router.url.startsWith(path);
+  }
+
   private updateShellVisibility(url: string): void {
     const normalizedUrl = this.normalizeUrl(url);
     const isProfileRoute = normalizedUrl.startsWith('/profile');
     const isPublicRoute = normalizedUrl.startsWith('/auth') || normalizedUrl.startsWith('/register');
     const shouldShowShell = this.authService.isLoggedIn() && !isPublicRoute;
+    this.refreshAdminAccess();
     this.shouldShowDashboardShell = shouldShowShell;
     if (shouldShowShell) {
       this.ensureUserContext();
@@ -243,5 +257,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.userInitialsValue = this.defaultInitials;
     this.hasLoadedUser = false;
     this.isFetchingUser = false;
+  }
+
+  private refreshAdminAccess(): void {
+    this.hasAdminAccess = this.authService.hasPermission(ADMIN_PERMISSION);
   }
 }

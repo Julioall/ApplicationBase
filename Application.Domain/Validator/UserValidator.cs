@@ -23,10 +23,10 @@ namespace Application.Domain.Validator
                 .LessThan(DateTime.UtcNow).WithMessage("DateOfBirthPast")
                 .GreaterThan(DateTime.UtcNow.AddYears(-120)).WithMessage("DateOfBirthTooOld");
 
-            RuleFor(user => user.Account.Role)
-                .NotEmpty().WithMessage("RoleRequired")
-                .Must(role => new[] { "User", "Admin", "Moderator" }.Contains(role))
-                .WithMessage("RoleInvalid");
+            RuleFor(user => user.Account.Permissions)
+                .NotNull().WithMessage("PermissionsRequired")
+                .Must(p => p.Any()).WithMessage("PermissionsRequired")
+                .ForEach(rule => rule.NotEmpty().WithMessage("PermissionsInvalid"));
         }
     }
 }

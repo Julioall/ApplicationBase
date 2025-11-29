@@ -3,6 +3,7 @@ using Application.Service.Interface;
 using Application.Service.Service.Security;
 using Application.Tests.Setup;
 using FluentValidation;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Tests.Validator
@@ -102,25 +103,25 @@ namespace Application.Tests.Validator
         }
 
         [Fact]
-        public void Should_Have_Error_When_Role_Is_Empty()
+        public void Should_Have_Error_When_Permissions_Are_Empty()
         {
             var user = CreateValidUser();
-            user.Account.Role = "";
+            user.Account.Permissions = new List<string>();
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains("RoleRequired", result.Message);
+            Assert.Contains("PermissionsRequired", result.Message);
         }
 
         [Fact]
-        public void Should_Have_Error_When_Role_Is_Invalid()
+        public void Should_Have_Error_When_Permissions_Are_Invalid()
         {
             var user = CreateValidUser();
-            user.Account.Role = "SuperUser";
+            user.Account.Permissions = new List<string> { "" };
 
             var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
 
-            Assert.Contains("RoleInvalid", result.Message);
+            Assert.Contains("PermissionsInvalid", result.Message);
         }
 
         [Fact]
@@ -145,7 +146,7 @@ namespace Application.Tests.Validator
                 {
                     Email = "valid@email.com",
                     PasswordHash = SecureHash.HashSecret("Valid123!"),
-                    Role = "User"
+                    Permissions = new List<string> { "view:home", "view:profile" }
                 },
                 Profile = new UserProfile
                 {

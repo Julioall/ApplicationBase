@@ -1,4 +1,4 @@
-﻿{
+{
   "auth": {
     "loginSuccess": "Login successful!",
     "loginError": "Login error. Please check your credentials.",
@@ -58,6 +58,11 @@
       "settingsSubtitle": "Manage preferences and security",
       "logout": "Log out",
       "logoutSubtitle": "Switch accounts or leave"
+    },
+    "adminNav": {
+      "permissions": "Users & permissions",
+      "emailSettings": "Email settings",
+      "services": "Services & integrations"
     }
   },
   "profile": {
@@ -68,18 +73,18 @@
       "editProfile": "Edit profile",
       "editAccount": "Edit account"
     },
-  "photo": {
-    "alt": "Profile photo",
-    "menu": {
-      "add": "Change photo",
-      "remove": "Remove photo"
+    "photo": {
+      "alt": "Profile photo",
+      "menu": {
+        "add": "Change photo",
+        "remove": "Remove photo"
+      },
+      "modalTitle": "Add profile photo",
+      "prompt": "Drag and drop your images here or upload a photo.",
+      "uploadButton": "Upload a photo",
+      "upload": "Upload",
+      "clear": "Remove photo"
     },
-    "modalTitle": "Add profile photo",
-    "prompt": "Drag and drop your images here or upload a photo.",
-    "uploadButton": "Upload a photo",
-    "upload": "Upload",
-    "clear": "Remove photo"
-  },
     "form": {
       "nameLabel": "Full name",
       "namePlaceholder": "Jane Doe",
@@ -139,5 +144,8 @@
       "formInvalid": "Fix the highlighted fields before saving.",
       "passwordFormInvalid": "Fill out every password field to continue."
     }
+  },
+  "admin": {
+    "pageTitle": "Admin"
   }
 }

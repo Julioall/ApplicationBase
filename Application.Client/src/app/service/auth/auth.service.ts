@@ -111,11 +111,38 @@ export class AuthService {
     return new HttpHeaders();
   }
 
-  getRole(): string | null {
+  getPermissions(): string[] {
     const token = this.getToken();
-    if (!token) return null;
-    const decoded: any = jwtDecode(token);
-    return decoded['role'] || decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || null;
+    if (!token) return [];
+    try {
+      const decoded: any = jwtDecode(token);
+      const raw = decoded['permissions'] ?? decoded['permission'];
+
+      if (!raw) {
+        return [];
+      }
+
+      if (Array.isArray(raw)) {
+        return raw;
+      }
+
+      if (typeof raw === 'string') {
+        return raw.split(',').map((value: string) => value.trim()).filter(Boolean);
+      }
+
+      return [];
+    } catch {
+      return [];
+    }
+  }
+
+  hasPermission(permission: string): boolean {
+    return this.getPermissions().includes(permission);
+  }
+
+  hasAnyPermission(permissions: string[]): boolean {
+    const current = this.getPermissions();
+    return permissions.some(p => current.includes(p));
   }
 
   getEmail(): string | null {
