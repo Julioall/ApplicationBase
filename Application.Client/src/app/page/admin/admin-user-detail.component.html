@@ -69,6 +69,24 @@
           <p class="muted">Dados básicos do usuário para conferência rápida.</p>
         </div>
       </header>
+      <div class="summary-identity">
+        <div class="summary-avatar" [class.has-image]="avatarUrl">
+          <ng-container *ngIf="avatarUrl; else summaryInitials">
+            <img [src]="avatarUrl" alt="Foto do usuário" />
+          </ng-container>
+          <ng-template #summaryInitials>
+            <span>{{ userInitials }}</span>
+          </ng-template>
+        </div>
+        <div class="summary-text">
+          <h4>{{ user.Profile?.Name || 'Usuário' }}</h4>
+          <p class="muted">{{ user.Account?.Email || 'Sem e-mail' }}</p>
+          <span class="pill ghost tiny">
+            <i class="fa-regular fa-id-badge"></i>
+            {{ user.Id ? ('ID ' + user.Id) : 'Conta sem ID' }}
+          </span>
+        </div>
+      </div>
       <dl class="meta">
         <div>
           <dt>Nome</dt>
