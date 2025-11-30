@@ -8,7 +8,7 @@
   color: var(--text-primary);
 }
 
-.jira-nav {
+.side-nav {
   background: linear-gradient(180deg, var(--surface) 0%, var(--surface-alt) 100%);
   border-right: 1px solid var(--border-soft);
   padding: var(--space-5) var(--space-4);
@@ -21,6 +21,7 @@
   overflow: hidden;
   box-shadow: var(--shadow-soft);
   backdrop-filter: blur(6px);
+  z-index: 30;
 }
 
 .nav-scroll {
@@ -50,9 +51,8 @@
 .nav-head {
   position: sticky;
   top: 0;
-  padding: 0 0 var(--space-3);
-  margin-bottom: var(--space-1);
-  background: linear-gradient(180deg, rgba(var(--shadow-rgb), 0.08) 0%, var(--surface) 65%, rgba(var(--shadow-rgb), 0) 100%);
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
   z-index: 2;
 }
 
@@ -83,6 +83,7 @@
 .brand-title {
   font-weight: var(--font-weight-bold);
   letter-spacing: -0.015em;
+  color: var(--text-primary);
 }
 
 .brand-subtitle {
@@ -453,7 +454,7 @@
     grid-template-columns: 1fr;
   }
 
-  .jira-nav {
+  .side-nav {
     position: fixed;
     inset: 0 auto 0 0;
     width: min(88vw, 360px);
@@ -468,10 +469,10 @@
     flex-wrap: nowrap;
     transform: translateX(-110%);
     transition: transform var(--transition-base);
-    z-index: 20;
+    z-index: 30;
   }
 
-  .jira-nav.is-open {
+  .side-nav.is-open {
     transform: translateX(0);
   }
 

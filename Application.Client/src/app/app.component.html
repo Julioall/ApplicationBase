@@ -8,19 +8,19 @@
 
 <ng-container *ngIf="shouldShowDashboardShell; else standaloneRoute">
   <div class="dashboard-shell">
-    <aside class="jira-nav" [class.is-open]="isNavOpen">
-      <div class="nav-scroll">
-        <div class="nav-head">
-          <div class="nav-brand">
-            <div class="logo-mark">
-              <i class="fa fa-cubes"></i>
-            </div>
-            <div class="brand-copy">
-              <span class="brand-title">ApplicationBase</span>
-              <span class="brand-subtitle">{{ 'home.brandSubtitle' | translate }}</span>
-            </div>
+    <aside class="side-nav" [class.is-open]="isNavOpen">
+      <div class="nav-head">
+        <div class="nav-brand">
+          <div class="logo-mark">
+            <i class="fa fa-cubes"></i>
+          </div>
+          <div class="brand-copy">
+            <span class="brand-title">ApplicationBase</span>
+            <span class="brand-subtitle">{{ 'home.brandSubtitle' | translate }}</span>
           </div>
         </div>
+      </div>
+      <div class="nav-scroll">
         <div class="nav-list">
           <a *ngFor="let link of primaryNav" class="nav-link" [class.active]="link.active" href="#" (click)="closeNav()">
             <i class="{{ link.icon }}" aria-hidden="true"></i>
