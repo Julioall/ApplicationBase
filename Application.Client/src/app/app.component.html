@@ -1,4 +1,10 @@
-<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="default" color="#fff" type="line-spin-fade" [fullScreen]="true"></ngx-spinner>
+<ngx-spinner
+  bdColor="var(--overlay-strong)"
+  size="default"
+  color="var(--accent-strong)"
+  type="line-spin-fade"
+  [fullScreen]="true"
+></ngx-spinner>
 
 <ng-container *ngIf="shouldShowDashboardShell; else standaloneRoute">
   <div class="dashboard-shell">
