@@ -9,54 +9,52 @@
 <ng-container *ngIf="shouldShowDashboardShell; else standaloneRoute">
   <div class="dashboard-shell">
     <aside class="jira-nav" [class.is-open]="isNavOpen">
-    <div class="nav-brand">
-      <div class="logo-mark">
-        <i class="fa fa-cubes"></i>
+      <div class="nav-scroll">
+        <div class="nav-head">
+          <div class="nav-brand">
+            <div class="logo-mark">
+              <i class="fa fa-cubes"></i>
+            </div>
+            <div class="brand-copy">
+              <span class="brand-title">ApplicationBase</span>
+              <span class="brand-subtitle">{{ 'home.brandSubtitle' | translate }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="nav-list">
+          <a *ngFor="let link of primaryNav" class="nav-link" [class.active]="link.active" href="#" (click)="closeNav()">
+            <i class="{{ link.icon }}" aria-hidden="true"></i>
+            <span>{{ link.label | translate }}</span>
+            <span *ngIf="link.badge" class="pill">{{ link.badge | translate }}</span>
+          </a>
+          <a *ngFor="let link of favoriteNav" class="nav-link subtle" href="#" (click)="closeNav()">
+            <i class="{{ link.icon }}" aria-hidden="true"></i>
+            <span>{{ link.label | translate }}</span>
+            <span *ngIf="link.badge" class="pill ghost">{{ link.badge | translate }}</span>
+          </a>
+        </div>
       </div>
-      <div class="brand-copy">
-        <span class="brand-title">ApplicationBase</span>
-        <span class="brand-subtitle">{{ 'home.brandSubtitle' | translate }}</span>
+
+      <div class="nav-footer" *ngIf="hasAdminAccess">
+        <div class="nav-section" [class.is-collapsed]="!sectionState.admin">
+          <button class="section-toggle" type="button" (click)="toggleSection('admin')">
+            <span class="section-label">{{ 'home.settings' | translate }}</span>
+            <i class="fa-solid" [ngClass]="sectionState.admin ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+          </button>
+          <div class="nav-list" *ngIf="sectionState.admin">
+            <a
+              *ngFor="let link of adminShortcuts"
+              class="nav-link minimal"
+              [class.active]="isRouteActive(link.path)"
+              [routerLink]="link.path"
+              (click)="closeNav()"
+            >
+              <i class="{{ link.icon }}" aria-hidden="true"></i>
+              <span>{{ link.label | translate }}</span>
+            </a>
+          </div>
+        </div>
       </div>
-    </div>
-
-    <div class="nav-section">
-      <div class="section-label">{{ 'home.navigation' | translate }}</div>
-      <a *ngFor="let link of primaryNav" class="nav-link" [class.active]="link.active" href="#" (click)="closeNav()">
-        <i class="{{ link.icon }}" aria-hidden="true"></i>
-        <span>{{ link.label | translate }}</span>
-        <span *ngIf="link.badge" class="pill">{{ link.badge | translate }}</span>
-      </a>
-    </div>
-
-    <div class="nav-section">
-      <div class="section-label">{{ 'home.favorites' | translate }}</div>
-      <a *ngFor="let link of favoriteNav" class="nav-link subtle" href="#" (click)="closeNav()">
-        <i class="{{ link.icon }}" aria-hidden="true"></i>
-        <span>{{ link.label | translate }}</span>
-        <span *ngIf="link.badge" class="pill ghost">{{ link.badge | translate }}</span>
-      </a>
-    </div>
-
-    <div class="nav-section" *ngIf="hasAdminAccess">
-      <div class="section-label">{{ 'home.shortcuts' | translate }}</div>
-      <a
-        *ngFor="let link of adminShortcuts"
-        class="nav-link minimal"
-        [class.active]="isRouteActive(link.path)"
-        [routerLink]="link.path"
-        (click)="closeNav()"
-      >
-        <i class="{{ link.icon }}" aria-hidden="true"></i>
-        <span>{{ link.label | translate }}</span>
-      </a>
-    </div>
-
-    <div class="nav-footer">
-      <a class="nav-link settings-link" href="#" (click)="closeNav()">
-        <i class="fa-solid fa-gear" aria-hidden="true"></i>
-        <span>{{ 'home.settings' | translate }}</span>
-      </a>
-    </div>
     </aside>
     <div class="nav-scrim" *ngIf="isNavOpen" (click)="closeNav()"></div>
 

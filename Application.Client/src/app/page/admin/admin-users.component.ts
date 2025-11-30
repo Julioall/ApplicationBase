@@ -47,7 +47,7 @@ export class AdminUsersComponent implements OnInit {
       this.notificationService.showError('Usuário sem identificador.');
       return;
     }
-    this.router.navigate(['/admin/permissions', user.Id]);
+    this.router.navigate(['/admin/users', user.Id]);
   }
 
   private loadUsers(): void {

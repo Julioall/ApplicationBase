@@ -17,10 +17,43 @@
   gap: var(--space-4);
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: min(100vh, 100dvh);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(6px);
+}
+
+.nav-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
   overflow-y: auto;
   overflow-x: hidden;
-  box-shadow: var(--shadow-soft);
+  min-height: 0;
+  flex: 1;
+  padding: 0 var(--space-2) var(--space-5) var(--space-1);
+}
+
+.nav-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.nav-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-soft);
+  border-radius: var(--radius-full);
+}
+
+.nav-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nav-head {
+  position: sticky;
+  top: 0;
+  padding: 0 0 var(--space-3);
+  margin-bottom: var(--space-1);
+  background: linear-gradient(180deg, rgba(var(--shadow-rgb), 0.08) 0%, var(--surface) 65%, rgba(var(--shadow-rgb), 0) 100%);
+  z-index: 2;
 }
 
 .nav-brand {
@@ -61,11 +94,46 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  padding: var(--space-2) 0;
+}
+
+.nav-section + .nav-section {
+  margin-top: var(--space-1);
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  border: none;
+  background: transparent;
+  color: var(--text-subtle);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  padding: 0;
+}
+
+.section-toggle i {
+  color: var(--text-subtle);
+  transition: transform var(--transition-fast);
+}
+
+.nav-section.is-collapsed .section-toggle i {
+  transform: rotate(0deg);
 }
 
 .nav-footer {
-  margin-top: auto;
-  padding: var(--space-4) var(--space-1) var(--space-2);
+  padding: var(--space-3) var(--space-2) var(--space-2);
   border-top: 1px solid var(--border-soft);
   position: sticky;
   bottom: 0;
@@ -91,6 +159,8 @@
   transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast),
     transform var(--transition-fast);
   border: 1px solid transparent;
+  position: relative;
+  background: linear-gradient(90deg, rgba(var(--shadow-rgb), 0.02) 0%, transparent 60%);
 }
 
 .nav-link .fa-solid,
@@ -103,6 +173,7 @@
   background: var(--accent-soft);
   border-color: var(--border-soft);
   color: var(--accent-strong);
+  transform: translateX(2px);
 }
 
 .nav-link:hover i {
@@ -111,10 +182,36 @@
 
 .nav-link.active {
   color: var(--accent-strong);
+  background: linear-gradient(135deg, rgba(var(--accent-rgb, 37, 99, 235), 0.12), rgba(var(--accent-rgb, 37, 99, 235), 0.06));
+  border-color: var(--accent-soft);
+  box-shadow: var(--shadow-soft);
 }
 
 .nav-link.active i {
   color: var(--accent-strong);
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(180deg, var(--accent-strong), var(--accent));
+  opacity: 0;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.nav-link:hover::before {
+  opacity: 0.4;
+}
+
+.nav-link.active::before {
+  opacity: 1;
+  transform: translate(-2px, -50%);
 }
 
 .nav-link.subtle {
@@ -359,16 +456,15 @@
   .jira-nav {
     position: fixed;
     inset: 0 auto 0 0;
-    width: 78%;
-    max-width: 320px;
-    height: 100vh;
+    width: min(88vw, 360px);
+    max-width: 360px;
+    height: min(100vh, 100dvh);
+    border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
     border-right: none;
     border-bottom: none;
     box-shadow: var(--shadow-soft);
     padding: var(--space-4) var(--space-4);
     gap: var(--space-3);
-    overflow-y: auto;
-    overflow-x: hidden;
     flex-wrap: nowrap;
     transform: translateX(-110%);
     transition: transform var(--transition-base);
@@ -394,6 +490,7 @@
 
   .nav-brand {
     width: 100%;
+    align-items: flex-start;
   }
 
   .nav-section {
@@ -401,6 +498,7 @@
     align-items: flex-start;
     flex-wrap: nowrap;
     gap: var(--space-2);
+    box-shadow: none;
   }
 
   .section-label {

@@ -28,10 +28,6 @@
           <h3>Controle de acesso</h3>
           <p class="muted">Adicione ou remova permissões específicas para este usuário.</p>
         </div>
-        <span class="pill ghost">
-          <i class="fa-solid fa-shield-halved"></i>
-          Apenas administradores
-        </span>
       </header>
 
       <div class="permissions" *ngIf="getUserPermissions().length; else noPermissions">

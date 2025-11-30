@@ -77,7 +77,7 @@ export class AdminUserDetailComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/admin/permissions']);
+    this.router.navigate(['/admin/users']);
   }
 
   showResetPassword(): void {
