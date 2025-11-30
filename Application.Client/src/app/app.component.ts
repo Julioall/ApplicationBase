@@ -30,23 +30,20 @@ export class AppComponent implements OnInit, OnDestroy {
   breadcrumbIconClass = 'fa-solid fa-house';
   userAvatarUrl: string | null = null;
   private userInitialsValue = 'AB';
+  sectionState: Record<'admin', boolean> = { admin: false };
   primaryNav: NavItem[] = [
-    { icon: 'fa-solid fa-compass', label: 'home.primaryNav.overview', active: true },
-    { icon: 'fa-solid fa-list-check', label: 'home.primaryNav.projects' },
-    { icon: 'fa-solid fa-table-columns', label: 'home.primaryNav.boards' },
-    { icon: 'fa-solid fa-users', label: 'home.primaryNav.teams' },
-    { icon: 'fa-solid fa-chart-simple', label: 'home.primaryNav.reports' },
-    { icon: 'fa-solid fa-robot', label: 'home.primaryNav.automation' },
+    { icon: 'fa-solid fa-compass', label: 'home.primaryNav.panel', active: true },
+    { icon: 'fa-solid fa-people-group', label: 'home.primaryNav.classes' },
+    { icon: 'fa-solid fa-signal', label: 'home.primaryNav.metrics' },
+    { icon: 'fa-solid fa-clipboard-check', label: 'home.primaryNav.todo' },
   ];
   favoriteNav: NavItem[] = [
-    { icon: 'fa-regular fa-star', label: 'home.favoriteNav.designSystem', badge: 'home.badges.ui' },
-    { icon: 'fa-regular fa-star', label: 'home.favoriteNav.mobileApp', badge: 'home.badges.sprint' },
-    { icon: 'fa-regular fa-star', label: 'home.favoriteNav.serviceDesk', badge: 'home.badges.support' },
+    { icon: 'fa-regular fa-file-lines', label: 'home.favoriteNav.reports' },
   ];
   adminShortcuts: NavItem[] = [
-    { icon: 'fa-solid fa-user-shield', label: 'home.adminNav.permissions', path: '/admin/permissions' },
-    { icon: 'fa-solid fa-envelope-circle-check', label: 'home.adminNav.emailSettings', path: '/admin/email' },
+    { icon: 'fa-solid fa-user-shield', label: 'home.adminNav.users', path: '/admin/users' },
     { icon: 'fa-solid fa-gears', label: 'home.adminNav.services', path: '/admin/services' },
+    { icon: 'fa-solid fa-life-ring', label: 'home.adminNav.support', path: '/support' },
   ];
   private readonly routeBreadcrumbMap: Record<string, { label: string; icon: string }> = {
     home: { label: 'home.dashboard', icon: 'fa-solid fa-house' },
@@ -119,6 +116,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isNavOpen = false;
   }
 
+  toggleSection(section: 'admin'): void {
+    const willOpen = !this.sectionState[section];
+    this.sectionState.admin = willOpen;
+  }
+
   toggleProfileMenu(event: Event): void {
     event.stopPropagation();
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
@@ -180,14 +182,41 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private updateBreadcrumb(url: string): void {
     const normalizedUrl = this.normalizeUrl(url);
-    const [firstSegment = 'home'] = normalizedUrl.split('/').filter(Boolean);
+    const [firstSegment = 'home', secondSegment] = normalizedUrl.split('/').filter(Boolean);
+
+    if (firstSegment === 'admin') {
+      this.setPrimaryActive(normalizedUrl, true);
+      this.breadcrumbIconClass = 'fa-solid fa-user-shield';
+      if (secondSegment === 'users') {
+        this.breadcrumbLabelKey = 'home.breadcrumbs.adminUsers';
+        return;
+      }
+      this.breadcrumbLabelKey = 'admin.pageTitle';
+      return;
+    }
+
+    this.setPrimaryActive(normalizedUrl, false);
     const routeMeta = this.routeBreadcrumbMap[firstSegment];
     if (routeMeta) {
       this.breadcrumbLabelKey = routeMeta.label;
       this.breadcrumbIconClass = routeMeta.icon;
-    } else {
-      this.breadcrumbLabelKey = 'home.dashboard';
-      this.breadcrumbIconClass = 'fa-solid fa-house';
+      return;
+    }
+
+    this.breadcrumbLabelKey = 'home.dashboard';
+    this.breadcrumbIconClass = 'fa-solid fa-house';
+  }
+
+  private setPrimaryActive(normalizedUrl: string, isAdminRoute: boolean): void {
+    this.primaryNav.forEach((item) => (item.active = false));
+    if (isAdminRoute) {
+      return;
+    }
+    if (!normalizedUrl || normalizedUrl === '/' || normalizedUrl.startsWith('/home')) {
+      const first = this.primaryNav[0];
+      if (first) {
+        first.active = true;
+      }
     }
   }
 

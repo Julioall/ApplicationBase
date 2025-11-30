@@ -1,36 +1,41 @@
+@use '../../../styles/variables' as *;
+
 .navbar-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 1rem;
-  background: #0f172a;
-  color: #f8fafc;
+  padding: var(--space-3) var(--space-5);
+  background: var(--surface);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-soft);
+  box-shadow: var(--elevation-1);
 }
 
 .brand {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--space-2);
   align-items: center;
   cursor: pointer;
 
   .logo {
-    background: #2563eb;
-    color: #fff;
-    padding: 0.35rem 0.5rem;
-    border-radius: 0.35rem;
-    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+    color: var(--text-inverse);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    font-weight: var(--font-weight-bold);
   }
 
   .title {
-    font-weight: 600;
-    letter-spacing: 0.5px;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.02em;
   }
 }
 
 .navbar {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-3);
+  flex-wrap: wrap;
 
   a,
   button {
@@ -39,16 +44,32 @@
     background: none;
     border: none;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-fast), background var(--transition-fast);
   }
 
   a:hover,
   button:hover {
-    color: #93c5fd;
+    color: var(--accent-strong);
+    background: var(--accent-soft);
   }
 
   .link {
-    padding: 0.35rem 0.5rem;
-    border-radius: 0.35rem;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+  }
+}
+
+@include respond-down(md) {
+  .navbar-container {
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .navbar {
+    width: 100%;
+    justify-content: flex-end;
   }
 }

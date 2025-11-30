@@ -26,17 +26,13 @@
       "releases": "Releases"
     },
     "primaryNav": {
-      "overview": "Overview",
-      "projects": "Projects",
-      "boards": "Boards",
-      "teams": "Teams",
-      "reports": "Reports",
-      "automation": "Automation"
+      "panel": "Dashboard",
+      "classes": "Classes",
+      "metrics": "Metrics",
+      "todo": "Todo"
     },
     "favoriteNav": {
-      "designSystem": "Design System",
-      "mobileApp": "Mobile App",
-      "serviceDesk": "Service Desk"
+      "reports": "Reports"
     },
     "badges": {
       "ui": "UI",
@@ -49,6 +45,9 @@
       "roadmap": "Roadmap"
     },
     "openShortcuts": "Open shortcuts",
+    "breadcrumbs": {
+      "adminUsers": "Settings • Users"
+    },
     "profileMenu": {
       "openLabel": "Open profile menu",
       "closeLabel": "Close profile menu",
@@ -60,9 +59,9 @@
       "logoutSubtitle": "Switch accounts or leave"
     },
     "adminNav": {
-      "permissions": "Users & permissions",
-      "emailSettings": "Email settings",
-      "services": "Services & integrations"
+      "users": "Users",
+      "services": "Services",
+      "support": "Support"
     }
   },
   "profile": {
