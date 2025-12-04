@@ -46,6 +46,9 @@ namespace Application.Tests.Services
             public Task UpdateProfileAsync(string email, string? name, DateTime? dateOfBirth, Stream? profilePictureStream, string? profilePictureContentType, bool removeProfilePicture, double? profilePictureOffsetX, double? profilePictureOffsetY, string? jobTitle, string? department, string? organization, string? location, double? profilePictureScale) => Task.CompletedTask;
             public Task ChangePasswordAsync(string email, string currentPassword, string newPassword) => Task.CompletedTask;
             public Task<(byte[] Data, string ContentType)?> GetProfilePictureAsync(string userId) => Task.FromResult<(byte[] Data, string ContentType)?>(null);
+            public Task<(string Code, DateTime ExpiresAt)> GenerateRecoveryCodeAsync(string email, bool sendEmail) => Task.FromResult((string.Empty, DateTime.UtcNow.AddMinutes(10)));
+            public Task ValidateRecoveryCodeAsync(string email, string code) => Task.CompletedTask;
+            public Task ChangePasswordWithRecoveryCodeAsync(string email, string code, string newPassword) => Task.CompletedTask;
         }
 
         [Fact]

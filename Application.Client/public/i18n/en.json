@@ -1,4 +1,4 @@
-{
+﻿{
   "auth": {
     "loginSuccess": "Login successful!",
     "loginError": "Login error. Please check your credentials.",
@@ -23,7 +23,8 @@
       "codeLabel": "Recovery code",
       "codeHelper": "Check your inbox and spam folder.",
       "continue": "Continue",
-      "backToLogin": "Back to login"
+      "backToLogin": "Back to login",
+      "resendIn": "Resend in {{seconds}}s"
     },
     "reset": {
       "title": "Set new password",
@@ -33,7 +34,9 @@
       "verifyCode": "Validate code",
       "verifying": "Validating...",
       "codeValidated": "Code confirmed",
-      "validateFirst": "Validate the code before setting a new password"
+      "validateFirst": "Validate the code before setting a new password",
+      "resend": "Resend code",
+      "resendIn": "Resend in {{seconds}}s"
     },
     "password": {
       "new": "New password",
@@ -135,7 +138,7 @@
       "currentLabel": "Current password",
       "newLabel": "New password",
       "confirmLabel": "Confirm password",
-      "requirements": "Must contain at least 6 characters.",
+      "requirements": "At least 8 characters including uppercase, lowercase, number and symbol.",
       "save": "Update password",
       "saving": "Updating...",
       "recoveryTitle": "Code-based recovery",

@@ -15,7 +15,6 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
 import { ToastContainerComponent } from './shared/notification/toast-container.component';
 import { ForgotPasswordComponent } from './page/auth/forgot-password.component';
-import { ResetPasswordComponent } from './page/auth/reset-password.component';
 
 export class AppTranslateLoader implements TranslateLoader {
   constructor(private http: HttpClient) {}
@@ -31,7 +30,6 @@ export class AppTranslateLoader implements TranslateLoader {
     RegisterComponent,
     ToastContainerComponent,
     ForgotPasswordComponent,
-    ResetPasswordComponent,
   ],
   imports: [
     BrowserModule,

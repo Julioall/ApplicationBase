@@ -21,7 +21,7 @@ namespace Application.Service.Service
             _logger = logger;
         }
 
-        public async Task SendPasswordResetAsync(string toEmail, string resetUrl)
+        public async Task SendPasswordResetAsync(string toEmail)
         {
             var settings = await GetEffectiveSettingsAsync();
 
@@ -34,7 +34,7 @@ namespace Application.Service.Service
             if (string.IsNullOrWhiteSpace(toEmail))
                 throw new ArgumentException("Destination email is required.", nameof(toEmail));
 
-            var message = BuildResetMessage(toEmail, resetUrl, settings);
+            var message = BuildResetMessage(toEmail, settings);
             using var client = BuildClient(settings);
             await client.SendMailAsync(message);
         }
@@ -75,6 +75,10 @@ namespace Application.Service.Service
             try
             {
                 var stored = await _settingsService.GetEmailAsync();
+                if (stored != null && stored.Password.StartsWith("hash:", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new InvalidOperationException("Email password is stored as hash. Reconfigure SMTP credentials.");
+                }
                 return stored ?? _defaultSettings;
             }
             catch (Exception ex)
@@ -113,14 +117,14 @@ namespace Application.Service.Service
             return client;
         }
 
-        private MailMessage BuildResetMessage(string toEmail, string resetUrl, EmailSettings settings)
+        private MailMessage BuildResetMessage(string toEmail, EmailSettings settings)
         {
             var from = new MailAddress(settings.FromEmail, settings.FromName);
             var message = new MailMessage
             {
                 From = from,
                 Subject = "Recuperação de senha",
-                Body = BuildResetBody(resetUrl, settings),
+                Body = BuildResetBody(settings),
                 IsBodyHtml = true,
                 BodyEncoding = Encoding.UTF8,
                 SubjectEncoding = Encoding.UTF8
@@ -129,9 +133,9 @@ namespace Application.Service.Service
             return message;
         }
 
-        public async Task SendTestEmailAsync(string toEmail)
+        public async Task SendTestEmailAsync(string toEmail, EmailSettings? overrideSettings = null)
         {
-            var settings = await GetEffectiveSettingsAsync();
+            var settings = overrideSettings ?? await GetEffectiveSettingsAsync();
 
             if (string.IsNullOrWhiteSpace(settings.Host))
                 throw new InvalidOperationException("Email host is not configured.");
@@ -155,16 +159,27 @@ namespace Application.Service.Service
             message.To.Add(new MailAddress(toEmail));
 
             using var client = BuildClient(settings);
-            await client.SendMailAsync(message);
+            try
+            {
+                await client.SendMailAsync(message);
+            }
+            catch (SmtpException smtpEx)
+            {
+                _logger.LogError(smtpEx, "SMTP send test failed: StatusCode={StatusCode}, Host={Host}, Port={Port}", smtpEx.StatusCode, client.Host, client.Port);
+                throw new InvalidOperationException($"Falha ao enviar e-mail de teste (SMTP). Verifique host, porta, segurança e credenciais. Código: {smtpEx.StatusCode}", smtpEx);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Send test email failed");
+                throw new InvalidOperationException("Falha ao enviar e-mail de teste. Verifique configuração SMTP.", ex);
+            }
         }
 
-        private string BuildResetBody(string resetUrl, EmailSettings settings)
+        private string BuildResetBody(EmailSettings settings)
         {
-            var link = string.IsNullOrWhiteSpace(resetUrl) ? settings.DefaultResetUrl : resetUrl;
             return $@"
                 <p>Recebemos um pedido para redefinir a senha da sua conta.</p>
-                <p>Clique no link abaixo para continuar:</p>
-                <p><a href=""{WebUtility.HtmlEncode(link)}"">{WebUtility.HtmlEncode(link)}</a></p>
+                <p>Use o código de verificação enviado para concluir a redefinição no aplicativo.</p>
                 <p>Se você não solicitou, ignore este e-mail.</p>";
         }
 

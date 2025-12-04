@@ -11,5 +11,8 @@
         public const string JWT_ISSUER_KEY = "JWT_ISSUER";
         public const string JWT_AUDIENCE_KEY = "JWT_AUDIENCE";
         public const string JWT_SIGNING_KEY = "JWT_SIGNING_KEY";
+
+        // Secrets
+        public const string SECRET_ENCRYPTION_KEY = "APP_SECRET_ENCRYPTION_KEY";
     }
 }

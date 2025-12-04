@@ -11,14 +11,11 @@ export interface EmailSettings {
   host: string;
   port: number;
   secure: string;
-  username: string;
   password: string;
-  defaultResetUrl: string;
 }
 
 export interface SendResetRequest {
   email: string;
-  resetUrl?: string;
 }
 
 @Injectable({
@@ -53,8 +50,8 @@ export class EmailSettingsService {
       .pipe(map((resp: any) => this.normalize(resp)));
   }
 
-  sendTestEmail(body: SendResetRequest): Observable<any> {
-    return this.http.post(`${this.apiUrl}/test`, body, { headers: this.getAuthHeaders() });
+  sendTestEmail(body: SendResetRequest, settings: EmailSettings): Observable<any> {
+    return this.http.post(`${this.apiUrl}/test`, { ...body, settings }, { headers: this.getAuthHeaders() });
   }
 
   private normalize(resp: any): EmailSettings {
@@ -65,9 +62,7 @@ export class EmailSettingsService {
         host: '',
         port: 0,
         secure: '',
-        username: '',
         password: '',
-        defaultResetUrl: '',
       };
     }
 
@@ -78,9 +73,7 @@ export class EmailSettingsService {
       host: resp.host ?? resp.Host ?? '',
       port: resp.port ?? resp.Port ?? 0,
       secure: resp.secure ?? resp.Secure ?? '',
-      username: resp.username ?? resp.Username ?? '',
       password: resp.password ?? resp.Password ?? '',
-      defaultResetUrl: resp.defaultResetUrl ?? resp.DefaultResetUrl ?? '',
     };
   }
 }

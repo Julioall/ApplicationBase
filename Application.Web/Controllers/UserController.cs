@@ -355,8 +355,27 @@ namespace Application.Api.Controllers
             }
 
             var sendEmail = request?.SendEmail ?? true;
-            var (_, expiresAt) = await _userService.GenerateRecoveryCodeAsync(email, sendEmail);
-            return Ok(new { expiresAt, sentByEmail = sendEmail });
+            try
+            {
+                var (code, expiresAt) = await _userService.GenerateRecoveryCodeAsync(email, sendEmail);
+                if (string.IsNullOrWhiteSpace(code))
+                {
+                    return Ok(new { message = _localizer["ResetEmailSent"], sentByEmail = sendEmail });
+                }
+                return Ok(new { expiresAt, sentByEmail = sendEmail });
+            }
+            catch (NotFoundException)
+            {
+                return Ok(new { message = _localizer["ResetEmailSent"], sentByEmail = sendEmail });
+            }
+            catch (BusinessException ex)
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: ex.Message, statusCode: StatusCodes.Status400BadRequest);
+            }
+            catch (InvalidOperationException)
+            {
+                return Problem(title: _localizer["InternalErrorTitle"], detail: _localizer["EmailNotConfigured"], statusCode: StatusCodes.Status500InternalServerError);
+            }
         }
 
         [AllowAnonymous]
@@ -368,6 +387,10 @@ namespace Application.Api.Controllers
             if (request == null || string.IsNullOrWhiteSpace(request.Code))
             {
                 return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["UserCannotBeNullDetail"], statusCode: StatusCodes.Status400BadRequest);
+            }
+            if (request.Code.Length != 6 || !request.Code.All(char.IsDigit))
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["RecoveryCodeInvalid"], statusCode: StatusCodes.Status400BadRequest);
             }
 
             var email = request.Email;
@@ -390,6 +413,10 @@ namespace Application.Api.Controllers
             if (request == null || string.IsNullOrWhiteSpace(request.Code) || string.IsNullOrWhiteSpace(request.NewPassword))
             {
                 return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["UserCannotBeNullDetail"], statusCode: StatusCodes.Status400BadRequest);
+            }
+            if (request.Code.Length != 6 || !request.Code.All(char.IsDigit))
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["RecoveryCodeInvalid"], statusCode: StatusCodes.Status400BadRequest);
             }
 
             var email = request.Email;

@@ -49,20 +49,21 @@ namespace Application.Api.Controllers
                 return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["EmailRequired"], statusCode: StatusCodes.Status400BadRequest);
             }
 
-            var user = await _userService.GetByEmailAsync(targetEmail);
-            if (user == null)
-            {
-                return Problem(title: _localizer["NotFoundTitle"], detail: _localizer["UserNotFoundByEmail", targetEmail], statusCode: StatusCodes.Status404NotFound);
-            }
-
-            var resetUrl = string.IsNullOrWhiteSpace(request?.ResetUrl) ? _settings.DefaultResetUrl : request!.ResetUrl!;
             try
             {
-                await _emailService.SendPasswordResetAsync(targetEmail, resetUrl);
+                var user = await _userService.GetByEmailAsync(targetEmail);
+                if (user != null)
+                {
+                    await _emailService.SendPasswordResetAsync(targetEmail);
+                }
             }
-            catch (Exception ex)
+            catch (InvalidOperationException ex)
             {
                 return Problem(title: _localizer["InternalErrorTitle"], detail: ex.Message, statusCode: StatusCodes.Status500InternalServerError);
+            }
+            catch (Exception)
+            {
+                return Problem(title: _localizer["InternalErrorTitle"], detail: _localizer["InternalErrorDetail"], statusCode: StatusCodes.Status500InternalServerError);
             }
 
             return Ok(new { message = _localizer["ResetEmailSent"] });
@@ -79,8 +80,7 @@ namespace Application.Api.Controllers
         [HttpGet("settings")]
         public async Task<ActionResult<EmailSettings>> GetSettings()
         {
-            var cfg = await _settingsService.GetOrCreateAsync();
-            var email = cfg.Email ?? _settings;
+            var email = await _settingsService.GetEmailAsync();
             return Ok(email);
         }
 
@@ -93,8 +93,7 @@ namespace Application.Api.Controllers
                 return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["InvalidOperationTitle"], statusCode: StatusCodes.Status400BadRequest);
             }
 
-            var cfg = await _settingsService.GetOrCreateAsync();
-            var currentEmail = cfg.Email ?? _settings;
+            var currentEmail = await _settingsService.GetEmailAsync();
 
             if (string.IsNullOrWhiteSpace(settings.Password))
             {
@@ -117,7 +116,7 @@ namespace Application.Api.Controllers
         [HttpPost("test")]
         public async Task<ActionResult> SendTest([FromBody] SendResetEmailDto? request)
         {
-            var targetEmail = request?.Email ?? GetAuthenticatedEmail() ?? _settings.FromEmail;
+            var targetEmail = request?.Email ?? GetAuthenticatedEmail();
             if (string.IsNullOrWhiteSpace(targetEmail))
             {
                 return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["EmailRequired"], statusCode: StatusCodes.Status400BadRequest);
@@ -125,11 +124,15 @@ namespace Application.Api.Controllers
 
             try
             {
-                await _emailService.SendTestEmailAsync(targetEmail);
+                await _emailService.SendTestEmailAsync(targetEmail, request?.Settings);
             }
-            catch (Exception ex)
+            catch (InvalidOperationException ex)
             {
                 return Problem(title: _localizer["InternalErrorTitle"], detail: ex.Message, statusCode: StatusCodes.Status500InternalServerError);
+            }
+            catch (Exception)
+            {
+                return Problem(title: _localizer["InternalErrorTitle"], detail: _localizer["InternalErrorDetail"], statusCode: StatusCodes.Status500InternalServerError);
             }
 
             return Ok(new { message = _localizer["ResetEmailSent"], email = targetEmail });

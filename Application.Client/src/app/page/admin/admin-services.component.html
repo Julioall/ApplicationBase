@@ -5,10 +5,6 @@
       <h2>Serviço de e-mail</h2>
       <p class="subtitle">SMTP utilizado para recuperação de senha e comunicações automáticas.</p>
     </div>
-    <span class="pill ghost">
-      <i class="fa-solid fa-shield-halved"></i>
-      Uso interno
-    </span>
   </header>
 
   <article class="card">
@@ -18,38 +14,54 @@
         <h3>Parâmetros de entrega</h3>
         <p class="muted">Defina remetente, host e credenciais. A integração real será adicionada depois.</p>
       </div>
-      <span class="pill">Em breve</span>
+      <div class="form-actions inline-actions">
+        <button type="button" class="secondary" (click)="testConnection()" [disabled]="isTesting || !isEditing">
+          <i class="fa-solid fa-paper-plane"></i>
+          {{ isTesting ? 'Testando...' : 'Testar envio' }}
+        </button>
+        <ng-container *ngIf="isEditing; else editBtn">
+          <button type="button" class="secondary" (click)="cancelEdit()" [disabled]="isSaving || isTesting">
+            Cancelar
+          </button>
+          <button type="submit" [disabled]="isSaving">
+            <i class="fa-solid fa-floppy-disk"></i>
+            {{ isSaving ? 'Salvando...' : 'Salvar' }}
+          </button>
+        </ng-container>
+        <ng-template #editBtn>
+          <button type="button" (click)="startEdit()">
+            <i class="fa-solid fa-pen"></i>
+            Editar e-mail
+          </button>
+        </ng-template>
+      </div>
     </header>
 
     <form class="config-form" (ngSubmit)="saveConfig()">
       <div class="form-grid">
         <label>
           Remetente (nome)
-          <input type="text" name="fromName" [(ngModel)]="emailConfig.fromName" />
+          <input type="text" name="fromName" [(ngModel)]="emailConfig.fromName" [disabled]="!isEditing" />
         </label>
         <label>
           Remetente (e-mail)
-          <input type="email" name="fromEmail" [(ngModel)]="emailConfig.fromEmail" required />
+          <input type="email" name="fromEmail" [(ngModel)]="emailConfig.fromEmail" required [disabled]="!isEditing" />
         </label>
         <label>
           Host SMTP
-          <input type="text" name="host" [(ngModel)]="emailConfig.host" placeholder="smtp.seuprovedor.com" />
+          <input type="text" name="host" [(ngModel)]="emailConfig.host" placeholder="smtp.seuprovedor.com" [disabled]="!isEditing" />
         </label>
         <label>
           Porta
-          <input type="number" name="port" [(ngModel)]="emailConfig.port" min="1" />
+          <input type="number" name="port" [(ngModel)]="emailConfig.port" min="1" [disabled]="!isEditing" />
         </label>
         <label>
           Segurança
-          <select name="secure" [(ngModel)]="emailConfig.secure">
+          <select name="secure" [(ngModel)]="emailConfig.secure" [disabled]="!isEditing">
             <option value="none">Nenhuma</option>
             <option value="starttls">STARTTLS</option>
             <option value="ssl">SSL/TLS</option>
           </select>
-        </label>
-        <label>
-          Usuário
-          <input type="text" name="username" [(ngModel)]="emailConfig.username" />
         </label>
         <label>
           Senha
@@ -59,6 +71,7 @@
               name="password"
               [(ngModel)]="emailConfig.password"
               autocomplete="current-password"
+              [disabled]="!isEditing"
             />
             <button
               type="button"
@@ -71,25 +84,12 @@
           </div>
         </label>
         <label class="full-row">
-          URL de recuperação
-          <input type="url" name="defaultResetUrl" [(ngModel)]="emailConfig.defaultResetUrl" />
-        </label>
-        <label class="full-row">
           E-mail para teste
-          <input type="email" name="testEmail" [(ngModel)]="emailConfig.testEmail" placeholder="teste@exemplo.com" />
+          <input type="email" name="testEmail" [(ngModel)]="emailConfig.testEmail" placeholder="teste@exemplo.com" [disabled]="!isEditing" />
         </label>
       </div>
 
-      <div class="form-actions">
-        <button type="button" class="secondary" (click)="testConnection()" [disabled]="isTesting">
-          <i class="fa-solid fa-paper-plane"></i>
-          {{ isTesting ? 'Testando...' : 'Testar envio' }}
-        </button>
-        <button type="submit" [disabled]="isSaving">
-          <i class="fa-solid fa-floppy-disk"></i>
-          {{ isSaving ? 'Salvando...' : 'Salvar' }}
-        </button>
-      </div>
+      <div class="form-actions"></div>
 
       <p *ngIf="statusMessage" class="status" [class.success]="statusType === 'success'" [class.error]="statusType === 'error'">
         {{ statusMessage }}

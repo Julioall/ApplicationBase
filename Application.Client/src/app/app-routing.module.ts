@@ -5,7 +5,6 @@ import { AuthGuard } from './service/auth/auth.guard';
 import { PermissionGuard } from './service/auth/permission.guard';
 import { RegisterComponent } from './page/register/register.component';
 import { ForgotPasswordComponent } from './page/auth/forgot-password.component';
-import { ResetPasswordComponent } from './page/auth/reset-password.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -14,7 +13,6 @@ const routes: Routes = [
   { path: 'admin', loadChildren: () => import('./page/admin/admin.module').then(m => m.AdminModule), canActivate: [AuthGuard, PermissionGuard], data: { permissions: ['manage:users'] } },
   { path: 'auth', component: AuthComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
-  { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'register', component: RegisterComponent },
 ];
 

@@ -23,9 +23,10 @@
       "codeLabel": "Código de recuperação",
       "codeHelper": "Confira sua caixa de entrada e spam.",
       "continue": "Continuar",
-      "backToLogin": "Voltar para o login"
+      "backToLogin": "Voltar para o login",
+      "resendIn": "Reenviar em {{seconds}}s"
     },
-        "reset": {
+    "reset": {
       "title": "Definir nova senha",
       "subtitle": "Confirme o código e crie uma nova senha.",
       "submit": "Salvar nova senha",
@@ -33,7 +34,9 @@
       "verifyCode": "Validar código",
       "verifying": "Validando...",
       "codeValidated": "Código confirmado",
-      "validateFirst": "Valide o código antes de definir a nova senha"
+      "validateFirst": "Valide o código antes de definir a nova senha",
+      "resend": "Reenviar c?digo",
+      "resendIn": "Reenviar em {{seconds}}s"
     },
     "password": {
       "new": "Nova senha",
@@ -135,7 +138,7 @@
       "currentLabel": "Senha atual",
       "newLabel": "Nova senha",
       "confirmLabel": "Confirmar nova senha",
-      "requirements": "Precisa ter pelo menos 6 caracteres.",
+      "requirements": "M?nimo de 8 caracteres com mai?scula, min?scula, n?mero e s?mbolo.",
       "save": "Atualizar senha",
       "saving": "Atualizando...",
       "recoveryTitle": "Recuperação com código",
@@ -192,4 +195,3 @@
     "pageTitle": "Administração"
   }
 }
-

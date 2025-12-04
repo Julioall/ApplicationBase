@@ -26,6 +26,7 @@ namespace Application.Service.Service
         private const int RecoveryCodeLength = 6;
         private const int RecoveryCodeTtlMinutes = 10;
         private const int MaxRecoveryAttempts = 5;
+        private static readonly TimeSpan RecoveryCodeCooldown = TimeSpan.FromMinutes(1);
 
         public UserService(IUserRepository userRepository, IValidator<User> userValidator, IValidator<PasswordInput> passwordValidator, IStringLocalizer<SharedResource> localizer, IEmailService emailService)
         {
@@ -182,7 +183,14 @@ namespace Application.Service.Service
             var user = await _userRepository.GetByEmailAsync(email);
             if (user == null)
             {
-                throw new NotFoundException(_localizer["UserNotFoundByEmail", email]);
+                // Não vazar existência: retorna placeholders, controller pode responder genericamente
+                return (string.Empty, DateTime.UtcNow);
+            }
+
+            if (user.Account.RecoveryCodeLastGenerated.HasValue &&
+                DateTime.UtcNow - user.Account.RecoveryCodeLastGenerated < RecoveryCodeCooldown)
+            {
+                throw new BusinessException(_localizer["RecoveryCodeCooldown"]);
             }
 
             var code = GenerateNumericCode(RecoveryCodeLength);
@@ -197,7 +205,15 @@ namespace Application.Service.Service
 
             if (sendEmail)
             {
-                await _emailService.SendRecoveryCodeAsync(user.Account.Email, code, expiresAt);
+                try
+                {
+                    await _emailService.SendRecoveryCodeAsync(user.Account.Email, code, expiresAt);
+                }
+                catch (InvalidOperationException)
+                {
+                    // SMTP não configurado
+                    throw new BusinessException(_localizer["EmailNotConfigured"]);
+                }
             }
 
             return (code, expiresAt);
@@ -234,10 +250,10 @@ namespace Application.Service.Service
             }
 
             var isValid = SecureHash.Verify(code, user.Account.RecoveryCodeHash);
-            user.Account.RecoveryCodeAttempts++;
 
             if (!isValid)
             {
+                user.Account.RecoveryCodeAttempts++;
                 await _userRepository.UpdateAsync(user);
                 throw new BusinessException(_localizer["RecoveryCodeInvalid"]);
             }
@@ -277,10 +293,10 @@ namespace Application.Service.Service
             }
 
             var isValid = SecureHash.Verify(code, user.Account.RecoveryCodeHash);
-            user.Account.RecoveryCodeAttempts++;
 
             if (!isValid)
             {
+                user.Account.RecoveryCodeAttempts++;
                 await _userRepository.UpdateAsync(user);
                 throw new BusinessException(_localizer["RecoveryCodeInvalid"]);
             }

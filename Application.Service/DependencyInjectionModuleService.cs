@@ -1,5 +1,6 @@
 using Application.Service.Interface;
 using Application.Service.Service;
+using Application.Service.Service.Security;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Service
@@ -12,6 +13,7 @@ namespace Application.Service
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ISettingsService, SettingsService>();
+            services.AddScoped<ISecretEncryptionService, SecretEncryptionService>();
             return services;
         }
     }

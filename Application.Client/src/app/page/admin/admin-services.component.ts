@@ -13,9 +13,7 @@ export class AdminServicesComponent implements OnInit {
     host: '',
     port: 587,
     secure: 'starttls',
-    username: '',
     password: '',
-    defaultResetUrl: 'https://app.example.com/auth/reset-password',
     testEmail: '',
   };
 
@@ -24,6 +22,7 @@ export class AdminServicesComponent implements OnInit {
   statusMessage = '';
   statusType: 'success' | 'error' | '' = '';
   showPassword = false;
+  isEditing = false;
 
   constructor(private emailSettingsService: EmailSettingsService) {}
 
@@ -41,6 +40,8 @@ export class AdminServicesComponent implements OnInit {
       next: (settings) => {
         this.emailConfig = { ...settings, testEmail: settings.fromEmail };
         this.setStatus('', '');
+        this.isEditing = false;
+        this.showPassword = false;
       },
       error: () => {
         this.setStatus('Não foi possível carregar as configurações de e-mail.', 'error');
@@ -73,7 +74,7 @@ export class AdminServicesComponent implements OnInit {
     }
     this.isTesting = true;
     this.setStatus('', '');
-    this.emailSettingsService.sendTestEmail({ email: to, resetUrl: this.emailConfig.defaultResetUrl }).subscribe({
+    this.emailSettingsService.sendTestEmail({ email: to }, this.emailConfig).subscribe({
       next: () => {
         this.isTesting = false;
         this.setStatus('E-mail de teste enviado (verifique a caixa de entrada).', 'success');
@@ -87,5 +88,16 @@ export class AdminServicesComponent implements OnInit {
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
+  }
+
+  startEdit(): void {
+    this.isEditing = true;
+    this.setStatus('', '');
+  }
+
+  cancelEdit(): void {
+    this.loadSettings();
+    this.isEditing = false;
+    this.showPassword = false;
   }
 }

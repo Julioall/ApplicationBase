@@ -98,7 +98,14 @@ export class ProfileComponent implements OnInit {
     this.passwordForm = this.fb.group(
       {
         currentPassword: ['', [Validators.required]],
-        newPassword: ['', [Validators.required, Validators.minLength(6)]],
+        newPassword: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(8),
+            Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]).+$/),
+          ],
+        ],
         confirmPassword: ['', [Validators.required]],
       },
       { validators: [this.passwordsMatchValidator] }
@@ -106,8 +113,15 @@ export class ProfileComponent implements OnInit {
 
     this.recoveryForm = this.fb.group(
       {
-        code: ['', [Validators.required, Validators.minLength(4)]],
-        newPassword: ['', [Validators.required, Validators.minLength(6)]],
+        code: ['', [Validators.required, Validators.pattern(/^\\d{6}$/)]],
+        newPassword: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(8),
+            Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]).+$/),
+          ],
+        ],
         confirmPassword: ['', [Validators.required]],
       },
       { validators: [this.passwordsMatchValidator] }

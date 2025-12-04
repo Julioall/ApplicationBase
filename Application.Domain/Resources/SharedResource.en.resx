@@ -120,8 +120,14 @@
   <data name="RecoveryCodeInvalid" xml:space="preserve">
     <value>Invalid code. Check and try again.</value>
   </data>
+  <data name="RecoveryCodeCooldown" xml:space="preserve">
+    <value>Please wait before requesting a new recovery code.</value>
+  </data>
   <data name="RecoveryCodeValidated" xml:space="preserve">
     <value>Code validated successfully.</value>
+  </data>
+  <data name="EmailNotConfigured" xml:space="preserve">
+    <value>Email service is not configured. Please contact an administrator.</value>
   </data>
   <data name="UserPasswordUpdatedSuccessfully" xml:space="preserve">
     <value>Password updated successfully.</value>

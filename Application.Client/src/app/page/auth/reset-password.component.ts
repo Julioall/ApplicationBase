@@ -1,7 +1,8 @@
-import { Component, OnInit, QueryList, ViewChildren, ElementRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, QueryList, ViewChildren, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { firstValueFrom, interval, Subscription } from 'rxjs';
 import { NotificationService } from '../../service/notification/notification.service';
 import { UserService } from '../../service/user/user.service';
 
@@ -10,18 +11,20 @@ import { UserService } from '../../service/user/user.service';
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.scss'],
 })
-export class ResetPasswordComponent implements OnInit {
+export class ResetPasswordComponent implements OnInit, OnDestroy {
+  private static readonly CODE_LENGTH = 6;
   resetForm: FormGroup;
   isSaving = false;
   isVerifyingCode = false;
   codeValidated = false;
   codeError: string | null = null;
-  private initialValidationAttempted = false;
-  codeDigits: string[] = new Array(6).fill('');
+  codeDigits: string[] = new Array(ResetPasswordComponent.CODE_LENGTH).fill('');
   passwordVisibility = {
     newPassword: false,
     confirmPassword: false,
   };
+  resendCooldown = 0;
+  private resendSub?: Subscription;
   @ViewChildren('codeInput') codeInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   constructor(
@@ -35,8 +38,18 @@ export class ResetPasswordComponent implements OnInit {
     this.resetForm = this.fb.group(
       {
         email: ['', [Validators.required, Validators.email]],
-        code: ['', [Validators.required, Validators.minLength(4)]],
-        newPassword: ['', [Validators.required, Validators.minLength(6)]],
+        code: [
+          '',
+          [Validators.required, Validators.pattern(`^\\d{${ResetPasswordComponent.CODE_LENGTH}}$`)],
+        ],
+        newPassword: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(8),
+            Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]).+$/),
+          ],
+        ],
         confirmPassword: ['', [Validators.required]],
       },
       { validators: [this.passwordsMatchValidator] }
@@ -60,9 +73,13 @@ export class ResetPasswordComponent implements OnInit {
       this.codeValidated = false;
       this.codeError = null;
     });
-    if (email && code && code.length === 6) {
-      this.verifyCode(true);
+    if (email && code && code.length === ResetPasswordComponent.CODE_LENGTH) {
+      this.verifyCodeAsync(true);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.resendSub?.unsubscribe();
   }
 
   private passwordsMatchValidator(group: FormGroup) {
@@ -84,7 +101,7 @@ export class ResetPasswordComponent implements OnInit {
     if (value && index < this.codeDigits.length - 1) {
       this.focusCodeInput(index + 1);
     } else if (this.codeDigits.join('').length === this.codeDigits.length && !this.codeDigits.includes('')) {
-      this.verifyCode(true);
+      this.verifyCodeAsync(true);
     }
   }
 
@@ -93,7 +110,7 @@ export class ResetPasswordComponent implements OnInit {
     const pasted = event.clipboardData?.getData('text') ?? '';
     this.applyCodeValue(pasted);
     if (!this.codeDigits.includes('')) {
-      this.verifyCode(true);
+      this.verifyCodeAsync(true);
     }
   }
 
@@ -138,9 +155,9 @@ export class ResetPasswordComponent implements OnInit {
     });
   }
 
-  verifyCode(isInitial: boolean = false): void {
+  async verifyCodeAsync(isInitial: boolean = false): Promise<boolean> {
     if (this.isVerifyingCode) {
-      return;
+      return false;
     }
     if (this.resetForm.get('email')?.invalid || this.resetForm.get('code')?.invalid) {
       this.resetForm.get('email')?.markAsTouched();
@@ -148,48 +165,42 @@ export class ResetPasswordComponent implements OnInit {
       if (!isInitial) {
         this.notificationService.showWarning(this.translate.instant('auth.reset.validateFirst'));
       }
-      return;
+      return false;
     }
     const { email, code } = this.resetForm.getRawValue();
     this.isVerifyingCode = true;
-    this.userService.verifyRecoveryCode({ email, code }).subscribe({
-      next: () => {
-        this.codeValidated = true;
-        this.codeError = null;
-        if (!isInitial) {
-          this.notificationService.showSuccess(this.translate.instant('auth.reset.codeValidated'));
-        }
-        this.initialValidationAttempted = true;
-      },
-      error: (error) => {
-        this.codeValidated = false;
-        const detail = error?.error?.detail || error?.error?.title || this.translate.instant('auth.resetFailed');
-        this.codeError = detail;
-        this.notificationService.showError(detail);
-        this.applyCodeValue('');
-        this.isVerifyingCode = false;
-      },
-      complete: () => {
-        this.isVerifyingCode = false;
-      },
-    });
+    try {
+      await firstValueFrom(this.userService.verifyRecoveryCode({ email, code }));
+      this.codeValidated = true;
+      this.codeError = null;
+      if (!isInitial) {
+        this.notificationService.showSuccess(this.translate.instant('auth.reset.codeValidated'));
+      }
+      return true;
+    } catch (error: any) {
+      this.codeValidated = false;
+      const detail = error?.error?.detail || error?.error?.title || this.translate.instant('auth.resetFailed');
+      this.codeError = detail;
+      this.notificationService.showError(detail);
+      this.applyCodeValue('');
+      return false;
+    } finally {
+      this.isVerifyingCode = false;
+    }
   }
 
   togglePasswordVisibility(field: 'newPassword' | 'confirmPassword'): void {
     this.passwordVisibility[field] = !this.passwordVisibility[field];
   }
 
-  submit(): void {
+  async submit(): Promise<void> {
     if (this.resetForm.invalid) {
       this.resetForm.markAllAsTouched();
       this.notificationService.showWarning(this.translate.instant('auth.resetPasswordInvalid'));
       return;
     }
-    if (!this.codeValidated) {
-      this.verifyCode();
-      if (!this.codeValidated) {
-        return;
-      }
+    if (!this.codeValidated && !(await this.verifyCodeAsync())) {
+      return;
     }
 
     const { email, code, newPassword } = this.resetForm.getRawValue();
@@ -215,5 +226,39 @@ export class ResetPasswordComponent implements OnInit {
 
   goToLogin(): void {
     this.router.navigate(['/auth']);
+  }
+
+  resendCode(): void {
+    if (this.isVerifyingCode || this.isSaving || this.resendCooldown > 0) {
+      return;
+    }
+    if (this.resetForm.get('email')?.invalid) {
+      this.resetForm.get('email')?.markAsTouched();
+      this.notificationService.showWarning(this.translate.instant('auth.resetEmailRequired'));
+      return;
+    }
+    const email = this.resetForm.get('email')?.value;
+    this.userService.generateRecoveryCode(true, email).subscribe({
+      next: () => {
+        this.notificationService.showSuccess(this.translate.instant('auth.resetCodeSent'));
+        this.codeValidated = false;
+        this.startResendCooldown();
+      },
+      error: (error) => {
+        const detail = error?.error?.detail || this.translate.instant('auth.resetFailed');
+        this.notificationService.showError(detail);
+      },
+    });
+  }
+
+  private startResendCooldown(seconds: number = 60): void {
+    this.resendCooldown = seconds;
+    this.resendSub?.unsubscribe();
+    this.resendSub = interval(1000).subscribe(() => {
+      this.resendCooldown = Math.max(0, this.resendCooldown - 1);
+      if (this.resendCooldown === 0) {
+        this.resendSub?.unsubscribe();
+      }
+    });
   }
 }

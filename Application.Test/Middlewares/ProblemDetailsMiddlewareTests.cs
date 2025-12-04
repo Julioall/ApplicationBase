@@ -56,7 +56,7 @@ namespace Application.Tests.Middlewares
             });
 
             Assert.Equal(StatusCodes.Status400BadRequest, context.Response.StatusCode);
-            Assert.Equal("Erro de validação", problem?.Title);
+            Assert.Equal(_localizer["ValidationTitle"], problem?.Title);
             Assert.Equal(StatusCodes.Status400BadRequest, problem?.Status);
             Assert.NotNull(problem);
         }
@@ -82,7 +82,7 @@ namespace Application.Tests.Middlewares
             });
 
             Assert.Equal(StatusCodes.Status409Conflict, context.Response.StatusCode);
-            Assert.Equal("Operação inválida", problem?.Title);
+            Assert.Equal(_localizer["InvalidOperationTitle"], problem?.Title);
             Assert.Equal("Conflito de e-mail", problem?.Detail);
         }
     }
