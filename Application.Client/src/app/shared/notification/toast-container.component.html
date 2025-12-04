@@ -1,0 +1,16 @@
+<div class="toast-shell" *ngIf="toasts$ | async as toasts" aria-live="polite" role="status">
+  <div class="toast-stack">
+    <article *ngFor="let toast of toasts; trackBy: trackById" class="toast-card" [ngClass]="toast.type">
+      <div class="toast-icon">
+        <i [class]="iconMap[toast.type]" aria-hidden="true"></i>
+      </div>
+      <div class="toast-body">
+        <div class="toast-title">{{ toast.title }}</div>
+        <div class="toast-message">{{ toast.message }}</div>
+      </div>
+      <button type="button" class="toast-close" aria-label="Fechar notificação" (click)="dismiss(toast.id)">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </article>
+  </div>
+</div>

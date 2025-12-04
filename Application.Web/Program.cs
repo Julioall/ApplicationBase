@@ -124,10 +124,10 @@ public class Program
         });
 
         // Register dependency injection modules
+        builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
         DependencyInjectionModuleDomain.AddDomainDependencies(builder.Services);
         DependencyInjectionModuleInfra.AddInfraDependencies(builder.Services);
         DependencyInjectionModuleService.AddServiceDependencies(builder.Services);
-        DependencyInjectionModuleWeb.AddWebDependencies(builder.Services);
 
 
         var app = builder.Build();

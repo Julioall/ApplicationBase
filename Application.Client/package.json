@@ -29,7 +29,6 @@
     "jwt-decode": "^4.0.0",
     "ng-toast": "^2.0.0",
     "ngx-spinner": "^17.0.0",
-    "ngx-toastr": "^19.0.0",
     "run-script-os": "*",
     "rxjs": "~7.8.0",
     "tslib": "^2.7.0",

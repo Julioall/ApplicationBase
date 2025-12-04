@@ -42,6 +42,15 @@ export class AuthService {
     );
   }
 
+  sendPasswordReset(email: string, resetUrl?: string): Observable<any> {
+    const url = `${environment.apiUrl}/email/reset`;
+    const body: any = { email };
+    if (resetUrl) {
+      body.resetUrl = resetUrl;
+    }
+    return this.http.post<any>(url, body);
+  }
+
   logout(): void {
     this.removeToken();
   }

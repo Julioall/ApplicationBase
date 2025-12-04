@@ -19,13 +19,24 @@ type HydratedUser = User & { Account: UserAccount; Profile: UserProfile };
 export class ProfileComponent implements OnInit {
   profileForm: FormGroup;
   passwordForm: FormGroup;
+  recoveryForm: FormGroup;
   user: HydratedUser | null = null;
   isLoading = false;
   isSavingProfile = false;
   isSavingPassword = false;
+  isGeneratingRecovery = false;
+  isVerifyingRecovery = false;
   isSavingAvatar = false;
   isEditingProfile = false;
   isEditingPassword = false;
+  sendRecoveryByEmail = true;
+  passwordVisibility = {
+    current: false,
+    new: false,
+    confirm: false,
+  };
+  recoveryCode: string | null = null;
+  recoveryExpiresAt: string | null = null;
   avatarPreview: string | null = null;
   private selectedAvatarFile: File | null = null;
   avatarDraftPreview: string | null = null;
@@ -87,6 +98,15 @@ export class ProfileComponent implements OnInit {
     this.passwordForm = this.fb.group(
       {
         currentPassword: ['', [Validators.required]],
+        newPassword: ['', [Validators.required, Validators.minLength(6)]],
+        confirmPassword: ['', [Validators.required]],
+      },
+      { validators: [this.passwordsMatchValidator] }
+    );
+
+    this.recoveryForm = this.fb.group(
+      {
+        code: ['', [Validators.required, Validators.minLength(4)]],
         newPassword: ['', [Validators.required, Validators.minLength(6)]],
         confirmPassword: ['', [Validators.required]],
       },
@@ -282,6 +302,7 @@ export class ProfileComponent implements OnInit {
       next: () => {
         this.notificationService.showSuccess(this.translate.instant('profile.messages.passwordUpdated'));
         this.passwordForm.reset();
+        this.resetPasswordVisibility();
         this.isEditingPassword = false;
       },
       error: (error) => {
@@ -292,6 +313,67 @@ export class ProfileComponent implements OnInit {
         this.isSavingPassword = false;
       },
     });
+  }
+
+  generateRecoveryCode(): void {
+    if (this.isGeneratingRecovery) {
+      return;
+    }
+
+    this.isGeneratingRecovery = true;
+    this.userService.generateRecoveryCode(this.sendRecoveryByEmail).subscribe({
+      next: (response) => {
+        this.recoveryCode = null;
+        this.recoveryExpiresAt = response.expiresAt;
+        this.recoveryForm.patchValue({ code: '' });
+        const messageKey = this.sendRecoveryByEmail
+          ? 'profile.messages.recoveryGeneratedAndSent'
+          : 'profile.messages.recoveryGenerated';
+        this.notificationService.showSuccess(this.translate.instant(messageKey));
+      },
+      error: (error) => {
+        this.handleApiError(error);
+        this.isGeneratingRecovery = false;
+      },
+      complete: () => {
+        this.isGeneratingRecovery = false;
+      },
+    });
+  }
+
+  onRecoverySubmit(): void {
+    if (this.recoveryForm.invalid) {
+      this.recoveryForm.markAllAsTouched();
+      const messageKey = this.recoveryForm.hasError('passwordMismatch')
+        ? 'profile.messages.passwordMismatch'
+        : 'profile.messages.passwordFormInvalid';
+      this.notificationService.showWarning(this.translate.instant(messageKey));
+      return;
+    }
+
+    const { code, newPassword } = this.recoveryForm.getRawValue();
+    this.isVerifyingRecovery = true;
+    this.userService.changePasswordWithCode({ code, newPassword }).subscribe({
+      next: () => {
+        this.notificationService.showSuccess(this.translate.instant('profile.messages.passwordUpdated'));
+        this.recoveryForm.reset();
+        this.recoveryCode = null;
+        this.recoveryExpiresAt = null;
+      },
+      error: (error) => {
+        this.handleApiError(error);
+        this.isVerifyingRecovery = false;
+      },
+      complete: () => {
+        this.isVerifyingRecovery = false;
+      },
+    });
+  }
+
+  resetRecoveryForm(): void {
+    this.recoveryForm.reset();
+    this.recoveryCode = null;
+    this.recoveryExpiresAt = null;
   }
 
   startProfileEdit(): void {
@@ -310,12 +392,22 @@ export class ProfileComponent implements OnInit {
 
   startPasswordEdit(): void {
     this.isEditingPassword = true;
+    this.resetPasswordVisibility();
     this.passwordForm.reset();
   }
 
   cancelPasswordEdit(): void {
     this.isEditingPassword = false;
+    this.resetPasswordVisibility();
     this.passwordForm.reset();
+  }
+
+  togglePasswordVisibility(field: 'current' | 'new' | 'confirm'): void {
+    this.passwordVisibility[field] = !this.passwordVisibility[field];
+  }
+
+  private resetPasswordVisibility(): void {
+    this.passwordVisibility = { current: false, new: false, confirm: false };
   }
 
   goBack(): void {
@@ -334,6 +426,7 @@ export class ProfileComponent implements OnInit {
         this.setProfileControlsState(false);
         this.isEditingProfile = false;
         this.isEditingPassword = false;
+        this.resetPasswordVisibility();
         this.isLoading = false;
       },
       error: (error) => {
@@ -344,6 +437,7 @@ export class ProfileComponent implements OnInit {
         this.isEditingProfile = false;
         this.isEditingPassword = false;
         this.setProfileControlsState(false);
+        this.resetPasswordVisibility();
         this.isLoading = false;
       },
     });

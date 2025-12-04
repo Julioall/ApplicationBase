@@ -341,6 +341,68 @@ namespace Application.Api.Controllers
             return Ok(new { message = _localizer["UserPasswordUpdatedSuccessfully"] });
         }
 
+        [AllowAnonymous]
+        [HttpPost("recovery/code")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GenerateRecoveryCode([FromBody] GenerateRecoveryCodeDto? request)
+        {
+            var email = request?.Email;
+            email ??= GetAuthenticatedEmail();
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return Problem(title: _localizer["UnauthorizedTitle"], detail: _localizer["UnauthorizedDetail"], statusCode: StatusCodes.Status401Unauthorized);
+            }
+
+            var sendEmail = request?.SendEmail ?? true;
+            var (_, expiresAt) = await _userService.GenerateRecoveryCodeAsync(email, sendEmail);
+            return Ok(new { expiresAt, sentByEmail = sendEmail });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("recovery/validate")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ValidateRecoveryCode([FromBody] ValidateRecoveryCodeDto? request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.Code))
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["UserCannotBeNullDetail"], statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            var email = request.Email;
+            email ??= GetAuthenticatedEmail();
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return Problem(title: _localizer["UnauthorizedTitle"], detail: _localizer["UnauthorizedDetail"], statusCode: StatusCodes.Status401Unauthorized);
+            }
+
+            await _userService.ValidateRecoveryCodeAsync(email, request.Code);
+            return Ok(new { message = _localizer["RecoveryCodeValidated"] });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("recovery/verify")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> VerifyRecoveryCode([FromBody] VerifyRecoveryCodeDto? request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.Code) || string.IsNullOrWhiteSpace(request.NewPassword))
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["UserCannotBeNullDetail"], statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            var email = request.Email;
+            email ??= GetAuthenticatedEmail();
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return Problem(title: _localizer["UnauthorizedTitle"], detail: _localizer["UnauthorizedDetail"], statusCode: StatusCodes.Status401Unauthorized);
+            }
+
+            await _userService.ChangePasswordWithRecoveryCodeAsync(email, request.Code, request.NewPassword);
+            return Ok(new { message = _localizer["UserPasswordUpdatedSuccessfully"] });
+        }
+
         private async Task PopulateProfilePictureAsync(User user)
         {
             if (user?.Id.IsNullOrEmpty() ?? true)

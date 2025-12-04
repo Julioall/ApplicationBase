@@ -41,19 +41,6 @@
   line-height: var(--line-height-relaxed);
 }
 
-.btn {
-  border: 1px solid transparent;
-  font-weight: var(--font-weight-bold);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
-}
-
-.btn:active {
-  transform: translateY(0);
-}
-
 .primary {
   background: linear-gradient(135deg, var(--accent-strong), var(--accent));
   color: var(--text-inverse);

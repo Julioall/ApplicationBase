@@ -15,5 +15,14 @@ namespace Application.Domain.Model.User
         public string? RefreshTokenHash { get; set; }
         public string? RefreshTokenId { get; set; }
         public DateTime? RefreshTokenExpiry { get; set; }
+
+        [JsonIgnore]
+        public string? RecoveryCodeHash { get; set; }
+        [JsonIgnore]
+        public DateTime? RecoveryCodeExpiresAt { get; set; }
+        [JsonIgnore]
+        public int RecoveryCodeAttempts { get; set; }
+        [JsonIgnore]
+        public DateTime? RecoveryCodeLastGenerated { get; set; }
     }
 }

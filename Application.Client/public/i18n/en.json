@@ -4,7 +4,41 @@
     "loginError": "Login error. Please check your credentials.",
     "signupSuccess": "Registration successful!",
     "signupError": "Error during registration. Please try again.",
-    "formError": "Please fill out the form correctly."
+    "formError": "Please fill out the form correctly.",
+    "resetSent": "If the email exists, we will send instructions to recover your password.",
+    "resetFailed": "Could not send the recovery email.",
+    "resetEmailRequired": "Enter a valid email to recover your password.",
+    "resetCodeSent": "Code generated and sent by email.",
+    "resetPasswordSuccess": "Password reset successfully.",
+    "resetPasswordInvalid": "Fill in code, email, and new password to continue.",
+    "forgot": {
+      "title": "Recover access",
+      "subtitle": "Enter your email to receive the recovery code.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@email.com",
+      "sendCode": "Send code",
+      "sending": "Sending...",
+      "sent": "Code sent",
+      "codeStep": "Enter the code sent",
+      "codeLabel": "Recovery code",
+      "codeHelper": "Check your inbox and spam folder.",
+      "continue": "Continue",
+      "backToLogin": "Back to login"
+    },
+    "reset": {
+      "title": "Set new password",
+      "subtitle": "Confirm the code and create a new password.",
+      "submit": "Save new password",
+      "saving": "Saving...",
+      "verifyCode": "Validate code",
+      "verifying": "Validating...",
+      "codeValidated": "Code confirmed",
+      "validateFirst": "Validate the code before setting a new password"
+    },
+    "password": {
+      "new": "New password",
+      "confirm": "Confirm password"
+    }
   },
   "home": {
     "brandSubtitle": "Workspace",
@@ -103,7 +137,15 @@
       "confirmLabel": "Confirm password",
       "requirements": "Must contain at least 6 characters.",
       "save": "Update password",
-      "saving": "Updating..."
+      "saving": "Updating...",
+      "recoveryTitle": "Code-based recovery",
+      "recoveryDescription": "Generate a verification code and use it to set a new password.",
+      "generateCode": "Generate code",
+      "generatingCode": "Generating code...",
+      "sendEmail": "Send code by email",
+      "codeLabel": "Code",
+      "applyWithCode": "Apply new password",
+      "expiresAt": "Expires at"
     },
     "about": {
       "title": "Profile",
@@ -141,7 +183,9 @@
       "avatarInvalid": "Please choose a valid image file.",
       "avatarTooLarge": "Images must be 2 MB or less.",
       "formInvalid": "Fix the highlighted fields before saving.",
-      "passwordFormInvalid": "Fill out every password field to continue."
+      "passwordFormInvalid": "Fill out every password field to continue.",
+      "recoveryGenerated": "Code generated. Use it before it expires.",
+      "recoveryGeneratedAndSent": "Code generated and sent by email."
     }
   },
   "admin": {

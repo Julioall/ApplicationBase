@@ -4,7 +4,6 @@ import { ReactiveFormsModule, FormsModule } from "@angular/forms";
 import { RouterTestingModule } from "@angular/router/testing";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
 import { TranslateModule } from '@ngx-translate/core';
-import { ToastrModule } from 'ngx-toastr';
 
 describe('AuthComponent', () => {
   let component: AuthComponent;
@@ -18,8 +17,7 @@ describe('AuthComponent', () => {
         FormsModule,
         RouterTestingModule,
         HttpClientTestingModule,
-        TranslateModule.forRoot(),
-        ToastrModule.forRoot()
+        TranslateModule.forRoot()
       ]
     }).compileComponents();
   }));

@@ -25,14 +25,44 @@
       <div class="inline">
         <label class="field">
           <span>Senha</span>
-          <input type="password" placeholder="Minimo 8 caracteres" formControlName="password" />
+          <div class="password-input">
+            <input
+              [type]="passwordVisibility.password ? 'text' : 'password'"
+              placeholder="Minimo 8 caracteres"
+              formControlName="password"
+              autocomplete="new-password"
+            />
+            <button
+              type="button"
+              class="visibility-toggle"
+              (click)="togglePasswordVisibility('password')"
+              [attr.aria-label]="passwordVisibility.password ? 'Ocultar senha' : 'Mostrar senha'"
+            >
+              <i class="fa-solid" [ngClass]="passwordVisibility.password ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
+            </button>
+          </div>
           <small class="error" *ngIf="registerForm.get('password')?.invalid && (registerForm.get('password')?.touched || submitted)">
             {{ registerForm.get('password')?.hasError('required') ? 'Senha e obrigatoria.' : 'Use no minimo 8 caracteres.' }}
           </small>
         </label>
         <label class="field">
           <span>Confirmar senha</span>
-          <input type="password" placeholder="Repita a senha" formControlName="confirmPassword" />
+          <div class="password-input">
+            <input
+              [type]="passwordVisibility.confirmPassword ? 'text' : 'password'"
+              placeholder="Repita a senha"
+              formControlName="confirmPassword"
+              autocomplete="new-password"
+            />
+            <button
+              type="button"
+              class="visibility-toggle"
+              (click)="togglePasswordVisibility('confirmPassword')"
+              [attr.aria-label]="passwordVisibility.confirmPassword ? 'Ocultar senha' : 'Mostrar senha'"
+            >
+              <i class="fa-solid" [ngClass]="passwordVisibility.confirmPassword ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
+            </button>
+          </div>
           <small class="error" *ngIf="(registerForm.get('confirmPassword')?.touched || submitted) && registerForm.hasError('passwordsMismatch')">
             As senhas precisam ser iguais.
           </small>

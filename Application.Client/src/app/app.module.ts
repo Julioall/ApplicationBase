@@ -7,13 +7,15 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { AuthComponent } from './page/auth/auth.component';
 import { RegisterComponent } from './page/register/register.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ToastrModule } from 'ngx-toastr';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { LoadingInterceptor } from './service/loading/loading.interceptor';
 import { ProblemInterceptorProvider } from './service/http/problem.interceptor';
 import { NgxSpinnerModule } from "ngx-spinner";
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
+import { ToastContainerComponent } from './shared/notification/toast-container.component';
+import { ForgotPasswordComponent } from './page/auth/forgot-password.component';
+import { ResetPasswordComponent } from './page/auth/reset-password.component';
 
 export class AppTranslateLoader implements TranslateLoader {
   constructor(private http: HttpClient) {}
@@ -27,6 +29,9 @@ export class AppTranslateLoader implements TranslateLoader {
     AppComponent,
     AuthComponent,
     RegisterComponent,
+    ToastContainerComponent,
+    ForgotPasswordComponent,
+    ResetPasswordComponent,
   ],
   imports: [
     BrowserModule,
@@ -36,7 +41,6 @@ export class AppTranslateLoader implements TranslateLoader {
     HttpClientModule,
     BrowserAnimationsModule,
     NgxSpinnerModule,
-    ToastrModule.forRoot(),
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {

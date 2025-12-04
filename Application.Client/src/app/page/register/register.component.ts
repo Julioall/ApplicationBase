@@ -18,6 +18,10 @@ export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;
   submitted = false;
   activeTheme = this.themeService.getActiveTheme();
+  passwordVisibility = {
+    password: false,
+    confirmPassword: false,
+  };
 
   private passwordMatchValidator: ValidatorFn = (group: AbstractControl) => {
     const password = group.get('password')?.value;
@@ -53,6 +57,10 @@ export class RegisterComponent implements OnInit {
 
   goToLogin(): void {
     this.router.navigate(['/auth']);
+  }
+
+  togglePasswordVisibility(field: 'password' | 'confirmPassword'): void {
+    this.passwordVisibility[field] = !this.passwordVisibility[field];
   }
 
   private buildErrorMessage(error: any): string {
@@ -104,6 +112,7 @@ export class RegisterComponent implements OnInit {
     this.authService.signup(newUser).subscribe({
       next: () => {
         this.notificationService.showSuccess(this.translateService.instant('auth.signupSuccess'));
+        this.passwordVisibility = { password: false, confirmPassword: false };
         this.router.navigate(['/auth'], { queryParams: { email } });
       },
       error: (err) => {

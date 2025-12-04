@@ -5,17 +5,6 @@
       <p>Bem vindo de volta. Continue construindo seus apps com Angular + .NET.</p>
     </header>
 
-    <button type="button" class="btn secondary w-100">
-      <span class="dot red"></span>
-      <span class="dot yellow"></span>
-      <span class="dot green"></span>
-      Entrar com Google
-    </button>
-
-    <div class="divider">
-      <span>ou entre com email</span>
-    </div>
-
     <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
       <label class="field">
         <span>Email</span>
@@ -27,7 +16,22 @@
 
       <label class="field">
         <span>Senha</span>
-        <input type="password" placeholder="********" formControlName="password" />
+        <div class="password-input">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            placeholder="********"
+            formControlName="password"
+            autocomplete="current-password"
+          />
+          <button
+            type="button"
+            class="visibility-toggle"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+          >
+            <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
+          </button>
+        </div>
         <small class="error" *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.touched || loginSubmitted)">
           {{ loginForm.get('password')?.hasError('required') ? 'Informe sua senha.' : 'A senha precisa de no minimo 6 caracteres.' }}
         </small>
@@ -38,10 +42,12 @@
           <input type="checkbox" />
           <span>Lembrar de mim</span>
         </label>
-        <a href="#" (click)="$event.preventDefault()">Esqueceu a senha?</a>
+        <button class="link-btn" type="button" (click)="onForgotPassword($event)">
+          Esqueceu a senha?
+        </button>
       </div>
 
-      <button class="btn secondary w-100" type="submit">Entrar</button>
+      <button class="btn primary w-100" type="submit">Entrar</button>
     </form>
 
     <footer class="card-footer">

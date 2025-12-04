@@ -239,30 +239,60 @@
                       <div class="password-grid" [formGroup]="passwordForm">
                         <label class="password-field" [class.has-error]="passwordForm.get('currentPassword')?.invalid && passwordForm.get('currentPassword')?.touched">
                           <span>{{ 'profile.password.currentLabel' | translate }}</span>
-                          <input
-                            class="account-field interactive"
-                            type="password"
-                            formControlName="currentPassword"
-                            autocomplete="current-password"
-                          />
+                          <div class="password-input">
+                            <input
+                              class="account-field interactive"
+                              [type]="passwordVisibility.current ? 'text' : 'password'"
+                              formControlName="currentPassword"
+                              autocomplete="current-password"
+                            />
+                            <button
+                              type="button"
+                              class="visibility-toggle"
+                              (click)="togglePasswordVisibility('current')"
+                              [attr.aria-label]="passwordVisibility.current ? 'Ocultar senha' : 'Mostrar senha'"
+                            >
+                              <i class="fa-solid" [ngClass]="passwordVisibility.current ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
+                            </button>
+                          </div>
                         </label>
                         <label class="password-field" [class.has-error]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched">
                           <span>{{ 'profile.password.newLabel' | translate }}</span>
-                          <input
-                            class="account-field interactive"
-                            type="password"
-                            formControlName="newPassword"
-                            autocomplete="new-password"
-                          />
+                          <div class="password-input">
+                            <input
+                              class="account-field interactive"
+                              [type]="passwordVisibility.new ? 'text' : 'password'"
+                              formControlName="newPassword"
+                              autocomplete="new-password"
+                            />
+                            <button
+                              type="button"
+                              class="visibility-toggle"
+                              (click)="togglePasswordVisibility('new')"
+                              [attr.aria-label]="passwordVisibility.new ? 'Ocultar senha' : 'Mostrar senha'"
+                            >
+                              <i class="fa-solid" [ngClass]="passwordVisibility.new ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
+                            </button>
+                          </div>
                         </label>
                         <label class="password-field" [class.has-error]="passwordForm.get('confirmPassword')?.invalid && passwordForm.get('confirmPassword')?.touched">
                           <span>{{ 'profile.password.confirmLabel' | translate }}</span>
-                          <input
-                            class="account-field interactive"
-                            type="password"
-                            formControlName="confirmPassword"
-                            autocomplete="new-password"
-                          />
+                          <div class="password-input">
+                            <input
+                              class="account-field interactive"
+                              [type]="passwordVisibility.confirm ? 'text' : 'password'"
+                              formControlName="confirmPassword"
+                              autocomplete="new-password"
+                            />
+                            <button
+                              type="button"
+                              class="visibility-toggle"
+                              (click)="togglePasswordVisibility('confirm')"
+                              [attr.aria-label]="passwordVisibility.confirm ? 'Ocultar senha' : 'Mostrar senha'"
+                            >
+                              <i class="fa-solid" [ngClass]="passwordVisibility.confirm ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
+                            </button>
+                          </div>
                         </label>
                       </div>
                       <small class="helper">{{ 'profile.password.requirements' | translate }}</small>
@@ -273,7 +303,7 @@
                   </div>
                 </div>
 
-              </div>
+                              </div>
 
               <ng-container *ngIf="isEditingPassword">
                 <small class="error" *ngIf="passwordForm.hasError('passwordMismatch') && passwordForm.touched">
@@ -281,7 +311,7 @@
                 </small>
 
                 <div class="form-actions account-form">
-                  <button class="btn subtle" type="button" (click)="cancelPasswordEdit()" [disabled]="isSavingPassword">
+                  <button class="btn secondary" type="button" (click)="cancelPasswordEdit()" [disabled]="isSavingPassword">
                     {{ 'profile.form.cancel' | translate }}
                   </button>
                   <button class="btn primary" type="button" (click)="onPasswordSubmit()" [disabled]="passwordForm.invalid || isSavingPassword">

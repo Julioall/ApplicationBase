@@ -7,7 +7,7 @@ Base monolítica em camadas com autenticação JWT, CRUD de usuários, i18n (pt-
 ## 1. Visão Geral
 - **Propósito:** Boilerplate para apps web com autenticação, gestão de usuários e localização.
 - **Arquitetura:** Onion/Clean (Domain → Service → Infrastructure → Web/API → Client).
-- **Tecnologias:** ASP.NET Core 8, Angular 18, RavenDB, JWT, FluentValidation, ngx-translate, Bootstrap, Toastr.
+- **Tecnologias:** ASP.NET Core 8, Angular 18, RavenDB, JWT, FluentValidation, ngx-translate, Bootstrap.
 - **Funcionalidades:** Login/refresh de tokens, CRUD de usuários, validação com mensagens localizadas, erros em RFC 7807.
 
 ## 2. Mapa de Arquitetura (alto nível)

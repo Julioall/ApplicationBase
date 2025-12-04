@@ -24,6 +24,7 @@ namespace Application.Infrastructure
 
             services.TryAddScoped<IServiceRavenDB, ServiceRavenDB>();
             services.TryAddScoped<IUserRepository, UserRepository>();
+            services.TryAddScoped<ISettingsRepository, SettingsRepository>();
 
             return services;
         }

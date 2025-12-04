@@ -19,6 +19,7 @@ export class AuthComponent implements OnInit {
   loginForm!: FormGroup;
   loginSubmitted: boolean = false;
   activeTheme = this.themeService.getActiveTheme();
+  showPassword = false;
 
   constructor(
     private fb: FormBuilder,
@@ -40,8 +41,21 @@ export class AuthComponent implements OnInit {
     this.activeTheme = this.themeService.toggleTheme();
   }
 
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
   goToRegister(): void {
     this.router.navigate(['/register']);
+  }
+
+  onForgotPassword(event: Event): void {
+    event.preventDefault();
+    this.router.navigate(['/forgot-password'], {
+      queryParams: {
+        email: this.loginForm.get('email')?.value || undefined,
+      },
+    });
   }
 
   onLogin(): void {
@@ -57,6 +71,7 @@ export class AuthComponent implements OnInit {
           this.authService.saveToken(response.token);
           this.notificationService.showSuccess(this.translateService.instant('auth.loginSuccess'));
           this.loginForm?.reset();
+          this.showPassword = false;
           this.router.navigate(['/home']);
         }
       },

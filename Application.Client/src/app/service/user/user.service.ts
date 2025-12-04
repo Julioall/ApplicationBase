@@ -24,6 +24,22 @@ export interface ChangePasswordPayload {
   NewPassword: string;
 }
 
+export interface RecoveryCodeResponse {
+  expiresAt: string;
+  sentByEmail: boolean;
+}
+
+export interface VerifyRecoveryPayload {
+  code: string;
+  newPassword: string;
+  email?: string;
+}
+
+export interface ValidateRecoveryPayload {
+  code: string;
+  email?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -136,6 +152,25 @@ export class UserService {
 
   changePassword(payload: ChangePasswordPayload): Observable<any> {
     return this.http.put(`${this.apiUrl}/change-password`, payload, { headers: this.getAuthHeaders() })
+      .pipe(catchError(this.handleError));
+  }
+
+  generateRecoveryCode(sendEmail: boolean = true, email?: string): Observable<RecoveryCodeResponse> {
+    const body: any = { sendEmail };
+    if (email) {
+      body.email = email;
+    }
+    return this.http.post<RecoveryCodeResponse>(`${this.apiUrl}/recovery/code`, body, { headers: this.getAuthHeaders() })
+      .pipe(catchError(this.handleError));
+  }
+
+  verifyRecoveryCode(payload: ValidateRecoveryPayload): Observable<any> {
+    return this.http.post(`${this.apiUrl}/recovery/validate`, payload, { headers: this.getAuthHeaders() })
+      .pipe(catchError(this.handleError));
+  }
+
+  changePasswordWithCode(payload: VerifyRecoveryPayload): Observable<any> {
+    return this.http.post(`${this.apiUrl}/recovery/verify`, payload, { headers: this.getAuthHeaders() })
       .pipe(catchError(this.handleError));
   }
 

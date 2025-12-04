@@ -26,5 +26,11 @@ namespace Application.Service.Interface
         Task ChangePasswordAsync(string email, string currentPassword, string newPassword);
 
         Task<(byte[] Data, string ContentType)?> GetProfilePictureAsync(string userId);
+
+        Task<(string Code, DateTime ExpiresAt)> GenerateRecoveryCodeAsync(string email, bool sendEmail);
+
+        Task ValidateRecoveryCodeAsync(string email, string code);
+
+        Task ChangePasswordWithRecoveryCodeAsync(string email, string code, string newPassword);
     }
 }

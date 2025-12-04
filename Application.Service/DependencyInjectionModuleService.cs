@@ -10,6 +10,8 @@ namespace Application.Service
         {
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<ISettingsService, SettingsService>();
             return services;
         }
     }

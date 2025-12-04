@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -16,16 +16,16 @@
     <value>A data de nascimento deve ser uma data passada.</value>
   </data>
   <data name="DateOfBirthTooOld" xml:space="preserve">
-    <value>A data de nascimento não pode ser superior a 120 anos.</value>
+    <value>A data de nascimento nÃ£o pode ser superior a 120 anos.</value>
   </data>
   <data name="EmailAlreadyExists" xml:space="preserve">
-    <value>Este e-mail já existe na nossa base de dados.</value>
+    <value>Este e-mail jÃ¡ existe na nossa base de dados.</value>
   </data>
   <data name="EmailInvalid" xml:space="preserve">
-    <value>O email deve ser válido.</value>
+    <value>O email deve ser vÃ¡lido.</value>
   </data>
   <data name="EmailRequired" xml:space="preserve">
-    <value>O email é obrigatório.</value>
+    <value>O email Ã© obrigatÃ³rio.</value>
   </data>
   <data name="InternalErrorDetail" xml:space="preserve">
     <value>Ocorreu um erro inesperado.</value>
@@ -34,75 +34,104 @@
     <value>Erro interno</value>
   </data>
   <data name="InvalidLoginCredentials" xml:space="preserve">
-    <value>Credenciais de login inválidas.</value>
+    <value>Credenciais de login invÃ¡lidas.</value>
   </data>
   <data name="InvalidOperationTitle" xml:space="preserve">
-    <value>Operação inválida</value>
+    <value>OperaÃ§Ã£o invÃ¡lida</value>
   </data>
   <data name="InvalidRefreshToken" xml:space="preserve">
-    <value>Refresh token inválido.</value>
+    <value>Refresh token invÃ¡lido.</value>
   </data>
   <data name="InvalidRequestTitle" xml:space="preserve">
-    <value>Requisição inválida</value>
+    <value>RequisiÃ§Ã£o invÃ¡lida</value>
   </data>
   <data name="LoginInformationMissing" xml:space="preserve">
-    <value>Informações de login ausentes.</value>
+    <value>InformaÃ§Ãµes de login ausentes.</value>
   </data>
   <data name="NameMaxLength" xml:space="preserve">
-    <value>O nome não pode ter mais de 100 caracteres.</value>
+    <value>O nome nÃ£o pode ter mais de 100 caracteres.</value>
   </data>
   <data name="NameRequired" xml:space="preserve">
-    <value>O nome é obrigatório.</value>
+    <value>O nome Ã© obrigatÃ³rio.</value>
   </data>
   <data name="PasswordLowercase" xml:space="preserve">
-    <value>A senha deve conter pelo menos uma letra minúscula.</value>
+    <value>A senha deve conter pelo menos uma letra minÃºscula.</value>
   </data>
   <data name="PasswordMinLength" xml:space="preserve">
     <value>A senha deve ter pelo menos 8 caracteres.</value>
   </data>
   <data name="PasswordNumber" xml:space="preserve">
-    <value>A senha deve conter pelo menos um número.</value>
+    <value>A senha deve conter pelo menos um nÃºmero.</value>
   </data>
   <data name="PasswordRequired" xml:space="preserve">
-    <value>A senha é obrigatória.</value>
+    <value>A senha Ã© obrigatÃ³ria.</value>
+  </data>
+  <data name="ResetEmailSent" xml:space="preserve">
+    <value>E-mail de redefiniÃ§Ã£o de senha enviado.</value>
   </data>
   <data name="PasswordSpecial" xml:space="preserve">
     <value>A senha deve conter pelo menos um caractere especial (!@#$%^&amp;*()_+-=[]{};':"\|,.&lt;&gt;/?~`).</value>
   </data>
   <data name="PasswordUppercase" xml:space="preserve">
-    <value>A senha deve conter pelo menos uma letra maiúscula.</value>
+    <value>A senha deve conter pelo menos uma letra maiÃºscula.</value>
   </data>
   <data name="PermissionsInvalid" xml:space="preserve">
-    <value>Permissões inválidas.</value>
+    <value>PermissÃµes invÃ¡lidas.</value>
   </data>
   <data name="PermissionsRequired" xml:space="preserve">
-    <value>É necessário informar ao menos uma permissão.</value>
+    <value>Ã‰ necessÃ¡rio informar ao menos uma permissÃ£o.</value>
   </data>
   <data name="UnauthorizedDetail" xml:space="preserve">
-    <value>Credenciais inválidas ou ausentes.</value>
+    <value>Credenciais invÃ¡lidas ou ausentes.</value>
   </data>
   <data name="UnauthorizedTitle" xml:space="preserve">
-    <value>Não autorizado</value>
+    <value>NÃ£o autorizado</value>
   </data>
   <data name="UserAddedSuccessfully" xml:space="preserve">
-    <value>Usuário adicionado com sucesso.</value>
+    <value>UsuÃ¡rio adicionado com sucesso.</value>
   </data>
   <data name="UserCannotBeNullDetail" xml:space="preserve">
-    <value>Usuário não pode ser nulo.</value>
+    <value>UsuÃ¡rio nÃ£o pode ser nulo.</value>
   </data>
   <data name="UserNotFoundByEmail" xml:space="preserve">
-    <value>Usuário com email {0} não encontrado.</value>
+    <value>UsuÃ¡rio com email {0} nÃ£o encontrado.</value>
   </data>
   <data name="UserNotFoundById" xml:space="preserve">
-    <value>Usuário com ID {0} não encontrado.</value>
+    <value>UsuÃ¡rio com ID {0} nÃ£o encontrado.</value>
   </data>
   <data name="UserUpdatedSuccessfully" xml:space="preserve">
-    <value>Usuário atualizado com sucesso.</value>
+    <value>UsuÃ¡rio atualizado com sucesso.</value>
   </data>
   <data name="ValidationDetail" xml:space="preserve">
-    <value>Um ou mais campos estão inválidos.</value>
+    <value>Um ou mais campos estÃ£o invÃ¡lidos.</value>
   </data>
   <data name="ValidationTitle" xml:space="preserve">
-    <value>Erro de validação</value>
+    <value>Erro de validaÃ§Ã£o</value>
+  </data>
+  <data name="RecoveryCodeMissing" xml:space="preserve">
+    <value>Gere um novo codigo de recuperacao antes de continuar.</value>
+  </data>
+  <data name="RecoveryCodeExpired" xml:space="preserve">
+    <value>O codigo expirou. Gere um novo codigo para tentar novamente.</value>
+  </data>
+  <data name="RecoveryCodeTooManyAttempts" xml:space="preserve">
+    <value>Limite de tentativas atingido. Gere um novo codigo.</value>
+  </data>
+  <data name="RecoveryCodeInvalid" xml:space="preserve">
+    <value>Codigo invalido. Verifique e tente novamente.</value>
+  </data>
+  <data name="RecoveryCodeValidated" xml:space="preserve">
+    <value>Codigo validado com sucesso.</value>
+  </data>
+  <data name="UserPasswordUpdatedSuccessfully" xml:space="preserve">
+    <value>Senha atualizada com sucesso.</value>
   </data>
 </root>
+
+
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -66,6 +66,9 @@
   <data name="PasswordRequired" xml:space="preserve">
     <value>Password is required.</value>
   </data>
+  <data name="ResetEmailSent" xml:space="preserve">
+    <value>Password reset email sent.</value>
+  </data>
   <data name="PasswordSpecial" xml:space="preserve">
     <value>Password must contain at least one special character (!@#$%^&amp;*()_+-=[]{};':"\|,.&lt;&gt;/?~`).</value>
   </data>
@@ -105,4 +108,30 @@
   <data name="ValidationTitle" xml:space="preserve">
     <value>Validation error</value>
   </data>
+  <data name="RecoveryCodeMissing" xml:space="preserve">
+    <value>Generate a new recovery code before continuing.</value>
+  </data>
+  <data name="RecoveryCodeExpired" xml:space="preserve">
+    <value>The code has expired. Generate a new code to try again.</value>
+  </data>
+  <data name="RecoveryCodeTooManyAttempts" xml:space="preserve">
+    <value>Attempt limit reached. Generate a new code.</value>
+  </data>
+  <data name="RecoveryCodeInvalid" xml:space="preserve">
+    <value>Invalid code. Check and try again.</value>
+  </data>
+  <data name="RecoveryCodeValidated" xml:space="preserve">
+    <value>Code validated successfully.</value>
+  </data>
+  <data name="UserPasswordUpdatedSuccessfully" xml:space="preserve">
+    <value>Password updated successfully.</value>
+  </data>
 </root>
+
+
+
+
+
+
+
+

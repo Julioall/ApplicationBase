@@ -78,6 +78,7 @@
 
 .avatar .initials {
   letter-spacing: 0.05em;
+  transition: opacity var(--transition-fast);
 }
 
 .avatar-trigger {
@@ -94,7 +95,9 @@
   background: rgba(var(--shadow-rgb), 0.25);
   border-radius: var(--radius-full);
   cursor: pointer;
-  transition: background var(--transition-fast);
+  transition: background var(--transition-fast), opacity var(--transition-fast);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .avatar-trigger i {
@@ -103,6 +106,13 @@
 
 .avatar-shell:hover .avatar-trigger {
   background: var(--overlay-strong);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.avatar-shell:hover .initials,
+.avatar-shell:focus-within .initials {
+  opacity: 0;
 }
 
 .avatar-menu {
@@ -176,37 +186,6 @@
   margin: 0;
   font-size: var(--font-size-lg);
   color: var(--text-primary);
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  border-radius: var(--radius-full);
-  padding: var(--space-2) var(--space-4);
-  font-weight: var(--font-weight-semibold);
-  border: 1px solid var(--border-soft);
-  background: var(--surface-alt);
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.btn.subtle {
-  background: var(--surface);
-}
-
-.btn.primary {
-  background: linear-gradient(135deg, var(--accent-strong), var(--accent));
-  color: var(--text-inverse);
-  border-color: transparent;
-  box-shadow: var(--elevation-2);
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .about-list {
@@ -337,6 +316,58 @@
 .password-field.has-error input {
   border-color: var(--danger);
   box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.recovery-row .helper {
+  margin: 0 0 var(--space-2);
+}
+
+.recovery-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.recovery-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--text-subtle);
+}
+
+.recovery-checkbox input {
+  width: 16px;
+  height: 16px;
+}
+
+.code-display {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-2) 0;
+}
+
+.code-pill {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  border: 1px dashed var(--border-soft);
+  background: var(--surface);
+  letter-spacing: 0.18em;
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+}
+
+.recovery-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.recovery-grid {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
 .helper {
