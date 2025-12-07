@@ -1,18 +1,25 @@
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
 using Application.Api;
 using Application.Api.Filters;
+using Application.Api.Health;
 using Application.Api.Middlewares;
 using Application.Domain;
+using Application.Domain.Localization;
 using Application.Domain.Model;
 using Application.Infrastructure;
 using Application.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
-using System.Globalization;
-using System.Text;
-using Application.Domain.Localization;
+using Microsoft.IdentityModel.Tokens;
 
 public class Program
 {
@@ -124,6 +131,9 @@ public class Program
             }
         });
 
+        builder.Services.AddHealthChecks()
+            .AddCheck<StartupConfigurationHealthCheck>("startup_configuration", tags: new[] { "startup" });
+
         // Register dependency injection modules
         builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
         DependencyInjectionModuleDomain.AddDomainDependencies(builder.Services);
@@ -132,6 +142,8 @@ public class Program
 
 
         var app = builder.Build();
+
+        RunStartupValidation(app.Services);
 
         var localizationOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value;
         app.UseRequestLocalization(localizationOptions);
@@ -159,9 +171,51 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
 
+        app.MapHealthChecks("/health/startup", new HealthCheckOptions
+        {
+            Predicate = registration => registration.Tags.Contains("startup"),
+            ResponseWriter = async (context, report) =>
+            {
+                context.Response.ContentType = "application/json";
+                var payload = new
+                {
+                    status = report.Status.ToString(),
+                    checks = report.Entries.Select(entry => new
+                    {
+                        name = entry.Key,
+                        status = entry.Value.Status.ToString(),
+                        description = entry.Value.Description
+                    })
+                };
+
+                await context.Response.WriteAsync(JsonSerializer.Serialize(payload));
+            }
+        });
+
         app.MapControllers();
         app.MapFallbackToFile("/index.html");
 
         app.Run();
+    }
+
+    private static void RunStartupValidation(IServiceProvider services)
+    {
+        using var scope = services.CreateScope();
+        var healthService = scope.ServiceProvider.GetRequiredService<HealthCheckService>();
+        var report = healthService.CheckHealthAsync(registration => registration.Tags.Contains("startup"))
+            .GetAwaiter().GetResult();
+
+        if (report.Status != HealthStatus.Healthy)
+        {
+            var details = string.Join("; ", report.Entries.Select(entry =>
+            {
+                var description = string.IsNullOrWhiteSpace(entry.Value.Description)
+                    ? entry.Value.Status.ToString()
+                    : entry.Value.Description;
+                return $"{entry.Key}: {description}";
+            }));
+
+            throw new InvalidOperationException(SharedResourceProvider.GetString("StartupValidationFailed", details));
+        }
     }
 }

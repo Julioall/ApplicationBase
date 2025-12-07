@@ -68,6 +68,15 @@
   <data name="EnvVarNotDefined" xml:space="preserve">
     <value>Variável de ambiente [{0}] não definida.</value>
   </data>
+  <data name="InvalidRavenDbUrls" xml:space="preserve">
+    <value>URLs do RavenDB inválidas: {0}.</value>
+  </data>
+  <data name="StartupValidationFailed" xml:space="preserve">
+    <value>Validação de inicialização falhou: {0}.</value>
+  </data>
+  <data name="StartupValidationPassed" xml:space="preserve">
+    <value>Configuração de inicialização válida.</value>
+  </data>
   <data name="InternalErrorDetail" xml:space="preserve">
     <value>Ocorreu um erro inesperado.</value>
   </data>

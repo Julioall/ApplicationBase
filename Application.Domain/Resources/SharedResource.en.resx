@@ -68,6 +68,15 @@
   <data name="EnvVarNotDefined" xml:space="preserve">
     <value>Environment variable [{0}] is not defined.</value>
   </data>
+  <data name="InvalidRavenDbUrls" xml:space="preserve">
+    <value>Invalid RavenDB URLs: {0}.</value>
+  </data>
+  <data name="StartupValidationFailed" xml:space="preserve">
+    <value>Startup validation failed: {0}.</value>
+  </data>
+  <data name="StartupValidationPassed" xml:space="preserve">
+    <value>Startup configuration is valid.</value>
+  </data>
   <data name="InternalErrorDetail" xml:space="preserve">
     <value>Something went wrong. Please try again.</value>
   </data>
