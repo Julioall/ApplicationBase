@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { User } from '../../model/User';
 import { ALL_PERMISSIONS, DEFAULT_USER_PERMISSIONS } from '../../model/permissions';
 import { NotificationService } from '../../service/notification/notification.service';
@@ -39,6 +40,7 @@ export class AdminUserDetailComponent implements OnInit {
     private readonly router: Router,
     private readonly userService: UserService,
     private readonly notificationService: NotificationService,
+    private readonly translate: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -56,11 +58,15 @@ export class AdminUserDetailComponent implements OnInit {
     }
     const currentPermissions = this.getUserPermissions();
     if (currentPermissions.includes(this.selectedPermission)) {
-      this.notificationService.showWarning('Esta permissão já está atribuída.');
+      this.notificationService.showWarning(this.translate.instant('adminUserDetail.messages.permissionAlready'));
       return;
     }
     const updatedPermissions = [...currentPermissions, this.selectedPermission];
-    this.persistPermissions(updatedPermissions, `Permissão ${this.selectedPermission} adicionada.`);
+    this.persistPermissions(
+      updatedPermissions,
+      'adminUserDetail.messages.permissionAdded',
+      { permission: this.selectedPermission },
+    );
     this.selectedPermission = '';
   }
 
@@ -69,11 +75,15 @@ export class AdminUserDetailComponent implements OnInit {
       return;
     }
     const updatedPermissions = this.getUserPermissions().filter((p) => p !== permission);
-    this.persistPermissions(updatedPermissions, `Permissão ${permission} removida.`);
+    this.persistPermissions(
+      updatedPermissions,
+      'adminUserDetail.messages.permissionRemoved',
+      { permission },
+    );
   }
 
   resetToDefault(): void {
-    this.persistPermissions([...DEFAULT_USER_PERMISSIONS], 'Permissões padrão restauradas.');
+    this.persistPermissions([...DEFAULT_USER_PERMISSIONS], 'adminUserDetail.messages.resetDefault');
   }
 
   goBack(): void {
@@ -81,13 +91,13 @@ export class AdminUserDetailComponent implements OnInit {
   }
 
   showResetPassword(): void {
-    this.notificationService.showWarning('Reset de senha deverá ser integrado ao backend.');
+    this.notificationService.showWarning(this.translate.instant('adminUserDetail.messages.resetPassword'));
   }
 
   private loadUser(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
-      this.notificationService.showError('Usuário não encontrado.');
+      this.notificationService.showError(this.translate.instant('adminUserDetail.messages.notFound'));
       return;
     }
     this.loading = true;
@@ -98,7 +108,9 @@ export class AdminUserDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error(err);
-        this.notificationService.showError('Não foi possível carregar o usuário.');
+        const fallback = this.translate.instant('adminUserDetail.messages.loadError');
+        const detail = err?.error?.detail || err?.error?.title || fallback;
+        this.notificationService.showError(detail);
         this.loading = false;
       },
     });
@@ -115,7 +127,11 @@ export class AdminUserDetailComponent implements OnInit {
     });
   }
 
-  private persistPermissions(permissions: string[], successMessage: string): void {
+  private persistPermissions(
+    permissions: string[],
+    successKey: string,
+    successParams?: Record<string, unknown>,
+  ): void {
     if (!this.user?.Id) {
       return;
     }
@@ -127,12 +143,13 @@ export class AdminUserDetailComponent implements OnInit {
         }
         this.user.Account = this.user.Account || {};
         this.user.Account.Permissions = permissions;
-        this.notificationService.showSuccess(successMessage);
+        this.notificationService.showSuccess(this.translate.instant(successKey, successParams));
         this.loading = false;
       },
       error: (err) => {
         console.error(err);
-        const message = err?.error?.detail || 'Não foi possível atualizar as permissões.';
+        const fallback = this.translate.instant('adminUserDetail.messages.updateError');
+        const message = err?.error?.detail || err?.error?.title || fallback;
         this.notificationService.showError(message);
         this.loading = false;
       },

@@ -1,25 +1,36 @@
 <div class="auth-wrapper">
   <div class="card">
     <header class="card-head">
-      <h1>Login</h1>
-      <p>Bem vindo de volta. Continue construindo seus apps com Angular + .NET.</p>
+      <h1>{{ 'auth.login.title' | translate }}</h1>
+      <p>{{ 'auth.login.subtitle' | translate }}</p>
     </header>
 
     <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
       <label class="field">
-        <span>Email</span>
-        <input type="email" placeholder="exemplo@empresa.com" formControlName="email" />
-        <small class="error" *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.touched || loginSubmitted)">
-          {{ loginForm.get('email')?.hasError('required') ? 'Informe seu email.' : 'Formato de email invalido.' }}
+        <span>{{ 'auth.login.emailLabel' | translate }}</span>
+        <input
+          type="email"
+          [placeholder]="'auth.login.emailPlaceholder' | translate"
+          formControlName="email"
+        />
+        <small
+          class="error"
+          *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.touched || loginSubmitted)"
+        >
+          {{
+            loginForm.get('email')?.hasError('required')
+              ? ('auth.login.emailRequired' | translate)
+              : ('auth.login.emailInvalid' | translate)
+          }}
         </small>
       </label>
 
       <label class="field">
-        <span>Senha</span>
+        <span>{{ 'auth.login.passwordLabel' | translate }}</span>
         <div class="password-input">
           <input
             [type]="showPassword ? 'text' : 'password'"
-            placeholder="********"
+            [placeholder]="'auth.login.passwordPlaceholder' | translate"
             formControlName="password"
             autocomplete="current-password"
           />
@@ -27,38 +38,49 @@
             type="button"
             class="visibility-toggle"
             (click)="togglePasswordVisibility()"
-            [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+            [attr.aria-label]="
+              showPassword ? ('auth.login.hidePassword' | translate) : ('auth.login.showPassword' | translate)
+            "
           >
             <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
           </button>
         </div>
-        <small class="error" *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.touched || loginSubmitted)">
-          {{ loginForm.get('password')?.hasError('required') ? 'Informe sua senha.' : 'A senha precisa de no minimo 6 caracteres.' }}
+        <small
+          class="error"
+          *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.touched || loginSubmitted)"
+        >
+          {{
+            loginForm.get('password')?.hasError('required')
+              ? ('auth.login.passwordRequired' | translate)
+              : ('auth.login.passwordMin' | translate)
+          }}
         </small>
       </label>
 
       <div class="support">
         <label class="remember">
           <input type="checkbox" />
-          <span>Lembrar de mim</span>
+          <span>{{ 'auth.login.remember' | translate }}</span>
         </label>
         <button class="link-btn" type="button" (click)="onForgotPassword($event)">
-          Esqueceu a senha?
+          {{ 'auth.login.forgot' | translate }}
         </button>
       </div>
 
-      <button class="btn primary w-100" type="submit">Entrar</button>
+      <button class="btn primary w-100" type="submit">{{ 'auth.login.submit' | translate }}</button>
     </form>
 
     <footer class="card-footer">
-      <span>Nao tem conta?</span>
-      <button type="button" class="link-btn" (click)="goToRegister()">Criar conta</button>
+      <span>{{ 'auth.login.noAccount' | translate }}</span>
+      <button type="button" class="link-btn" (click)="goToRegister()">
+        {{ 'auth.login.create' | translate }}
+      </button>
     </footer>
   </div>
 
   <button type="button" class="theme-fab" (click)="toggleTheme()">
     <span class="toggle-icon" [class.dark]="activeTheme === 'dark'">
-      {{ activeTheme === 'dark' ? '☀' : '☾' }}
+      {{ activeTheme === 'dark' ? '🌙' : '☀️' }}
     </span>
   </button>
 </div>

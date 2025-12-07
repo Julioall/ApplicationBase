@@ -1,17 +1,17 @@
 <section class="admin-panel" *ngIf="!loading; else loadingState">
   <header class="header">
     <div>
-      <h2>Usuários</h2>
-      <p class="subtitle">Visualize, pesquise e abra o painel individual para gerenciar permissões.</p>
+      <h2>{{ 'adminUsers.title' | translate }}</h2>
+      <p class="subtitle">{{ 'adminUsers.subtitle' | translate }}</p>
     </div>
   </header>
 
   <div class="list-shell" *ngIf="users.length; else emptyState">
     <div class="list-header">
-      <span class="col name">Usuário</span>
-      <span class="col email">E-mail</span>
-      <span class="col roles">Permissões</span>
-      <span class="col actions">Ações</span>
+      <span class="col name">{{ 'adminUsers.columns.user' | translate }}</span>
+      <span class="col email">{{ 'adminUsers.columns.email' | translate }}</span>
+      <span class="col roles">{{ 'adminUsers.columns.permissions' | translate }}</span>
+      <span class="col actions">{{ 'adminUsers.columns.actions' | translate }}</span>
     </div>
 
     <div class="list-body">
@@ -20,21 +20,23 @@
         *ngFor="let user of paginatedUsers; trackBy: trackByUserId"
         type="button"
         (click)="goToUser(user)"
-        aria-label="Abrir gestão de permissões do usuário"
+        [attr.aria-label]="'adminUsers.actions.openUser' | translate"
       >
         <span class="col name">
           <span class="avatar-dot">{{ (user.Profile?.Name || user.Account?.Email || '?') | slice:0:1 }}</span>
           <span class="text">
-            <strong>{{ user.Profile?.Name || 'Usuário' }}</strong>
-            <small class="muted">{{ user.Account?.Email }}</small>
+            <strong>{{ user.Profile?.Name || ('adminUsers.fallbackName' | translate) }}</strong>
+            <small class="muted">{{ user.Account?.Email || ('adminUsers.fallbackEmail' | translate) }}</small>
           </span>
         </span>
-        <span class="col email muted">{{ user.Account?.Email }}</span>
+        <span class="col email muted">{{ user.Account?.Email || ('adminUsers.fallbackEmail' | translate) }}</span>
         <span class="col roles">
-          <span class="pill small">{{ (user.Account?.Permissions?.length || 0) + ' permissões' }}</span>
+          <span class="pill small">
+            {{ 'adminUsers.permissionsCount' | translate:{ count: (user.Account?.Permissions?.length || 0) } }}
+          </span>
         </span>
         <span class="col actions">
-          <span class="link">Gerenciar</span>
+          <span class="link">{{ 'adminUsers.actions.manage' | translate }}</span>
           <i class="fa-solid fa-chevron-right"></i>
         </span>
       </button>
@@ -44,7 +46,9 @@
       <button type="button" class="ghost" [disabled]="page === 1" (click)="changePage(-1)">
         <i class="fa-solid fa-chevron-left"></i>
       </button>
-      <span>Página {{ page }} de {{ totalPages }}</span>
+      <span>
+        {{ 'adminUsers.pagination' | translate:{ page: page, totalPages: totalPages } }}
+      </span>
       <button type="button" class="ghost" [disabled]="page === totalPages" (click)="changePage(1)">
         <i class="fa-solid fa-chevron-right"></i>
       </button>
@@ -54,12 +58,12 @@
 
 <ng-template #emptyState>
   <div class="empty">
-    <p>Nenhum usuário encontrado para gerenciar.</p>
+    <p>{{ 'adminUsers.empty' | translate }}</p>
   </div>
 </ng-template>
 
 <ng-template #loadingState>
   <div class="empty">
-    <p>Carregando usuários...</p>
+    <p>{{ 'adminUsers.loading' | translate }}</p>
   </div>
 </ng-template>

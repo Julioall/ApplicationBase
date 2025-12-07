@@ -1,4 +1,4 @@
-﻿{
+{
   "auth": {
     "loginSuccess": "Login successful!",
     "loginError": "Login error. Please check your credentials.",
@@ -41,6 +41,48 @@
     "password": {
       "new": "New password",
       "confirm": "Confirm password"
+    },
+    "login": {
+      "title": "Login",
+      "subtitle": "Welcome back. Keep building your apps with Angular + .NET.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "example@company.com",
+      "emailRequired": "Enter your email.",
+      "emailInvalid": "Enter a valid email.",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "********",
+      "passwordRequired": "Enter your password.",
+      "passwordMin": "Password must be at least 6 characters.",
+      "remember": "Remember me",
+      "forgot": "Forgot your password?",
+      "submit": "Sign in",
+      "noAccount": "Don't have an account?",
+      "create": "Create account",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "Fill in your info to start new projects with Angular + .NET.",
+      "fullNameLabel": "Full name",
+      "fullNamePlaceholder": "Type your name",
+      "fullNameRequired": "Full name is required.",
+      "fullNameMin": "Enter at least 3 characters.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@email.com",
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Enter a valid email.",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Minimum 8 characters",
+      "passwordRequired": "Password is required.",
+      "passwordMin": "Use at least 8 characters.",
+      "confirmPasswordLabel": "Confirm password",
+      "confirmPasswordPlaceholder": "Repeat the password",
+      "confirmPasswordMismatch": "Passwords must match.",
+      "updatesLabel": "I want to receive updates about the template.",
+      "submit": "Register",
+      "footerText": "Already have an account?",
+      "footerLink": "Log in"
     }
   },
   "home": {
@@ -257,6 +299,99 @@
       "smtpPasswordRequiredTest": "Enter the SMTP password to run the test.",
       "testSuccess": "Test email sent (check your inbox).",
       "testError": "Failed to send test email."
+    }
+  },
+  "adminEmailSettings": {
+    "title": "Email settings",
+    "subtitle": "Manage default sender, SMTP infrastructure, and transactional alerts.",
+    "smtp": {
+      "eyebrow": "Infrastructure",
+      "title": "SMTP server",
+      "description": "Configure host, port, TLS, and sender account credentials.",
+      "comingSoon": "Coming soon",
+      "placeholderTitle": "Add email host",
+      "placeholderDescription": "Define provider, default sender, and authentication."
+    },
+    "notifications": {
+      "eyebrow": "Notifications",
+      "title": "Transactional",
+      "description": "Password reset, onboarding, and operational alert templates.",
+      "bullets": {
+        "reliable": "Reliable delivery of welcome, verification, and reset emails.",
+        "integrations": "Integrations with SendGrid, Amazon SES, or custom SMTP.",
+        "monitoring": "Delivery rate and bounce monitoring."
+      }
+    }
+  },
+  "adminUsers": {
+    "title": "Users",
+    "subtitle": "Browse, search, and open the individual panel to manage permissions.",
+    "columns": {
+      "user": "User",
+      "email": "Email",
+      "permissions": "Permissions",
+      "actions": "Actions"
+    },
+    "actions": {
+      "manage": "Manage",
+      "openUser": "Open user permission management"
+    },
+    "pagination": "Page {{page}} of {{totalPages}}",
+    "empty": "No users found to manage.",
+    "loading": "Loading users...",
+    "fallbackName": "User",
+    "fallbackEmail": "No email",
+    "permissionsCount": "{{count}} permissions",
+    "messages": {
+      "missingId": "User without identifier.",
+      "loadError": "Could not load users."
+    }
+  },
+  "adminUserDetail": {
+    "breadcrumb": "Admin > User",
+    "fallbackName": "User",
+    "fallbackEmail": "No email",
+    "fallbackId": "Account without ID",
+    "loading": "Loading user...",
+    "actions": {
+      "back": "Back",
+      "resetPassword": "Reset password"
+    },
+    "access": {
+      "eyebrow": "Permissions",
+      "title": "Access control",
+      "description": "Add or remove specific permissions for this user.",
+      "removePermission": "Remove permission",
+      "none": "No permission assigned.",
+      "newPermission": "New permission",
+      "select": "Select",
+      "restoreDefault": "Restore default",
+      "add": "Add",
+      "total": "Permissions",
+      "idLabel": "ID"
+    },
+    "summary": {
+      "eyebrow": "Account",
+      "title": "Summary",
+      "description": "Basic user data for quick review.",
+      "avatarAlt": "User photo",
+      "idMissing": "Account without ID"
+    },
+    "meta": {
+      "name": "Name",
+      "email": "Email",
+      "permissions": "Permissions",
+      "notProvided": "Not provided"
+    },
+    "messages": {
+      "permissionAlready": "This permission is already assigned.",
+      "permissionAdded": "Permission {{permission}} added.",
+      "permissionRemoved": "Permission {{permission}} removed.",
+      "resetDefault": "Default permissions restored.",
+      "resetPassword": "Password reset must be integrated with the backend.",
+      "notFound": "User not found.",
+      "loadError": "Could not load user.",
+      "updateError": "Could not update permissions."
     }
   },
   "admin": {

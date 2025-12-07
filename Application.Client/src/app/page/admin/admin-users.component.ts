@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { User } from '../../model/User';
 import { NotificationService } from '../../service/notification/notification.service';
 import { UserService } from '../../service/user/user.service';
@@ -19,6 +20,7 @@ export class AdminUsersComponent implements OnInit {
     private userService: UserService,
     private notificationService: NotificationService,
     private router: Router,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -44,7 +46,7 @@ export class AdminUsersComponent implements OnInit {
 
   goToUser(user: User): void {
     if (!user.Id) {
-      this.notificationService.showError('Usuário sem identificador.');
+      this.notificationService.showError(this.translate.instant('adminUsers.messages.missingId'));
       return;
     }
     this.router.navigate(['/admin/users', user.Id]);
@@ -61,7 +63,9 @@ export class AdminUsersComponent implements OnInit {
       error: (err) => {
         console.error(err);
         this.loading = false;
-        this.notificationService.showError('Não foi possível carregar os usuários.');
+        const fallback = this.translate.instant('adminUsers.messages.loadError');
+        const detail = err?.error?.detail || err?.error?.title || fallback;
+        this.notificationService.showError(detail);
       },
     });
   }

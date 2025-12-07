@@ -1,4 +1,4 @@
-﻿{
+{
   "auth": {
     "loginSuccess": "Login realizado com sucesso!",
     "loginError": "Erro no login. Verifique suas credenciais.",
@@ -41,6 +41,48 @@
     "password": {
       "new": "Nova senha",
       "confirm": "Confirmar senha"
+    },
+    "login": {
+      "title": "Login",
+      "subtitle": "Bem-vindo de volta. Continue construindo seus apps com Angular + .NET.",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "exemplo@empresa.com",
+      "emailRequired": "Informe seu e-mail.",
+      "emailInvalid": "Formato de e-mail inv?lido.",
+      "passwordLabel": "Senha",
+      "passwordPlaceholder": "********",
+      "passwordRequired": "Informe sua senha.",
+      "passwordMin": "A senha precisa de pelo menos 6 caracteres.",
+      "remember": "Lembrar de mim",
+      "forgot": "Esqueceu a senha?",
+      "submit": "Entrar",
+      "noAccount": "N?o tem conta?",
+      "create": "Criar conta",
+      "showPassword": "Mostrar senha",
+      "hidePassword": "Ocultar senha"
+    },
+    "register": {
+      "title": "Criar conta",
+      "subtitle": "Preencha os dados para iniciar novos projetos com Angular + .NET.",
+      "fullNameLabel": "Nome completo",
+      "fullNamePlaceholder": "Digite seu nome",
+      "fullNameRequired": "Nome ? obrigat?rio.",
+      "fullNameMin": "Informe ao menos 3 caracteres.",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "seu@email.com",
+      "emailRequired": "E-mail ? obrigat?rio.",
+      "emailInvalid": "Formato de e-mail inv?lido.",
+      "passwordLabel": "Senha",
+      "passwordPlaceholder": "M?nimo 8 caracteres",
+      "passwordRequired": "Senha ? obrigat?ria.",
+      "passwordMin": "Use no m?nimo 8 caracteres.",
+      "confirmPasswordLabel": "Confirmar senha",
+      "confirmPasswordPlaceholder": "Repita a senha",
+      "confirmPasswordMismatch": "As senhas precisam ser iguais.",
+      "updatesLabel": "Quero receber novidades sobre evolu??es do template.",
+      "submit": "Registrar",
+      "footerText": "J? possui uma conta?",
+      "footerLink": "Fazer login"
     }
   },
   "home": {
@@ -257,6 +299,99 @@
       "smtpPasswordRequiredTest": "Informe a senha do SMTP para testar.",
       "testSuccess": "E-mail de teste enviado (verifique a caixa de entrada).",
       "testError": "Falha ao enviar e-mail de teste."
+    }
+  },
+  "adminEmailSettings": {
+    "title": "Configura??es de e-mail",
+    "subtitle": "Gerencie remetente padr?o, infraestrutura SMTP e alertas transacionais.",
+    "smtp": {
+      "eyebrow": "Infraestrutura",
+      "title": "Servidor SMTP",
+      "description": "Configure host, porta, TLS e credenciais da conta de envio.",
+      "comingSoon": "Em breve",
+      "placeholderTitle": "Adicionar host de e-mail",
+      "placeholderDescription": "Defina provedor, remetente padr?o e autentica??o."
+    },
+    "notifications": {
+      "eyebrow": "Notifica??es",
+      "title": "Transacionais",
+      "description": "Templates de reset de senha, onboard e alertas operacionais.",
+      "bullets": {
+        "reliable": "Disparos confi?veis de boas-vindas, verifica??o e redefini??o.",
+        "integrations": "Integra??es com SendGrid, Amazon SES ou SMTP customizado.",
+        "monitoring": "Monitoramento de taxa de entrega e rejei??o."
+      }
+    }
+  },
+  "adminUsers": {
+    "title": "Usu?rios",
+    "subtitle": "Visualize, pesquise e abra o painel individual para gerenciar permiss?es.",
+    "columns": {
+      "user": "Usu?rio",
+      "email": "E-mail",
+      "permissions": "Permiss?es",
+      "actions": "A??es"
+    },
+    "actions": {
+      "manage": "Gerenciar",
+      "openUser": "Abrir gest?o de permiss?es do usu?rio"
+    },
+    "pagination": "P?gina {{page}} de {{totalPages}}",
+    "empty": "Nenhum usu?rio encontrado para gerenciar.",
+    "loading": "Carregando usu?rios...",
+    "fallbackName": "Usu?rio",
+    "fallbackEmail": "Sem e-mail",
+    "permissionsCount": "{{count}} permiss?es",
+    "messages": {
+      "missingId": "Usu?rio sem identificador.",
+      "loadError": "N?o foi poss?vel carregar os usu?rios."
+    }
+  },
+  "adminUserDetail": {
+    "breadcrumb": "Admin > Usu?rio",
+    "fallbackName": "Usu?rio",
+    "fallbackEmail": "Sem e-mail",
+    "fallbackId": "Conta sem ID",
+    "loading": "Carregando usu?rio...",
+    "actions": {
+      "back": "Voltar",
+      "resetPassword": "Resetar senha"
+    },
+    "access": {
+      "eyebrow": "Permiss?es",
+      "title": "Controle de acesso",
+      "description": "Adicione ou remova permiss?es espec?ficas para este usu?rio.",
+      "removePermission": "Remover permiss?o",
+      "none": "Nenhuma permiss?o atribu?da.",
+      "newPermission": "Nova permiss?o",
+      "select": "Selecione",
+      "restoreDefault": "Restaurar padr?o",
+      "add": "Adicionar",
+      "total": "Permiss?es",
+      "idLabel": "ID"
+    },
+    "summary": {
+      "eyebrow": "Conta",
+      "title": "Resumo",
+      "description": "Dados b?sicos do usu?rio para confer?ncia r?pida.",
+      "avatarAlt": "Foto do usu?rio",
+      "idMissing": "Conta sem ID"
+    },
+    "meta": {
+      "name": "Nome",
+      "email": "E-mail",
+      "permissions": "Permiss?es",
+      "notProvided": "N?o informado"
+    },
+    "messages": {
+      "permissionAlready": "Esta permiss?o j? est? atribu?da.",
+      "permissionAdded": "Permiss?o {{permission}} adicionada.",
+      "permissionRemoved": "Permiss?o {{permission}} removida.",
+      "resetDefault": "Permiss?es padr?o restauradas.",
+      "resetPassword": "Reset de senha deve ser integrado ao backend.",
+      "notFound": "Usu?rio n?o encontrado.",
+      "loadError": "N?o foi poss?vel carregar o usu?rio.",
+      "updateError": "N?o foi poss?vel atualizar as permiss?es."
     }
   },
   "admin": {

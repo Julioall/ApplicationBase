@@ -1,8 +1,8 @@
 <section class="admin-page">
   <header class="page-header">
     <div>
-      <h2>Configurações de e-mail</h2>
-      <p class="subtitle">Gerencie remetente padrão, infraestrutura SMTP e alertas transacionais.</p>
+      <h2>{{ 'adminEmailSettings.title' | translate }}</h2>
+      <p class="subtitle">{{ 'adminEmailSettings.subtitle' | translate }}</p>
     </div>
   </header>
 
@@ -10,17 +10,17 @@
     <article class="card">
       <div class="card-head">
         <div>
-          <p class="eyebrow">Infraestrutura</p>
-          <h3>Servidor SMTP</h3>
-          <p class="muted">Configure host, porta, TLS e credenciais da conta de envio.</p>
+          <p class="eyebrow">{{ 'adminEmailSettings.smtp.eyebrow' | translate }}</p>
+          <h3>{{ 'adminEmailSettings.smtp.title' | translate }}</h3>
+          <p class="muted">{{ 'adminEmailSettings.smtp.description' | translate }}</p>
         </div>
-        <span class="pill">Em breve</span>
+        <span class="pill">{{ 'adminEmailSettings.smtp.comingSoon' | translate }}</span>
       </div>
       <div class="placeholder">
         <i class="fa-regular fa-circle-dot"></i>
         <div>
-          <strong>Adicionar host de e-mail</strong>
-          <p>Defina provedor, remetente padrão e autenticação.</p>
+          <strong>{{ 'adminEmailSettings.smtp.placeholderTitle' | translate }}</strong>
+          <p>{{ 'adminEmailSettings.smtp.placeholderDescription' | translate }}</p>
         </div>
       </div>
     </article>
@@ -28,23 +28,23 @@
     <article class="card">
       <div class="card-head">
         <div>
-          <p class="eyebrow">Notificações</p>
-          <h3>Transacionais</h3>
-          <p class="muted">Templates de reset de senha, onboard e alertas operacionais.</p>
+          <p class="eyebrow">{{ 'adminEmailSettings.notifications.eyebrow' | translate }}</p>
+          <h3>{{ 'adminEmailSettings.notifications.title' | translate }}</h3>
+          <p class="muted">{{ 'adminEmailSettings.notifications.description' | translate }}</p>
         </div>
       </div>
       <ul class="summary">
         <li>
           <i class="fa-solid fa-envelope-circle-check"></i>
-          Disparos confiáveis de boas-vindas, verificação e redefinição.
+          {{ 'adminEmailSettings.notifications.bullets.reliable' | translate }}
         </li>
         <li>
           <i class="fa-solid fa-plug-circle-bolt"></i>
-          Integrações com SendGrid, Amazon SES ou SMTP customizado.
+          {{ 'adminEmailSettings.notifications.bullets.integrations' | translate }}
         </li>
         <li>
           <i class="fa-solid fa-chart-line"></i>
-          Monitoramento de taxa de entrega e rejeição.
+          {{ 'adminEmailSettings.notifications.bullets.monitoring' | translate }}
         </li>
       </ul>
     </article>

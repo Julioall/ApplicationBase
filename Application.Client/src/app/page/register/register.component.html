@@ -1,34 +1,56 @@
 <div class="auth-wrapper">
   <div class="card">
     <header class="card-head">
-      <h1>Criar conta</h1>
-      <p>Preencha os dados para iniciar novos projetos com Angular + .NET.</p>
+      <h1>{{ 'auth.register.title' | translate }}</h1>
+      <p>{{ 'auth.register.subtitle' | translate }}</p>
     </header>
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <label class="field">
-        <span>Nome completo</span>
-        <input type="text" placeholder="Digite seu nome" formControlName="fullName" />
-        <small class="error" *ngIf="registerForm.get('fullName')?.invalid && (registerForm.get('fullName')?.touched || submitted)">
-          {{ registerForm.get('fullName')?.hasError('required') ? 'Nome e obrigatorio.' : 'Informe ao menos 3 caracteres.' }}
+        <span>{{ 'auth.register.fullNameLabel' | translate }}</span>
+        <input
+          type="text"
+          [placeholder]="'auth.register.fullNamePlaceholder' | translate"
+          formControlName="fullName"
+        />
+        <small
+          class="error"
+          *ngIf="registerForm.get('fullName')?.invalid && (registerForm.get('fullName')?.touched || submitted)"
+        >
+          {{
+            registerForm.get('fullName')?.hasError('required')
+              ? ('auth.register.fullNameRequired' | translate)
+              : ('auth.register.fullNameMin' | translate)
+          }}
         </small>
       </label>
 
       <label class="field">
-        <span>Email</span>
-        <input type="email" placeholder="seu@email.com" formControlName="email" />
-        <small class="error" *ngIf="registerForm.get('email')?.invalid && (registerForm.get('email')?.touched || submitted)">
-          {{ registerForm.get('email')?.hasError('required') ? 'Email e obrigatorio.' : 'Formato de email invalido.' }}
+        <span>{{ 'auth.register.emailLabel' | translate }}</span>
+        <input
+          type="email"
+          [placeholder]="'auth.register.emailPlaceholder' | translate"
+          formControlName="email"
+        />
+        <small
+          class="error"
+          *ngIf="registerForm.get('email')?.invalid && (registerForm.get('email')?.touched || submitted)"
+        >
+          {{
+            registerForm.get('email')?.hasError('required')
+              ? ('auth.register.emailRequired' | translate)
+              : ('auth.register.emailInvalid' | translate)
+          }}
         </small>
       </label>
 
       <div class="inline">
         <label class="field">
-          <span>Senha</span>
+          <span>{{ 'auth.register.passwordLabel' | translate }}</span>
           <div class="password-input">
             <input
               [type]="passwordVisibility.password ? 'text' : 'password'"
-              placeholder="Minimo 8 caracteres"
+              [placeholder]="'auth.register.passwordPlaceholder' | translate"
               formControlName="password"
               autocomplete="new-password"
             />
@@ -36,21 +58,32 @@
               type="button"
               class="visibility-toggle"
               (click)="togglePasswordVisibility('password')"
-              [attr.aria-label]="passwordVisibility.password ? 'Ocultar senha' : 'Mostrar senha'"
+              [attr.aria-label]="
+                passwordVisibility.password
+                  ? ('auth.login.hidePassword' | translate)
+                  : ('auth.login.showPassword' | translate)
+              "
             >
               <i class="fa-solid" [ngClass]="passwordVisibility.password ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
             </button>
           </div>
-          <small class="error" *ngIf="registerForm.get('password')?.invalid && (registerForm.get('password')?.touched || submitted)">
-            {{ registerForm.get('password')?.hasError('required') ? 'Senha e obrigatoria.' : 'Use no minimo 8 caracteres.' }}
+          <small
+            class="error"
+            *ngIf="registerForm.get('password')?.invalid && (registerForm.get('password')?.touched || submitted)"
+          >
+            {{
+              registerForm.get('password')?.hasError('required')
+                ? ('auth.register.passwordRequired' | translate)
+                : ('auth.register.passwordMin' | translate)
+            }}
           </small>
         </label>
         <label class="field">
-          <span>Confirmar senha</span>
+          <span>{{ 'auth.register.confirmPasswordLabel' | translate }}</span>
           <div class="password-input">
             <input
               [type]="passwordVisibility.confirmPassword ? 'text' : 'password'"
-              placeholder="Repita a senha"
+              [placeholder]="'auth.register.confirmPasswordPlaceholder' | translate"
               formControlName="confirmPassword"
               autocomplete="new-password"
             />
@@ -58,34 +91,45 @@
               type="button"
               class="visibility-toggle"
               (click)="togglePasswordVisibility('confirmPassword')"
-              [attr.aria-label]="passwordVisibility.confirmPassword ? 'Ocultar senha' : 'Mostrar senha'"
+              [attr.aria-label]="
+                passwordVisibility.confirmPassword
+                  ? ('auth.login.hidePassword' | translate)
+                  : ('auth.login.showPassword' | translate)
+              "
             >
               <i class="fa-solid" [ngClass]="passwordVisibility.confirmPassword ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
             </button>
           </div>
-          <small class="error" *ngIf="(registerForm.get('confirmPassword')?.touched || submitted) && registerForm.hasError('passwordsMismatch')">
-            As senhas precisam ser iguais.
+          <small
+            class="error"
+            *ngIf="(registerForm.get('confirmPassword')?.touched || submitted) && registerForm.hasError('passwordsMismatch')"
+          >
+            {{ 'auth.register.confirmPasswordMismatch' | translate }}
           </small>
         </label>
       </div>
 
       <label class="checkbox">
         <input type="checkbox" formControlName="updates" />
-        <span>Quero receber novidades sobre evolucoes do template.</span>
+        <span>{{ 'auth.register.updatesLabel' | translate }}</span>
       </label>
 
-      <button class="btn primary w-100" type="submit" [disabled]="registerForm.invalid">Registrar</button>
+      <button class="btn primary w-100" type="submit" [disabled]="registerForm.invalid">
+        {{ 'auth.register.submit' | translate }}
+      </button>
     </form>
 
     <footer class="card-footer">
-      <span>Ja possui uma conta?</span>
-      <button type="button" class="link-btn" (click)="goToLogin()">Fazer login</button>
+      <span>{{ 'auth.register.footerText' | translate }}</span>
+      <button type="button" class="link-btn" (click)="goToLogin()">
+        {{ 'auth.register.footerLink' | translate }}
+      </button>
     </footer>
   </div>
 
   <button type="button" class="theme-fab" (click)="toggleTheme()">
     <span class="toggle-icon" [class.dark]="activeTheme === 'dark'">
-      {{ activeTheme === 'dark' ? '☀' : '☾' }}
+      {{ activeTheme === 'dark' ? '🌙' : '☀️' }}
     </span>
   </button>
 </div>

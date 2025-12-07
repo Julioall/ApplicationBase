@@ -3,19 +3,19 @@
     <div class="identity">
       <div class="avatar-dot">{{ (user.Profile?.Name || user.Account?.Email || '?') | slice:0:1 }}</div>
       <div>
-        <p class="eyebrow">Admin · Usuário</p>
-        <h2>{{ user.Profile?.Name || 'Usuário' }}</h2>
-        <p class="muted">{{ user.Account?.Email }}</p>
+        <p class="eyebrow">{{ 'adminUserDetail.breadcrumb' | translate }}</p>
+        <h2>{{ user.Profile?.Name || ('adminUserDetail.fallbackName' | translate) }}</h2>
+        <p class="muted">{{ user.Account?.Email || ('adminUserDetail.fallbackEmail' | translate) }}</p>
       </div>
     </div>
     <div class="actions">
       <button type="button" class="ghost" (click)="goBack()">
         <i class="fa-solid fa-chevron-left"></i>
-        Voltar
+        {{ 'adminUserDetail.actions.back' | translate }}
       </button>
       <button type="button" class="ghost" (click)="showResetPassword()">
         <i class="fa-solid fa-key"></i>
-        Resetar senha
+        {{ 'adminUserDetail.actions.resetPassword' | translate }}
       </button>
     </div>
   </header>
@@ -24,35 +24,44 @@
     <article class="card">
       <header class="card-head">
         <div>
-          <p class="eyebrow">Permissões</p>
-          <h3>Controle de acesso</h3>
-          <p class="muted">Adicione ou remova permissões específicas para este usuário.</p>
+          <p class="eyebrow">{{ 'adminUserDetail.access.eyebrow' | translate }}</p>
+          <h3>{{ 'adminUserDetail.access.title' | translate }}</h3>
+          <p class="muted">{{ 'adminUserDetail.access.description' | translate }}</p>
         </div>
       </header>
 
       <div class="permissions" *ngIf="getUserPermissions().length; else noPermissions">
         <span class="permission" *ngFor="let permission of getUserPermissions()">
           {{ permission }}
-          <button type="button" class="icon" (click)="removePermission(permission)" aria-label="Remover permissão">
-            ×
+          <button
+            type="button"
+            class="icon"
+            (click)="removePermission(permission)"
+            [attr.aria-label]="'adminUserDetail.access.removePermission' | translate"
+          >
+            &times;
           </button>
         </span>
       </div>
       <ng-template #noPermissions>
-        <p class="muted">Nenhuma permissão atribuída.</p>
+        <p class="muted">{{ 'adminUserDetail.access.none' | translate }}</p>
       </ng-template>
 
       <div class="controls">
         <label>
-          Nova permissão
+          {{ 'adminUserDetail.access.newPermission' | translate }}
           <select [(ngModel)]="selectedPermission">
-            <option value="">Selecione</option>
+            <option value="">{{ 'adminUserDetail.access.select' | translate }}</option>
             <option *ngFor="let permission of availablePermissions" [value]="permission">{{ permission }}</option>
           </select>
         </label>
         <div class="actions">
-          <button type="button" class="secondary" (click)="resetToDefault()">Restaurar padrão</button>
-          <button type="button" class="primary" (click)="addPermission()" [disabled]="!selectedPermission">Adicionar</button>
+          <button type="button" class="secondary" (click)="resetToDefault()">
+            {{ 'adminUserDetail.access.restoreDefault' | translate }}
+          </button>
+          <button type="button" class="primary" (click)="addPermission()" [disabled]="!selectedPermission">
+            {{ 'adminUserDetail.access.add' | translate }}
+          </button>
         </div>
       </div>
     </article>
@@ -60,40 +69,43 @@
     <article class="card">
       <header class="card-head">
         <div>
-          <p class="eyebrow">Conta</p>
-          <h3>Resumo</h3>
-          <p class="muted">Dados básicos do usuário para conferência rápida.</p>
+          <p class="eyebrow">{{ 'adminUserDetail.summary.eyebrow' | translate }}</p>
+          <h3>{{ 'adminUserDetail.summary.title' | translate }}</h3>
+          <p class="muted">{{ 'adminUserDetail.summary.description' | translate }}</p>
         </div>
       </header>
       <div class="summary-identity">
         <div class="summary-avatar" [class.has-image]="avatarUrl">
           <ng-container *ngIf="avatarUrl; else summaryInitials">
-            <img [src]="avatarUrl" alt="Foto do usuário" />
+            <img [src]="avatarUrl" [alt]="'adminUserDetail.summary.avatarAlt' | translate" />
           </ng-container>
           <ng-template #summaryInitials>
             <span>{{ userInitials }}</span>
           </ng-template>
         </div>
         <div class="summary-text">
-          <h4>{{ user.Profile?.Name || 'Usuário' }}</h4>
-          <p class="muted">{{ user.Account?.Email || 'Sem e-mail' }}</p>
+          <h4>{{ user.Profile?.Name || ('adminUserDetail.fallbackName' | translate) }}</h4>
+          <p class="muted">{{ user.Account?.Email || ('adminUserDetail.fallbackEmail' | translate) }}</p>
           <span class="pill ghost tiny">
             <i class="fa-regular fa-id-badge"></i>
-            {{ user.Id ? ('ID ' + user.Id) : 'Conta sem ID' }}
+            <ng-container *ngIf="user.Id; else missingId">
+              {{ ('adminUserDetail.access.idLabel' | translate) + ' ' + user.Id }}
+            </ng-container>
+            <ng-template #missingId>{{ 'adminUserDetail.fallbackId' | translate }}</ng-template>
           </span>
         </div>
       </div>
       <dl class="meta">
         <div>
-          <dt>Nome</dt>
-          <dd>{{ user.Profile?.Name || 'Não informado' }}</dd>
+          <dt>{{ 'adminUserDetail.meta.name' | translate }}</dt>
+          <dd>{{ user.Profile?.Name || ('adminUserDetail.meta.notProvided' | translate) }}</dd>
         </div>
         <div>
-          <dt>E-mail</dt>
-          <dd>{{ user.Account?.Email || 'Não informado' }}</dd>
+          <dt>{{ 'adminUserDetail.meta.email' | translate }}</dt>
+          <dd>{{ user.Account?.Email || ('adminUserDetail.meta.notProvided' | translate) }}</dd>
         </div>
         <div>
-          <dt>Permissões</dt>
+          <dt>{{ 'adminUserDetail.meta.permissions' | translate }}</dt>
           <dd>{{ getUserPermissions().length }}</dd>
         </div>
       </dl>
@@ -103,6 +115,6 @@
 
 <ng-template #loadingState>
   <div class="empty">
-    <p>Carregando usuário...</p>
+    <p>{{ 'adminUserDetail.loading' | translate }}</p>
   </div>
 </ng-template>
