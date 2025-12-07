@@ -295,6 +295,64 @@ namespace Application.Tests.Services
                 _userService.ChangePasswordAsync(existing.Account.Email, "Wrong123!", "Another123!"));
         }
 
+        [Fact]
+        public async Task GenerateRecoveryCode_Should_Throw_When_In_Cooldown()
+        {
+            var existing = CreateValidUser("cooldown@test.com");
+            existing.Account.RecoveryCodeLastGenerated = DateTime.UtcNow;
+            _session.Store(existing);
+            _session.SaveChanges();
+
+            var ex = await Assert.ThrowsAsync<BusinessException>(() => _userService.GenerateRecoveryCodeAsync(existing.Account.Email, sendEmail: false));
+            Assert.Contains("RecoveryCodeCooldown", ex.Message);
+        }
+
+        [Fact]
+        public async Task ValidateRecoveryCode_Should_Clear_When_Expired()
+        {
+            const string code = "123456";
+            var existing = CreateValidUser("expired@test.com");
+            existing.Account.RecoveryCodeHash = SecureHash.HashSecret(code);
+            existing.Account.RecoveryCodeExpiresAt = DateTime.UtcNow.AddMinutes(-1);
+            _session.Store(existing);
+            _session.SaveChanges();
+
+            var ex = await Assert.ThrowsAsync<BusinessException>(() => _userService.ValidateRecoveryCodeAsync(existing.Account.Email, code));
+            Assert.Contains("RecoveryCodeExpired", ex.Message);
+            await _asyncSession.SaveChangesAsync();
+
+            var reloaded = await _userService.GetByEmailAsync(existing.Account.Email);
+            Assert.NotNull(reloaded);
+            Assert.Null(reloaded!.Account.RecoveryCodeHash);
+            Assert.Null(reloaded.Account.RecoveryCodeExpiresAt);
+        }
+
+        [Fact]
+        public async Task ChangePasswordWithRecoveryCode_Should_Reset_RefreshTokens_And_Clear_Code()
+        {
+            const string code = "654321";
+            var existing = CreateValidUser("recover@test.com");
+            existing.Account.RecoveryCodeHash = SecureHash.HashSecret(code);
+            existing.Account.RecoveryCodeExpiresAt = DateTime.UtcNow.AddMinutes(5);
+            existing.Account.RefreshTokenHash = "old-hash";
+            existing.Account.RefreshTokenId = "old-id";
+            existing.Account.RefreshTokenExpiry = DateTime.UtcNow.AddDays(1);
+            _session.Store(existing);
+            _session.SaveChanges();
+
+            await _userService.ChangePasswordWithRecoveryCodeAsync(existing.Account.Email, code, "NewPass123!");
+            await _asyncSession.SaveChangesAsync();
+
+            var updated = await _userService.GetByEmailAsync(existing.Account.Email);
+            Assert.NotNull(updated);
+            Assert.False(SecureHash.Verify("Valid123!", updated!.Account.PasswordHash));
+            Assert.Null(updated.Account.RefreshTokenHash);
+            Assert.Null(updated.Account.RefreshTokenId);
+            Assert.Null(updated.Account.RefreshTokenExpiry);
+            Assert.Null(updated.Account.RecoveryCodeHash);
+            Assert.Null(updated.Account.RecoveryCodeExpiresAt);
+        }
+
         private static User CreateValidUser(string email, bool withHash = true)
         {
             const string defaultPassword = "Valid123!";

@@ -53,5 +53,30 @@ namespace Application.Test.Middlewares
             Assert.NotNull(ravenService.AsyncSession);
             Assert.True(ravenService.SessionDisposed);
         }
+
+        [Fact]
+        public async Task Should_Dispose_Sessions_When_Next_Throws()
+        {
+            var store = GetDocumentStore();
+            var services = new ServiceCollection();
+            services.AddSingleton<IDocumentStore>(store);
+            services.AddScoped<IServiceRavenDB, TestRavenService>();
+
+            var provider = services.BuildServiceProvider();
+            var scope = provider.CreateScope();
+            var context = new DefaultHttpContext
+            {
+                RequestServices = scope.ServiceProvider
+            };
+
+            var middleware = new MiddlewareServiceRavenDbStore(_ => throw new InvalidOperationException("boom"));
+            var documentStore = scope.ServiceProvider.GetRequiredService<IDocumentStore>();
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => middleware.Invoke(context, scope.ServiceProvider.GetRequiredService<IServiceRavenDB>(), documentStore));
+
+            var ravenService = (TestRavenService)scope.ServiceProvider.GetRequiredService<IServiceRavenDB>();
+            Assert.True(ravenService.SessionDisposed);
+            Assert.True(ravenService.AsyncSessionDisposed);
+        }
     }
 }

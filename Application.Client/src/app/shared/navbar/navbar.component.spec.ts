@@ -4,6 +4,14 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ThemeService } from '../../service/theme/theme.service';
 import { AuthService } from '../../service/auth/auth.service';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { of } from 'rxjs';
+
+class FakeLoader implements TranslateLoader {
+  getTranslation(): any {
+    return of({});
+  }
+}
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
@@ -12,7 +20,13 @@ describe('NavbarComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ NavbarComponent ],
-      imports: [RouterTestingModule, HttpClientTestingModule],
+      imports: [
+        RouterTestingModule,
+        HttpClientTestingModule,
+        TranslateModule.forRoot({
+          loader: { provide: TranslateLoader, useClass: FakeLoader }
+        })
+      ],
       providers: [ThemeService, AuthService]
     }).compileComponents();
   }));

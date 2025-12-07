@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Application.Domain;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
@@ -7,6 +8,7 @@ using Application.Service.Service;
 using Application.Service.Service.Security;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Linq;
+using Application.Domain.Model;
 
 namespace Application.Tests.Services
 {
@@ -106,6 +108,70 @@ namespace Application.Tests.Services
             var refreshed = await service.RefreshAsync("invalid-token");
 
             Assert.Null(refreshed);
+        }
+
+        [Fact]
+        public async Task RefreshAsync_Should_Return_Null_When_User_Not_Found()
+        {
+            var user = CreateUser();
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
+            var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
+
+            var initial = await service.GenerateTokens(loginDto);
+            Assert.NotNull(initial);
+
+            var refreshed = await service.RefreshAsync("other-id." + Guid.NewGuid().ToString("N"));
+
+            Assert.Null(refreshed);
+        }
+
+        [Fact]
+        public async Task RefreshAsync_Should_Return_Null_When_Hash_Mismatch()
+        {
+            var user = CreateUser();
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
+            var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
+
+            var initial = await service.GenerateTokens(loginDto);
+            Assert.NotNull(initial);
+
+            // Corrompe hash para simular token inválido
+            user.Account.RefreshTokenHash = SecureHash.HashSecret("other-secret");
+
+            var refreshed = await service.RefreshAsync(initial!.RefreshToken);
+
+            Assert.Null(refreshed);
+        }
+
+        [Fact]
+        public async Task GenerateTokens_Should_Return_Null_When_LoginDto_Is_Null()
+        {
+            var user = CreateUser();
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
+
+            var tokens = await service.GenerateTokens(null!);
+
+            Assert.Null(tokens);
+        }
+
+        [Fact]
+        public async Task GenerateTokens_Should_Throw_When_SigningKey_Missing()
+        {
+            var user = CreateUser();
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
+            var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
+
+            var previousKey = Environment.GetEnvironmentVariable(ApplicationConstants.JWT_SIGNING_KEY);
+            try
+            {
+                Environment.SetEnvironmentVariable(ApplicationConstants.JWT_SIGNING_KEY, null);
+
+                await Assert.ThrowsAsync<ArgumentNullException>(() => service.GenerateTokens(loginDto));
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable(ApplicationConstants.JWT_SIGNING_KEY, previousKey);
+            }
         }
 
         [Fact]

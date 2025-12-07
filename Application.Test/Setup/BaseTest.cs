@@ -1,5 +1,6 @@
 using Application.Domain;
 using Application.Domain.Interface;
+using Application.Domain.Model;
 using Application.Infrastructure;
 using Application.Infrastructure.Indexes;
 using Application.Infrastructure.Service;
@@ -30,6 +31,12 @@ namespace Application.Tests.Setup
             var culture = new CultureInfo("pt");
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+            // Ensure encryption key required by SecretEncryptionService is set for all tests
+            if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(ApplicationConstants.SECRET_ENCRYPTION_KEY)))
+            {
+                Environment.SetEnvironmentVariable(ApplicationConstants.SECRET_ENCRYPTION_KEY, "test-secret-key");
+            }
 
             InitializeDataBase();
             _serviceCollection = InitializeServices(_store, _session, _asyncSession);

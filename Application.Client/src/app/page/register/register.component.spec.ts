@@ -7,8 +7,14 @@ import { Router } from '@angular/router';
 import { RegisterComponent } from './register.component';
 import { AuthService } from '../../service/auth/auth.service';
 import { NotificationService } from '../../service/notification/notification.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { ThemeService } from '../../service/theme/theme.service';
+
+class FakeLoader implements TranslateLoader {
+  getTranslation(): any {
+    return of({});
+  }
+}
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
@@ -23,18 +29,12 @@ describe('RegisterComponent', () => {
     router = jasmine.createSpyObj<Router>('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule],
+      imports: [ReactiveFormsModule, TranslateModule.forRoot({ loader: { provide: TranslateLoader, useClass: FakeLoader } })],
       declarations: [RegisterComponent],
       providers: [
         { provide: AuthService, useValue: authService },
         { provide: NotificationService, useValue: notificationService },
         { provide: Router, useValue: router },
-        {
-          provide: TranslateService,
-          useValue: {
-            instant: (key: string) => key,
-          },
-        },
         {
           provide: ThemeService,
           useValue: {
