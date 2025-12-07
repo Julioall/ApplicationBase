@@ -1,33 +1,40 @@
 <section class="email-settings">
   <article class="card settings-shell">
     <div class="card-lead">
-      <h1>Serviço de e-mail</h1>
-      <p class="subtitle">Configuração do serviço de envio de e-mails para recuperação de senha e comunicações automáticas.</p>
+      <h1>{{ 'adminEmail.title' | translate }}</h1>
+      <p class="subtitle">{{ 'adminEmail.subtitle' | translate }}</p>
     </div>
 
     <div class="settings-body">
       <div class="section-bar">
         <div class="section-lead">
-          <h3>Remetente padrão</h3>
+          <h3>{{ 'adminEmail.sections.sender' | translate }}</h3>
         </div>
         <div class="actions-inline">
           <ng-container *ngIf="!isEditing; else editingActions">
-            <button class="btn primary" type="button" (click)="startEdit()" aria-label="Editar configurações de SMTP">
+            <button
+              class="btn primary"
+              type="button"
+              (click)="startEdit()"
+              [attr.aria-label]="'adminEmail.aria.editSmtp' | translate"
+            >
               <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
-              <span>Editar SMTP</span>
+              <span>{{ 'adminEmail.actions.editSmtp' | translate }}</span>
             </button>
           </ng-container>
           <ng-template #editingActions>
-            <button class="btn subtle" type="button" (click)="testConnection()" [disabled]="isTesting">
-              <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
-              <span>{{ isTesting ? 'Testando...' : 'Enviar teste' }}</span>
-            </button>
             <button class="btn ghost" type="button" (click)="cancelEdit()" [disabled]="isSaving || isTesting">
-              Cancelar
+              {{ 'adminEmail.actions.cancel' | translate }}
             </button>
             <button class="btn primary" type="submit" form="emailSettingsForm" [disabled]="isSaving">
               <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
-              <span>{{ isSaving ? 'Salvando...' : 'Salvar alterações' }}</span>
+              <span>
+                {{
+                  isSaving
+                    ? ('adminEmail.actions.saving' | translate)
+                    : ('adminEmail.actions.save' | translate)
+                }}
+              </span>
             </button>
           </ng-template>
         </div>
@@ -38,18 +45,24 @@
           <div class="form-section">
             <div class="field-grid">
               <div class="field-row">
-                <label class="field-label" for="fromName">Nome</label>
+                <label class="field-label" for="fromName">{{ 'adminEmail.labels.fromName' | translate }}</label>
                 <div class="field-control">
                   <ng-container *ngIf="isEditing; else fromNameView">
-                    <input id="fromName" type="text" name="fromName" [(ngModel)]="emailConfig.fromName" placeholder="Equipe ApplicationBase" />
+                    <input
+                      id="fromName"
+                      type="text"
+                      name="fromName"
+                      [(ngModel)]="emailConfig.fromName"
+                      [placeholder]="'adminEmail.placeholders.fromName' | translate"
+                    />
                   </ng-container>
                   <ng-template #fromNameView>
-                    <span class="field-value">{{ emailConfig.fromName || 'Não configurado' }}</span>
+                    <span class="field-value">{{ emailConfig.fromName || ('adminEmail.state.notConfigured' | translate) }}</span>
                   </ng-template>
                 </div>
               </div>
               <div class="field-row">
-                <label class="field-label" for="fromEmail">E-mail</label>
+                <label class="field-label" for="fromEmail">{{ 'adminEmail.labels.fromEmail' | translate }}</label>
                 <div class="field-control">
                   <ng-container *ngIf="isEditing; else fromEmailView">
                     <input
@@ -58,11 +71,11 @@
                       name="fromEmail"
                       [(ngModel)]="emailConfig.fromEmail"
                       required
-                      placeholder="no-reply@exemplo.com"
+                      [placeholder]="'adminEmail.placeholders.fromEmail' | translate"
                     />
                   </ng-container>
                   <ng-template #fromEmailView>
-                    <span class="field-value">{{ emailConfig.fromEmail || 'Não configurado' }}</span>
+                    <span class="field-value">{{ emailConfig.fromEmail || ('adminEmail.state.notConfigured' | translate) }}</span>
                   </ng-template>
                 </div>
               </div>
@@ -72,49 +85,57 @@
 
         <div class="section-block">
           <div class="section-lead">
-            <h3>Servidor SMTP</h3>
+            <h3>{{ 'adminEmail.sections.smtp' | translate }}</h3>
           </div>
           <div class="form-section">
             <div class="field-grid">
               <div class="field-row">
-                <label class="field-label" for="host">Host</label>
+                <label class="field-label" for="host">{{ 'adminEmail.labels.host' | translate }}</label>
                 <div class="field-control">
                   <ng-container *ngIf="isEditing; else hostView">
-                    <input id="host" type="text" name="host" [(ngModel)]="emailConfig.host" placeholder="smtp.seuprovedor.com" />
+                    <input
+                      id="host"
+                      type="text"
+                      name="host"
+                      [(ngModel)]="emailConfig.host"
+                      [placeholder]="'adminEmail.placeholders.host' | translate"
+                    />
                   </ng-container>
                   <ng-template #hostView>
-                    <span class="field-value">{{ emailConfig.host || 'Não configurado' }}</span>
+                    <span class="field-value">{{ emailConfig.host || ('adminEmail.state.notConfigured' | translate) }}</span>
                   </ng-template>
                 </div>
               </div>
               <div class="field-row">
-                <label class="field-label" for="port">Porta</label>
+                <label class="field-label" for="port">{{ 'adminEmail.labels.port' | translate }}</label>
                 <div class="field-control">
                   <ng-container *ngIf="isEditing; else portView">
                     <input id="port" type="number" name="port" [(ngModel)]="emailConfig.port" min="1" />
                   </ng-container>
                   <ng-template #portView>
-                    <span class="field-value">{{ emailConfig.port || 'Não configurada' }}</span>
+                    <span class="field-value">{{ emailConfig.port || ('adminEmail.state.notConfigured' | translate) }}</span>
                   </ng-template>
                 </div>
               </div>
               <div class="field-row">
-                <label class="field-label" for="secure">Segurança</label>
+                <label class="field-label" for="secure">{{ 'adminEmail.labels.secure' | translate }}</label>
                 <div class="field-control">
                   <ng-container *ngIf="isEditing; else secureView">
                     <select id="secure" name="secure" [(ngModel)]="emailConfig.secure">
-                      <option value="none">Nenhuma</option>
-                      <option value="starttls">STARTTLS</option>
-                      <option value="ssl">SSL/TLS</option>
+                      <option value="none">{{ 'adminEmail.secure.none' | translate }}</option>
+                      <option value="starttls">{{ 'adminEmail.secure.starttls' | translate }}</option>
+                      <option value="ssl">{{ 'adminEmail.secure.ssl' | translate }}</option>
                     </select>
                   </ng-container>
                   <ng-template #secureView>
-                    <span class="field-value">{{ secureLabels[emailConfig.secure] || 'Nenhuma' }}</span>
+                    <span class="field-value">
+                      {{ (secureLabels[emailConfig.secure] || 'adminEmail.secure.none') | translate }}
+                    </span>
                   </ng-template>
                 </div>
               </div>
               <div class="field-row">
-                <label class="field-label" for="password">Senha</label>
+                <label class="field-label" for="password">{{ 'adminEmail.labels.password' | translate }}</label>
                 <div class="field-control">
                   <ng-container *ngIf="isEditing; else passwordView">
                     <div class="password-input">
@@ -129,17 +150,21 @@
                         type="button"
                         class="visibility-toggle"
                         (click)="togglePasswordVisibility()"
-                        [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+                        [attr.aria-label]="
+                          showPassword
+                            ? ('adminEmail.aria.hidePassword' | translate)
+                            : ('adminEmail.aria.showPassword' | translate)
+                        "
                       >
                         <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
                       </button>
                     </div>
-                    <small class="helper">Para manter a senha atual, deixe em branco.</small>
+                    <small class="helper">{{ 'adminEmail.helpers.keepPassword' | translate }}</small>
                   </ng-container>
                   <ng-template #passwordView>
                     <span class="field-value">
-                      <ng-container *ngIf="emailConfig.password; else noPassword">********</ng-container>
-                      <ng-template #noPassword>Não configurada</ng-template>
+                      <ng-container *ngIf="hasStoredPassword; else noPassword">********</ng-container>
+                      <ng-template #noPassword>{{ 'adminEmail.state.passwordNotConfigured' | translate }}</ng-template>
                     </span>
                   </ng-template>
                 </div>
@@ -150,34 +175,47 @@
 
         <div class="section-block">
           <div class="section-lead">
-            <h3>E-mail de validação</h3>
+            <h3>{{ 'adminEmail.sections.validation' | translate }}</h3>
           </div>
           <div class="form-section">
             <div class="field-grid">
               <div class="field-row">
-                <label class="field-label" for="testEmail">Destino</label>
+                <label class="field-label" for="testEmail">{{ 'adminEmail.labels.testEmail' | translate }}</label>
                 <div class="field-control">
                   <ng-container *ngIf="isEditing; else testEmailView">
-                    <input
-                      id="testEmail"
-                      type="email"
-                      name="testEmail"
-                      [(ngModel)]="emailConfig.testEmail"
-                      placeholder="teste@exemplo.com"
-                    />
+                    <div class="input-send-row">
+                      <input
+                        id="testEmail"
+                        type="email"
+                        name="testEmail"
+                        [(ngModel)]="emailConfig.testEmail"
+                        [placeholder]="'adminEmail.placeholders.testEmail' | translate"
+                      />
+                      <button class="send-test" type="button" (click)="testConnection()" [disabled]="isTesting">
+                        <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+                        <span>
+                          {{
+                            isTesting
+                              ? ('adminEmail.actions.testing' | translate)
+                              : ('adminEmail.actions.sendTest' | translate)
+                          }}
+                        </span>
+                      </button>
+                    </div>
+                    <small class="helper">{{ 'adminEmail.helpers.sendTest' | translate }}</small>
                   </ng-container>
                   <ng-template #testEmailView>
-                    <span class="field-value">{{ emailConfig.testEmail || emailConfig.fromEmail || 'Não definido' }}</span>
+                    <span class="field-value">
+                      {{
+                        emailConfig.testEmail || emailConfig.fromEmail || ('adminEmail.state.notDefined' | translate)
+                      }}
+                    </span>
                   </ng-template>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-        <p *ngIf="statusMessage" class="status" [class.success]="statusType === 'success'" [class.error]="statusType === 'error'">
-          {{ statusMessage }}
-        </p>
       </form>
     </div>
   </article>

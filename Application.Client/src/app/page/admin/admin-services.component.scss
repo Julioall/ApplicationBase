@@ -52,9 +52,13 @@
 }
 
 .card-lead {
+  
   border-radius: var(--radius-lg);
-  color: var(--text-primary);
-  box-shadow: var(--elevation-2);
+  background: linear-gradient(135deg, var(--surface-alt), var(--surface));
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 
   h1 {
     margin: 0;
@@ -250,6 +254,55 @@
 
 }
 
+.input-send-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+
+  input {
+    flex: 1;
+    min-width: 220px;
+  }
+}
+
+.send-test {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  color: #f6fff6;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    filter var(--transition-fast);
+
+  i {
+    font-size: 0.95em;
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    box-shadow: var(--elevation-2);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+    filter: none;
+    box-shadow: none;
+  }
+}
+
 .field-value {
   display: block;
   padding: var(--space-2) 0;
@@ -259,31 +312,6 @@
 .field-value .password-mask {
   letter-spacing: 0.35rem;
   font-weight: var(--font-weight-semibold);
-}
-
-.status {
-  margin: 0;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  color: var(--text-primary);
-  border: 1px solid var(--border-soft);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-weight: var(--font-weight-semibold);
-}
-
-.status.success {
-  background: color-mix(in srgb, var(--success) 15%, transparent);
-  border-color: var(--success);
-  color: var(--success);
-}
-
-.status.error {
-  background: color-mix(in srgb, var(--danger) 15%, transparent);
-  border-color: var(--danger);
-  color: var(--danger);
 }
 
 @include respond-down(md) {
@@ -297,6 +325,16 @@
 
   .actions-inline {
     justify-content: flex-start;
+  }
+
+  .input-send-row {
+    flex-direction: column;
+    align-items: stretch;
+
+    .send-test {
+      width: 100%;
+      justify-content: center;
+    }
   }
 }
 

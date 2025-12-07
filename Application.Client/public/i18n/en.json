@@ -138,6 +138,8 @@
       "currentLabel": "Current password",
       "newLabel": "New password",
       "confirmLabel": "Confirm password",
+      "show": "Show password",
+      "hide": "Hide password",
       "requirements": "At least 8 characters including uppercase, lowercase, number and symbol.",
       "save": "Update password",
       "saving": "Updating...",
@@ -189,6 +191,72 @@
       "passwordFormInvalid": "Fill out every password field to continue.",
       "recoveryGenerated": "Code generated. Use it before it expires.",
       "recoveryGeneratedAndSent": "Code generated and sent by email."
+    }
+  },
+  "adminEmail": {
+    "title": "Email service",
+    "subtitle": "Configure the email service used for password recovery and automated communications.",
+    "sections": {
+      "sender": "Default sender",
+      "smtp": "SMTP server",
+      "validation": "Validation email"
+    },
+    "labels": {
+      "fromName": "Name",
+      "fromEmail": "Email",
+      "host": "Host",
+      "port": "Port",
+      "secure": "Security",
+      "password": "Password",
+      "testEmail": "Test destination"
+    },
+    "secure": {
+      "none": "None",
+      "starttls": "STARTTLS",
+      "ssl": "SSL/TLS"
+    },
+    "actions": {
+      "editSmtp": "Edit SMTP",
+      "cancel": "Cancel",
+      "save": "Save changes",
+      "saving": "Saving...",
+      "sendTest": "Send test",
+      "testing": "Sending..."
+    },
+    "placeholders": {
+      "fromName": "ApplicationBase Team",
+      "fromEmail": "no-reply@example.com",
+      "host": "smtp.yourprovider.com",
+      "testEmail": "test@example.com"
+    },
+    "helpers": {
+      "keepPassword": "Leave blank to keep the current password.",
+      "sendTest": "Send a quick test to validate SMTP."
+    },
+    "state": {
+      "notConfigured": "Not configured",
+      "passwordNotConfigured": "Not configured",
+      "notDefined": "Not defined"
+    },
+    "aria": {
+      "editSmtp": "Edit SMTP settings",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    },
+    "validation": {
+      "fromEmail": "Enter a valid sender email.",
+      "host": "Enter the SMTP server host."
+    },
+    "messages": {
+      "loadError": "Could not load email settings.",
+      "smtpPasswordRequired": "Enter the SMTP password.",
+      "saveSuccess": "Settings saved successfully.",
+      "saveError": "Error saving settings.",
+      "testEmailRequired": "Enter a test email.",
+      "testEmailInvalid": "Enter a valid test email.",
+      "smtpPasswordRequiredTest": "Enter the SMTP password to run the test.",
+      "testSuccess": "Test email sent (check your inbox).",
+      "testError": "Failed to send test email."
     }
   },
   "admin": {

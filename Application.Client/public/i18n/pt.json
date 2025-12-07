@@ -138,7 +138,9 @@
       "currentLabel": "Senha atual",
       "newLabel": "Nova senha",
       "confirmLabel": "Confirmar nova senha",
-      "requirements": "M?nimo de 8 caracteres com mai?scula, min?scula, n?mero e s?mbolo.",
+      "show": "Mostrar senha",
+      "hide": "Ocultar senha",
+      "requirements": "Mínimo de 8 caracteres com maiúscula, minúscula, número e símbolo.",
       "save": "Atualizar senha",
       "saving": "Atualizando...",
       "recoveryTitle": "Recuperação com código",
@@ -189,6 +191,72 @@
       "passwordFormInvalid": "Preencha todos os campos para atualizar a senha.",
       "recoveryGenerated": "Código gerado. Use-o antes de expirar.",
       "recoveryGeneratedAndSent": "Código gerado e enviado por e-mail."
+    }
+  },
+  "adminEmail": {
+    "title": "Serviço de e-mail",
+    "subtitle": "Configuração do serviço de envio de e-mails para recuperação de senha e comunicações automáticas.",
+    "sections": {
+      "sender": "Remetente padrão",
+      "smtp": "Servidor SMTP",
+      "validation": "E-mail de validação"
+    },
+    "labels": {
+      "fromName": "Nome",
+      "fromEmail": "E-mail",
+      "host": "Host",
+      "port": "Porta",
+      "secure": "Segurança",
+      "password": "Senha",
+      "testEmail": "Destino do teste"
+    },
+    "secure": {
+      "none": "Nenhuma",
+      "starttls": "STARTTLS",
+      "ssl": "SSL/TLS"
+    },
+    "actions": {
+      "editSmtp": "Editar SMTP",
+      "cancel": "Cancelar",
+      "save": "Salvar alterações",
+      "saving": "Salvando...",
+      "sendTest": "Enviar teste",
+      "testing": "Enviando..."
+    },
+    "placeholders": {
+      "fromName": "Equipe ApplicationBase",
+      "fromEmail": "no-reply@exemplo.com",
+      "host": "smtp.seuprovedor.com",
+      "testEmail": "teste@exemplo.com"
+    },
+    "helpers": {
+      "keepPassword": "Para manter a senha atual, deixe em branco.",
+      "sendTest": "Envie um teste para validar o SMTP."
+    },
+    "state": {
+      "notConfigured": "Não configurado",
+      "passwordNotConfigured": "Não configurada",
+      "notDefined": "Não definido"
+    },
+    "aria": {
+      "editSmtp": "Editar configurações de SMTP",
+      "showPassword": "Mostrar senha",
+      "hidePassword": "Ocultar senha"
+    },
+    "validation": {
+      "fromEmail": "Informe um e-mail de remetente válido.",
+      "host": "Informe o host do servidor SMTP."
+    },
+    "messages": {
+      "loadError": "Não foi possível carregar as configurações de e-mail.",
+      "smtpPasswordRequired": "Informe a senha do SMTP.",
+      "saveSuccess": "Configurações salvas com sucesso.",
+      "saveError": "Erro ao salvar as configurações.",
+      "testEmailRequired": "Informe um e-mail para teste.",
+      "testEmailInvalid": "Informe um e-mail de teste válido.",
+      "smtpPasswordRequiredTest": "Informe a senha do SMTP para testar.",
+      "testSuccess": "E-mail de teste enviado (verifique a caixa de entrada).",
+      "testError": "Falha ao enviar e-mail de teste."
     }
   },
   "admin": {
