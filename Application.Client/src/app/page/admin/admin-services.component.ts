@@ -23,6 +23,11 @@ export class AdminServicesComponent implements OnInit {
   statusType: 'success' | 'error' | '' = '';
   showPassword = false;
   isEditing = false;
+  readonly secureLabels: Record<string, string> = {
+    none: 'Nenhuma',
+    starttls: 'STARTTLS',
+    ssl: 'SSL/TLS',
+  };
 
   constructor(private emailSettingsService: EmailSettingsService) {}
 

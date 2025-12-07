@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using Application.Domain.Exceptions;
 using Application.Domain.Model;
 using Application.Service.Interface;
 
@@ -17,7 +18,7 @@ namespace Application.Service.Service.Security
             var keyMaterial = Environment.GetEnvironmentVariable(ApplicationConstants.SECRET_ENCRYPTION_KEY);
             if (string.IsNullOrWhiteSpace(keyMaterial))
             {
-                throw new InvalidOperationException($"Encryption key not configured. Set env var {ApplicationConstants.SECRET_ENCRYPTION_KEY}.");
+                throw new ConfigurationException($"Encryption key not configured. Set env var {ApplicationConstants.SECRET_ENCRYPTION_KEY}.");
             }
 
             _key = DeriveKey(keyMaterial);

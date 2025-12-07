@@ -1,99 +1,184 @@
-<section class="admin-page">
-  <header class="page-header">
-    <div>
-      <p class="eyebrow">Configurações</p>
-      <h2>Serviço de e-mail</h2>
-      <p class="subtitle">SMTP utilizado para recuperação de senha e comunicações automáticas.</p>
+<section class="email-settings">
+  <article class="card settings-shell">
+    <div class="card-lead">
+      <h1>Serviço de e-mail</h1>
+      <p class="subtitle">Configuração do serviço de envio de e-mails para recuperação de senha e comunicações automáticas.</p>
     </div>
-  </header>
 
-  <article class="card">
-    <header class="card-head">
-      <div>
-        <p class="eyebrow">SMTP</p>
-        <h3>Parâmetros de entrega</h3>
-        <p class="muted">Defina remetente, host e credenciais. A integração real será adicionada depois.</p>
-      </div>
-      <div class="form-actions inline-actions">
-        <button type="button" class="secondary" (click)="testConnection()" [disabled]="isTesting || !isEditing">
-          <i class="fa-solid fa-paper-plane"></i>
-          {{ isTesting ? 'Testando...' : 'Testar envio' }}
-        </button>
-        <ng-container *ngIf="isEditing; else editBtn">
-          <button type="button" class="secondary" (click)="cancelEdit()" [disabled]="isSaving || isTesting">
-            Cancelar
-          </button>
-          <button type="submit" [disabled]="isSaving">
-            <i class="fa-solid fa-floppy-disk"></i>
-            {{ isSaving ? 'Salvando...' : 'Salvar' }}
-          </button>
-        </ng-container>
-        <ng-template #editBtn>
-          <button type="button" (click)="startEdit()">
-            <i class="fa-solid fa-pen"></i>
-            Editar e-mail
-          </button>
-        </ng-template>
-      </div>
-    </header>
-
-    <form class="config-form" (ngSubmit)="saveConfig()">
-      <div class="form-grid">
-        <label>
-          Remetente (nome)
-          <input type="text" name="fromName" [(ngModel)]="emailConfig.fromName" [disabled]="!isEditing" />
-        </label>
-        <label>
-          Remetente (e-mail)
-          <input type="email" name="fromEmail" [(ngModel)]="emailConfig.fromEmail" required [disabled]="!isEditing" />
-        </label>
-        <label>
-          Host SMTP
-          <input type="text" name="host" [(ngModel)]="emailConfig.host" placeholder="smtp.seuprovedor.com" [disabled]="!isEditing" />
-        </label>
-        <label>
-          Porta
-          <input type="number" name="port" [(ngModel)]="emailConfig.port" min="1" [disabled]="!isEditing" />
-        </label>
-        <label>
-          Segurança
-          <select name="secure" [(ngModel)]="emailConfig.secure" [disabled]="!isEditing">
-            <option value="none">Nenhuma</option>
-            <option value="starttls">STARTTLS</option>
-            <option value="ssl">SSL/TLS</option>
-          </select>
-        </label>
-        <label>
-          Senha
-          <div class="password-input">
-            <input
-              [type]="showPassword ? 'text' : 'password'"
-              name="password"
-              [(ngModel)]="emailConfig.password"
-              autocomplete="current-password"
-              [disabled]="!isEditing"
-            />
-            <button
-              type="button"
-              class="visibility-toggle"
-              (click)="togglePasswordVisibility()"
-              [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
-            >
-              <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
+    <div class="settings-body">
+      <div class="section-bar">
+        <div class="section-lead">
+          <h3>Remetente padrão</h3>
+        </div>
+        <div class="actions-inline">
+          <ng-container *ngIf="!isEditing; else editingActions">
+            <button class="btn primary" type="button" (click)="startEdit()" aria-label="Editar configurações de SMTP">
+              <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+              <span>Editar SMTP</span>
             </button>
-          </div>
-        </label>
-        <label class="full-row">
-          E-mail para teste
-          <input type="email" name="testEmail" [(ngModel)]="emailConfig.testEmail" placeholder="teste@exemplo.com" [disabled]="!isEditing" />
-        </label>
+          </ng-container>
+          <ng-template #editingActions>
+            <button class="btn subtle" type="button" (click)="testConnection()" [disabled]="isTesting">
+              <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+              <span>{{ isTesting ? 'Testando...' : 'Enviar teste' }}</span>
+            </button>
+            <button class="btn ghost" type="button" (click)="cancelEdit()" [disabled]="isSaving || isTesting">
+              Cancelar
+            </button>
+            <button class="btn primary" type="submit" form="emailSettingsForm" [disabled]="isSaving">
+              <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+              <span>{{ isSaving ? 'Salvando...' : 'Salvar alterações' }}</span>
+            </button>
+          </ng-template>
+        </div>
       </div>
 
-      <div class="form-actions"></div>
+      <form id="emailSettingsForm" class="config-form" (ngSubmit)="saveConfig()">
+        <div class="section-block">
+          <div class="form-section">
+            <div class="field-grid">
+              <div class="field-row">
+                <label class="field-label" for="fromName">Nome</label>
+                <div class="field-control">
+                  <ng-container *ngIf="isEditing; else fromNameView">
+                    <input id="fromName" type="text" name="fromName" [(ngModel)]="emailConfig.fromName" placeholder="Equipe ApplicationBase" />
+                  </ng-container>
+                  <ng-template #fromNameView>
+                    <span class="field-value">{{ emailConfig.fromName || 'Não configurado' }}</span>
+                  </ng-template>
+                </div>
+              </div>
+              <div class="field-row">
+                <label class="field-label" for="fromEmail">E-mail</label>
+                <div class="field-control">
+                  <ng-container *ngIf="isEditing; else fromEmailView">
+                    <input
+                      id="fromEmail"
+                      type="email"
+                      name="fromEmail"
+                      [(ngModel)]="emailConfig.fromEmail"
+                      required
+                      placeholder="no-reply@exemplo.com"
+                    />
+                  </ng-container>
+                  <ng-template #fromEmailView>
+                    <span class="field-value">{{ emailConfig.fromEmail || 'Não configurado' }}</span>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <p *ngIf="statusMessage" class="status" [class.success]="statusType === 'success'" [class.error]="statusType === 'error'">
-        {{ statusMessage }}
-      </p>
-    </form>
+        <div class="section-block">
+          <div class="section-lead">
+            <h3>Servidor SMTP</h3>
+          </div>
+          <div class="form-section">
+            <div class="field-grid">
+              <div class="field-row">
+                <label class="field-label" for="host">Host</label>
+                <div class="field-control">
+                  <ng-container *ngIf="isEditing; else hostView">
+                    <input id="host" type="text" name="host" [(ngModel)]="emailConfig.host" placeholder="smtp.seuprovedor.com" />
+                  </ng-container>
+                  <ng-template #hostView>
+                    <span class="field-value">{{ emailConfig.host || 'Não configurado' }}</span>
+                  </ng-template>
+                </div>
+              </div>
+              <div class="field-row">
+                <label class="field-label" for="port">Porta</label>
+                <div class="field-control">
+                  <ng-container *ngIf="isEditing; else portView">
+                    <input id="port" type="number" name="port" [(ngModel)]="emailConfig.port" min="1" />
+                  </ng-container>
+                  <ng-template #portView>
+                    <span class="field-value">{{ emailConfig.port || 'Não configurada' }}</span>
+                  </ng-template>
+                </div>
+              </div>
+              <div class="field-row">
+                <label class="field-label" for="secure">Segurança</label>
+                <div class="field-control">
+                  <ng-container *ngIf="isEditing; else secureView">
+                    <select id="secure" name="secure" [(ngModel)]="emailConfig.secure">
+                      <option value="none">Nenhuma</option>
+                      <option value="starttls">STARTTLS</option>
+                      <option value="ssl">SSL/TLS</option>
+                    </select>
+                  </ng-container>
+                  <ng-template #secureView>
+                    <span class="field-value">{{ secureLabels[emailConfig.secure] || 'Nenhuma' }}</span>
+                  </ng-template>
+                </div>
+              </div>
+              <div class="field-row">
+                <label class="field-label" for="password">Senha</label>
+                <div class="field-control">
+                  <ng-container *ngIf="isEditing; else passwordView">
+                    <div class="password-input">
+                      <input
+                        id="password"
+                        [type]="showPassword ? 'text' : 'password'"
+                        name="password"
+                        [(ngModel)]="emailConfig.password"
+                        autocomplete="current-password"
+                      />
+                      <button
+                        type="button"
+                        class="visibility-toggle"
+                        (click)="togglePasswordVisibility()"
+                        [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+                      >
+                        <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                    <small class="helper">Para manter a senha atual, deixe em branco.</small>
+                  </ng-container>
+                  <ng-template #passwordView>
+                    <span class="field-value">
+                      <ng-container *ngIf="emailConfig.password; else noPassword">********</ng-container>
+                      <ng-template #noPassword>Não configurada</ng-template>
+                    </span>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-block">
+          <div class="section-lead">
+            <h3>E-mail de validação</h3>
+          </div>
+          <div class="form-section">
+            <div class="field-grid">
+              <div class="field-row">
+                <label class="field-label" for="testEmail">Destino</label>
+                <div class="field-control">
+                  <ng-container *ngIf="isEditing; else testEmailView">
+                    <input
+                      id="testEmail"
+                      type="email"
+                      name="testEmail"
+                      [(ngModel)]="emailConfig.testEmail"
+                      placeholder="teste@exemplo.com"
+                    />
+                  </ng-container>
+                  <ng-template #testEmailView>
+                    <span class="field-value">{{ emailConfig.testEmail || emailConfig.fromEmail || 'Não definido' }}</span>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p *ngIf="statusMessage" class="status" [class.success]="statusType === 'success'" [class.error]="statusType === 'error'">
+          {{ statusMessage }}
+        </p>
+      </form>
+    </div>
   </article>
 </section>
