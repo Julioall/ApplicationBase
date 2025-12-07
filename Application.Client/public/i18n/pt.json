@@ -348,6 +348,8 @@
     }
   },
   "adminUserDetail": {
+    "pageTitle": "Detalhes do usu\u00e1rio",
+    "pageSubtitle": "Revise permiss\u00f5es e informa\u00e7\u00f5es de conta deste usu\u00e1rio.",
     "breadcrumb": "Admin > Usu?rio",
     "fallbackName": "Usu?rio",
     "fallbackEmail": "Sem e-mail",
@@ -396,5 +398,14 @@
   },
   "admin": {
     "pageTitle": "Administração"
+  },
+  "navbar": {
+    "logo": "App",
+    "title": "Application",
+    "home": "Home",
+    "profile": "Perfil",
+    "admin": "Admin",
+    "theme": "Tema",
+    "logout": "Sair"
   }
 }

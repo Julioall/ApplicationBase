@@ -348,6 +348,8 @@
     }
   },
   "adminUserDetail": {
+    "pageTitle": "User details",
+    "pageSubtitle": "Review permissions and account info for this user.",
     "breadcrumb": "Admin > User",
     "fallbackName": "User",
     "fallbackEmail": "No email",
@@ -396,5 +398,14 @@
   },
   "admin": {
     "pageTitle": "Admin"
+  },
+  "navbar": {
+    "logo": "App",
+    "title": "Application",
+    "home": "Home",
+    "profile": "Profile",
+    "admin": "Admin",
+    "theme": "Theme",
+    "logout": "Sign out"
   }
 }

@@ -105,7 +105,7 @@ namespace Application.Api.Controllers
                 string.IsNullOrWhiteSpace(settings.Password) ||
                 settings.Port <= 0)
             {
-                return Problem(title: _localizer["InvalidRequestTitle"], detail: "Host, remetente, senha e porta são obrigatórios.", statusCode: StatusCodes.Status400BadRequest);
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["EmailSettingsFieldsRequired"], statusCode: StatusCodes.Status400BadRequest);
             }
 
             var saved = await _settingsService.SaveEmailAsync(settings);

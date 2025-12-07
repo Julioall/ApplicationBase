@@ -10,6 +10,33 @@
   color: var(--text-primary);
 }
 
+.page-lead {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-subtle);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-weight: var(--font-weight-semibold);
+}
+
+.back-link:hover {
+  color: var(--text-primary);
+}
+
+.title-block h1 {
+  margin: 0;
+}
+
 .detail-head {
   display: flex;
   justify-content: space-between;
@@ -72,8 +99,8 @@
 }
 
 .detail-grid {
-  display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: var(--space-4);
 }
 
@@ -259,12 +286,6 @@
   text-align: center;
   padding: var(--space-7);
   color: var(--text-subtle);
-}
-
-@include respond-down(lg) {
-  .detail-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @include respond-down(sm) {

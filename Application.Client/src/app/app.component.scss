@@ -402,8 +402,8 @@
 
 .topbar {
   display: grid;
-  grid-template-columns: auto auto 1fr auto;
-  grid-template-areas: "menu breadcrumbs search user";
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: "menu search user";
   align-items: center;
   gap: var(--space-3);
   justify-items: end;
@@ -411,14 +411,6 @@
 
 .menu-toggle {
   grid-area: menu;
-}
-
-.breadcrumbs {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  color: var(--text-subtle);
-  grid-area: breadcrumbs;
 }
 
 .search-bar {
@@ -513,10 +505,10 @@
   }
 
   .topbar {
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 1fr;
     grid-template-areas:
-      "menu breadcrumbs user"
-      "search search search";
+      "menu user"
+      "search search";
     gap: 10px;
   }
 
@@ -532,10 +524,6 @@
     flex-wrap: wrap;
     grid-area: user;
     gap: var(--space-2);
-  }
-
-  .breadcrumbs {
-    grid-area: breadcrumbs;
   }
 
   .menu-toggle {

@@ -1,13 +1,13 @@
 <header class="navbar-container">
   <div class="brand" (click)="navigateTo('/home')">
-    <span class="logo">App</span>
-    <span class="title">Application</span>
+    <span class="logo">{{ 'navbar.logo' | translate }}</span>
+    <span class="title">{{ 'navbar.title' | translate }}</span>
   </div>
   <nav class="navbar">
-    <a routerLink="/home">Home</a>
-    <a routerLink="/profile">Perfil</a>
-    <a *ngIf="canManageUsers" routerLink="/admin">Admin</a>
-    <button class="link" (click)="toggleTheme()">Tema</button>
-    <button class="link" (click)="logOut()">Sair</button>
+    <a routerLink="/home">{{ 'navbar.home' | translate }}</a>
+    <a routerLink="/profile">{{ 'navbar.profile' | translate }}</a>
+    <a *ngIf="canManageUsers" routerLink="/admin">{{ 'navbar.admin' | translate }}</a>
+    <button class="link" (click)="toggleTheme()">{{ 'navbar.theme' | translate }}</button>
+    <button class="link" (click)="logOut()">{{ 'navbar.logout' | translate }}</button>
   </nav>
 </header>

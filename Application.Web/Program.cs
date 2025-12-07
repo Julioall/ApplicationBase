@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Globalization;
 using System.Text;
+using Application.Domain.Localization;
 
 public class Program
 {
@@ -96,11 +97,11 @@ public class Program
             var signingKey = Environment.GetEnvironmentVariable(ApplicationConstants.JWT_SIGNING_KEY);
 
             if (string.IsNullOrEmpty(issuer))
-                throw new ArgumentNullException(nameof(issuer), "JWT issuer is not configured.");
+                throw new ArgumentNullException(nameof(issuer), SharedResourceProvider.GetString("JwtIssuerNotConfigured"));
             if (string.IsNullOrEmpty(audience))
-                throw new ArgumentNullException(nameof(audience), "JWT audience is not configured.");
+                throw new ArgumentNullException(nameof(audience), SharedResourceProvider.GetString("JwtAudienceNotConfigured"));
             if (string.IsNullOrEmpty(signingKey))
-                throw new ArgumentNullException(nameof(signingKey), "JWT signing key is not configured.");
+                throw new ArgumentNullException(nameof(signingKey), SharedResourceProvider.GetString("JwtSigningKeyNotConfigured"));
 
             options.TokenValidationParameters = new TokenValidationParameters
             {

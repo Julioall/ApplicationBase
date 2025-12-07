@@ -1,79 +1,20 @@
 <section class="user-detail" *ngIf="!loading && user; else loadingState">
-  <header class="detail-head">
-    <div class="identity">
-      <div class="avatar-dot">{{ (user.Profile?.Name || user.Account?.Email || '?') | slice:0:1 }}</div>
-      <div>
-        <p class="eyebrow">{{ 'adminUserDetail.breadcrumb' | translate }}</p>
-        <h2>{{ user.Profile?.Name || ('adminUserDetail.fallbackName' | translate) }}</h2>
-        <p class="muted">{{ user.Account?.Email || ('adminUserDetail.fallbackEmail' | translate) }}</p>
-      </div>
-    </div>
-    <div class="actions">
-      <button type="button" class="ghost" (click)="goBack()">
-        <i class="fa-solid fa-chevron-left"></i>
-        {{ 'adminUserDetail.actions.back' | translate }}
-      </button>
-      <button type="button" class="ghost" (click)="showResetPassword()">
-        <i class="fa-solid fa-key"></i>
-        {{ 'adminUserDetail.actions.resetPassword' | translate }}
-      </button>
+  <header class="page-lead">
+    <button type="button" class="back-link" (click)="goBack()">
+      <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+      <span>{{ 'adminUserDetail.actions.back' | translate }}</span>
+    </button>
+    <div class="title-block">
+      <h1>{{ 'adminUserDetail.pageTitle' | translate }}</h1>
+      <p class="subtitle">{{ 'adminUserDetail.pageSubtitle' | translate }}</p>
     </div>
   </header>
 
   <div class="detail-grid">
+    <div class="card-lead">
+      <h3>{{ 'adminUserDetail.summary.title' | translate }}</h3>
+    </div>
     <article class="card">
-      <header class="card-head">
-        <div>
-          <p class="eyebrow">{{ 'adminUserDetail.access.eyebrow' | translate }}</p>
-          <h3>{{ 'adminUserDetail.access.title' | translate }}</h3>
-          <p class="muted">{{ 'adminUserDetail.access.description' | translate }}</p>
-        </div>
-      </header>
-
-      <div class="permissions" *ngIf="getUserPermissions().length; else noPermissions">
-        <span class="permission" *ngFor="let permission of getUserPermissions()">
-          {{ permission }}
-          <button
-            type="button"
-            class="icon"
-            (click)="removePermission(permission)"
-            [attr.aria-label]="'adminUserDetail.access.removePermission' | translate"
-          >
-            &times;
-          </button>
-        </span>
-      </div>
-      <ng-template #noPermissions>
-        <p class="muted">{{ 'adminUserDetail.access.none' | translate }}</p>
-      </ng-template>
-
-      <div class="controls">
-        <label>
-          {{ 'adminUserDetail.access.newPermission' | translate }}
-          <select [(ngModel)]="selectedPermission">
-            <option value="">{{ 'adminUserDetail.access.select' | translate }}</option>
-            <option *ngFor="let permission of availablePermissions" [value]="permission">{{ permission }}</option>
-          </select>
-        </label>
-        <div class="actions">
-          <button type="button" class="secondary" (click)="resetToDefault()">
-            {{ 'adminUserDetail.access.restoreDefault' | translate }}
-          </button>
-          <button type="button" class="primary" (click)="addPermission()" [disabled]="!selectedPermission">
-            {{ 'adminUserDetail.access.add' | translate }}
-          </button>
-        </div>
-      </div>
-    </article>
-
-    <article class="card">
-      <header class="card-head">
-        <div>
-          <p class="eyebrow">{{ 'adminUserDetail.summary.eyebrow' | translate }}</p>
-          <h3>{{ 'adminUserDetail.summary.title' | translate }}</h3>
-          <p class="muted">{{ 'adminUserDetail.summary.description' | translate }}</p>
-        </div>
-      </header>
       <div class="summary-identity">
         <div class="summary-avatar" [class.has-image]="avatarUrl">
           <ng-container *ngIf="avatarUrl; else summaryInitials">
@@ -109,6 +50,47 @@
           <dd>{{ getUserPermissions().length }}</dd>
         </div>
       </dl>
+    </article>
+
+    <div class="card-lead">
+      <h3>{{ 'adminUserDetail.access.title' | translate }}</h3>
+    </div>
+    <article class="card">
+
+      <div class="permissions" *ngIf="getUserPermissions().length; else noPermissions">
+        <span class="permission" *ngFor="let permission of getUserPermissions()">
+          {{ permission }}
+          <button
+            type="button"
+            class="icon"
+            (click)="removePermission(permission)"
+            [attr.aria-label]="'adminUserDetail.access.removePermission' | translate"
+          >
+            &times;
+          </button>
+        </span>
+      </div>
+      <ng-template #noPermissions>
+        <p class="muted">{{ 'adminUserDetail.access.none' | translate }}</p>
+      </ng-template>
+
+      <div class="controls">
+        <label>
+          {{ 'adminUserDetail.access.newPermission' | translate }}
+          <select [(ngModel)]="selectedPermission">
+            <option value="">{{ 'adminUserDetail.access.select' | translate }}</option>
+            <option *ngFor="let permission of availablePermissions" [value]="permission">{{ permission }}</option>
+          </select>
+        </label>
+        <div class="actions">
+          <button type="button" class="secondary" (click)="resetToDefault()">
+            {{ 'adminUserDetail.access.restoreDefault' | translate }}
+          </button>
+          <button type="button" class="primary" (click)="addPermission()" [disabled]="!selectedPermission">
+            {{ 'adminUserDetail.access.add' | translate }}
+          </button>
+        </div>
+      </div>
     </article>
   </div>
 </section>

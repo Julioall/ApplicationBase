@@ -9,6 +9,7 @@ using Raven.Client.ServerWide.Operations;
 using System.Security.Cryptography.X509Certificates;
 using Application.Infrastructure.Indexes;
 using Raven.Client.Documents.Indexes;
+using Application.Domain.Localization;
 
 namespace Application.Infrastructure.ConfigurationDb
 {
@@ -19,7 +20,7 @@ namespace Application.Infrastructure.ConfigurationDb
             db ??= Environment.GetEnvironmentVariable(ApplicationConstants.DATABASE_NAME_KEY);
 
             var url = Environment.GetEnvironmentVariable(ApplicationConstants.DATABASE_URL_KEY)
-                ?? throw new Exception($"Environment variable [{ApplicationConstants.DATABASE_URL_KEY}] is not defined");
+                ?? throw new Exception(SharedResourceProvider.GetString("EnvVarNotDefined", ApplicationConstants.DATABASE_URL_KEY));
 
             var urls = url.Split(',').ToArray();
 
@@ -41,7 +42,7 @@ namespace Application.Infrastructure.ConfigurationDb
             var certificateSubject = Environment.GetEnvironmentVariable(ApplicationConstants.CERTIFICATE_SUBJECT_KEY);
             if (string.IsNullOrWhiteSpace(certificateSubject))
             {
-                Console.Error.WriteLine("RavenDB certificate subject not configured; proceeding without certificate.");
+                Console.Error.WriteLine(SharedResourceProvider.GetString("CertificateSubjectNotConfigured"));
                 return null;
             }
 
@@ -54,13 +55,13 @@ namespace Application.Infrastructure.ConfigurationDb
                     var certificate = certs.FirstOrDefault();
                     if (!certificate.HasPrivateKey)
                     {
-                        throw new Exception($"Certificate with subject '{certificateSubject}' does not have a private key.");
+                        throw new Exception(SharedResourceProvider.GetString("CertificateMissingPrivateKey", certificateSubject));
                     }
                     return certificate;
                 }
                 else
                 {
-                    throw new Exception($"Certificate with subject '{certificateSubject}' not found in the LocalMachine certificate store.");
+                    throw new Exception(SharedResourceProvider.GetString("CertificateNotFound", certificateSubject));
                 }
             }
         }
@@ -84,7 +85,7 @@ namespace Application.Infrastructure.ConfigurationDb
 
             if (string.IsNullOrWhiteSpace(dbName))
             {
-                throw new ArgumentException("Create database dont find definition to database name");
+                throw new ArgumentException(SharedResourceProvider.GetString("DatabaseNameMissing"));
             }
 
             try

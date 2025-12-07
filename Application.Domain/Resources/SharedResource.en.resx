@@ -1,5 +1,37 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
   </resheader>
@@ -12,29 +44,38 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DateOfBirthPast" xml:space="preserve">
-    <value>Date of birth must be in the past.</value>
+  <data name="CertificateMissingPrivateKey" xml:space="preserve">
+    <value>Certificate with subject '{0}' does not have a private key.</value>
   </data>
-  <data name="DateOfBirthTooOld" xml:space="preserve">
-    <value>Date of birth cannot be more than 120 years ago.</value>
+  <data name="CertificateNotFound" xml:space="preserve">
+    <value>Certificate with subject '{0}' not found in the LocalMachine certificate store.</value>
   </data>
-  <data name="EmailAlreadyExists" xml:space="preserve">
-    <value>This email already exists in our database.</value>
+  <data name="CertificateSubjectNotConfigured" xml:space="preserve">
+    <value>RavenDB certificate subject not configured; proceeding without certificate.</value>
   </data>
-  <data name="EmailInvalid" xml:space="preserve">
-    <value>Email must be valid.</value>
+  <data name="DatabaseNameMissing" xml:space="preserve">
+    <value>Database name is not defined.</value>
+  </data>
+  <data name="EmailNotConfigured" xml:space="preserve">
+    <value>Email service is not configured.</value>
   </data>
   <data name="EmailRequired" xml:space="preserve">
     <value>Email is required.</value>
   </data>
+  <data name="EmailSettingsFieldsRequired" xml:space="preserve">
+    <value>Host, sender, password, and port are required.</value>
+  </data>
+  <data name="EnvVarNotDefined" xml:space="preserve">
+    <value>Environment variable [{0}] is not defined.</value>
+  </data>
   <data name="InternalErrorDetail" xml:space="preserve">
-    <value>An unexpected error occurred.</value>
+    <value>Something went wrong. Please try again.</value>
   </data>
   <data name="InternalErrorTitle" xml:space="preserve">
     <value>Internal error</value>
   </data>
   <data name="InvalidLoginCredentials" xml:space="preserve">
-    <value>Invalid login credentials.</value>
+    <value>Invalid credentials.</value>
   </data>
   <data name="InvalidOperationTitle" xml:space="preserve">
     <value>Invalid operation</value>
@@ -45,44 +86,38 @@
   <data name="InvalidRequestTitle" xml:space="preserve">
     <value>Invalid request</value>
   </data>
+  <data name="JwtAudienceNotConfigured" xml:space="preserve">
+    <value>JWT audience is not configured.</value>
+  </data>
+  <data name="JwtIssuerNotConfigured" xml:space="preserve">
+    <value>JWT issuer is not configured.</value>
+  </data>
+  <data name="JwtSigningKeyNotConfigured" xml:space="preserve">
+    <value>JWT signing key is not configured.</value>
+  </data>
   <data name="LoginInformationMissing" xml:space="preserve">
-    <value>Login information is missing.</value>
-  </data>
-  <data name="NameMaxLength" xml:space="preserve">
-    <value>Name cannot have more than 100 characters.</value>
-  </data>
-  <data name="NameRequired" xml:space="preserve">
-    <value>Name is required.</value>
-  </data>
-  <data name="PasswordLowercase" xml:space="preserve">
-    <value>Password must contain at least one lowercase letter.</value>
-  </data>
-  <data name="PasswordMinLength" xml:space="preserve">
-    <value>Password must be at least 8 characters long.</value>
-  </data>
-  <data name="PasswordNumber" xml:space="preserve">
-    <value>Password must contain at least one number.</value>
+    <value>Please provide email and password.</value>
   </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>Password is required.</value>
   </data>
+  <data name="ProfilePictureContentTypeInvalid" xml:space="preserve">
+    <value>Invalid profile picture content type.</value>
+  </data>
+  <data name="ProfilePictureTooLarge" xml:space="preserve">
+    <value>Profile picture too large.</value>
+  </data>
+  <data name="RecoveryCodeInvalid" xml:space="preserve">
+    <value>Invalid recovery code.</value>
+  </data>
+  <data name="RecoveryCodeValidated" xml:space="preserve">
+    <value>Recovery code validated successfully.</value>
+  </data>
   <data name="ResetEmailSent" xml:space="preserve">
     <value>Password reset email sent.</value>
   </data>
-  <data name="PasswordSpecial" xml:space="preserve">
-    <value>Password must contain at least one special character (!@#$%^&amp;*()_+-=[]{};':"\|,.&lt;&gt;/?~`).</value>
-  </data>
-  <data name="PasswordUppercase" xml:space="preserve">
-    <value>Password must contain at least one uppercase letter.</value>
-  </data>
-  <data name="PermissionsInvalid" xml:space="preserve">
-    <value>Invalid permissions.</value>
-  </data>
-  <data name="PermissionsRequired" xml:space="preserve">
-    <value>At least one permission must be provided.</value>
-  </data>
   <data name="UnauthorizedDetail" xml:space="preserve">
-    <value>Invalid or missing credentials.</value>
+    <value>Unauthorized access.</value>
   </data>
   <data name="UnauthorizedTitle" xml:space="preserve">
     <value>Unauthorized</value>
@@ -97,47 +132,21 @@
     <value>User with email {0} not found.</value>
   </data>
   <data name="UserNotFoundById" xml:space="preserve">
-    <value>User with ID {0} not found.</value>
+    <value>User with id {0} not found.</value>
+  </data>
+  <data name="UserPasswordUpdatedSuccessfully" xml:space="preserve">
+    <value>Password updated successfully.</value>
+  </data>
+  <data name="UserProfileUpdatedSuccessfully" xml:space="preserve">
+    <value>Profile updated successfully.</value>
   </data>
   <data name="UserUpdatedSuccessfully" xml:space="preserve">
     <value>User updated successfully.</value>
   </data>
   <data name="ValidationDetail" xml:space="preserve">
-    <value>One or more fields are invalid.</value>
+    <value>Please review the data and try again.</value>
   </data>
   <data name="ValidationTitle" xml:space="preserve">
     <value>Validation error</value>
   </data>
-  <data name="RecoveryCodeMissing" xml:space="preserve">
-    <value>Generate a new recovery code before continuing.</value>
-  </data>
-  <data name="RecoveryCodeExpired" xml:space="preserve">
-    <value>The code has expired. Generate a new code to try again.</value>
-  </data>
-  <data name="RecoveryCodeTooManyAttempts" xml:space="preserve">
-    <value>Attempt limit reached. Generate a new code.</value>
-  </data>
-  <data name="RecoveryCodeInvalid" xml:space="preserve">
-    <value>Invalid code. Check and try again.</value>
-  </data>
-  <data name="RecoveryCodeCooldown" xml:space="preserve">
-    <value>Please wait before requesting a new recovery code.</value>
-  </data>
-  <data name="RecoveryCodeValidated" xml:space="preserve">
-    <value>Code validated successfully.</value>
-  </data>
-  <data name="EmailNotConfigured" xml:space="preserve">
-    <value>Email service is not configured. Please contact an administrator.</value>
-  </data>
-  <data name="UserPasswordUpdatedSuccessfully" xml:space="preserve">
-    <value>Password updated successfully.</value>
-  </data>
 </root>
-
-
-
-
-
-
-
-

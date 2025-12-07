@@ -26,8 +26,6 @@ export class AppComponent implements OnInit, OnDestroy {
   isNavOpen = false;
   isProfileMenuOpen = false;
   shouldShowDashboardShell = false;
-  breadcrumbLabelKey = 'home.dashboard';
-  breadcrumbIconClass = 'fa-solid fa-house';
   userAvatarUrl: string | null = null;
   private userInitialsValue = 'AB';
   sectionState: Record<'admin', boolean> = { admin: false };
@@ -45,11 +43,6 @@ export class AppComponent implements OnInit, OnDestroy {
     { icon: 'fa-solid fa-gears', label: 'home.adminNav.services', path: '/admin/services' },
     { icon: 'fa-solid fa-life-ring', label: 'home.adminNav.support', path: '/support' },
   ];
-  private readonly routeBreadcrumbMap: Record<string, { label: string; icon: string }> = {
-    home: { label: 'home.dashboard', icon: 'fa-solid fa-house' },
-    profile: { label: 'profile.pageTitle', icon: 'fa-regular fa-user' },
-    admin: { label: 'admin.pageTitle', icon: 'fa-solid fa-user-shield' },
-  };
   private routerSubscription?: Subscription;
   private hasLoadedUser = false;
   private isFetchingUser = false;
@@ -73,7 +66,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.themeService.setTheme(this.themeService.getActiveTheme());
     this.refreshAdminAccess();
     this.updateShellVisibility(this.router.url);
-    this.updateBreadcrumb(this.router.url);
     if (this.authService.isLoggedIn()) {
       this.ensureUserContext();
     } else {
@@ -83,7 +75,6 @@ export class AppComponent implements OnInit, OnDestroy {
       if (event instanceof NavigationEnd) {
         const currentUrl = event.urlAfterRedirects ?? event.url ?? '';
         this.updateShellVisibility(currentUrl);
-        this.updateBreadcrumb(currentUrl);
       }
     });
   }
@@ -178,46 +169,6 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     const [pathname] = url.split('?');
     return pathname || '';
-  }
-
-  private updateBreadcrumb(url: string): void {
-    const normalizedUrl = this.normalizeUrl(url);
-    const [firstSegment = 'home', secondSegment] = normalizedUrl.split('/').filter(Boolean);
-
-    if (firstSegment === 'admin') {
-      this.setPrimaryActive(normalizedUrl, true);
-      this.breadcrumbIconClass = 'fa-solid fa-user-shield';
-      if (secondSegment === 'users') {
-        this.breadcrumbLabelKey = 'home.breadcrumbs.adminUsers';
-        return;
-      }
-      this.breadcrumbLabelKey = 'admin.pageTitle';
-      return;
-    }
-
-    this.setPrimaryActive(normalizedUrl, false);
-    const routeMeta = this.routeBreadcrumbMap[firstSegment];
-    if (routeMeta) {
-      this.breadcrumbLabelKey = routeMeta.label;
-      this.breadcrumbIconClass = routeMeta.icon;
-      return;
-    }
-
-    this.breadcrumbLabelKey = 'home.dashboard';
-    this.breadcrumbIconClass = 'fa-solid fa-house';
-  }
-
-  private setPrimaryActive(normalizedUrl: string, isAdminRoute: boolean): void {
-    this.primaryNav.forEach((item) => (item.active = false));
-    if (isAdminRoute) {
-      return;
-    }
-    if (!normalizedUrl || normalizedUrl === '/' || normalizedUrl.startsWith('/home')) {
-      const first = this.primaryNav[0];
-      if (first) {
-        first.active = true;
-      }
-    }
   }
 
   private ensureUserContext(): void {

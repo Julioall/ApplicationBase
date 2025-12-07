@@ -64,11 +64,6 @@
         <button class="icon-btn ghost menu-toggle" type="button" [attr.aria-label]="'home.openMenu' | translate" (click)="toggleNav()">
           <i class="fa-solid" [ngClass]="isNavOpen ? 'fa-xmark' : 'fa-bars'"></i>
         </button>
-      <div class="breadcrumbs">
-        <i [class]="breadcrumbIconClass"></i>
-        <span>{{ breadcrumbLabelKey | translate }}</span>
-      </div>
-
         <div class="search-bar">
           <i class="fa-solid fa-magnifying-glass"></i>
           <input

@@ -248,11 +248,11 @@ namespace Application.Api.Controllers
                     {
                         if (!formRequest.ProfilePicture.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
                         {
-                            return Problem(title: _localizer["InvalidRequestTitle"], detail: "Invalid profile picture content type.", statusCode: StatusCodes.Status400BadRequest);
+                            return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["ProfilePictureContentTypeInvalid"], statusCode: StatusCodes.Status400BadRequest);
                         }
                         if (formRequest.ProfilePicture.Length > MaxAvatarBytes)
                         {
-                            return Problem(title: _localizer["InvalidRequestTitle"], detail: "Profile picture too large.", statusCode: StatusCodes.Status400BadRequest);
+                            return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["ProfilePictureTooLarge"], statusCode: StatusCodes.Status400BadRequest);
                         }
 
                         profilePictureStream = formRequest.ProfilePicture.OpenReadStream();
@@ -284,11 +284,11 @@ namespace Application.Api.Controllers
                     {
                         if (data.Length > MaxAvatarBytes)
                         {
-                            return Problem(title: _localizer["InvalidRequestTitle"], detail: "Profile picture too large.", statusCode: StatusCodes.Status400BadRequest);
+                            return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["ProfilePictureTooLarge"], statusCode: StatusCodes.Status400BadRequest);
                         }
                         if (!dtoContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
                         {
-                            return Problem(title: _localizer["InvalidRequestTitle"], detail: "Invalid profile picture content type.", statusCode: StatusCodes.Status400BadRequest);
+                            return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["ProfilePictureContentTypeInvalid"], statusCode: StatusCodes.Status400BadRequest);
                         }
                         profilePictureStream = new MemoryStream(data);
                         contentType = dtoContentType;

@@ -1,175 +1,150 @@
-# Application Base (Angular 18 + ASP.NET Core 8 + RavenDB)
+# Application Base
+Base monolítica pronta para produção com ASP.NET Core 8, Angular 18 e RavenDB. Inclui autenticação JWT com rotação de refresh tokens, autorização por permissões, gerenciamento completo de usuários, recuperação de senha, configuração de SMTP (com criptografia de segredo), i18n full-stack e tratamento unificado de erros via ProblemDetails.
 
-Base monolítica em camadas com autenticação JWT, CRUD de usuários, i18n (pt-BR/pt/en-US/en) e tratamento unificado de erros (ProblemDetails). Este README concentra toda a documentação: arquitetura, padrões, arquivos-chave, fluxos e guia para estender e operar o sistema.
+## Visão Geral
+- **Arquitetura:** Clean/Onion (Domain → Service → Infrastructure → Web/API → Client).
+- **Stack:** ASP.NET Core 8, Angular 18, RavenDB, FluentValidation, JWT Bearer, ngx-translate, ngx-spinner, FontAwesome, Bootstrap.
+- **Principais entregas:** CRUD de usuários, permissões granulares, perfil com avatar (anexo RavenDB), troca de senha e fluxo completo de recuperação, configurações de e-mail persistidas e criptografadas, interceptores de erros e loading, temas claro/escuro, i18n (pt/en) e ProblemDetails padronizado.
+
+## Funcionalidades
+- Autenticação JWT (2h) + refresh token rotativo (7d) com hash PBKDF2.
+- Cadastro/login, CRUD de usuários, consulta por permissão, e lista de permissões disponíveis.
+- Perfil: edição de dados, foto (upload multipart ou data URL), offsets/zoom do avatar, funções/cargo/departamento/organização/localização.
+- Segurança da conta: troca de senha, geração/validação/uso de código de recuperação (6 dígitos, TTL 10 min, cooldown 1 min, 5 tentativas).
+- Administração: painel Angular para usuários (lista, detalhes, gestão de permissões) e configuração de serviços (SMTP).
+- E-mail: envio de reset/recovery, teste de SMTP e persistência de credenciais criptografadas.
+- Observabilidade de erros: ProblemDetails com `traceId`, ModelState → ValidationProblemDetails, i18n backend/frontend.
+- UX: toasts centralizados, loading global, tema claro/escuro, shell dashboard com navegação protegida por permissões.
+
+## Arquitetura e Camadas (Backend)
+- **Domain (`Application.Domain`):**
+  - Modelos: `User` (Account+Profile), `ApplicationPermissions` (claim `permissions`, defaults user/admin), `ApplicationConstants` (env keys), `Configurations`/`EmailSettings`.
+  - DTOs: `LoginDto`, `CreateUserDto`, `ChangePasswordDto`, `RefreshRequestDto`, `TokenResponseDto`, `UpdateProfileDto`, `Generate/Validate/VerifyRecoveryCodeDto`, `SendResetEmailDto`, `PasswordInput`.
+  - Validações: `UserValidator` (e-mail, nome, data, permissões), `PasswordValidator` (força mínima).
+  - Exceções: `DomainException` + `Conflict/NotFound/Forbidden/Business/ConfigurationException`.
+  - i18n: `SharedResource` (.resx pt/en) e `SharedResourceProvider` para usos estáticos.
+
+- **Service (`Application.Service`):**
+  - `UserService`: valida domínio, normaliza permissões, hash de senha (PBKDF2), CRUD, perfil/arquivo de avatar (Raven attachment), troca de senha (revoga refresh), recuperação (gera código 6 dígitos, TTL 10 min, cooldown 1 min, 5 tentativas, envia e-mail opcional).
+  - `TokenService`: autentica, gera JWT com permissões, emite/rotaciona refresh tokens (id.secret + hash), expiração 2h/7d.
+  - `EmailService`: envio de reset e código de recuperação via SMTP, envio de teste; usa configurações persistidas ou default.
+  - `SettingsService`: persiste `Configurations.Email` no RavenDB; de/para criptografia de senha SMTP.
+  - Segurança: `SecureHash` (PBKDF2) e `SecretEncryptionService` (AES key derivada do env `APP_SECRET_ENCRYPTION_KEY`).
+  - DI: registrado em `DependencyInjectionModuleService` (IUserService, ITokenService, IEmailService, ISettingsService, ISecretEncryptionService).
+
+- **Infrastructure (`Application.Infrastructure`):**
+  - DocumentStore RavenDB: `DocumentStoreHolderAlternative` (URLs via `RAVENDBSETTINGS_URLS`, certificado por assunto em store, convenções, criação de DB, índices).
+  - Repositórios: `UserRepository` (CRUD, consultas, refresh token, permissões, profile picture como attachment), `SettingsRepository` (Configurations), `ServiceRavenDB` para sessão/async session.
+  - Índices: `User_ByEmail`.
+  - DI: `DependencyInjectionModuleInfra` registra `IDocumentStore`, `IServiceRavenDB`, repositórios e cria índices.
+
+- **Web/API (`Application.Web`):**
+  - Pipeline: localization (pt-BR default; pt/en-US/en) → `ProblemDetailsMiddleware` → `MiddlewareServiceRavenDbStore` (abre/salva/dispose sessão) → static files → CORS liberado → HTTPS → AuthZ → controllers → SPA fallback.
+  - Autenticação: JWT Bearer configurado com env (`JWT_ISSUER`, `JWT_AUDIENCE`, `JWT_SIGNING_KEY`). Policies por permissão (`ApplicationPermissions.All`).
+  - Middlewares/Filters: `ProblemDetailsMiddleware` (FluentValidation → 400 ValidationProblemDetails; DomainException → status específico; 401; 500; todos com traceId), `ValidationProblemDetailsFilter` (ModelState → 400 ValidationProblemDetails).
+  - Controllers:
+    - `AuthenticationController`: `POST /api/authentication/login`, `POST /api/authentication/refresh`.
+    - `UserController`: cadastro público, `GET /api/user/all|get/{id}|email/{email}|permission/{permission}|permissions`, `GET /api/user/me`, `PUT /api/user/update`, `PUT /api/user/{id}/permissions`, `PUT /api/user/profile` (multipart ou JSON/data URL), `PUT /api/user/change-password`, fluxo de recuperação `POST /api/user/recovery/code|validate|verify`, `DELETE /api/user/delete/{id}`.
+    - `EmailController`: `POST /api/email/reset` (envia e-mail se usuário existe), `GET/PUT /api/email/settings` (SMTP), `POST /api/email/test` (testa com override opcional).
+  - Swagger está comentado/desativado.
+
+## Camada Client (Angular 18 - `Application.Client`)
+- **Roteamento:** home (`/home`), perfil (`/profile`), admin (`/admin/*`), auth/login, registro, forgot/reset password. Guards: `AuthGuard` + `PermissionGuard` (JWT decode de claim `permissions`).
+- **Componentes/Páginas:**
+  - `AppComponent`: shell dashboard com side-nav, topbar, menu de perfil, toasts e spinner.
+  - Auth: `AuthComponent` (login), `RegisterComponent` (signup), `ForgotPasswordComponent` e `ResetPasswordComponent` (fluxo de código 6 dígitos e nova senha).
+  - Perfil: `ProfileComponent` (edição de dados, avatar com offset/zoom, troca de senha, geração/uso de código de recuperação, seleção de idioma e tema).
+  - Admin: `AdminUsersComponent` (lista/paginação), `AdminUserDetailComponent` (detalhe e gestão de permissões), `AdminServicesComponent` (SMTP com teste), `AdminEmailSettingsComponent` (card estático/teaser).
+  - Compartilhados: navbar, toast container, loading spinner.
+- **Serviços e interceptors:** `AuthService` (login/refresh/signup), `UserService` (CRUD/profile/permissões/recovery), `EmailSettingsService` (SMTP), `ProblemInterceptor` (ProblemDetails → toast), `LoadingInterceptor` (spinner global), `ThemeService` (tema persistido), `NotificationService` (toasts).
+- **i18n:** `ngx-translate` com `public/i18n/en.json` e `pt.json`; loader HTTP, fallback en, detecção de idioma do navegador.
+- **UI/estilo:** SCSS com variáveis em `src/styles/_variables.scss` + temas em `src/styles/_theme.scss`; FontAwesome; Bootstrap 5.
+- **Config:** `environment.ts` aponta `apiUrl: http://localhost:5095/api`; `proxy.conf.js` direciona `/api` para SPA proxy ASP.NET.
+
+## Fluxos & Endpoints
+- **Autenticação:** `POST /api/authentication/login` → { token, refreshToken, expiresAt }; `POST /api/authentication/refresh` (refresh rotativo). Claims incluem `permissions`.
+- **Usuários:** `POST /api/user/add` (público, cria com permissões default), `PUT /api/user/update`, `PUT /api/user/{id}/permissions`, `DELETE /api/user/delete/{id}`, `GET /api/user/all|get/{id}|email/{email}|permission/{permission}|permissions`, `GET /api/user/me`.
+- **Perfil/Senha:** `PUT /api/user/profile` (multipart ou JSON), `PUT /api/user/change-password`, recuperação `POST /api/user/recovery/code|validate|verify`.
+- **E-mail/SMTP:** `POST /api/email/reset` (silencioso para e-mail inexistente), `GET/PUT /api/email/settings`, `POST /api/email/test`.
+- **Permissões:** claim type `permissions`. Defaults: usuário (`view:home`, `view:profile`), admin adiciona `manage:users`. Policies geradas dinamicamente.
+
+## Banco de Dados (RavenDB)
+- Configuração via env: `RAVENDBSETTINGS_URLS` (vírgula separada), `RAVENDBSETTINGS_DATABASE_NAME`, `RAVENDBSETTINGS_CERTIFICATE_SUBJECT` (busca certificado no store do usuário atual, exige chave privada).
+- Conexão e criação de DB/índices em `DocumentStoreHolderAlternative`. Convens: `MaxNumberOfRequestsPerSession=30`, optimistic concurrency, `IdentityPartsSeparator='-'`.
+- Anexos: avatar salvo como attachment (`profile-picture`) com content-type preservado.
+- Índice: `User_ByEmail` para busca de e-mail com `WaitForNonStaleResults` nos cadastros.
+
+## Configuração e Variáveis de Ambiente
+- **JWT:** `JWT_ISSUER`, `JWT_AUDIENCE`, `JWT_SIGNING_KEY` (obrigatórios; API lança se ausentes).
+- **RavenDB:** `RAVENDBSETTINGS_URLS`, `RAVENDBSETTINGS_DATABASE_NAME`, `RAVENDBSETTINGS_CERTIFICATE_SUBJECT`.
+- **Segredos:** `APP_SECRET_ENCRYPTION_KEY` (obrigatório para criptografar senha SMTP).
+- **Front:** `Application.Client/src/app/environment/environment.ts` (`apiUrl`), `proxy.conf.js` (dev).
+- Logging/CORS/HTTPS estão em `Program.cs`; Swagger desativado por padrão.
+
+## Executar
+1. **Backend**
+   ```bash
+   dotnet restore Application.sln
+   dotnet build Application.sln
+   dotnet run --project Application.Web/Application.Api.csproj
+   ```
+   Configure as variáveis de ambiente acima antes de subir. Lançamento padrão: http://localhost:5095 e https://localhost:7240.
+
+2. **Frontend**
+   ```bash
+   cd Application.Client
+   npm install
+   npm start        # usa proxy/SSL do ASP.NET SPA
+   # ou build de produção
+   npm run build
+   ```
+
+3. **Testes**
+   ```bash
+   dotnet test Application.sln
+   # Angular (Karma)
+   cd Application.Client && npm test
+   ```
+   Os testes .NET usam RavenDB embarcado (`RavenTestDriver`) com cultura pt setada em `BaseTest`.
+
+## Estrutura de Diretórios
+```
+Application.Domain/               # Modelos, DTOs, validators, exceções, recursos i18n
+Application.Infrastructure/       # DocumentStore, repositórios RavenDB, índices, DI infra
+Application.Service/              # Serviços de domínio (User/Token/Email/Settings), segurança, DI service
+Application.Web/                  # ASP.NET Core API, controllers, middlewares, filters, configs
+Application.Client/               # Angular 18 SPA (src/app/...)
+  src/app/page/auth|home|profile|admin/... 
+  src/app/service/auth|user|email|http|loading|notification|theme
+  src/app/shared/...              # toast, navbar, etc.
+Application.Test/                 # Testes de controllers, services, validators, middlewares
+.github/                          # (pasta de workflows vazia)
+```
+
+## Como Estender
+1. **Domínio:** crie o modelo/DTOs/validator e adicione mensagens nos `.resx`. Se precisar de permissão nova, inclua em `ApplicationPermissions` (claim + policy automática).
+2. **Infra:** acrescente repositório/índices RavenDB e registre em `DependencyInjectionModuleInfra`.
+3. **Service:** implemente regras/casos de uso, valide com FluentValidation e exceções de domínio. Hash/cripte segredos via `SecureHash`/`SecretEncryptionService` quando aplicável.
+4. **API:** exponha via controller com ProblemDetails/i18n; use policies por permissão. Adicione mapping de DTOs e suporte a multipart se houver upload.
+5. **Client:** crie serviços Angular e páginas, proteja rotas com `AuthGuard`/`PermissionGuard`, internacionalize (`public/i18n/*.json`), use interceptors existentes.
+6. **Testes:** amplie `Application.Test` (serviço/controller/middleware) e, se front mudar, adicione specs no Angular.
+
+## Padrões e Práticas
+- Clean/Onion com dependências direcionadas ao domínio.
+- ProblemDetails (RFC 7807) para erros; traceId propagado.
+- FluentValidation para domínio; mensagens localizadas.
+- JWT + policies por permissão; refresh token rotativo com hash.
+- Segredos reversíveis (SMTP) criptografados por AES com chave de ambiente; senhas de usuário/refresh hash PBKDF2.
+- RavenDB com sessão por request via middleware; attachments para arquivos binários.
+- Front com interceptors de erro/loading, toasts centralizados, tema persistido, i18n, guards de rota.
+
+## Glossário
+- **ProblemDetails / ValidationProblemDetails:** respostas RFC 7807 com `traceId` para exceções e ModelState/FluentValidation.
+- **DomainException:** exceções de negócio com status code específico.
+- **ApplicationPermissions:** claim `permissions` usada em policies. Defaults: user (`view:home`, `view:profile`), admin (`manage:users`).
+- **Refresh Token Rotativo:** token composto `id.secret`; `id` armazenado em texto, `secret` em hash; rotacionado a cada refresh.
+- **Recovery Code:** código de 6 dígitos, TTL 10 min, cooldown 1 min, 5 tentativas; revoga quando expira ou excede tentativas.
+- **SecretEncryptionService:** AES CBC/PKCS7 com chave derivada de `APP_SECRET_ENCRYPTION_KEY` para armazenar senha SMTP de forma reversível.
 
 ---
-
-## 1. Visão Geral
-- **Propósito:** Boilerplate para apps web com autenticação, gestão de usuários e localização.
-- **Arquitetura:** Onion/Clean (Domain → Service → Infrastructure → Web/API → Client).
-- **Tecnologias:** ASP.NET Core 8, Angular 18, RavenDB, JWT, FluentValidation, ngx-translate, Bootstrap.
-- **Funcionalidades:** Login/refresh de tokens, CRUD de usuários, validação com mensagens localizadas, erros em RFC 7807.
-
-## 2. Mapa de Arquitetura (alto nível)
-- **Camadas:** Client (Angular) → Web/API (Controllers, Middlewares, Filters) → Service (casos de uso) → Infrastructure (Repositórios Raven) → Domain (modelos/validações/exceções/resources).
-- **Fluxos:** SPA chama `/api/authentication/*` e `/api/user/*`; API valida JWT/cultura; Services consultam repositórios; middleware salva sessão Raven e formata erros.
-
-## 3. Camadas e Arquivos-Chave
-### 3.1 Web/API (`Application.Web`)
-- `Program.cs`: pipeline (RequestLocalization pt-BR default; pt/en-US/en) → `ProblemDetailsMiddleware` → `MiddlewareServiceRavenDbStore` → static/CORS/HTTPS/Auth → `MapControllers` → SPA fallback.
-- Controllers: `AuthenticationController` (400/401/200 login/refresh), `UserController` (400/404/201/200/204 CRUD) com mensagens via `IStringLocalizer<SharedResource>`.
-- Middlewares: `ProblemDetailsMiddleware.cs` (exceções → ProblemDetails i18n + traceId), `MiddlewareServiceRavenDbStore.cs` (abre sessão Raven e salva ao fim).
-- Filtro: `ValidationProblemDetailsFilter.cs` (ModelState inválido → 400 ValidationProblemDetails i18n + traceId).
-
-### 3.2 Service (`Application.Service`)
-- `UserService.cs`: valida `User` (UserValidator), checa e-mail duplicado (ConflictException), define `DateJoined`, salva/atualiza via repo.
-- `TokenService.cs`: autentica via `IUserService`, gera JWT (claims Name/Role, expira 2h) e refresh (GUID Base64, expira 7 dias), atualiza usuário.
-- Interfaces: `IUserService`, `ITokenService` para DI/testes.
-
-### 3.3 Domain (`Application.Domain`)
-- Modelos/DTOs: `User`, `UserAccount`, `UserProfile`, `LoginDto`, `RefreshRequestDto`, `TokenResponseDto`, `ApplicationConstants` (env JWT/Raven).
-- Validação: `Validator/UserValidator.cs` (e-mail obrigatório/válido/único; senha forte; nome; datas; roles permitidas). Mensagens em `Resources/SharedResource.resx/.en.resx` via `SharedResource`.
-- Exceções: `DomainException` base + `ConflictException`, `NotFoundException`, `ForbiddenException`, `BusinessException`.
-
-### 3.4 Infrastructure (`Application.Infrastructure`)
-- `Repository/UserRepository.cs`: Add/Update/Delete/GetById/GetByEmail/GetByRole/GetByRefreshToken/GetAll usando `IServiceRavenDB` (Session/AsyncSession/Store).
-- `ConfigurationDb/DocumentStoreHolderAlternative.cs`: cria `DocumentStore` a partir de env vars.
-
-### 3.5 Client (`Application.Client`)
-- Angular SPA com i18n (pt/en), interceptors (`problem.interceptor`, `loading.interceptor`), páginas Auth/Register/Home; consumo de `/api/authentication/*` e `/api/user/*`.
-
-### 3.6 Tests (`Application.Test`)
-- Controllers: `AuthenticationControllerTests`, `UserControllerTests`.
-- Services: `UserServiceTests` (Raven embutido).
-- Validators: `UserValidatorTests`.
-- Middlewares: `ProblemDetailsMiddlewareTests`.
-- Setup: `Setup/BaseTest.cs` (Raven embutido, DI, cultura pt).
-
-## 4. Padrões de Projeto (implementação)
-- **Onion/Clean:** Dependências apontam para o domínio; controllers → services → interfaces de repo; infra implementa as interfaces.
-- **Repository:** `IUserRepository` abstrai Raven; `UserRepository` implementa; services ignoram o DB.
-- **DI:** Registros em `DependencyInjectionModule*.cs`/`Program.cs`; injeção por construtor; facilita fakes/mocks em testes.
-- **ProblemDetails (RFC 7807):** Middleware + filtro geram `application/problem+json` padronizado, com i18n e `traceId`.
-- **Validação:** FluentValidation (`UserValidator`) + ModelState; mensagens em resx.
-- **i18n:** `SharedResource` + resx pt/en; `Program.cs` configura culturas; controllers/validators/middlewares usam localizer; SPA também usa i18n.
-- **JWT:** Config em `Program.cs`; geração em `TokenService`; uso de `[Authorize]` e `Roles`.
-- **SOLID:** SRP (responsabilidades separadas), OCP/DIP (interfaces + DI), ISP (interfaces coesas), LSP (exceções de domínio tratadas uniformemente).
-
-## 5. Fluxos Importantes
-- Autenticação: `POST /api/authentication/login` (200 tokens | 400 se payload nulo | 401 se credencial inválida); `POST /api/authentication/refresh` (200 novo par | 401 inválido/expirado).
-- Usuários: `POST /api/user/add` (201 sucesso | 400 payload | 409 e-mail duplicado via ConflictException → ProblemDetails); `PUT /api/user/update` (400 id vazio | 404 se não existe | 200 sucesso); `GET /api/user/get/{id}`, `GET /api/user/email/{email}`, `GET /api/user/role/{role}`, `GET /api/user/all` (200 ou 404); `DELETE /api/user/delete/{id}` (204 ou 404).
-- Erros: ModelState inválido → 400 ValidationProblemDetails (filtro); exceções → ProblemDetails (middleware) com status apropriado e i18n; inclui `traceId`.
-- Localização: `RequestLocalization` aplica cultura do `Accept-Language` (default pt-BR) e propaga nos headers/respostas.
-
-## 6. Banco de Dados (RavenDB)
-- Documento `User`:  
-  - `Account`: Email (único em regra), Password, Role, DateJoined?, LastLogin?, RefreshToken?, RefreshTokenExpiry?  
-  - `Profile`: Name, DateOfBirth?
-- Consultas: por email/role/refreshToken/id via `AsyncSession.Query<T>()`.
-- Persistência: `MiddlewareServiceRavenDbStore` mantém sessão por request e chama `SaveChangesAsync`.
-
-## 7. Configuração e Dependências
-- Env obrigatórias:  
-  - JWT: `JWT_AUDIENCE`, `JWT_ISSUER`, `JWT_SIGNING_KEY`  
-  - RavenDB: `RAVENDBSETTINGS_DATABASE_NAME`, `RAVENDBSETTINGS_URLS`, `RAVENDBSETTINGS_CERTIFICATE_SUBJECT`
-- Config internas: Resources i18n; culturas pt-BR/pt/en-US/en; CORS permissivo; HTTPS redirection; SPA fallback; RequestLocalization antes dos middlewares.
-
-## 8. Execução, Build e Testes
-- Backend: `dotnet restore Application.sln && dotnet build Application.sln && dotnet run --project Application.Web/Application.Api.csproj`
-- Frontend: `cd Application.Client && npm install && npm start` (dev); build `npm run build`
-- Testes: `dotnet test Application.sln`
-
-## 9. Rotas Principais
-- Auth: `POST /api/authentication/login`, `POST /api/authentication/refresh`
-- Usuários: `POST /api/user/add`, `PUT /api/user/update`, `DELETE /api/user/delete/{id}`,
-  `GET /api/user/get/{id}`, `GET /api/user/email/{email}`, `GET /api/user/role/{role}`, `GET /api/user/all`
-
-## 10. Como Estender (exemplo Product)
-1) Domain: `Product.cs`, `ProductValidator.cs`, mensagens em resx, `IProductRepository`.  
-2) Infrastructure: `ProductRepository` (Raven).  
-3) Service: `ProductService` com regras; registre em `DependencyInjectionModuleService`.  
-4) Web: `ProductController` com rotas/status/mensagens via localizer; use ProblemDetails.  
-5) Tests: validator + service (Raven embutido) + controller (fakes).  
-6) Client: traduções em `public/i18n`, serviços/componentes Angular se aplicável.
-
-## 11. Dicas de Desenvolvimento (fluxo sugerido)
-1. Comece no domínio: modelos, resx, validador.  
-2. Implemente caso de uso no service; lance exceções de domínio.  
-3. Ajuste repositório/queries na infra se precisar.  
-4. Exponha via controller com status/mensagens; deixe middleware/filtro tratarem erros.  
-5. Crie testes (validator/service/controller/middleware).  
-6. Atualize i18n no back e no front.  
-7. Rode `dotnet test` e, se front alterado, `npm test` (se configurado).
-
-## 12. Glossário
-- **ProblemDetails:** Erro padronizado RFC 7807 (`application/problem+json`).  
-- **ValidationProblemDetails:** Variante com erros de campo ModelState.  
-- **DomainException:** Exceção base de negócio com status específico.  
-- **Localizer (`IStringLocalizer<SharedResource>`):** Resolve textos i18n (pt/en).  
-- **RefreshToken:** Token de renovação com expiração armazenado no usuário.  
-- **SharedResource.resx/.en.resx:** Recursos de mensagens de validação/erro/sucesso.  
-- **MiddlewareServiceRavenDbStore:** Garante sessão/SaveChanges Raven por request.  
-- **UserValidator:** Regras de e-mail, senha, nome, datas e role.  
-- **ApplicationConstants:** Lê env vars JWT/Raven.
-
----
-
-# Tipos de Commit
-
-## feat
-Nova funcionalidade.
-Exemplo:
-`feat(api): adicionar endpoint de autenticação`
-
-## fix
-Correção de bug.
-Exemplo:
-`fix(domain): corrigir cálculo de validação`
-
-## docs
-Alterações na documentação.
-Exemplo:
-`docs: atualizar guia de instalação`
-
-## style
-Mudanças que não afetam lógica (espaços, formatação, lint).
-Exemplo:
-`style: aplicar padrão de formatação no projeto`
-
-## refactor
-Refatoração sem mudar comportamento.
-Exemplo:
-`refactor(service): simplificar método de processamento`
-
-## perf
-Melhorias de performance.
-Exemplo:
-`perf(api): reduzir tempo de resposta`
-
-## test
-Adição ou atualização de testes.
-Exemplo:
-`test(app): incluir testes de integração`
-
-## build
-Mudanças em build, dependências ou ferramentas.
-Exemplo:
-`build: atualizar dependências do Angular`
-
-## ci
-Alterações em pipelines de CI/CD.
-Exemplo:
-`ci: ajustar workflow do GitHub Actions`
-
-## chore
-Tarefas internas sem alteração funcional.
-Exemplo:
-`chore: ajustar scripts de automação`
-
-## revert
-Reversão de commit anterior.
-Exemplo:
-`revert: desfazer commit da feature de login`
-
-
-MIT — contribuições são bem-vindas!﻿
+MIT — contribuições são bem-vindas.
