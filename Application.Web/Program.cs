@@ -1,9 +1,6 @@
-using System;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
-using Application.Api;
 using Application.Api.Filters;
 using Application.Api.Health;
 using Application.Api.Middlewares;
@@ -16,10 +13,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Application.Api.RateLimiting;
 
 public class Program
 {
@@ -28,6 +25,9 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+        builder.Services.AddMemoryCache();
+        builder.Services.Configure<RateLimitSettings>(builder.Configuration.GetSection("RateLimiting"));
+        builder.Services.AddSingleton<IRateLimiter, MemoryRateLimiter>();
 
         // Service configuration
         builder.Services.AddScoped<ValidationProblemDetailsFilter>();

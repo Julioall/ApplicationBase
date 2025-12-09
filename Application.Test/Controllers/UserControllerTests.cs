@@ -1,4 +1,5 @@
 using Application.Api.Controllers;
+using Application.Api.RateLimiting;
 using Application.Domain;
 using Application.Domain.Exceptions;
 using Application.Domain.Model.Dtos;
@@ -7,8 +8,7 @@ using Application.Service.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.Extensions.Options;
 
 namespace Application.Tests.Controllers
 {
@@ -20,6 +20,24 @@ namespace Application.Tests.Controllers
             public LocalizedString this[string name, params object[] arguments] => new(name, string.Format(name, arguments));
             public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures) => Array.Empty<LocalizedString>();
             public IStringLocalizer WithCulture(System.Globalization.CultureInfo culture) => this;
+        }
+
+        private sealed class FakeRateLimiter : IRateLimiter
+        {
+            public Func<string, int, TimeSpan, (bool Allowed, TimeSpan? RetryAfter)>? ConsumeFunc { get; set; }
+
+            public bool TryConsume(string key, int limit, TimeSpan window, out TimeSpan? retryAfter)
+            {
+                if (ConsumeFunc != null)
+                {
+                    var (allowed, retry) = ConsumeFunc(key, limit, window);
+                    retryAfter = retry;
+                    return allowed;
+                }
+
+                retryAfter = null;
+                return true;
+            }
         }
 
         private sealed class FakeUserService : IUserService
@@ -85,10 +103,30 @@ namespace Application.Tests.Controllers
             };
         }
 
+        private static UserController CreateController(
+            FakeUserService? service = null,
+            FakeRateLimiter? rateLimiter = null,
+            RateLimitSettings? rateLimitSettings = null,
+            IStringLocalizer<SharedResource>? localizer = null)
+        {
+            service ??= new FakeUserService();
+            rateLimiter ??= new FakeRateLimiter();
+            rateLimitSettings ??= new RateLimitSettings();
+            localizer ??= new FakeLocalizer();
+            var controller = new UserController(service, localizer, rateLimiter, Options.Create(rateLimitSettings))
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = new DefaultHttpContext()
+                }
+            };
+            return controller;
+        }
+
         [Fact]
         public async Task AddUser_Should_Return_BadRequest_When_Body_Is_Null()
         {
-            var controller = new UserController(new FakeUserService(), new FakeLocalizer());
+            var controller = CreateController();
 
             var result = await controller.AddUser(null!) as ObjectResult;
 
@@ -102,7 +140,7 @@ namespace Application.Tests.Controllers
         [Fact]
         public async Task AddUser_Should_Return_BadRequest_When_Password_Missing()
         {
-            var controller = new UserController(new FakeUserService(), new FakeLocalizer());
+            var controller = CreateController();
             var dto = CreateUserRequest(password: "");
 
             var result = await controller.AddUser(dto) as ObjectResult;
@@ -125,7 +163,7 @@ namespace Application.Tests.Controllers
                     return Task.CompletedTask;
                 }
             };
-            var controller = new UserController(service, new FakeLocalizer());
+            var controller = CreateController(service);
             var dto = CreateUserRequest();
 
             var result = await controller.AddUser(dto) as CreatedAtActionResult;
@@ -137,13 +175,34 @@ namespace Application.Tests.Controllers
         }
 
         [Fact]
+        public async Task AddUser_Should_Return_TooManyRequests_When_Rate_Limit_Reached()
+        {
+            var limiter = new FakeRateLimiter
+            {
+                ConsumeFunc = (_, _, _) => (false, TimeSpan.FromSeconds(30))
+            };
+
+            var controller = CreateController(rateLimiter: limiter);
+            var dto = CreateUserRequest();
+
+            var result = await controller.AddUser(dto) as ObjectResult;
+
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status429TooManyRequests, result!.StatusCode);
+            var problem = Assert.IsType<ProblemDetails>(result.Value);
+            Assert.Equal("RateLimitExceededTitle", problem.Title);
+            Assert.Equal("RateLimitExceededDetail", problem.Detail);
+            Assert.Equal("30", controller.Response.Headers["Retry-After"]);
+        }
+
+        [Fact]
         public async Task DeleteUser_Should_Throw_NotFound_When_Missing()
         {
             var service = new FakeUserService
             {
                 GetByIdFunc = _ => Task.FromResult<User?>(null)
             };
-            var controller = new UserController(service, new FakeLocalizer());
+            var controller = CreateController(service);
 
             await Assert.ThrowsAsync<NotFoundException>(() => controller.DeleteUser("999"));
         }
@@ -158,7 +217,7 @@ namespace Application.Tests.Controllers
                 GetByIdFunc = _ => Task.FromResult<User?>(CreateUser("2")),
                 DeleteFunc = _ => { deleted = true; return Task.CompletedTask; }
             };
-            var controller = new UserController(service, new FakeLocalizer());
+            var controller = CreateController(service);
 
             var result = await controller.DeleteUser("2") as NoContentResult;
 
@@ -174,7 +233,7 @@ namespace Application.Tests.Controllers
             {
                 GetAllFunc = () => Task.FromResult<IEnumerable<User>>(new[] { CreateUser("a"), CreateUser("b") })
             };
-            var controller = new UserController(service, new FakeLocalizer());
+            var controller = CreateController(service);
 
             var actionResult = await controller.GetAllUsers();
             var ok = Assert.IsType<OkObjectResult>(actionResult.Result);
@@ -189,7 +248,7 @@ namespace Application.Tests.Controllers
             {
                 GetByIdFunc = _ => Task.FromResult<User?>(CreateUser("5"))
             };
-            var controller = new UserController(service, new FakeLocalizer());
+            var controller = CreateController(service);
 
             var actionResult = await controller.GetUserById("5");
             var ok = Assert.IsType<OkObjectResult>(actionResult.Result);
@@ -204,7 +263,7 @@ namespace Application.Tests.Controllers
             {
                 GetByIdFunc = _ => Task.FromResult<User?>(null)
             };
-            var controller = new UserController(service, new FakeLocalizer());
+            var controller = CreateController(service);
 
             await Assert.ThrowsAsync<NotFoundException>(() => controller.GetUserById("missing"));
         }
@@ -221,7 +280,7 @@ namespace Application.Tests.Controllers
                     return Task.FromResult<User?>(CreateUser("email-id"));
                 }
             };
-            var controller = new UserController(service, new FakeLocalizer());
+            var controller = CreateController(service);
 
             var actionResult = await controller.GetUserByEmail("mail@test.com");
             var ok = Assert.IsType<OkObjectResult>(actionResult.Result);
@@ -242,7 +301,7 @@ namespace Application.Tests.Controllers
                     return Task.FromResult<User?>(null);
                 }
             };
-            var controller = new UserController(service, new FakeLocalizer());
+            var controller = CreateController(service);
 
             await Assert.ThrowsAsync<NotFoundException>(() => controller.GetUserByEmail("none@test.com"));
             Assert.Equal("none@test.com", receivedEmail);
@@ -259,7 +318,7 @@ namespace Application.Tests.Controllers
             {
                 GetByPermissionFunc = _ => Task.FromResult<IEnumerable<User>>(new[] { user, second })
             };
-            var controller = new UserController(service, new FakeLocalizer());
+            var controller = CreateController(service);
 
             var actionResult = await controller.GetUsersByPermission("manage:users");
             var ok = Assert.IsType<OkObjectResult>(actionResult.Result);
@@ -275,7 +334,7 @@ namespace Application.Tests.Controllers
             {
                 GetByPermissionFunc = _ => Task.FromResult<IEnumerable<User>>(Array.Empty<User>())
             };
-            var controller = new UserController(service, new FakeLocalizer());
+            var controller = CreateController(service);
 
             var actionResult = await controller.GetUsersByPermission("Missing");
             var ok = Assert.IsType<OkObjectResult>(actionResult.Result);
@@ -286,7 +345,7 @@ namespace Application.Tests.Controllers
         [Fact]
         public async Task UpdateUser_Should_Return_BadRequest_When_User_Null()
         {
-            var controller = new UserController(new FakeUserService(), new FakeLocalizer());
+            var controller = CreateController();
 
             var result = await controller.UpdateUser(null) as ObjectResult;
 
@@ -300,7 +359,7 @@ namespace Application.Tests.Controllers
         [Fact]
         public async Task UpdateUser_Should_Return_BadRequest_When_Id_Empty()
         {
-            var controller = new UserController(new FakeUserService(), new FakeLocalizer());
+            var controller = CreateController();
             var user = CreateUser(string.Empty);
 
             var result = await controller.UpdateUser(user) as ObjectResult;
@@ -315,7 +374,7 @@ namespace Application.Tests.Controllers
         [Fact]
         public async Task UpdateUser_Should_Return_BadRequest_When_Body_Is_Null()
         {
-            var controller = new UserController(new FakeUserService(), new FakeLocalizer());
+            var controller = CreateController();
 
             var result = await controller.UpdateUser(null!) as ObjectResult;
 
@@ -333,7 +392,7 @@ namespace Application.Tests.Controllers
             {
                 GetByIdFunc = _ => Task.FromResult<User?>(null)
             };
-            var controller = new UserController(service, new FakeLocalizer());
+            var controller = CreateController(service);
             var user = CreateUser("missing");
 
             await Assert.ThrowsAsync<NotFoundException>(() => controller.UpdateUser(user));
@@ -349,7 +408,7 @@ namespace Application.Tests.Controllers
                 GetByIdFunc = _ => Task.FromResult<User?>(CreateUser("7")),
                 UpdateFunc = _ => { updated = true; return Task.CompletedTask; }
             };
-            var controller = new UserController(service, new FakeLocalizer());
+            var controller = CreateController(service);
             var user = CreateUser("7");
 
             var result = await controller.UpdateUser(user) as OkObjectResult;

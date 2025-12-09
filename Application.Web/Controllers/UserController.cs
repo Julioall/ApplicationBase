@@ -1,4 +1,5 @@
 using Application.Api.Models.User;
+using Application.Api.RateLimiting;
 using Application.Domain;
 using Application.Domain.Exceptions;
 using Application.Domain.Model;
@@ -8,12 +9,10 @@ using Application.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 
 namespace Application.Api.Controllers
@@ -25,11 +24,19 @@ namespace Application.Api.Controllers
         private const int MaxAvatarBytes = 2 * 1024 * 1024; // 2 MB
         private readonly IUserService _userService;
         private readonly IStringLocalizer<SharedResource> _localizer;
+        private readonly IRateLimiter _rateLimiter;
+        private readonly RateLimitSettings _rateLimitSettings;
 
-        public UserController(IUserService userService, IStringLocalizer<SharedResource> localizer)
+        public UserController(
+            IUserService userService,
+            IStringLocalizer<SharedResource> localizer,
+            IRateLimiter rateLimiter,
+            IOptions<RateLimitSettings> rateLimitSettings)
         {
             _userService = userService;
             _localizer = localizer;
+            _rateLimiter = rateLimiter;
+            _rateLimitSettings = rateLimitSettings.Value;
         }
 
         [AllowAnonymous]
@@ -43,14 +50,32 @@ namespace Application.Api.Controllers
                 return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["UserCannotBeNullDetail"], statusCode: StatusCodes.Status400BadRequest);
             }
 
-            if (string.IsNullOrWhiteSpace(request.Account?.Password))
+            if (request.Account == null || request.Profile == null)
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["UserCannotBeNullDetail"], statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            if (string.IsNullOrWhiteSpace(request.Account.Password))
             {
                 return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["PasswordRequired"], statusCode: StatusCodes.Status400BadRequest);
             }
 
+            var account = request.Account;
+            var rateLimitResult = EnforceRateLimit(
+                "register",
+                account.Email,
+                _rateLimitSettings.RegistrationPerIpLimit,
+                _rateLimitSettings.RegistrationWindow,
+                _rateLimitSettings.RegistrationPerEmailLimit,
+                _rateLimitSettings.RegistrationWindow);
+            if (rateLimitResult != null)
+            {
+                return rateLimitResult;
+            }
+
             var user = MapToUser(request);
 
-            await _userService.AddAsync(user, request.Account.Password);
+            await _userService.AddAsync(user, account.Password);
             return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, new { message = _localizer["UserAddedSuccessfully"] });
         }
 
@@ -159,15 +184,16 @@ namespace Application.Api.Controllers
                 return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["UserCannotBeNullDetail"], statusCode: StatusCodes.Status400BadRequest);
             }
 
-            if (user.Id.IsNullOrEmpty())
+            var userId = user.Id;
+            if (string.IsNullOrWhiteSpace(userId))
             {
                 return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["UserCannotBeNullDetail"], statusCode: StatusCodes.Status400BadRequest);
             }
 
-            var existingUser = await _userService.GetByIdAsync(user.Id);
+            var existingUser = await _userService.GetByIdAsync(userId);
             if (existingUser == null)
             {
-                throw new NotFoundException(_localizer["UserNotFoundById", user.Id]);
+                throw new NotFoundException(_localizer["UserNotFoundById", userId]);
             }
 
             await _userService.UpdateAsync(user);
@@ -354,6 +380,18 @@ namespace Application.Api.Controllers
                 return Problem(title: _localizer["UnauthorizedTitle"], detail: _localizer["UnauthorizedDetail"], statusCode: StatusCodes.Status401Unauthorized);
             }
 
+            var rateLimitResult = EnforceRateLimit(
+                "recovery-generate",
+                email,
+                _rateLimitSettings.RecoveryGeneratePerIpLimit,
+                _rateLimitSettings.RecoveryGenerateWindow,
+                _rateLimitSettings.RecoveryGeneratePerEmailLimit,
+                _rateLimitSettings.RecoveryGenerateWindow);
+            if (rateLimitResult != null)
+            {
+                return rateLimitResult;
+            }
+
             var sendEmail = request?.SendEmail ?? true;
             try
             {
@@ -426,18 +464,83 @@ namespace Application.Api.Controllers
                 return Problem(title: _localizer["UnauthorizedTitle"], detail: _localizer["UnauthorizedDetail"], statusCode: StatusCodes.Status401Unauthorized);
             }
 
+            var rateLimitResult = EnforceRateLimit(
+                "recovery-verify",
+                email,
+                _rateLimitSettings.RecoveryVerifyPerIpLimit,
+                _rateLimitSettings.RecoveryVerifyWindow,
+                _rateLimitSettings.RecoveryVerifyPerEmailLimit,
+                _rateLimitSettings.RecoveryVerifyWindow);
+            if (rateLimitResult != null)
+            {
+                return rateLimitResult;
+            }
+
             await _userService.ChangePasswordWithRecoveryCodeAsync(email, request.Code, request.NewPassword);
             return Ok(new { message = _localizer["UserPasswordUpdatedSuccessfully"] });
         }
 
+        private ActionResult? EnforceRateLimit(string scenarioKey, string? email, int perIpLimit, TimeSpan ipWindow, int perEmailLimit, TimeSpan emailWindow)
+        {
+            var normalizedEmail = string.IsNullOrWhiteSpace(email) ? null : email.Trim().ToLowerInvariant();
+            var clientIp = GetClientIp();
+
+            if (!string.IsNullOrWhiteSpace(clientIp) && perIpLimit > 0)
+            {
+                if (!_rateLimiter.TryConsume($"{scenarioKey}:ip:{clientIp}", perIpLimit, ipWindow, out var retryAfter))
+                {
+                    return BuildRateLimitResponse(retryAfter);
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(normalizedEmail) && perEmailLimit > 0)
+            {
+                if (!_rateLimiter.TryConsume($"{scenarioKey}:email:{normalizedEmail}", perEmailLimit, emailWindow, out var retryAfter))
+                {
+                    return BuildRateLimitResponse(retryAfter);
+                }
+            }
+
+            return null;
+
+            ActionResult BuildRateLimitResponse(TimeSpan? retryAfter)
+            {
+                if (retryAfter.HasValue)
+                {
+                    Response.Headers["Retry-After"] = Math.Ceiling(retryAfter.Value.TotalSeconds).ToString(CultureInfo.InvariantCulture);
+                }
+
+                var detail = retryAfter.HasValue
+                    ? _localizer["RateLimitExceededDetail", Math.Ceiling(retryAfter.Value.TotalSeconds)]
+                    : _localizer["RateLimitExceededGeneric"];
+
+                return Problem(title: _localizer["RateLimitExceededTitle"], detail: detail, statusCode: StatusCodes.Status429TooManyRequests);
+            }
+        }
+
+        private string? GetClientIp()
+        {
+            if (Request.Headers.TryGetValue("X-Forwarded-For", out var forwardedFor))
+            {
+                var first = forwardedFor.ToString().Split(',', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+                if (!string.IsNullOrWhiteSpace(first))
+                {
+                    return first.Trim();
+                }
+            }
+
+            return HttpContext.Connection.RemoteIpAddress?.ToString();
+        }
+
         private async Task PopulateProfilePictureAsync(User user)
         {
-            if (user?.Id.IsNullOrEmpty() ?? true)
+            if (string.IsNullOrWhiteSpace(user?.Id))
             {
                 return;
             }
 
-            var attachment = await _userService.GetProfilePictureAsync(user.Id);
+            var userId = user.Id!;
+            var attachment = await _userService.GetProfilePictureAsync(userId);
             if (attachment?.Data != null && attachment.Value.Data.Length > 0)
             {
                 var contentType = string.IsNullOrWhiteSpace(attachment.Value.ContentType) ? "image/png" : attachment.Value.ContentType;

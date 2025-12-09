@@ -158,4 +158,16 @@
   <data name="ValidationTitle" xml:space="preserve">
     <value>Validation error</value>
   </data>
+  <data name="RateLimitExceededTitle" xml:space="preserve">
+    <value>Rate limit exceeded</value>
+  </data>
+  <data name="RateLimitExceededDetail" xml:space="preserve">
+    <value>Please wait {0} seconds before trying again.</value>
+  </data>
+  <data name="RateLimitExceededGeneric" xml:space="preserve">
+    <value>Too many attempts. Please try again later.</value>
+  </data>
+
+
+
 </root>
