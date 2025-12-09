@@ -8,16 +8,27 @@ import { NgxSpinnerService } from 'ngx-spinner';
 export class LoadingService {
   private loadingSubject = new BehaviorSubject<boolean>(false);
   loading$ = this.loadingSubject.asObservable();
+  private activeRequests = 0;
 
   constructor(private spinner: NgxSpinnerService) {}
 
   startLoading() {
-    this.loadingSubject.next(true);
-    this.spinner.show(undefined, { type: 'ball-spin-fade', size: 'small' });
+    this.activeRequests += 1;
+    if (this.activeRequests === 1) {
+      this.loadingSubject.next(true);
+      this.spinner.show(undefined, { type: 'ball-spin-fade', size: 'small' });
+    }
   }
 
   stopLoading() {
-    this.loadingSubject.next(false);
-    this.spinner.hide();
+    if (this.activeRequests === 0) {
+      return;
+    }
+
+    this.activeRequests -= 1;
+    if (this.activeRequests === 0) {
+      this.loadingSubject.next(false);
+      this.spinner.hide();
+    }
   }
 }

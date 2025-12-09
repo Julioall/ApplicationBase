@@ -57,11 +57,13 @@ describe('AdminUsersComponent', () => {
 
   it('should handle load errors', () => {
     const subject = new Subject<User[]>();
+    const consoleSpy = spyOn(console, 'error').and.stub();
     spyOn(userService, 'getAllUsers').and.returnValue(subject.asObservable());
 
     component['loadUsers']();
     subject.error({ error: { detail: 'fail' } });
 
     expect(notification.showError).toHaveBeenCalled();
+    expect(consoleSpy).toHaveBeenCalled();
   });
 });
