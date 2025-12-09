@@ -1,98 +1,105 @@
-<section class="user-detail" *ngIf="!loading && user; else loadingState">
-  <header class="page-lead">
+<section class="user-detail">
+  <div class="detail-top">
     <button type="button" class="back-link" (click)="goBack()">
       <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
       <span>{{ 'adminUserDetail.actions.back' | translate }}</span>
     </button>
-    <div class="title-block">
-      <h1>{{ 'adminUserDetail.pageTitle' | translate }}</h1>
-      <p class="subtitle">{{ 'adminUserDetail.pageSubtitle' | translate }}</p>
-    </div>
-  </header>
-
-  <div class="detail-grid">
-    <div class="card-lead">
-      <h3>{{ 'adminUserDetail.summary.title' | translate }}</h3>
-    </div>
-    <article class="card">
-      <div class="summary-identity">
-        <div class="summary-avatar" [class.has-image]="avatarUrl">
-          <ng-container *ngIf="avatarUrl; else summaryInitials">
-            <img [src]="avatarUrl" [alt]="'adminUserDetail.summary.avatarAlt' | translate" />
-          </ng-container>
-          <ng-template #summaryInitials>
-            <span>{{ userInitials }}</span>
-          </ng-template>
-        </div>
-        <div class="summary-text">
-          <h4>{{ user.Profile?.Name || ('adminUserDetail.fallbackName' | translate) }}</h4>
-          <p class="muted">{{ user.Account?.Email || ('adminUserDetail.fallbackEmail' | translate) }}</p>
-          <span class="pill ghost tiny">
-            <i class="fa-regular fa-id-badge"></i>
-            <ng-container *ngIf="user.Id; else missingId">
-              {{ ('adminUserDetail.access.idLabel' | translate) + ' ' + user.Id }}
-            </ng-container>
-            <ng-template #missingId>{{ 'adminUserDetail.fallbackId' | translate }}</ng-template>
-          </span>
-        </div>
-      </div>
-      <dl class="meta">
-        <div>
-          <dt>{{ 'adminUserDetail.meta.name' | translate }}</dt>
-          <dd>{{ user.Profile?.Name || ('adminUserDetail.meta.notProvided' | translate) }}</dd>
-        </div>
-        <div>
-          <dt>{{ 'adminUserDetail.meta.email' | translate }}</dt>
-          <dd>{{ user.Account?.Email || ('adminUserDetail.meta.notProvided' | translate) }}</dd>
-        </div>
-        <div>
-          <dt>{{ 'adminUserDetail.meta.permissions' | translate }}</dt>
-          <dd>{{ getUserPermissions().length }}</dd>
-        </div>
-      </dl>
-    </article>
-
-    <div class="card-lead">
-      <h3>{{ 'adminUserDetail.access.title' | translate }}</h3>
-    </div>
-    <article class="card">
-
-      <div class="permissions" *ngIf="getUserPermissions().length; else noPermissions">
-        <span class="permission" *ngFor="let permission of getUserPermissions()">
-          {{ permission }}
-          <button
-            type="button"
-            class="icon"
-            (click)="removePermission(permission)"
-            [attr.aria-label]="'adminUserDetail.access.removePermission' | translate"
-          >
-            &times;
-          </button>
-        </span>
-      </div>
-      <ng-template #noPermissions>
-        <p class="muted">{{ 'adminUserDetail.access.none' | translate }}</p>
-      </ng-template>
-
-      <div class="controls">
-        <label>
-          {{ 'adminUserDetail.access.newPermission' | translate }}
-          <select [(ngModel)]="selectedPermission">
-            <option value="">{{ 'adminUserDetail.access.select' | translate }}</option>
-            <option *ngFor="let permission of availablePermissions" [value]="permission">{{ permission }}</option>
-          </select>
-        </label>
-        <div class="actions">
-          <button type="button" class="secondary" (click)="resetToDefault()">
-            {{ 'adminUserDetail.access.restoreDefault' | translate }}
-          </button>
-          <button type="button" class="primary" (click)="addPermission()" [disabled]="!selectedPermission">
-            {{ 'adminUserDetail.access.add' | translate }}
-          </button>
-        </div>
-      </div>
-    </article>
   </div>
+
+  <article class="card settings-shell">
+    <div class="card-lead">
+        <h1>{{ 'adminUserDetail.pageTitle' | translate }}</h1>
+        <p class="subtitle">{{ 'adminUserDetail.pageSubtitle' | translate }}</p>
+    </div>
+
+    <ng-container *ngIf="!loading && user; else loadingState">
+      <div class="settings-body">
+        <div class="detail-grid">
+          <div class="section-head">
+            <h3>{{ 'adminUserDetail.summary.title' | translate }}</h3>
+          </div>
+          <article class="card section-card">
+            <div class="summary-identity">
+              <div class="summary-avatar" [class.has-image]="avatarUrl">
+                <ng-container *ngIf="avatarUrl; else summaryInitials">
+                  <img [src]="avatarUrl" [alt]="'adminUserDetail.summary.avatarAlt' | translate" />
+                </ng-container>
+                <ng-template #summaryInitials>
+                  <span>{{ userInitials }}</span>
+                </ng-template>
+              </div>
+              <div class="summary-text">
+                <h4>{{ user.Profile?.Name || ('adminUserDetail.fallbackName' | translate) }}</h4>
+                <p class="muted">{{ user.Account?.Email || ('adminUserDetail.fallbackEmail' | translate) }}</p>
+                <span class="pill ghost tiny">
+                  <i class="fa-regular fa-id-badge"></i>
+                  <ng-container *ngIf="user.Id; else missingId">
+                    {{ ('adminUserDetail.access.idLabel' | translate) + ' ' + user.Id }}
+                  </ng-container>
+                  <ng-template #missingId>{{ 'adminUserDetail.fallbackId' | translate }}</ng-template>
+                </span>
+              </div>
+            </div>
+            <dl class="meta">
+              <div>
+                <dt>{{ 'adminUserDetail.meta.name' | translate }}</dt>
+                <dd>{{ user.Profile?.Name || ('adminUserDetail.meta.notProvided' | translate) }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'adminUserDetail.meta.email' | translate }}</dt>
+                <dd>{{ user.Account?.Email || ('adminUserDetail.meta.notProvided' | translate) }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'adminUserDetail.meta.permissions' | translate }}</dt>
+                <dd>{{ getUserPermissions().length }}</dd>
+              </div>
+            </dl>
+          </article>
+
+          <div class="section-head">
+            <h3>{{ 'adminUserDetail.access.title' | translate }}</h3>
+          </div>
+          <article class="card section-card">
+
+            <div class="permissions" *ngIf="getUserPermissions().length; else noPermissions">
+              <span class="permission" *ngFor="let permission of getUserPermissions()">
+                {{ permission }}
+                <button
+                  type="button"
+                  class="icon"
+                  (click)="removePermission(permission)"
+                  [attr.aria-label]="'adminUserDetail.access.removePermission' | translate"
+                >
+                  &times;
+                </button>
+              </span>
+            </div>
+            <ng-template #noPermissions>
+              <p class="muted">{{ 'adminUserDetail.access.none' | translate }}</p>
+            </ng-template>
+
+            <div class="controls">
+              <label>
+                {{ 'adminUserDetail.access.newPermission' | translate }}
+                <select [(ngModel)]="selectedPermission">
+                  <option value="">{{ 'adminUserDetail.access.select' | translate }}</option>
+                  <option *ngFor="let permission of availablePermissions" [value]="permission">{{ permission }}</option>
+                </select>
+              </label>
+              <div class="actions">
+                <button type="button" class="secondary" (click)="resetToDefault()">
+                  {{ 'adminUserDetail.access.restoreDefault' | translate }}
+                </button>
+                <button type="button" class="primary" (click)="addPermission()" [disabled]="!selectedPermission">
+                  {{ 'adminUserDetail.access.add' | translate }}
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </ng-container>
+  </article>
 </section>
 
 <ng-template #loadingState>

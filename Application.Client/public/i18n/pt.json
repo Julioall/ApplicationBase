@@ -324,76 +324,76 @@
     }
   },
   "adminUsers": {
-    "title": "Usu?rios",
-    "subtitle": "Visualize, pesquise e abra o painel individual para gerenciar permiss?es.",
+    "title": "Usuários",
+    "subtitle": "Visualize, pesquise e abra o painel individual para gerenciar permissões.",
     "columns": {
-      "user": "Usu?rio",
+      "user": "Usuário",
       "email": "E-mail",
-      "permissions": "Permiss?es",
-      "actions": "A??es"
+      "permissions": "Permissões",
+      "actions": "Ações"
     },
     "actions": {
       "manage": "Gerenciar",
-      "openUser": "Abrir gest?o de permiss?es do usu?rio"
+      "openUser": "Abrir gestão de permissões do usuário"
     },
-    "pagination": "P?gina {{page}} de {{totalPages}}",
-    "empty": "Nenhum usu?rio encontrado para gerenciar.",
-    "loading": "Carregando usu?rios...",
-    "fallbackName": "Usu?rio",
+    "pagination": "Página {{page}} de {{totalPages}}",
+    "empty": "Nenhum usuário encontrado para gerenciar.",
+    "loading": "Carregando usuários...",
+    "fallbackName": "Usuário",
     "fallbackEmail": "Sem e-mail",
-    "permissionsCount": "{{count}} permiss?es",
+    "permissionsCount": "{{count}} permissões",
     "messages": {
-      "missingId": "Usu?rio sem identificador.",
-      "loadError": "N?o foi poss?vel carregar os usu?rios."
+      "missingId": "Usuário sem identificador.",
+      "loadError": "Não foi possível carregar os usuários."
     }
   },
   "adminUserDetail": {
-    "pageTitle": "Detalhes do usu\u00e1rio",
-    "pageSubtitle": "Revise permiss\u00f5es e informa\u00e7\u00f5es de conta deste usu\u00e1rio.",
-    "breadcrumb": "Admin > Usu?rio",
-    "fallbackName": "Usu?rio",
+    "pageTitle": "Detalhes do usuário",
+    "pageSubtitle": "Revise permissões e informações de conta deste usuário.",
+    "breadcrumb": "Admin > Usuário",
+    "fallbackName": "Usuário",
     "fallbackEmail": "Sem e-mail",
     "fallbackId": "Conta sem ID",
-    "loading": "Carregando usu?rio...",
+    "loading": "Carregando usuário...",
     "actions": {
       "back": "Voltar",
       "resetPassword": "Resetar senha"
     },
     "access": {
-      "eyebrow": "Permiss?es",
+      "eyebrow": "Permissões",
       "title": "Controle de acesso",
-      "description": "Adicione ou remova permiss?es espec?ficas para este usu?rio.",
-      "removePermission": "Remover permiss?o",
-      "none": "Nenhuma permiss?o atribu?da.",
-      "newPermission": "Nova permiss?o",
+      "description": "Adicione ou remova permissões específicas para este usuário.",
+      "removePermission": "Remover permissão",
+      "none": "Nenhuma permissão atribuída.",
+      "newPermission": "Nova permissão",
       "select": "Selecione",
-      "restoreDefault": "Restaurar padr?o",
+      "restoreDefault": "Restaurar padrão",
       "add": "Adicionar",
-      "total": "Permiss?es",
+      "total": "Permissões",
       "idLabel": "ID"
     },
     "summary": {
       "eyebrow": "Conta",
       "title": "Resumo",
-      "description": "Dados b?sicos do usu?rio para confer?ncia r?pida.",
-      "avatarAlt": "Foto do usu?rio",
+      "description": "Dados básicos do usuário para conferência rápida.",
+      "avatarAlt": "Foto do usuário",
       "idMissing": "Conta sem ID"
     },
     "meta": {
       "name": "Nome",
       "email": "E-mail",
-      "permissions": "Permiss?es",
-      "notProvided": "N?o informado"
+      "permissions": "Permissões",
+      "notProvided": "Não informado"
     },
     "messages": {
-      "permissionAlready": "Esta permiss?o j? est? atribu?da.",
-      "permissionAdded": "Permiss?o {{permission}} adicionada.",
-      "permissionRemoved": "Permiss?o {{permission}} removida.",
-      "resetDefault": "Permiss?es padr?o restauradas.",
+      "permissionAlready": "Esta permissão já está atribuída.",
+      "permissionAdded": "Permissão {{permission}} adicionada.",
+      "permissionRemoved": "Permissão {{permission}} removida.",
+      "resetDefault": "Permissões padrão restauradas.",
       "resetPassword": "Reset de senha deve ser integrado ao backend.",
-      "notFound": "Usu?rio n?o encontrado.",
-      "loadError": "N?o foi poss?vel carregar o usu?rio.",
-      "updateError": "N?o foi poss?vel atualizar as permiss?es."
+      "notFound": "Usuário não encontrado.",
+      "loadError": "Não foi possível carregar o usuário.",
+      "updateError": "Não foi possível atualizar as permissões."
     }
   },
   "admin": {
