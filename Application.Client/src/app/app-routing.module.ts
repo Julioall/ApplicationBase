@@ -11,6 +11,7 @@ const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', loadChildren: () => import('./page/home/home.module').then(m => m.HomeModule), canActivate: [AuthGuard, PermissionGuard], data: { permissions: ['view:home'] } },
   { path: 'profile', loadChildren: () => import('./page/profile/profile.module').then(m => m.ProfileModule), canActivate: [AuthGuard, PermissionGuard], data: { permissions: ['view:profile'] } },
+  { path: 'students', loadChildren: () => import('./modules/students/students.module').then(m => m.StudentsModule), canActivate: [AuthGuard, PermissionGuard], data: { permissions: ['view:students'] } },
   { path: 'admin', loadChildren: () => import('./page/admin/admin.module').then(m => m.AdminModule), canActivate: [AuthGuard, PermissionGuard], data: { permissions: ['manage:users'] } },
   { path: 'auth', component: AuthComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },

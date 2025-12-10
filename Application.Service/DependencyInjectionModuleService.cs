@@ -14,6 +14,7 @@ namespace Application.Service
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ISettingsService, SettingsService>();
             services.AddScoped<ISecretEncryptionService, SecretEncryptionService>();
+            services.AddScoped<IStudentService, StudentService>();
             return services;
         }
     }

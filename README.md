@@ -146,5 +146,30 @@ Application.Test/                 # Testes de controllers, services, validators,
 - **Recovery Code:** código de 6 dígitos, TTL 10 min, cooldown 1 min, 5 tentativas; revoga quando expira ou excede tentativas.
 - **SecretEncryptionService:** AES CBC/PKCS7 com chave derivada de `APP_SECRET_ENCRYPTION_KEY` para armazenar senha SMTP de forma reversível.
 
+
+## Prompt base
+Você é o Codex trabalhando no monorepo ApplicationBase (Angular 18 + @ngx-translate no front e API .NET 8 com RavenDB). Siga estas regras em qualquer implementação:
+
+Front-end (Application.Client)
+- Sempre internacionalize: use o pipe/serviço `@ngx-translate/core`; todas as strings devem virar chaves em `public/i18n/en.json` e `public/i18n/pt.json` (defaultLanguage = en, fallback configurado). Evite textos literais em templates/TS.
+- Notificações: nunca use alert/snackbar genérico. Use `NotificationService` (`showSuccess|showError|showWarning|showInfo`) que renderiza os toasts via `app-toast-container`.
+- HTTP: baseie-se em `environment.apiUrl`; use `HttpClient` e deixe `LoadingInterceptor` + `ProblemInterceptor` cuidarem de spinner e erros `application/problem+json`. Não duplique handling de loading/erro.
+- Forms: use Reactive Forms (`FormBuilder` + validators). Mensagens de erro e toasts devem ser traduzidas. Mantenha acessibilidade (aria-labels, etc.).
+- Permissões/rotas: proteja com `AuthGuard`/`PermissionGuard` usando as claims `permissions` (ex.: `view:home`, `view:profile`, `manage:users`). Respeite tokens armazenados pelo `AuthService`.
+- Preferências: idioma em `preferredLanguage` (localStorage) via `TranslateService`; tema com `ThemeService` (`light`/`dark`), sem criar lógica paralela.
+- Componentes/shared: reutilize estilos e padrões existentes (navbar, dashboard shell, avatar handling, ngx-spinner). Nada de bibliotecas de UI ou notificações extras sem necessidade.
+- Testes: escreva specs Jasmine/Karma quando alterar lógica; mocke `TranslateService`/pipe e `NotificationService` como nos specs atuais.
+
+Back-end (Application.Web/.Domain/.Service/.Infrastructure)
+- Globalização: mensagens via `IStringLocalizer<SharedResource>` com chaves nos resx `Application.Domain/Resources/SharedResource.resx` e `SharedResource.en.resx`. Não retornar strings cruas.
+- Erros/validação: use FluentValidation para regras de domínio; lance `DomainException` (`BusinessException`, `NotFoundException`, etc.) e deixe o `ProblemDetailsMiddleware`/`ValidationProblemDetailsFilter` gerar `application/problem+json`.
+- Autorização/autenticação: JWT com claim `permissions` (constantes em `Application.Domain/Model/ApplicationPermissions.cs`); proteja endpoints com `[Authorize(Policy = ...)]`. Respeite rate limiting via `IRateLimiter` quando aplicável.
+- Persistência: RavenDB via `IServiceRavenDB` e repositórios (`IUserRepository`, `ISettingsRepository`, etc.). Para arquivos (ex.: avatar), use attachments. Não abra sessões diretas.
+- Serviços: siga o padrão das services (UserService, TokenService, EmailService, SettingsService) e mantenha regras de segurança (hash de senha com `SecureHash`, refresh tokens, códigos de recuperação com TTL).
+- Configuração: JWT keys e SECRET_ENCRYPTION_KEY vêm de env vars (`ApplicationConstants`). Mantenha JsonSerializer sem naming policy (camel-case desativado já no Program.cs).
+- Testes: use xUnit; para cenários com RavenDB, herde de `BaseTest` (RavenTestDriver, cultura pt) e mocke localizador/serviços conforme os testes existentes.
+
+Saída esperada: código alinhado a essas práticas, com traduções e notificações corretas, seguindo os padrões de arquitetura e testes do repositório.
+
 ---
 MIT — contribuições são bem-vindas.

@@ -7,6 +7,8 @@ namespace Application.Domain.Model
         public const string ViewHome = "view:home";
         public const string ViewProfile = "view:profile";
         public const string ManageUsers = "manage:users";
+        public const string ViewStudents = "view:students";
+        public const string ManageStudents = "manage:students";
 
         public static IReadOnlyCollection<string> DefaultUserPermissions => new[]
         {
@@ -18,14 +20,18 @@ namespace Application.Domain.Model
         {
             ViewHome,
             ViewProfile,
-            ManageUsers
+            ManageUsers,
+            ViewStudents,
+            ManageStudents
         };
 
         public static IReadOnlyCollection<string> All => new[]
         {
             ViewHome,
             ViewProfile,
-            ManageUsers
+            ManageUsers,
+            ViewStudents,
+            ManageStudents
         };
     }
 }

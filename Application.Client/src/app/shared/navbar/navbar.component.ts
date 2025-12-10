@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../service/auth/auth.service';
 import { ThemeService } from '../../service/theme/theme.service';
-import { ADMIN_PERMISSION } from '../../model/permissions';
+import { ADMIN_PERMISSION, MANAGE_STUDENTS_PERMISSION, VIEW_STUDENTS_PERMISSION } from '../../model/permissions';
 
 @Component({
   selector: 'app-navbar',
@@ -18,6 +18,10 @@ export class NavbarComponent implements OnInit {
 
   get canManageUsers(): boolean {
     return this.authService.hasPermission(ADMIN_PERMISSION);
+  }
+
+  get canAccessStudents(): boolean {
+    return this.authService.hasAnyPermission([VIEW_STUDENTS_PERMISSION, MANAGE_STUDENTS_PERMISSION]);
   }
 
   navigateTo(path: string) {

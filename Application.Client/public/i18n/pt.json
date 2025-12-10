@@ -406,6 +406,86 @@
     "profile": "Perfil",
     "admin": "Admin",
     "theme": "Tema",
-    "logout": "Sair"
+    "logout": "Sair",
+    "students": "Alunos"
+  },
+  "students": {
+    "common": {
+      "error": "Erro"
+    },
+    "list": {
+      "eyebrow": "Catálogo",
+      "title": "Alunos",
+      "subtitle": "Gerencie os cadastros de alunos sem login ou credenciais.",
+      "add": "Novo aluno",
+      "searchPlaceholder": "Busque por nome, e-mail ou matrícula",
+      "searchAria": "Buscar alunos",
+      "statusFilter": "Status",
+      "statusAll": "Todos",
+      "statusActive": "Ativo",
+      "statusInactive": "Inativo",
+      "columns": {
+        "name": "Nome completo",
+        "email": "E-mail",
+        "idNumber": "Matrícula/CPF",
+        "phone": "Telefone",
+        "status": "Status",
+        "actions": "Ações"
+      },
+      "loading": "Carregando alunos...",
+      "empty": "Nenhum aluno encontrado.",
+      "noInstitution": "Sem instituição",
+      "edit": "Editar",
+      "delete": "Excluir",
+      "confirmDelete": "Inativar {{name}}?",
+      "deleteSuccess": "Aluno inativado.",
+      "deleteError": "Não foi possível remover o aluno.",
+      "loadError": "Não foi possível carregar os alunos.",
+      "missingId": "ID do aluno ausente.",
+      "prev": "Anterior",
+      "next": "Próxima",
+      "pageXofY": "Página {{page}} de {{total}}"
+    },
+    "form": {
+      "eyebrow": "Cadastro",
+      "titleCreate": "Cadastrar aluno",
+      "titleEdit": "Editar aluno",
+      "subtitle": "Guarde dados de contato, idioma e fuso horário de cada aluno.",
+      "back": "Voltar para lista",
+      "save": "Salvar aluno",
+      "saving": "Salvando...",
+      "firstName": "Primeiro nome",
+      "lastName": "Sobrenome",
+      "email": "E-mail",
+      "idNumber": "Matrícula / CPF",
+      "phone": "Telefone",
+      "dateOfBirth": "Data de nascimento",
+      "institution": "Instituição",
+      "lang": "Idioma",
+      "timeZone": "Fuso horário",
+      "isActive": "Aluno está ativo",
+      "address": {
+        "street": "Rua",
+        "number": "Número",
+        "district": "Bairro",
+        "city": "Cidade",
+        "state": "Estado",
+        "postalCode": "CEP",
+        "country": "País"
+      },
+      "errors": {
+        "firstNameRequired": "Primeiro nome é obrigatório.",
+        "firstNameLength": "Informe entre 2 e 100 caracteres.",
+        "lastNameRequired": "Sobrenome é obrigatório.",
+        "lastNameLength": "Informe entre 2 e 100 caracteres.",
+        "email": "Informe um e-mail válido.",
+        "idNumber": "Máximo de 20 caracteres.",
+        "lang": "Use códigos como pt ou en_US."
+      },
+      "createSuccess": "Aluno criado com sucesso.",
+      "updateSuccess": "Aluno atualizado com sucesso.",
+      "saveError": "Não foi possível salvar o aluno.",
+      "loadError": "Não foi possível carregar o aluno."
+    }
   }
 }

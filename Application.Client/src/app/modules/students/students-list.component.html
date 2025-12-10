@@ -1,0 +1,84 @@
+<div class="students-shell">
+  <div class="header">
+    <div class="title-block">
+      <p class="eyebrow">{{ 'students.list.eyebrow' | translate }}</p>
+      <h1>{{ 'students.list.title' | translate }}</h1>
+      <p class="subtitle">{{ 'students.list.subtitle' | translate }}</p>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn primary" (click)="onAdd()">
+        {{ 'students.list.add' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search">
+      <input
+        type="search"
+        [placeholder]="translate.instant('students.list.searchPlaceholder')"
+        [formControl]="searchControl"
+        [attr.aria-label]="translate.instant('students.list.searchAria')"
+      />
+    </div>
+    <div class="filters">
+      <label for="statusFilter">{{ 'students.list.statusFilter' | translate }}</label>
+      <select id="statusFilter" [(ngModel)]="statusFilter" (change)="pageNumber = 1; loadStudents();">
+        <option value="all">{{ 'students.list.statusAll' | translate }}</option>
+        <option value="active">{{ 'students.list.statusActive' | translate }}</option>
+        <option value="inactive">{{ 'students.list.statusInactive' | translate }}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card list-card">
+    <div class="list-header">
+      <span>{{ 'students.list.columns.name' | translate }}</span>
+      <span>{{ 'students.list.columns.email' | translate }}</span>
+      <span>{{ 'students.list.columns.idNumber' | translate }}</span>
+      <span>{{ 'students.list.columns.phone' | translate }}</span>
+      <span>{{ 'students.list.columns.status' | translate }}</span>
+      <span class="actions-col">{{ 'students.list.columns.actions' | translate }}</span>
+    </div>
+    <div class="list-body">
+      <div *ngIf="loading" class="loading-row">
+        {{ 'students.list.loading' | translate }}
+      </div>
+      <div *ngIf="!loading && students.length === 0" class="empty-row">
+        {{ 'students.list.empty' | translate }}
+      </div>
+      <div *ngFor="let student of students; trackBy: trackByStudent" class="list-row">
+        <div class="cell name">
+          <div class="main">{{ student.FirstName }} {{ student.LastName }}</div>
+          <div class="meta">{{ student.Institution || ('students.list.noInstitution' | translate) }}</div>
+        </div>
+        <div class="cell">{{ student.Email || '—' }}</div>
+        <div class="cell">{{ student.IdNumber || '—' }}</div>
+        <div class="cell">{{ student.Phone || '—' }}</div>
+        <div class="cell">
+          <span class="status" [class.active]="student.IsActive" [class.inactive]="!student.IsActive">
+            {{ getStatusLabel(student) }}
+          </span>
+        </div>
+        <div class="cell actions">
+          <button type="button" class="btn ghost" (click)="onEdit(student)">{{ 'students.list.edit' | translate }}</button>
+          <button type="button" class="btn ghost danger" (click)="onDelete(student)">
+            {{ 'students.list.delete' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pagination">
+    <button type="button" class="btn ghost" [disabled]="pageNumber === 1 || loading" (click)="changePage(-1)">
+      {{ 'students.list.prev' | translate }}
+    </button>
+    <span class="page-indicator">
+      {{ 'students.list.pageXofY' | translate:{ page: pageNumber, total: totalPages } }}
+    </span>
+    <button type="button" class="btn ghost" [disabled]="pageNumber >= totalPages || loading" (click)="changePage(1)">
+      {{ 'students.list.next' | translate }}
+    </button>
+  </div>
+</div>

@@ -2,11 +2,13 @@ using Application.Domain.Interface;
 using Application.Infrastructure.ConfigurationDb;
 using Application.Infrastructure.Indexes;
 using Application.Infrastructure.Repository;
+using Application.Infrastructure.Repository.Students;
 using Application.Infrastructure.Service;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Indexes;
+using Application.Domain.Interface.Students;
 
 namespace Application.Infrastructure
 {
@@ -25,6 +27,7 @@ namespace Application.Infrastructure
             services.TryAddScoped<IServiceRavenDB, ServiceRavenDB>();
             services.TryAddScoped<IUserRepository, UserRepository>();
             services.TryAddScoped<ISettingsRepository, SettingsRepository>();
+            services.TryAddScoped<IStudentRepository, StudentRepository>();
 
             return services;
         }

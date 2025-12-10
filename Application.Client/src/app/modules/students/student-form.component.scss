@@ -1,0 +1,126 @@
+@use '../../../styles/variables' as *;
+
+:host {
+  display: block;
+}
+
+.form-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-4);
+}
+
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+
+  h1 {
+    margin: 0;
+    font-size: var(--font-size-display);
+    letter-spacing: -0.02em;
+  }
+
+  .subtitle {
+    margin: 0;
+    color: var(--text-subtle);
+  }
+
+  .actions {
+    display: flex;
+    gap: var(--space-2);
+  }
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--text-subtle);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.grid.two-cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.address-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px dashed var(--border-soft);
+  border-radius: var(--radius-lg);
+  background: var(--surface-alt);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+
+  label {
+    color: var(--text-subtle);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  input,
+  select {
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-soft);
+    background: var(--surface);
+    color: var(--text-primary);
+  }
+
+  small {
+    color: #d35400;
+    font-size: var(--font-size-sm);
+  }
+
+  &.checkbox {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-2);
+
+    input {
+      width: auto;
+      margin-right: var(--space-1);
+    }
+  }
+
+  &.invalid input {
+    border-color: #e67e22;
+  }
+}
+
+@media (max-width: 768px) {
+  .card-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .grid.two-cols {
+    grid-template-columns: 1fr;
+  }
+}

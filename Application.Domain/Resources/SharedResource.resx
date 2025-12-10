@@ -152,6 +152,48 @@
   <data name="UserUpdatedSuccessfully" xml:space="preserve">
     <value>Usuário atualizado com sucesso.</value>
   </data>
+  <data name="StudentFirstNameRequired" xml:space="preserve">
+    <value>Primeiro nome e obrigatorio.</value>
+  </data>
+  <data name="StudentFirstNameLength" xml:space="preserve">
+    <value>Primeiro nome deve ter entre 2 e 100 caracteres.</value>
+  </data>
+  <data name="StudentLastNameRequired" xml:space="preserve">
+    <value>Sobrenome e obrigatorio.</value>
+  </data>
+  <data name="StudentLastNameLength" xml:space="preserve">
+    <value>Sobrenome deve ter entre 2 e 100 caracteres.</value>
+  </data>
+  <data name="StudentEmailInvalid" xml:space="preserve">
+    <value>E-mail invalido.</value>
+  </data>
+  <data name="StudentIdNumberRequired" xml:space="preserve">
+    <value>Numero de matricula/CPF nao pode ficar vazio.</value>
+  </data>
+  <data name="StudentIdNumberMaxLength" xml:space="preserve">
+    <value>Numero de matricula/CPF deve ter no maximo 20 caracteres.</value>
+  </data>
+  <data name="StudentLangInvalid" xml:space="preserve">
+    <value>Idioma deve seguir o padrao "pt" ou "en_US".</value>
+  </data>
+  <data name="StudentTimeZoneInvalid" xml:space="preserve">
+    <value>Fuso horario invalido.</value>
+  </data>
+  <data name="StudentIdNumberExists" xml:space="preserve">
+    <value>Ja existe um aluno com o numero {0}.</value>
+  </data>
+  <data name="StudentNotFound" xml:space="preserve">
+    <value>Aluno com id {0} nao encontrado.</value>
+  </data>
+  <data name="StudentCreated" xml:space="preserve">
+    <value>Aluno criado com sucesso.</value>
+  </data>
+  <data name="StudentUpdated" xml:space="preserve">
+    <value>Aluno atualizado com sucesso.</value>
+  </data>
+  <data name="InvalidRequestDetail" xml:space="preserve">
+    <value>A requisicao esta ausente ou invalida.</value>
+  </data>
   <data name="ValidationDetail" xml:space="preserve">
     <value>Verifique os dados e tente novamente.</value>
   </data>

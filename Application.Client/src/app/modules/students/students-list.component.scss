@@ -1,0 +1,220 @@
+@use '../../../styles/variables' as *;
+
+:host {
+  display: block;
+}
+
+.students-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  color: var(--text-primary);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-4);
+  background: linear-gradient(135deg, var(--surface), var(--surface-alt));
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+}
+
+.title-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  h1 {
+    margin: 0;
+    font-size: var(--font-size-display);
+    letter-spacing: -0.02em;
+  }
+
+  .subtitle {
+    margin: 0;
+    color: var(--text-subtle);
+    max-width: 720px;
+  }
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--text-subtle);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.toolbar {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search {
+  flex: 1 1 320px;
+
+  input {
+    width: 100%;
+    padding: var(--space-3);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    color: var(--text-primary);
+  }
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-subtle);
+
+  select {
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-soft);
+    background: var(--surface);
+    color: var(--text-primary);
+  }
+}
+
+.card.list-card {
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-soft);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+}
+
+.list-header {
+  display: grid;
+  grid-template-columns: 1.4fr 1.2fr 1fr 1fr 0.8fr auto;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-alt);
+  color: var(--text-subtle);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+}
+
+.list-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.list-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1.2fr 1fr 1fr 0.8fr auto;
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border-soft);
+  align-items: center;
+  gap: var(--space-2);
+
+  &:hover {
+    background: var(--surface-alt);
+  }
+}
+
+.cell {
+  &.name {
+    display: flex;
+    flex-direction: column;
+
+    .main {
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .meta {
+      color: var(--text-subtle);
+      font-size: var(--font-size-sm);
+    }
+  }
+
+  &.actions {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: flex-end;
+  }
+}
+
+.actions-col {
+  text-align: right;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: var(--font-size-sm);
+  border: 1px solid var(--border-soft);
+
+  &.active {
+    background: rgba(46, 204, 113, 0.12);
+    color: #27ae60;
+    border-color: rgba(46, 204, 113, 0.35);
+  }
+
+  &.inactive {
+    background: rgba(255, 99, 71, 0.1);
+    color: #d35400;
+    border-color: rgba(255, 99, 71, 0.3);
+  }
+}
+
+.loading-row,
+.empty-row {
+  padding: var(--space-4);
+  color: var(--text-subtle);
+  text-align: center;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  padding: 0 var(--space-1);
+}
+
+.page-indicator {
+  color: var(--text-subtle);
+}
+
+@media (max-width: 960px) {
+  .list-header,
+  .list-row {
+    grid-template-columns: 1.2fr 1fr 1fr;
+    grid-template-areas:
+      'name name actions'
+      'email idNumber status'
+      'phone phone status';
+  }
+
+  .list-header span:nth-child(1) { grid-area: name; }
+  .list-header span:nth-child(2) { grid-area: email; }
+  .list-header span:nth-child(3) { grid-area: idNumber; }
+  .list-header span:nth-child(4) { grid-area: phone; }
+  .list-header span:nth-child(5) { grid-area: status; }
+  .list-header span:nth-child(6) { grid-area: actions; }
+
+  .list-row .cell:nth-child(1) { grid-area: name; }
+  .list-row .cell:nth-child(2) { grid-area: email; }
+  .list-row .cell:nth-child(3) { grid-area: idNumber; }
+  .list-row .cell:nth-child(4) { grid-area: phone; }
+  .list-row .cell:nth-child(5) { grid-area: status; }
+  .list-row .cell:nth-child(6) { grid-area: actions; justify-content: flex-start; }
+
+  .actions {
+    flex-wrap: wrap;
+  }
+}

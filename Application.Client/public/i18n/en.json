@@ -396,6 +396,85 @@
       "updateError": "Could not update permissions."
     }
   },
+  "students": {
+    "common": {
+      "error": "Error"
+    },
+    "list": {
+      "eyebrow": "Directory",
+      "title": "Students",
+      "subtitle": "Manage student records without logins or credentials.",
+      "add": "New student",
+      "searchPlaceholder": "Search by name, email or ID number",
+      "searchAria": "Search students",
+      "statusFilter": "Status",
+      "statusAll": "All",
+      "statusActive": "Active",
+      "statusInactive": "Inactive",
+      "columns": {
+        "name": "Full name",
+        "email": "Email",
+        "idNumber": "ID number",
+        "phone": "Phone",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "loading": "Loading students...",
+      "empty": "No students found.",
+      "noInstitution": "No institution",
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirmDelete": "Inactivate {{name}}?",
+      "deleteSuccess": "Student inactivated.",
+      "deleteError": "Could not remove the student.",
+      "loadError": "Could not load students.",
+      "missingId": "Student ID is missing.",
+      "prev": "Previous",
+      "next": "Next",
+      "pageXofY": "Page {{page}} of {{total}}"
+    },
+    "form": {
+      "eyebrow": "Registration",
+      "titleCreate": "Create student",
+      "titleEdit": "Edit student",
+      "subtitle": "Store contact, language, and timezone preferences for each student.",
+      "back": "Back to list",
+      "save": "Save student",
+      "saving": "Saving...",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "idNumber": "ID number / CPF",
+      "phone": "Phone",
+      "dateOfBirth": "Date of birth",
+      "institution": "Institution",
+      "lang": "Language",
+      "timeZone": "Time zone",
+      "isActive": "Student is active",
+      "address": {
+        "street": "Street",
+        "number": "Number",
+        "district": "District",
+        "city": "City",
+        "state": "State",
+        "postalCode": "Postal code",
+        "country": "Country"
+      },
+      "errors": {
+        "firstNameRequired": "First name is required.",
+        "firstNameLength": "Enter between 2 and 100 characters.",
+        "lastNameRequired": "Last name is required.",
+        "lastNameLength": "Enter between 2 and 100 characters.",
+        "email": "Enter a valid email.",
+        "idNumber": "Maximum 20 characters.",
+        "lang": "Use codes like pt or en_US."
+      },
+      "createSuccess": "Student created successfully.",
+      "updateSuccess": "Student updated successfully.",
+      "saveError": "Could not save the student.",
+      "loadError": "Could not load the student."
+    }
+  },
   "admin": {
     "pageTitle": "Admin"
   },
@@ -406,6 +485,7 @@
     "profile": "Profile",
     "admin": "Admin",
     "theme": "Theme",
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "students": "Students"
   }
 }
