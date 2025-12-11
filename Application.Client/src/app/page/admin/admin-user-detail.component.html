@@ -28,33 +28,52 @@
                   <span>{{ userInitials }}</span>
                 </ng-template>
               </div>
-              <div class="summary-text">
-                <h4>{{ user.Profile?.Name || ('adminUserDetail.fallbackName' | translate) }}</h4>
-                <p class="muted">{{ user.Account?.Email || ('adminUserDetail.fallbackEmail' | translate) }}</p>
-                <span class="pill ghost tiny">
-                  <i class="fa-regular fa-id-badge"></i>
-                  <ng-container *ngIf="user.Id; else missingId">
-                    {{ ('adminUserDetail.access.idLabel' | translate) + ' ' + user.Id }}
-                  </ng-container>
-                  <ng-template #missingId>{{ 'adminUserDetail.fallbackId' | translate }}</ng-template>
-                </span>
-              </div>
+            <div class="summary-text">
+              <h4>{{ user.Profile?.Name || ('adminUserDetail.fallbackName' | translate) }}</h4>
+              <p class="muted">{{ user.Account?.Email || ('adminUserDetail.fallbackEmail' | translate) }}</p>
             </div>
-            <dl class="meta">
-              <div>
-                <dt>{{ 'adminUserDetail.meta.name' | translate }}</dt>
-                <dd>{{ user.Profile?.Name || ('adminUserDetail.meta.notProvided' | translate) }}</dd>
-              </div>
-              <div>
-                <dt>{{ 'adminUserDetail.meta.email' | translate }}</dt>
-                <dd>{{ user.Account?.Email || ('adminUserDetail.meta.notProvided' | translate) }}</dd>
-              </div>
-              <div>
-                <dt>{{ 'adminUserDetail.meta.permissions' | translate }}</dt>
-                <dd>{{ getUserPermissions().length }}</dd>
-              </div>
-            </dl>
-          </article>
+          </div>
+          <dl class="meta">
+            <div>
+              <dt>{{ 'adminUserDetail.meta.jobTitle' | translate }}</dt>
+              <dd>{{ user.Profile?.JobTitle || ('adminUserDetail.meta.notProvided' | translate) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'adminUserDetail.meta.department' | translate }}</dt>
+              <dd>{{ user.Profile?.Department || ('adminUserDetail.meta.notProvided' | translate) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'adminUserDetail.meta.organization' | translate }}</dt>
+              <dd>{{ user.Profile?.Organization || ('adminUserDetail.meta.notProvided' | translate) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'adminUserDetail.meta.location' | translate }}</dt>
+              <dd>{{ user.Profile?.Location || ('adminUserDetail.meta.notProvided' | translate) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'adminUserDetail.meta.dateJoined' | translate }}</dt>
+              <dd>
+                <ng-container *ngIf="user.Account?.DateJoined; else noJoin">
+                  {{ user.Account?.DateJoined | date:'short' }}
+                </ng-container>
+                <ng-template #noJoin>{{ 'adminUserDetail.meta.notProvided' | translate }}</ng-template>
+              </dd>
+            </div>
+            <div>
+              <dt>{{ 'adminUserDetail.meta.lastLogin' | translate }}</dt>
+              <dd>
+                <ng-container *ngIf="user.Account?.LastLogin; else noLastLogin">
+                  {{ user.Account?.LastLogin | date:'short' }}
+                </ng-container>
+                <ng-template #noLastLogin>{{ 'adminUserDetail.meta.notProvided' | translate }}</ng-template>
+              </dd>
+            </div>
+            <div>
+              <dt>{{ 'adminUserDetail.meta.permissions' | translate }}</dt>
+              <dd>{{ getUserPermissions().length }}</dd>
+            </div>
+          </dl>
+        </article>
 
           <div class="section-head">
             <h3>{{ 'adminUserDetail.access.title' | translate }}</h3>
@@ -87,10 +106,10 @@
                 </select>
               </label>
               <div class="actions">
-                <button type="button" class="secondary" (click)="resetToDefault()">
+                <button type="button" class="btn secondary" (click)="resetToDefault()">
                   {{ 'adminUserDetail.access.restoreDefault' | translate }}
                 </button>
-                <button type="button" class="primary" (click)="addPermission()" [disabled]="!selectedPermission">
+                <button type="button" class="btn primary" (click)="addPermission()" [disabled]="!selectedPermission">
                   {{ 'adminUserDetail.access.add' | translate }}
                 </button>
               </div>

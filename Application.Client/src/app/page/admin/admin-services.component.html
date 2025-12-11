@@ -23,7 +23,7 @@
             </button>
           </ng-container>
           <ng-template #editingActions>
-            <button class="btn ghost" type="button" (click)="cancelEdit()" [disabled]="isSaving || isTesting">
+            <button class="btn secondary" type="button" (click)="cancelEdit()" [disabled]="isSaving || isTesting">
               {{ 'adminEmail.actions.cancel' | translate }}
             </button>
             <button class="btn primary" type="submit" form="emailSettingsForm" [disabled]="isSaving">
@@ -191,7 +191,7 @@
                         [(ngModel)]="emailConfig.testEmail"
                         [placeholder]="'adminEmail.placeholders.testEmail' | translate"
                       />
-                      <button class="send-test" type="button" (click)="testConnection()" [disabled]="isTesting">
+                      <button class="btn success send-test" type="button" (click)="testConnection()" [disabled]="isTesting">
                         <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
                         <span>
                           {{

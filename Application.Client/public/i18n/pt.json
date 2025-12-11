@@ -380,8 +380,12 @@
       "idMissing": "Conta sem ID"
     },
     "meta": {
-      "name": "Nome",
-      "email": "E-mail",
+      "jobTitle": "Cargo",
+      "department": "Departamento",
+      "organization": "Organização",
+      "location": "Localização",
+      "dateJoined": "Criado em",
+      "lastLogin": "Último acesso",
       "permissions": "Permissões",
       "notProvided": "Não informado"
     },

@@ -482,19 +482,21 @@
   }
 
   .topbar {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
     gap: var(--space-2);
   }
 
   .topbar-user {
-    width: 100%;
+    margin-left: auto;
+    width: auto;
     justify-content: flex-end;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: var(--space-2);
   }
 
   .menu-toggle {
     display: inline-grid;
-    margin-right: 0;
+    margin-right: var(--space-2);
   }
 }
