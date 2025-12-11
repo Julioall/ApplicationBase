@@ -6,13 +6,12 @@ import { Subscription } from 'rxjs';
 import { ThemeService } from './service/theme/theme.service';
 import { UserService } from './service/user/user.service';
 import { User } from './model/User';
-import { ADMIN_PERMISSION } from './model/permissions';
+import { ADMIN_PERMISSION, MANAGE_STUDENTS_PERMISSION, VIEW_STUDENTS_PERMISSION } from './model/permissions';
 
 type NavItem = {
   icon: string;
   label: string;
   badge?: string;
-  active?: boolean;
   path?: string;
 };
 
@@ -30,7 +29,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private userInitialsValue = 'AB';
   sectionState: Record<'admin', boolean> = { admin: false };
   primaryNav: NavItem[] = [
-    { icon: 'fa-solid fa-compass', label: 'home.primaryNav.panel', active: true },
+    { icon: 'fa-solid fa-compass', label: 'home.primaryNav.panel', path: '/home' },
     { icon: 'fa-solid fa-people-group', label: 'home.primaryNav.classes' },
     { icon: 'fa-solid fa-signal', label: 'home.primaryNav.metrics' },
     { icon: 'fa-solid fa-clipboard-check', label: 'home.primaryNav.todo' },
@@ -107,6 +106,14 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isNavOpen = false;
   }
 
+  onNavClick(link: NavItem, event: Event): void {
+    event.preventDefault();
+    if (link.path) {
+      this.router.navigate([link.path]);
+    }
+    this.closeNav();
+  }
+
   toggleSection(section: 'admin'): void {
     const willOpen = !this.sectionState[section];
     this.sectionState.admin = willOpen;
@@ -136,6 +143,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   get userInitials(): string {
     return this.userInitialsValue;
+  }
+
+  get canAccessStudents(): boolean {
+    return this.authService.hasAnyPermission([VIEW_STUDENTS_PERMISSION, MANAGE_STUDENTS_PERMISSION]);
   }
 
   isRouteActive(path?: string): boolean {
