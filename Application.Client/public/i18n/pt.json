@@ -466,6 +466,7 @@
       "dateOfBirth": "Data de nascimento",
       "institution": "Instituição",
       "lang": "Idioma",
+      "langSelectPlaceholder": "Selecione o idioma",
       "timeZone": "Fuso horário",
       "isActive": "Aluno está ativo",
       "address": {
@@ -475,7 +476,10 @@
         "city": "Cidade",
         "state": "Estado",
         "postalCode": "CEP",
-        "country": "País"
+        "country": "País",
+        "searchCep": "Buscar CEP",
+        "searchingCep": "Buscando...",
+        "cepSuccess": "Endereço preenchido pelo CEP"
       },
       "errors": {
         "firstNameRequired": "Primeiro nome é obrigatório.",
@@ -484,7 +488,9 @@
         "lastNameLength": "Informe entre 2 e 100 caracteres.",
         "email": "Informe um e-mail válido.",
         "idNumber": "Máximo de 20 caracteres.",
-        "lang": "Use códigos como pt ou en_US."
+        "lang": "Use códigos como pt ou en_US.",
+        "cepInvalid": "Informe um CEP válido com 8 dígitos.",
+        "cepNotFound": "CEP não encontrado."
       },
       "createSuccess": "Aluno criado com sucesso.",
       "updateSuccess": "Aluno atualizado com sucesso.",

@@ -5,6 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { StudentsService } from '../../service/students/students.service';
 import { Student } from '../../model/student';
+import { CepService, CepResult } from '../../service/cep/cep.service';
 
 @Component({
   selector: 'app-student-form',
@@ -17,8 +18,13 @@ export class StudentFormComponent implements OnInit {
   loading = false;
   submitted = false;
   studentId?: string;
-  languages = ['pt', 'en', 'es'];
+  languages = [
+    { value: 'pt', label: 'Português' },
+    { value: 'en', label: 'English' },
+    { value: 'es', label: 'Español' },
+  ];
   timeZones = ['UTC', 'America/Sao_Paulo', 'America/New_York', 'Europe/London'];
+  cepLoading = false;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -27,6 +33,7 @@ export class StudentFormComponent implements OnInit {
     private readonly studentsService: StudentsService,
     private readonly notificationService: NotificationService,
     private readonly translate: TranslateService,
+    private readonly cepService: CepService,
   ) {
     this.form = this.fb.group({
       FirstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
@@ -41,7 +48,7 @@ export class StudentFormComponent implements OnInit {
         District: [''],
         City: [''],
         State: [''],
-        PostalCode: [''],
+        PostalCode: ['', [Validators.pattern(/^\d{5}-?\d{3}$/)]],
         Country: [''],
       }),
       Institution: [''],
@@ -64,6 +71,11 @@ export class StudentFormComponent implements OnInit {
 
   get addressGroup(): FormGroup {
     return this.form.get('Address') as FormGroup;
+  }
+
+  private formatCep(value?: string | null): string {
+    const digits = this.cepService.sanitize(value || '');
+    return digits.length === 8 ? digits.replace(/(\d{5})(\d{3})/, '$1-$2') : digits;
   }
 
   onSubmit(): void {
@@ -99,6 +111,55 @@ export class StudentFormComponent implements OnInit {
     this.router.navigate(['/students']);
   }
 
+  onCepBlur(): void {
+    if (this.cepLoading) {
+      return;
+    }
+    this.searchCep(true);
+  }
+
+  searchCep(triggeredByBlur = false): void {
+    const cepControl = this.addressGroup.get('PostalCode');
+    const cep = this.cepService.sanitize(cepControl?.value);
+
+    if (!cep || cep.length !== 8) {
+      if (!triggeredByBlur) {
+        this.notificationService.showWarning(this.translate.instant('students.form.errors.cepInvalid'));
+      }
+      return;
+    }
+
+    this.cepLoading = true;
+    this.cepService.lookup(cep).subscribe({
+      next: (result) => {
+        this.patchAddressFromCep(result);
+        this.notificationService.showSuccess(this.translate.instant('students.form.address.cepSuccess'));
+      },
+      error: () => {
+        this.notificationService.showError(this.translate.instant('students.form.errors.cepNotFound'));
+      },
+      complete: () => {
+        this.cepLoading = false;
+      },
+    });
+  }
+
+  showAddressError(controlName: string, error: string): boolean {
+    const control = this.addressGroup.get(controlName);
+    return !!control && (control.touched || this.submitted) && control.hasError(error);
+  }
+
+  private patchAddressFromCep(result: CepResult): void {
+    this.addressGroup.patchValue({
+      Street: result.street || this.addressGroup.get('Street')?.value,
+      District: result.district || this.addressGroup.get('District')?.value,
+      City: result.city || this.addressGroup.get('City')?.value,
+      State: result.state || this.addressGroup.get('State')?.value,
+      PostalCode: this.formatCep(result.cep),
+      Country: this.addressGroup.get('Country')?.value || 'Brasil',
+    });
+  }
+
   private loadStudent(id: string): void {
     this.loading = true;
     this.studentsService.getStudent(id).subscribe({
@@ -129,13 +190,17 @@ export class StudentFormComponent implements OnInit {
     });
 
     if (student.Address) {
-      this.addressGroup.patchValue(student.Address);
+      this.addressGroup.patchValue({
+        ...student.Address,
+        PostalCode: this.formatCep(student.Address.PostalCode || ''),
+      });
     }
   }
 
   private buildPayload(): Partial<Student> {
     const raw = this.form.value;
     const address = this.addressGroup.value;
+    const postalCode = address.PostalCode ? this.cepService.sanitize(address.PostalCode) : undefined;
     return {
       FirstName: (raw.FirstName as string).trim(),
       LastName: (raw.LastName as string).trim(),
@@ -143,7 +208,10 @@ export class StudentFormComponent implements OnInit {
       IdNumber: raw.IdNumber ? (raw.IdNumber as string).trim() : undefined,
       Phone: raw.Phone ? (raw.Phone as string).trim() : undefined,
       DateOfBirth: raw.DateOfBirth ? new Date(raw.DateOfBirth).toISOString() : null,
-      Address: address,
+      Address: {
+        ...address,
+        PostalCode: postalCode || undefined,
+      },
       Institution: raw.Institution ? (raw.Institution as string).trim() : undefined,
       Lang: raw.Lang ? (raw.Lang as string).trim() : undefined,
       TimeZone: raw.TimeZone ? (raw.TimeZone as string).trim() : undefined,
