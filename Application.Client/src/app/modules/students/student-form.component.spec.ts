@@ -51,12 +51,39 @@ describe('StudentFormComponent', () => {
 
   it('should call createStudent on submit when valid', () => {
     studentsService.createStudent.and.returnValue(of({} as Student));
-    component.form.patchValue({ FirstName: 'Ana', LastName: 'Silva', IsActive: true });
+    component.form.patchValue({ FirstName: 'Ana', LastName: 'Silva', Status: 'active' });
 
     component.onSubmit();
 
     expect(studentsService.createStudent).toHaveBeenCalled();
     expect(routerNavigate).toHaveBeenCalled();
+  });
+
+  it('should include LastAccessAt when provided', () => {
+    studentsService.createStudent.and.returnValue(of({} as Student));
+    const lastAccess = '2024-12-10T10:30';
+    component.form.patchValue({ FirstName: 'Ana', LastName: 'Silva', Status: 'suspended', LastAccessAt: lastAccess });
+
+    component.onSubmit();
+
+    const payload = studentsService.createStudent.calls.mostRecent().args[0] as Partial<Student>;
+    expect(payload.LastAccessAt).toBe(new Date(lastAccess).toISOString());
+    expect(payload.Status).toBe('suspended');
+    expect(payload.IsActive).toBeFalse();
+  });
+
+  it('should set IsActive true only for active status', () => {
+    studentsService.createStudent.and.returnValue(of({} as Student));
+    component.form.patchValue({ FirstName: 'Ana', LastName: 'Silva', Status: 'active' });
+
+    component.onSubmit();
+    let payload = studentsService.createStudent.calls.mostRecent().args[0] as Partial<Student>;
+    expect(payload.IsActive).toBeTrue();
+
+    component.form.patchValue({ Status: 'not_currently' });
+    component.onSubmit();
+    payload = studentsService.createStudent.calls.mostRecent().args[0] as Partial<Student>;
+    expect(payload.IsActive).toBeFalse();
   });
 
   it('should load student when route has id', () => {

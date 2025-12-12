@@ -30,6 +30,8 @@ namespace Application.Service.Service
             ArgumentException.ThrowIfNullOrWhiteSpace(dto.FirstName);
             ArgumentException.ThrowIfNullOrWhiteSpace(dto.LastName);
 
+            var status = NormalizeStatus(dto.Status ?? (dto.IsActive ? StudentStatus.Active : StudentStatus.NotCurrently));
+
             var student = new Student
             {
                 FirstName = dto.FirstName.Trim(),
@@ -42,7 +44,9 @@ namespace Application.Service.Service
                 Institution = Normalize(dto.Institution),
                 Lang = Normalize(dto.Lang),
                 TimeZone = Normalize(dto.TimeZone),
-                IsActive = dto.IsActive,
+                Status = status,
+                IsActive = status == StudentStatus.Active,
+                LastAccessAt = dto.LastAccessAt,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -65,6 +69,8 @@ namespace Application.Service.Service
                 throw new NotFoundException(_localizer["StudentNotFound", id]);
             }
 
+            var status = NormalizeStatus(dto.Status ?? existing.Status ?? (dto.IsActive ? StudentStatus.Active : StudentStatus.NotCurrently));
+
             existing.FirstName = dto.FirstName.Trim();
             existing.LastName = dto.LastName.Trim();
             existing.Email = Normalize(dto.Email);
@@ -75,9 +81,11 @@ namespace Application.Service.Service
             existing.Institution = Normalize(dto.Institution);
             existing.Lang = Normalize(dto.Lang);
             existing.TimeZone = Normalize(dto.TimeZone);
-            existing.IsActive = dto.IsActive;
+            existing.Status = status;
+            existing.IsActive = status == StudentStatus.Active;
             existing.CreatedAt = existing.CreatedAt == default ? DateTime.UtcNow : existing.CreatedAt;
             existing.UpdatedAt = DateTime.UtcNow;
+            existing.LastAccessAt = dto.LastAccessAt;
 
             await ValidateAsync(existing, existing.Id);
             await _studentRepository.UpdateAsync(existing);
@@ -95,6 +103,7 @@ namespace Application.Service.Service
                 throw new NotFoundException(_localizer["StudentNotFound", id]);
             }
 
+            existing.Status = StudentStatus.NotCurrently;
             existing.IsActive = false;
             existing.UpdatedAt = DateTime.UtcNow;
 
@@ -152,6 +161,22 @@ namespace Application.Service.Service
 
             var trimmed = value.Trim();
             return trimmed.Length == 0 ? null : trimmed;
+        }
+
+        private static string NormalizeStatus(string? status)
+        {
+            if (string.IsNullOrWhiteSpace(status))
+            {
+                return StudentStatus.Active;
+            }
+
+            var normalized = status.Trim().ToLowerInvariant();
+            if (normalized == "inactive" || normalized == "inativo")
+            {
+                return StudentStatus.NotCurrently;
+            }
+
+            return StudentStatus.All.Contains(normalized) ? normalized : normalized;
         }
 
         private static Address? CloneAddress(Address? address)

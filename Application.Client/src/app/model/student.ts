@@ -12,7 +12,9 @@ export interface Student {
   Institution?: string;
   Lang?: string;
   TimeZone?: string;
+  Status?: 'active' | 'suspended' | 'not_currently';
   IsActive: boolean;
   CreatedAt?: string;
   UpdatedAt?: string | null;
+  LastAccessAt?: string | null;
 }

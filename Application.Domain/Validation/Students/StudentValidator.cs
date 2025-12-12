@@ -40,6 +40,10 @@ namespace Application.Domain.Validation.Students
                 .Must(BeValidTimeZone).WithMessage("StudentTimeZoneInvalid")
                 .When(student => !string.IsNullOrWhiteSpace(student.TimeZone));
 
+            RuleFor(student => student.Status)
+                .Must(status => StudentStatus.All.Contains(status))
+                .WithMessage("StudentStatusInvalid");
+
             When(student => student.Address != null, () =>
             {
                 RuleFor(student => student.Address!).SetValidator(new AddressValidator());

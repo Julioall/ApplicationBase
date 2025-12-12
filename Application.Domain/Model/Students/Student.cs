@@ -16,8 +16,10 @@ namespace Application.Domain.Model.Students
         public string? Lang { get; set; }
         public string? TimeZone { get; set; }
         public bool IsActive { get; set; } = true;
+        public string Status { get; set; } = StudentStatus.Active;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+        public DateTime? LastAccessAt { get; set; }
 
         public string FullName => $"{FirstName} {LastName}".Trim();
     }

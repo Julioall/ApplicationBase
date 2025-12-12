@@ -7,7 +7,7 @@ import { Student } from '../../model/student';
 import { StudentsService } from '../../service/students/students.service';
 import { NotificationService } from '../../service/notification/notification.service';
 
-type StatusFilter = 'all' | 'active' | 'inactive';
+type StatusFilter = 'all' | 'active' | 'suspended' | 'not_currently';
 
 @Component({
   selector: 'app-students-list',
@@ -57,8 +57,11 @@ export class StudentsListComponent implements OnInit, OnDestroy {
       IsActive: isActive
     }).subscribe({
       next: (result) => {
-        this.students = result.Items || [];
-        this.total = result.Total;
+        const items = result.Items || [];
+        this.students = this.filterByStatus(items);
+        this.total = (this.statusFilter === 'suspended' || this.statusFilter === 'not_currently')
+          ? this.students.length
+          : result.Total;
         this.pageNumber = result.PageNumber || this.pageNumber;
         this.pageSize = result.PageSize || this.pageSize;
         this.loading = false;
@@ -124,6 +127,45 @@ export class StudentsListComponent implements OnInit, OnDestroy {
   }
 
   getStatusLabel(student: Student): string {
-    return student.IsActive ? this.translate.instant('students.list.statusActive') : this.translate.instant('students.list.statusInactive');
+    const status = (student.Status || (student.IsActive ? 'active' : 'not_currently')).toLowerCase();
+    switch (status) {
+      case 'suspended':
+        return this.translate.instant('students.status.suspended');
+      case 'not_currently':
+        return this.translate.instant('students.status.notCurrently');
+      default:
+        return this.translate.instant('students.status.active');
+    }
+  }
+
+  getStatusClass(student: Student): string {
+    const status = (student.Status || (student.IsActive ? 'active' : 'not_currently')).toLowerCase();
+    if (status === 'suspended') {
+      return 'suspended';
+    }
+    if (status === 'not_currently') {
+      return 'inactive';
+    }
+    return 'active';
+  }
+
+  private filterByStatus(items: Student[]): Student[] {
+    const filter = this.statusFilter;
+    if (filter === 'all') {
+      return items;
+    }
+
+    return items.filter(student => {
+      const status = (student.Status || (student.IsActive ? 'active' : 'not_currently')).toLowerCase();
+      if (filter === 'active') {
+        return status === 'active';
+      }
+
+      if (filter === 'suspended') {
+        return status === 'suspended';
+      }
+
+      return status === 'not_currently';
+    });
   }
 }

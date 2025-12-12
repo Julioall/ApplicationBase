@@ -83,12 +83,19 @@
               <option *ngFor="let tz of timeZones" [value]="tz"></option>
             </datalist>
           </div>
-          <div class="field checkbox">
-            <label>
-              <input type="checkbox" formControlName="IsActive" />
-              {{ 'students.form.isActive' | translate }}
-            </label>
+          <div class="field">
+            <label for="status">{{ 'students.form.status' | translate }}</label>
+            <select id="status" formControlName="Status">
+              <option *ngFor="let option of statusOptions" [value]="option.value">
+                {{ option.label | translate }}
+              </option>
+            </select>
           </div>
+        </div>
+
+        <div class="field">
+          <label for="lastAccess">{{ 'students.form.lastAccess' | translate }}</label>
+          <input id="lastAccess" type="datetime-local" formControlName="LastAccessAt" />
         </div>
 
         <div formGroupName="Address" class="address-grid">

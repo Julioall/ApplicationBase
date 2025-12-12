@@ -1,4 +1,5 @@
 using Application.Domain.Exceptions;
+using Application.Domain.Model.Students;
 using Application.Domain.Model.Students.Dtos;
 using Application.Domain.Model.ValueObjects;
 using Application.Service.Interface;
@@ -22,6 +23,10 @@ namespace Application.Tests.Services
         public async Task CreateStudent_Should_Persist()
         {
             var dto = CreateStudentDto(idNumber: "123456");
+            var expectedLastAccess = DateTime.UtcNow.AddDays(-1);
+            dto.LastAccessAt = expectedLastAccess;
+            dto.Status = StudentStatus.Suspended;
+            dto.IsActive = false;
 
             var created = await _studentService.CreateStudentAsync(dto);
             await _asyncSession.SaveChangesAsync();
@@ -31,7 +36,9 @@ namespace Application.Tests.Services
             Assert.NotNull(loaded);
             Assert.Equal(dto.FirstName, loaded!.FirstName);
             Assert.Equal(dto.LastName, loaded.LastName);
-            Assert.True(loaded.IsActive);
+            Assert.False(loaded.IsActive);
+            Assert.Equal(StudentStatus.Suspended, loaded.Status);
+            Assert.Equal(expectedLastAccess, loaded.LastAccessAt);
             Assert.NotEqual(default, loaded.CreatedAt);
         }
 
@@ -74,7 +81,9 @@ namespace Application.Tests.Services
                 Institution = "Tech University",
                 Lang = "pt_BR",
                 TimeZone = "America/Sao_Paulo",
-                IsActive = true
+                IsActive = false,
+                Status = StudentStatus.NotCurrently,
+                LastAccessAt = DateTime.UtcNow.AddDays(-2)
             };
 
             var updated = await _studentService.UpdateStudentAsync(created.Id!, updateDto);
@@ -85,6 +94,8 @@ namespace Application.Tests.Services
             Assert.Equal("Silva", loaded.LastName);
             Assert.Equal("Tech University", loaded.Institution);
             Assert.Equal("America/Sao_Paulo", loaded.TimeZone);
+            Assert.Equal(StudentStatus.NotCurrently, loaded.Status);
+            Assert.Equal(updateDto.LastAccessAt, loaded.LastAccessAt);
         }
 
         [Fact]
@@ -113,6 +124,7 @@ namespace Application.Tests.Services
             var loaded = await _studentService.GetStudentAsync(created.Id!);
             Assert.NotNull(loaded);
             Assert.False(loaded!.IsActive);
+            Assert.Equal(StudentStatus.NotCurrently, loaded.Status);
         }
 
         [Fact]
@@ -147,7 +159,9 @@ namespace Application.Tests.Services
                 Institution = "Test School",
                 Lang = "en",
                 TimeZone = "America/New_York",
-                IsActive = true
+                IsActive = true,
+                Status = StudentStatus.Active,
+                LastAccessAt = DateTime.UtcNow.AddDays(-1)
             };
         }
     }

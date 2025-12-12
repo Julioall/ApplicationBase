@@ -18,7 +18,7 @@
       "emailPlaceholder": "seuemail@dominio.com",
       "sendCode": "Enviar código",
       "sending": "Enviando...",
-      "sent": "Codigo enviado",
+      "sent": "Código enviado",
       "codeStep": "Insira o código enviado",
       "codeLabel": "Código de recuperação",
       "codeHelper": "Confira sua caixa de entrada e spam.",
@@ -35,7 +35,7 @@
       "verifying": "Validando...",
       "codeValidated": "Código confirmado",
       "validateFirst": "Valide o código antes de definir a nova senha",
-      "resend": "Reenviar c?digo",
+      "resend": "Reenviar código",
       "resendIn": "Reenviar em {{seconds}}s"
     },
     "password": {
@@ -48,7 +48,7 @@
       "emailLabel": "E-mail",
       "emailPlaceholder": "exemplo@empresa.com",
       "emailRequired": "Informe seu e-mail.",
-      "emailInvalid": "Formato de e-mail inv?lido.",
+      "emailInvalid": "Formato de e-mail inválido.",
       "passwordLabel": "Senha",
       "passwordPlaceholder": "********",
       "passwordRequired": "Informe sua senha.",
@@ -56,7 +56,7 @@
       "remember": "Lembrar de mim",
       "forgot": "Esqueceu a senha?",
       "submit": "Entrar",
-      "noAccount": "N?o tem conta?",
+      "noAccount": "Não tem conta?",
       "create": "Criar conta",
       "showPassword": "Mostrar senha",
       "hidePassword": "Ocultar senha"
@@ -66,22 +66,22 @@
       "subtitle": "Preencha os dados para iniciar novos projetos com Angular + .NET.",
       "fullNameLabel": "Nome completo",
       "fullNamePlaceholder": "Digite seu nome",
-      "fullNameRequired": "Nome ? obrigat?rio.",
+      "fullNameRequired": "Nome é obrigatório.",
       "fullNameMin": "Informe ao menos 3 caracteres.",
       "emailLabel": "E-mail",
       "emailPlaceholder": "seu@email.com",
-      "emailRequired": "E-mail ? obrigat?rio.",
-      "emailInvalid": "Formato de e-mail inv?lido.",
+      "emailRequired": "E-mail é obrigatório.",
+      "emailInvalid": "Formato de e-mail inválido.",
       "passwordLabel": "Senha",
-      "passwordPlaceholder": "M?nimo 8 caracteres",
-      "passwordRequired": "Senha ? obrigat?ria.",
-      "passwordMin": "Use no m?nimo 8 caracteres.",
+      "passwordPlaceholder": "Mínimo 8 caracteres",
+      "passwordRequired": "Senha é obrigatória.",
+      "passwordMin": "Use no mínimo 8 caracteres.",
       "confirmPasswordLabel": "Confirmar senha",
       "confirmPasswordPlaceholder": "Repita a senha",
       "confirmPasswordMismatch": "As senhas precisam ser iguais.",
-      "updatesLabel": "Quero receber novidades sobre evolu??es do template.",
+      "updatesLabel": "Quero receber novidades sobre evoluções do template.",
       "submit": "Registrar",
-      "footerText": "J? possui uma conta?",
+      "footerText": "Já possui uma conta?",
       "footerLink": "Fazer login"
     }
   },
@@ -302,24 +302,24 @@
     }
   },
   "adminEmailSettings": {
-    "title": "Configura??es de e-mail",
-    "subtitle": "Gerencie remetente padr?o, infraestrutura SMTP e alertas transacionais.",
+    "title": "Configurações de e-mail",
+    "subtitle": "Gerencie remetente padrão, infraestrutura SMTP e alertas transacionais.",
     "smtp": {
       "eyebrow": "Infraestrutura",
       "title": "Servidor SMTP",
       "description": "Configure host, porta, TLS e credenciais da conta de envio.",
       "comingSoon": "Em breve",
       "placeholderTitle": "Adicionar host de e-mail",
-      "placeholderDescription": "Defina provedor, remetente padr?o e autentica??o."
+      "placeholderDescription": "Defina provedor, remetente padrão e autenticação."
     },
     "notifications": {
-      "eyebrow": "Notifica??es",
+      "eyebrow": "Notificações",
       "title": "Transacionais",
       "description": "Templates de reset de senha, onboard e alertas operacionais.",
       "bullets": {
-        "reliable": "Disparos confi?veis de boas-vindas, verifica??o e redefini??o.",
-        "integrations": "Integra??es com SendGrid, Amazon SES ou SMTP customizado.",
-        "monitoring": "Monitoramento de taxa de entrega e rejei??o."
+        "reliable": "Disparos confiáveis de boas-vindas, verificação e redefinição.",
+        "integrations": "Integrações com SendGrid, Amazon SES ou SMTP customizado.",
+        "monitoring": "Monitoramento de taxa de entrega e rejeição."
       }
     }
   },
@@ -434,7 +434,8 @@
         "idNumber": "Matrícula/CPF",
         "phone": "Telefone",
         "status": "Status",
-        "actions": "Ações"
+        "actions": "Ações",
+        "lastAccess": "Último acesso"
       },
       "loading": "Carregando alunos...",
       "empty": "Nenhum aluno encontrado.",
@@ -455,7 +456,7 @@
       "titleCreate": "Cadastrar aluno",
       "titleEdit": "Editar aluno",
       "subtitle": "Guarde dados de contato, idioma e fuso horário de cada aluno.",
-      "back": "Voltar para lista",
+      "back": "Voltar",
       "save": "Salvar aluno",
       "saving": "Salvando...",
       "firstName": "Primeiro nome",
@@ -495,7 +496,14 @@
       "createSuccess": "Aluno criado com sucesso.",
       "updateSuccess": "Aluno atualizado com sucesso.",
       "saveError": "Não foi possível salvar o aluno.",
-      "loadError": "Não foi possível carregar o aluno."
+      "loadError": "Não foi possível carregar o aluno.",
+      "lastAccess": "Último acesso",
+      "status": "Estado"
+    },
+    "status": {
+      "active": "Ativo",
+      "suspended": "Suspenso",
+      "notCurrently": "Não atualmente"
     }
   }
 }

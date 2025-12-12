@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -24,6 +24,11 @@ export class StudentFormComponent implements OnInit {
     { value: 'es', label: 'Español' },
   ];
   timeZones = ['UTC', 'America/Sao_Paulo', 'America/New_York', 'Europe/London'];
+  statusOptions = [
+    { value: 'active', label: 'students.status.active' },
+    { value: 'suspended', label: 'students.status.suspended' },
+    { value: 'not_currently', label: 'students.status.notCurrently' },
+  ];
   cepLoading = false;
 
   constructor(
@@ -54,6 +59,8 @@ export class StudentFormComponent implements OnInit {
       Institution: [''],
       Lang: ['', [Validators.pattern(/^[a-z]{2}(?:_[A-Z]{2})?$/)]],
       TimeZone: [''],
+      Status: ['active'],
+      LastAccessAt: [''],
       IsActive: [true],
     });
   }
@@ -76,6 +83,37 @@ export class StudentFormComponent implements OnInit {
   private formatCep(value?: string | null): string {
     const digits = this.cepService.sanitize(value || '');
     return digits.length === 8 ? digits.replace(/(\d{5})(\d{3})/, '$1-$2') : digits;
+  }
+
+  private formatDateTimeForInput(value?: string | null): string {
+    if (!value) {
+      return '';
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return '';
+    }
+
+    const pad = (num: number) => num.toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  private normalizeStatus(status?: string | null): 'active' | 'suspended' | 'not_currently' {
+    const normalized = (status || '').trim().toLowerCase();
+    if (normalized === 'suspended') {
+      return 'suspended';
+    }
+    if (normalized === 'not_currently') {
+      return 'not_currently';
+    }
+    return 'active';
   }
 
   onSubmit(): void {
@@ -195,12 +233,26 @@ export class StudentFormComponent implements OnInit {
         PostalCode: this.formatCep(student.Address.PostalCode || ''),
       });
     }
+
+    this.form.patchValue({
+      LastAccessAt: this.formatDateTimeForInput(student.LastAccessAt)
+    });
+
+    const normalizedStatus = this.normalizeStatus(student.Status || (student.IsActive ? 'active' : 'not_currently'));
+    this.form.patchValue({
+      Status: normalizedStatus,
+      IsActive: normalizedStatus === 'active'
+    });
   }
 
   private buildPayload(): Partial<Student> {
     const raw = this.form.value;
     const address = this.addressGroup.value;
     const postalCode = address.PostalCode ? this.cepService.sanitize(address.PostalCode) : undefined;
+    const lastAccess = raw.LastAccessAt ? new Date(raw.LastAccessAt as string) : null;
+    const status = this.normalizeStatus(raw.Status as string);
+    const isActive = status === 'active';
+
     return {
       FirstName: (raw.FirstName as string).trim(),
       LastName: (raw.LastName as string).trim(),
@@ -215,7 +267,9 @@ export class StudentFormComponent implements OnInit {
       Institution: raw.Institution ? (raw.Institution as string).trim() : undefined,
       Lang: raw.Lang ? (raw.Lang as string).trim() : undefined,
       TimeZone: raw.TimeZone ? (raw.TimeZone as string).trim() : undefined,
-      IsActive: raw.IsActive ?? true,
+      Status: status,
+      LastAccessAt: lastAccess && !Number.isNaN(lastAccess.getTime()) ? lastAccess.toISOString() : null,
+      IsActive: isActive,
     };
   }
 

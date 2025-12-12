@@ -37,6 +37,7 @@
           <span>{{ 'students.list.columns.email' | translate }}</span>
           <span>{{ 'students.list.columns.idNumber' | translate }}</span>
           <span>{{ 'students.list.columns.phone' | translate }}</span>
+          <span>{{ 'students.list.columns.lastAccess' | translate }}</span>
           <span>{{ 'students.list.columns.status' | translate }}</span>
           <span class="actions-col">{{ 'students.list.columns.actions' | translate }}</span>
         </div>
@@ -56,8 +57,9 @@
             <div class="cell">{{ student.Email || '-' }}</div>
             <div class="cell">{{ student.IdNumber || '-' }}</div>
             <div class="cell">{{ student.Phone || '-' }}</div>
+            <div class="cell">{{ student.LastAccessAt ? (student.LastAccessAt | date:'short') : '-' }}</div>
             <div class="cell">
-              <span class="status" [class.active]="student.IsActive" [class.inactive]="!student.IsActive">
+              <span class="status" [ngClass]="getStatusClass(student)">
                 {{ getStatusLabel(student) }}
               </span>
             </div>

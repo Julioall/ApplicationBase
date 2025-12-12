@@ -224,7 +224,7 @@
 
 .list-header {
   display: grid;
-  grid-template-columns: 1.4fr 1.2fr 1fr 1fr 0.8fr auto;
+  grid-template-columns: 1.4fr 1.2fr 1fr 1fr 1fr 0.8fr auto;
   padding: var(--space-3) var(--space-4);
   background: var(--surface-alt);
   color: var(--text-subtle);
@@ -239,7 +239,7 @@
 
 .list-row {
   display: grid;
-  grid-template-columns: 1.4fr 1.2fr 1fr 1fr 0.8fr auto;
+  grid-template-columns: 1.4fr 1.2fr 1fr 1fr 1fr 0.8fr auto;
   padding: var(--space-3) var(--space-4);
   border-top: 1px solid var(--border-soft);
   align-items: center;
@@ -297,6 +297,12 @@
     color: #d35400;
     border-color: rgba(255, 99, 71, 0.3);
   }
+
+  &.suspended {
+    background: rgba(255, 193, 7, 0.12);
+    color: #b7791f;
+    border-color: rgba(255, 193, 7, 0.4);
+  }
 }
 
 .state-row {
@@ -325,22 +331,24 @@
     grid-template-areas:
       'name name actions'
       'email idNumber status'
-      'phone phone status';
+      'phone lastAccess status';
   }
 
   .list-header span:nth-child(1) { grid-area: name; }
   .list-header span:nth-child(2) { grid-area: email; }
   .list-header span:nth-child(3) { grid-area: idNumber; }
   .list-header span:nth-child(4) { grid-area: phone; }
-  .list-header span:nth-child(5) { grid-area: status; }
-  .list-header span:nth-child(6) { grid-area: actions; text-align: right; }
+  .list-header span:nth-child(5) { grid-area: lastAccess; }
+  .list-header span:nth-child(6) { grid-area: status; }
+  .list-header span:nth-child(7) { grid-area: actions; text-align: right; }
 
   .list-row .cell:nth-child(1) { grid-area: name; }
   .list-row .cell:nth-child(2) { grid-area: email; }
   .list-row .cell:nth-child(3) { grid-area: idNumber; }
   .list-row .cell:nth-child(4) { grid-area: phone; }
-  .list-row .cell:nth-child(5) { grid-area: status; }
-  .list-row .cell:nth-child(6) { grid-area: actions; justify-content: flex-start; }
+  .list-row .cell:nth-child(5) { grid-area: lastAccess; }
+  .list-row .cell:nth-child(6) { grid-area: status; }
+  .list-row .cell:nth-child(7) { grid-area: actions; justify-content: flex-start; }
 }
 
 @include respond-down(md) {

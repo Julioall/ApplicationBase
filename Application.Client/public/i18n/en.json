@@ -417,7 +417,8 @@
         "idNumber": "ID number",
         "phone": "Phone",
         "status": "Status",
-        "actions": "Actions"
+        "actions": "Actions",
+        "lastAccess": "Last access"
       },
       "loading": "Loading students...",
       "empty": "No students found.",
@@ -438,7 +439,7 @@
       "titleCreate": "Create student",
       "titleEdit": "Edit student",
       "subtitle": "Store contact, language, and timezone preferences for each student.",
-      "back": "Back to list",
+      "back": "Back",
       "save": "Save student",
       "saving": "Saving...",
       "firstName": "First name",
@@ -472,7 +473,14 @@
       "createSuccess": "Student created successfully.",
       "updateSuccess": "Student updated successfully.",
       "saveError": "Could not save the student.",
-      "loadError": "Could not load the student."
+      "loadError": "Could not load the student.",
+      "lastAccess": "Last access",
+      "status": "Status"
+    },
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "notCurrently": "Not currently"
     }
   },
   "admin": {

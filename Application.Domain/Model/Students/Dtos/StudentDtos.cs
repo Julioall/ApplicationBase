@@ -1,3 +1,4 @@
+using Application.Domain.Model.Students;
 using Application.Domain.Model.ValueObjects;
 
 namespace Application.Domain.Model.Students.Dtos
@@ -15,6 +16,8 @@ namespace Application.Domain.Model.Students.Dtos
         public string? Lang { get; set; }
         public string? TimeZone { get; set; }
         public bool IsActive { get; set; } = true;
+        public string Status { get; set; } = StudentStatus.Active;
+        public DateTime? LastAccessAt { get; set; }
     }
 
     public class UpdateStudentDto
@@ -30,5 +33,7 @@ namespace Application.Domain.Model.Students.Dtos
         public string? Lang { get; set; }
         public string? TimeZone { get; set; }
         public bool IsActive { get; set; } = true;
+        public string Status { get; set; } = StudentStatus.Active;
+        public DateTime? LastAccessAt { get; set; }
     }
 }
