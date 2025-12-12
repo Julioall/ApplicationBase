@@ -3,9 +3,13 @@ import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription, debounceTime } from 'rxjs';
+import { finalize } from 'rxjs/operators';
 import { Student } from '../../model/student';
 import { StudentsService } from '../../service/students/students.service';
 import { NotificationService } from '../../service/notification/notification.service';
+import { AuthService } from '../../service/auth/auth.service';
+import { MANAGE_STUDENTS_PERMISSION } from '../../model/permissions';
+import { StudentImportResult } from '../../model/student-import-result';
 
 type StatusFilter = 'all' | 'active' | 'suspended' | 'not_currently';
 
@@ -20,6 +24,8 @@ export class StudentsListComponent implements OnInit, OnDestroy {
   pageNumber = 1;
   pageSize = 10;
   loading = false;
+  importing = false;
+  exporting = false;
   statusFilter: StatusFilter = 'all';
   searchControl = new FormControl('');
   private searchSub?: Subscription;
@@ -29,6 +35,7 @@ export class StudentsListComponent implements OnInit, OnDestroy {
     private readonly notificationService: NotificationService,
     public readonly translate: TranslateService,
     private readonly router: Router,
+    private readonly authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -117,6 +124,51 @@ export class StudentsListComponent implements OnInit, OnDestroy {
     this.loadStudents();
   }
 
+  onImport(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    this.importing = true;
+    this.studentsService.importStudents(file)
+      .pipe(finalize(() => {
+        this.importing = false;
+        input.value = '';
+      }))
+      .subscribe({
+        next: (result) => {
+          this.handleImportResult(result);
+          this.loadStudents();
+        },
+        error: (err) => {
+          const detail = this.resolveErrorDetail(err, 'students.list.importError');
+          this.notificationService.showError(detail, this.translate.instant('students.common.error'));
+        }
+      });
+  }
+
+  onExport(): void {
+    this.exporting = true;
+    this.studentsService.exportStudents()
+      .pipe(finalize(() => this.exporting = false))
+      .subscribe({
+        next: (blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `alunos-${new Date().toISOString().replace(/[:.]/g, '-')}.xlsx`;
+          link.click();
+          window.URL.revokeObjectURL(url);
+        },
+        error: (err) => {
+          const detail = this.resolveErrorDetail(err, 'students.list.exportError');
+          this.notificationService.showError(detail, this.translate.instant('students.common.error'));
+        }
+      });
+  }
+
   trackByStudent(_: number, student: Student): string | undefined {
     return student.Id;
   }
@@ -124,6 +176,10 @@ export class StudentsListComponent implements OnInit, OnDestroy {
   get totalPages(): number {
     const pages = Math.ceil(this.total / this.pageSize);
     return Number.isFinite(pages) && pages > 0 ? pages : 1;
+  }
+
+  get canManageStudents(): boolean {
+    return this.authService.hasPermission(MANAGE_STUDENTS_PERMISSION);
   }
 
   getStatusLabel(student: Student): string {
@@ -147,6 +203,31 @@ export class StudentsListComponent implements OnInit, OnDestroy {
       return 'inactive';
     }
     return 'active';
+  }
+
+  private handleImportResult(result: StudentImportResult): void {
+    const created = result?.Created ?? 0;
+    const updated = result?.Updated ?? 0;
+    this.notificationService.showSuccess(
+      this.translate.instant('students.list.importSuccess', { created, updated }),
+      this.translate.instant('students.list.importTitle')
+    );
+
+    const errors = result?.Errors || [];
+    if (errors.length > 0) {
+      const preview = errors.slice(0, 3)
+        .map(error => this.translate.instant('students.list.importErrorRow', { row: error.Row, message: error.Message }))
+        .join(' | ');
+
+      this.notificationService.showWarning(
+        preview,
+        this.translate.instant('students.list.importWarning', { count: errors.length })
+      );
+    }
+  }
+
+  private resolveErrorDetail(err: any, fallbackKey: string): string {
+    return err?.detail || err?.title || err?.message || this.translate.instant(fallbackKey);
   }
 
   private filterByStatus(items: Student[]): Student[] {

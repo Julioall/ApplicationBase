@@ -1,9 +1,11 @@
 using Application.Domain.Exceptions;
+using Application.Domain.Model.Dtos;
 using Application.Domain.Model.Students;
 using Application.Domain.Model.Students.Dtos;
 using Application.Domain.Model.ValueObjects;
 using Application.Service.Interface;
 using Application.Tests.Setup;
+using ClosedXML.Excel;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -134,6 +136,133 @@ namespace Application.Tests.Services
             dto.TimeZone = "Invalid/Zone";
 
             await Assert.ThrowsAsync<ValidationException>(() => _studentService.CreateStudentAsync(dto));
+        }
+
+        [Fact]
+        public async Task ImportStudents_Should_Create_And_Update_By_Email()
+        {
+            var existing = await _studentService.CreateStudentAsync(new CreateStudentDto
+            {
+                FirstName = "Old",
+                LastName = "Name",
+                Email = "existing@test.com",
+                IsActive = true,
+                Status = StudentStatus.Active
+            });
+            await _asyncSession.SaveChangesAsync();
+
+            var workbook = new XLWorkbook();
+            var ws = workbook.AddWorksheet("Students");
+            ws.Cell(1, 1).Value = "Nome";
+            ws.Cell(1, 2).Value = "Sobrenome";
+            ws.Cell(1, 3).Value = "Ultimo acesso";
+            ws.Cell(1, 4).Value = "Endereco de e-mail";
+
+            ws.Cell(2, 1).Value = "John";
+            ws.Cell(2, 2).Value = "Updated";
+            ws.Cell(2, 3).Value = DateTime.UtcNow.AddDays(-1);
+            ws.Cell(2, 4).Value = "existing@test.com";
+
+            ws.Cell(3, 1).Value = "Alice";
+            ws.Cell(3, 2).Value = "New";
+            ws.Cell(3, 3).Value = DateTime.UtcNow.AddDays(-2);
+            ws.Cell(3, 4).Value = "new@test.com";
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            stream.Position = 0;
+
+            var importResult = await _studentService.ImportStudentsAsync(stream, "students.xlsx");
+            await _asyncSession.SaveChangesAsync();
+
+            Assert.Equal(2, importResult.Processed);
+            Assert.Equal(1, importResult.Updated);
+            Assert.Equal(1, importResult.Created);
+            Assert.Equal(0, importResult.Skipped);
+            Assert.Empty(importResult.Errors);
+
+            var updated = await _studentService.GetStudentAsync(existing.Id!);
+            Assert.Equal("John", updated!.FirstName);
+            Assert.Equal("Updated", updated.LastName);
+            Assert.Equal("existing@test.com", updated.Email);
+            Assert.NotNull(updated.LastAccessAt);
+
+            var students = await _studentService.GetStudentsAsync(new PaginationQuery { PageNumber = 1, PageSize = 10 });
+            var created = students.Items.FirstOrDefault(s => s.Email == "new@test.com");
+            Assert.NotNull(created);
+            Assert.Equal("Alice", created!.FirstName);
+            Assert.Equal("New", created.LastName);
+        }
+
+        [Fact]
+        public async Task ImportStudents_Should_Report_Invalid_Date()
+        {
+            var workbook = new XLWorkbook();
+            var ws = workbook.AddWorksheet("Students");
+            ws.Cell(1, 1).Value = "Nome";
+            ws.Cell(1, 2).Value = "Sobrenome";
+            ws.Cell(1, 3).Value = "Ultimo acesso";
+            ws.Cell(1, 4).Value = "Endereco de e-mail";
+
+            ws.Cell(2, 1).Value = "John";
+            ws.Cell(2, 2).Value = "Doe";
+            ws.Cell(2, 3).Value = "not-a-date";
+            ws.Cell(2, 4).Value = "john@doe.com";
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            stream.Position = 0;
+
+            var importResult = await _studentService.ImportStudentsAsync(stream, "students.xlsx");
+
+            Assert.Equal(1, importResult.Processed);
+            Assert.Equal(1, importResult.Skipped);
+            Assert.Single(importResult.Errors);
+            Assert.Contains("Invalid date", importResult.Errors[0].Message);
+        }
+
+        [Fact]
+        public async Task ExportStudents_Should_Return_Workbook_With_Data()
+        {
+            await _studentService.CreateStudentAsync(new CreateStudentDto
+            {
+                FirstName = "Maria",
+                LastName = "Silva",
+                Email = "maria@test.com",
+                IsActive = true,
+                Status = StudentStatus.Active,
+                LastAccessAt = DateTime.UtcNow.AddDays(-3)
+            });
+            await _studentService.CreateStudentAsync(new CreateStudentDto
+            {
+                FirstName = "Ana",
+                LastName = "Costa",
+                Email = "ana@test.com",
+                IsActive = true,
+                Status = StudentStatus.Active
+            });
+            await _asyncSession.SaveChangesAsync();
+
+            var bytes = await _studentService.ExportStudentsAsync();
+
+            using var stream = new MemoryStream(bytes);
+            var workbook = new XLWorkbook(stream);
+            var ws = workbook.Worksheets.First();
+
+            Assert.Equal("Nome", ws.Cell(1, 1).GetString());
+            Assert.Equal("Sobrenome", ws.Cell(1, 2).GetString());
+            Assert.Equal("Ultimo acesso", ws.Cell(1, 3).GetString());
+            Assert.Equal("Endereco de e-mail", ws.Cell(1, 4).GetString());
+
+            // Two students + header
+            Assert.Equal(3, ws.LastRowUsed()!.RowNumber());
+            var exportedEmails = new[]
+            {
+                ws.Cell(2, 4).GetString(),
+                ws.Cell(3, 4).GetString()
+            };
+            Assert.Contains("maria@test.com", exportedEmails);
+            Assert.Contains("ana@test.com", exportedEmails);
         }
 
         private static CreateStudentDto CreateStudentDto(string firstName = "John", string lastName = "Doe", string? idNumber = null)

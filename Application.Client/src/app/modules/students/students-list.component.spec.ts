@@ -7,6 +7,7 @@ import { StudentsListComponent } from './students-list.component';
 import { StudentsService } from '../../service/students/students.service';
 import { NotificationService } from '../../service/notification/notification.service';
 import { Student } from '../../model/student';
+import { AuthService } from '../../service/auth/auth.service';
 
 class FakeLoader implements TranslateLoader {
   getTranslation(): any {
@@ -18,11 +19,17 @@ class StudentsServiceStub {
   students: Student[] = [{ Id: 'students-1', FirstName: 'Ana', LastName: 'Silva', IsActive: true }];
   getStudents = jasmine.createSpy('getStudents').and.returnValue(of({ Items: this.students, Total: 1, PageNumber: 1, PageSize: 10 }));
   deleteStudent = jasmine.createSpy('deleteStudent').and.returnValue(of(void 0));
+  importStudents = jasmine.createSpy('importStudents').and.returnValue(of({ Processed: 0, Created: 0, Updated: 0, Skipped: 0, Errors: [] }));
+  exportStudents = jasmine.createSpy('exportStudents').and.returnValue(of(new Blob()));
 }
 
 class NotificationStub {
   showError = jasmine.createSpy('showError');
   showSuccess = jasmine.createSpy('showSuccess');
+}
+
+class AuthServiceStub {
+  hasPermission = jasmine.createSpy('hasPermission').and.returnValue(true);
 }
 
 describe('StudentsListComponent', () => {
@@ -46,6 +53,7 @@ describe('StudentsListComponent', () => {
         { provide: StudentsService, useValue: studentsService },
         { provide: NotificationService, useClass: NotificationStub },
         { provide: Router, useValue: { navigate: routerNavigate } },
+        { provide: AuthService, useClass: AuthServiceStub },
       ]
     }).compileComponents();
 

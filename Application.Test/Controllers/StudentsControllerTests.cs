@@ -28,6 +28,8 @@ namespace Application.Tests.Controllers
             public Func<string, Task<Student?>>? GetFunc { get; set; }
             public Func<PaginationQuery, Task<PagedResult<Student>>>? GetStudentsFunc { get; set; }
             public Func<string, UpdateStudentDto, Task<Student>>? UpdateFunc { get; set; }
+            public Func<Stream, string, Task<StudentImportResult>>? ImportFunc { get; set; }
+            public Func<Task<byte[]>>? ExportFunc { get; set; }
 
             public Task<Student> CreateStudentAsync(CreateStudentDto dto) => CreateFunc?.Invoke(dto) ?? Task.FromResult(new Student { FirstName = string.Empty, LastName = string.Empty, IsActive = true, CreatedAt = DateTime.UtcNow });
 
@@ -44,6 +46,10 @@ namespace Application.Tests.Controllers
             });
 
             public Task<Student> UpdateStudentAsync(string id, UpdateStudentDto dto) => UpdateFunc?.Invoke(id, dto) ?? Task.FromResult(new Student { FirstName = string.Empty, LastName = string.Empty, IsActive = true, CreatedAt = DateTime.UtcNow });
+
+            public Task<StudentImportResult> ImportStudentsAsync(Stream fileStream, string fileName) => ImportFunc?.Invoke(fileStream, fileName) ?? Task.FromResult(new StudentImportResult());
+
+            public Task<byte[]> ExportStudentsAsync() => ExportFunc?.Invoke() ?? Task.FromResult(Array.Empty<byte>());
         }
 
         private static StudentsController CreateController(FakeStudentService? service = null, IStringLocalizer<SharedResource>? localizer = null)
@@ -194,6 +200,55 @@ namespace Application.Tests.Controllers
 
             Assert.IsType<NoContentResult>(result);
             Assert.Equal("students/5-A", deletedId);
+        }
+
+        [Fact]
+        public async Task ExportStudents_Should_Return_File()
+        {
+            var expectedBytes = new byte[] { 1, 2, 3, 4 };
+            var service = new FakeStudentService
+            {
+                ExportFunc = () => Task.FromResult(expectedBytes)
+            };
+            var controller = CreateController(service);
+
+            var result = await controller.ExportStudents();
+
+            var fileResult = Assert.IsType<FileContentResult>(result);
+            Assert.Equal(expectedBytes, fileResult.FileContents);
+            Assert.Equal("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileResult.ContentType);
+            Assert.StartsWith("students_", fileResult.FileDownloadName);
+        }
+
+        [Fact]
+        public async Task ImportStudents_Should_Return_Result()
+        {
+            var importResult = new StudentImportResult { Processed = 2, Created = 2 };
+            var service = new FakeStudentService
+            {
+                ImportFunc = (_, _) => Task.FromResult(importResult)
+            };
+            var controller = CreateController(service);
+
+            await using var stream = new MemoryStream(new byte[] { 1, 2, 3 });
+            var file = new FormFile(stream, 0, stream.Length, "file", "students.xlsx");
+
+            var response = await controller.ImportStudents(file);
+
+            var okResult = Assert.IsType<OkObjectResult>(response);
+            Assert.Same(importResult, okResult.Value);
+        }
+
+        [Fact]
+        public async Task ImportStudents_Should_Return_Problem_When_File_Is_Empty()
+        {
+            var controller = CreateController(new FakeStudentService());
+            var empty = new FormFile(Stream.Null, 0, 0, "file", "students.xlsx");
+
+            var response = await controller.ImportStudents(empty);
+
+            var problem = Assert.IsType<ObjectResult>(response);
+            Assert.Equal(StatusCodes.Status400BadRequest, problem.StatusCode);
         }
     }
 }

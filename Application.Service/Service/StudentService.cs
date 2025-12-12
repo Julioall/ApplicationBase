@@ -6,7 +6,9 @@ using Application.Domain.Model.Students;
 using Application.Domain.Model.Students.Dtos;
 using Application.Domain.Model.ValueObjects;
 using Application.Service.Interface;
+using ClosedXML.Excel;
 using FluentValidation;
+using System.Globalization;
 using Microsoft.Extensions.Localization;
 
 namespace Application.Service.Service
@@ -122,6 +124,187 @@ namespace Application.Service.Service
             return _studentRepository.GetPagedAsync(normalizedQuery);
         }
 
+        public async Task<StudentImportResult> ImportStudentsAsync(Stream fileStream, string fileName)
+        {
+            ArgumentNullException.ThrowIfNull(fileStream);
+
+            if (fileStream.Length == 0)
+            {
+                throw new ArgumentException("Import file is empty.", nameof(fileStream));
+            }
+
+            if (string.IsNullOrWhiteSpace(fileName) || !fileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException("Only .xlsx files are supported for import.");
+            }
+
+            using var workbook = new XLWorkbook(fileStream);
+            var worksheet = workbook.Worksheets.FirstOrDefault();
+            if (worksheet == null)
+            {
+                throw new InvalidOperationException("No worksheet found in the uploaded file.");
+            }
+
+            var firstRow = worksheet.FirstRowUsed();
+            var lastRow = worksheet.LastRowUsed();
+            if (firstRow == null || lastRow == null || lastRow.RowNumber() <= firstRow.RowNumber())
+            {
+                return new StudentImportResult();
+            }
+
+            var result = new StudentImportResult();
+            var existing = (await _studentRepository.GetAllAsync()).ToList();
+            var existingByEmail = existing
+                .Where(s => !string.IsNullOrWhiteSpace(s.Email))
+                .ToDictionary(s => s.Email!.Trim().ToLowerInvariant(), s => s);
+
+            var startRow = firstRow.RowNumber() + 1;
+            for (var rowNumber = startRow; rowNumber <= lastRow.RowNumber(); rowNumber++)
+            {
+                var row = worksheet.Row(rowNumber);
+                if (IsRowEmpty(row))
+                {
+                    continue;
+                }
+
+                result.Processed++;
+
+                var firstName = row.Cell(1).GetString().Trim();
+                var lastName = row.Cell(2).GetString().Trim();
+                var email = row.Cell(4).GetString().Trim();
+
+                if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
+                {
+                    result.Skipped++;
+                    result.Errors.Add(new StudentImportError
+                    {
+                        Row = rowNumber,
+                        Message = "First name and last name are required."
+                    });
+                    continue;
+                }
+
+                if (!TryParseDateCell(row.Cell(3), out var lastAccessAt, out var dateError))
+                {
+                    result.Skipped++;
+                    result.Errors.Add(new StudentImportError
+                    {
+                        Row = rowNumber,
+                        Message = dateError ?? "Invalid date value."
+                    });
+                    continue;
+                }
+
+                try
+                {
+                    Student? existingStudent = null;
+                    var emailKey = string.IsNullOrWhiteSpace(email) ? null : email.ToLowerInvariant();
+                    if (!string.IsNullOrWhiteSpace(emailKey))
+                    {
+                        existingByEmail.TryGetValue(emailKey!, out existingStudent);
+                    }
+
+                    if (existingStudent == null)
+                    {
+                        var dto = new CreateStudentDto
+                        {
+                            FirstName = firstName,
+                            LastName = lastName,
+                            Email = string.IsNullOrWhiteSpace(email) ? null : email,
+                            IsActive = true,
+                            Status = StudentStatus.Active,
+                            LastAccessAt = EnsureUtc(lastAccessAt)
+                        };
+
+                        var created = await CreateStudentAsync(dto);
+                        if (!string.IsNullOrWhiteSpace(emailKey))
+                        {
+                            existingByEmail[emailKey!] = created;
+                        }
+                        result.Created++;
+                    }
+                    else
+                    {
+                        if (string.IsNullOrWhiteSpace(existingStudent.Id))
+                        {
+                            result.Skipped++;
+                            result.Errors.Add(new StudentImportError
+                            {
+                                Row = rowNumber,
+                                Message = "Existing student is missing an identifier."
+                            });
+                            continue;
+                        }
+
+                        var updateDto = new UpdateStudentDto
+                        {
+                            FirstName = firstName,
+                            LastName = lastName,
+                            Email = string.IsNullOrWhiteSpace(email) ? existingStudent.Email : email,
+                            IdNumber = existingStudent.IdNumber,
+                            Phone = existingStudent.Phone,
+                            DateOfBirth = existingStudent.DateOfBirth,
+                            Address = CloneAddress(existingStudent.Address),
+                            Institution = existingStudent.Institution,
+                            Lang = existingStudent.Lang,
+                            TimeZone = existingStudent.TimeZone,
+                            IsActive = existingStudent.IsActive,
+                            Status = existingStudent.Status ?? StudentStatus.Active,
+                            LastAccessAt = EnsureUtc(lastAccessAt ?? existingStudent.LastAccessAt)
+                        };
+
+                        await UpdateStudentAsync(existingStudent.Id!, updateDto);
+                        result.Updated++;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    result.Skipped++;
+                    result.Errors.Add(new StudentImportError
+                    {
+                        Row = rowNumber,
+                        Message = ex.Message
+                    });
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<byte[]> ExportStudentsAsync()
+        {
+            var students = (await _studentRepository.GetAllAsync())
+                .OrderBy(s => s.LastName)
+                .ThenBy(s => s.FirstName)
+                .ToList();
+
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Students");
+
+            worksheet.Cell(1, 1).Value = "Nome";
+            worksheet.Cell(1, 2).Value = "Sobrenome";
+            worksheet.Cell(1, 3).Value = "Ultimo acesso";
+            worksheet.Cell(1, 4).Value = "Endereco de e-mail";
+            worksheet.Row(1).Style.Font.Bold = true;
+
+            var currentRow = 2;
+            foreach (var student in students)
+            {
+                worksheet.Cell(currentRow, 1).Value = student.FirstName;
+                worksheet.Cell(currentRow, 2).Value = student.LastName;
+                worksheet.Cell(currentRow, 3).Value = EnsureUtc(student.LastAccessAt);
+                worksheet.Cell(currentRow, 3).Style.DateFormat.Format = "yyyy-mm-dd HH:mm";
+                worksheet.Cell(currentRow, 4).Value = student.Email ?? string.Empty;
+                currentRow++;
+            }
+
+            worksheet.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
+        }
+
         private async Task ValidateAsync(Student student, string? currentId)
         {
             await _studentValidator.ValidateAndThrowAsync(student);
@@ -163,6 +346,21 @@ namespace Application.Service.Service
             return trimmed.Length == 0 ? null : trimmed;
         }
 
+        private static DateTime? EnsureUtc(DateTime? value)
+        {
+            if (!value.HasValue)
+            {
+                return null;
+            }
+
+            if (value.Value.Kind == DateTimeKind.Unspecified)
+            {
+                return DateTime.SpecifyKind(value.Value, DateTimeKind.Utc);
+            }
+
+            return value.Value.ToUniversalTime();
+        }
+
         private static string NormalizeStatus(string? status)
         {
             if (string.IsNullOrWhiteSpace(status))
@@ -196,6 +394,52 @@ namespace Application.Service.Service
                 PostalCode = Normalize(address.PostalCode),
                 Country = Normalize(address.Country)
             };
+        }
+
+        private static bool IsRowEmpty(IXLRow row)
+        {
+            for (var col = 1; col <= 4; col++)
+            {
+                if (!row.Cell(col).IsEmpty())
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool TryParseDateCell(IXLCell cell, out DateTime? value, out string? error)
+        {
+            value = null;
+            error = null;
+
+            if (cell.IsEmpty())
+            {
+                return true;
+            }
+
+            if (cell.TryGetValue(out DateTime dateValue))
+            {
+                value = EnsureUtc(dateValue);
+                return true;
+            }
+
+            var text = cell.GetString().Trim();
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return true;
+            }
+
+            if (DateTime.TryParse(text, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var parsed) ||
+                DateTime.TryParse(text, CultureInfo.CurrentCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out parsed))
+            {
+                value = EnsureUtc(parsed);
+                return true;
+            }
+
+            error = $"Invalid date value \"{text}\".";
+            return false;
         }
     }
 }

@@ -93,6 +93,12 @@
   gap: var(--space-4);
 }
 
+.import-hint {
+  margin: 0 0 var(--space-1);
+  color: var(--text-subtle);
+  font-size: var(--font-size-sm);
+}
+
 .list-toolbar {
   --control-height: 48px;
   display: flex;
