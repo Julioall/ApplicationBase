@@ -1,0 +1,53 @@
+<ng-container *ngIf="modals$ | async as modals">
+  <div class="modal-layer" *ngIf="modals.length > 0">
+    <ng-container *ngFor="let modal of modals; trackBy: trackById">
+      <div class="modal-entry">
+        <div class="modal-backdrop" (click)="onBackdropClick(modal)"></div>
+
+        <div
+          class="modal-dialog"
+          role="dialog"
+          [attr.aria-modal]="true"
+          [attr.aria-labelledby]="'modal-title-' + modal.id"
+          [attr.aria-describedby]="modal.message ? 'modal-description-' + modal.id : null"
+          (click)="$event.stopPropagation()"
+        >
+          <div class="modal-header">
+            <div class="modal-icon" *ngIf="modal.icon || modal.destructive" [class.is-destructive]="modal.destructive">
+              <i [class]="modal.icon || 'fa-regular fa-circle-question'" aria-hidden="true"></i>
+            </div>
+            <div>
+              <h2 class="modal-title" [id]="'modal-title-' + modal.id">{{ modal.title }}</h2>
+              <p
+                class="modal-message"
+                *ngIf="modal.message"
+                [id]="'modal-description-' + modal.id"
+              >
+                {{ modal.message }}
+              </p>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button
+              *ngIf="modal.showCancel !== false"
+              type="button"
+              class="btn ghost"
+              (click)="onCancel(modal)"
+            >
+              {{ modal.cancelText || ('modal.cancel' | translate) }}
+            </button>
+            <button
+              type="button"
+              class="btn"
+              [ngClass]="modal.destructive ? 'danger' : 'primary'"
+              (click)="onConfirm(modal)"
+            >
+              {{ modal.confirmText || ('modal.confirm' | translate) }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</ng-container>

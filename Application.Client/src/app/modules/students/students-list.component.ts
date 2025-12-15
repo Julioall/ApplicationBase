@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -10,8 +10,18 @@ import { NotificationService } from '../../service/notification/notification.ser
 import { AuthService } from '../../service/auth/auth.service';
 import { MANAGE_STUDENTS_PERMISSION } from '../../model/permissions';
 import { StudentImportResult } from '../../model/student-import-result';
+import { ModalService } from '../../shared/modal/modal.service';
+import { LocalStorageService } from '../../shared/storage/local-storage.service';
 
 type StatusFilter = 'all' | 'active' | 'suspended' | 'not_currently';
+type ColumnKey = 'name' | 'email' | 'idNumber' | 'phone' | 'lastAccess' | 'status';
+
+interface ColumnConfig {
+  id: ColumnKey;
+  labelKey: string;
+  width: string;
+  visible: boolean;
+}
 
 @Component({
   selector: 'app-students-list',
@@ -19,6 +29,7 @@ type StatusFilter = 'all' | 'active' | 'suspended' | 'not_currently';
   styleUrls: ['./students-list.component.scss']
 })
 export class StudentsListComponent implements OnInit, OnDestroy {
+  private readonly columnsStorageKey = 'students.columns.preferences';
   students: Student[] = [];
   total = 0;
   pageNumber = 1;
@@ -28,6 +39,15 @@ export class StudentsListComponent implements OnInit, OnDestroy {
   exporting = false;
   statusFilter: StatusFilter = 'all';
   searchControl = new FormControl('');
+  showColumnMenu = false;
+  columns: ColumnConfig[] = [
+    { id: 'name', labelKey: 'students.list.columns.name', width: '1fr', visible: true },
+    { id: 'email', labelKey: 'students.list.columns.email', width: '1fr', visible: true },
+    { id: 'idNumber', labelKey: 'students.list.columns.idNumber', width: '1fr', visible: true },
+    { id: 'phone', labelKey: 'students.list.columns.phone', width: '1fr', visible: true },
+    { id: 'lastAccess', labelKey: 'students.list.columns.lastAccess', width: '1fr', visible: true },
+    { id: 'status', labelKey: 'students.list.columns.status', width: '1fr', visible: true },
+  ];
   private searchSub?: Subscription;
 
   constructor(
@@ -36,9 +56,12 @@ export class StudentsListComponent implements OnInit, OnDestroy {
     public readonly translate: TranslateService,
     private readonly router: Router,
     private readonly authService: AuthService,
+    private readonly modalService: ModalService,
+    private readonly localStorage: LocalStorageService,
   ) {}
 
   ngOnInit(): void {
+    this.loadColumnPreferences();
     this.loadStudents();
     this.searchSub = this.searchControl.valueChanges
       .pipe(debounceTime(300))
@@ -93,14 +116,23 @@ export class StudentsListComponent implements OnInit, OnDestroy {
     this.router.navigate(['/students', student.Id, 'edit']);
   }
 
-  onDelete(student: Student): void {
+  async onDelete(student: Student): Promise<void> {
     if (!student.Id) {
       this.notificationService.showError(this.translate.instant('students.list.missingId'), this.translate.instant('students.common.error'));
       return;
     }
 
     const confirmMessage = this.translate.instant('students.list.confirmDelete', { name: `${student.FirstName} ${student.LastName}`.trim() });
-    if (!confirm(confirmMessage)) {
+    const confirmed = await this.modalService.confirm({
+      title: this.translate.instant('students.list.delete'),
+      message: confirmMessage,
+      confirmText: this.translate.instant('students.list.delete'),
+      cancelText: this.translate.instant('modal.cancel'),
+      icon: 'fa-solid fa-triangle-exclamation',
+      destructive: true
+    });
+
+    if (!confirmed) {
       return;
     }
 
@@ -171,6 +203,36 @@ export class StudentsListComponent implements OnInit, OnDestroy {
 
   trackByStudent(_: number, student: Student): string | undefined {
     return student.Id;
+  }
+
+  get visibleColumns(): ColumnConfig[] {
+    return this.columns.filter(column => column.visible);
+  }
+
+  get gridTemplateColumns(): string {
+    const count = this.visibleColumns.length || 1;
+    return `repeat(${count}, 1fr) auto`;
+  }
+
+  toggleColumnMenu(event: Event): void {
+    event.stopPropagation();
+    this.showColumnMenu = !this.showColumnMenu;
+  }
+
+  toggleColumn(columnId: ColumnKey, event?: Event): void {
+    event?.stopPropagation();
+    const column = this.columns.find(c => c.id === columnId);
+    if (!column) {
+      return;
+    }
+
+    const visibleCount = this.visibleColumns.length;
+    if (column.visible && visibleCount <= 1) {
+      return;
+    }
+
+    column.visible = !column.visible;
+    this.saveColumnPreferences();
   }
 
   get totalPages(): number {
@@ -248,5 +310,31 @@ export class StudentsListComponent implements OnInit, OnDestroy {
 
       return status === 'not_currently';
     });
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.showColumnMenu = false;
+  }
+
+  private loadColumnPreferences(): void {
+    const saved = this.localStorage.get<Partial<Record<ColumnKey, boolean>>>(this.columnsStorageKey);
+    if (!saved) {
+      return;
+    }
+
+    this.columns = this.columns.map(column => ({
+      ...column,
+      visible: saved[column.id] !== undefined ? !!saved[column.id] : column.visible
+    }));
+  }
+
+  private saveColumnPreferences(): void {
+    const prefs: Record<ColumnKey, boolean> = this.columns.reduce((acc, column) => {
+      acc[column.id] = column.visible;
+      return acc;
+    }, {} as Record<ColumnKey, boolean>);
+
+    this.localStorage.set(this.columnsStorageKey, prefs);
   }
 }

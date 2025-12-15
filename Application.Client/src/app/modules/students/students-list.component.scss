@@ -119,12 +119,67 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
   flex-wrap: wrap;
+  position: relative;
+
+  @supports not (gap: 1rem) {
+    > * + * {
+      margin-left: var(--space-3);
+    }
+  }
 
   .btn {
     height: var(--control-height);
     padding: 0 var(--space-4);
+    gap: var(--space-2);
+    display: inline-flex;
+    align-items: center;
+
+    @supports not (gap: 1rem) {
+      i:not(:last-child) {
+        margin-right: var(--space-2);
+      }
+    }
+  }
+}
+
+.column-filter {
+  position: relative;
+
+  .column-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + var(--space-2));
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    padding: var(--space-3);
+    min-width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    z-index: 10;
+  }
+
+  .menu-title {
+    margin: 0;
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+  }
+
+  .menu-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+
+    input {
+      accent-color: var(--accent-strong);
+    }
   }
 }
 
@@ -226,16 +281,31 @@
   background: var(--surface);
   box-shadow: var(--shadow-soft);
   overflow: hidden;
+  overflow-x: auto;
 }
 
 .list-header {
   display: grid;
   grid-template-columns: 1.4fr 1.2fr 1fr 1fr 1fr 0.8fr auto;
+  column-gap: 0;
   padding: var(--space-3) var(--space-4);
   background: var(--surface-alt);
   color: var(--text-subtle);
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-sm);
+  min-width: 900px;
+  align-items: center;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 0 var(--space-2);
+
+    &:not(:first-child) {
+      border-left: 1px solid var(--border-soft);
+    }
+  }
 }
 
 .list-body {
@@ -246,14 +316,23 @@
 .list-row {
   display: grid;
   grid-template-columns: 1.4fr 1.2fr 1fr 1fr 1fr 0.8fr auto;
+  column-gap: 0;
   padding: var(--space-3) var(--space-4);
   border-top: 1px solid var(--border-soft);
   align-items: center;
-  gap: var(--space-2);
   transition: background var(--transition-fast);
-
+  color: var(--text-primary);
+  min-width: 900px;
   &:hover {
     background: var(--surface-alt);
+  }
+}
+
+.list-row .cell {
+  padding: 0 var(--space-2);
+
+  &:not(:first-child) {
+    border-left: 1px solid var(--border-soft);
   }
 }
 
@@ -293,21 +372,15 @@
   border: 1px solid var(--border-soft);
 
   &.active {
-    background: rgba(46, 204, 113, 0.12);
     color: #27ae60;
-    border-color: rgba(46, 204, 113, 0.35);
   }
 
   &.inactive {
-    background: rgba(255, 99, 71, 0.1);
-    color: #d35400;
-    border-color: rgba(255, 99, 71, 0.3);
+    color: var(--warning);
   }
 
   &.suspended {
-    background: rgba(255, 193, 7, 0.12);
-    color: #b7791f;
-    border-color: rgba(255, 193, 7, 0.4);
+    color: var(--text-subtle);
   }
 }
 
@@ -333,28 +406,10 @@
 @include respond-down(lg) {
   .list-header,
   .list-row {
-    grid-template-columns: 1.2fr 1fr 1fr;
-    grid-template-areas:
-      'name name actions'
-      'email idNumber status'
-      'phone lastAccess status';
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-areas: none;
+    min-width: auto;
   }
-
-  .list-header span:nth-child(1) { grid-area: name; }
-  .list-header span:nth-child(2) { grid-area: email; }
-  .list-header span:nth-child(3) { grid-area: idNumber; }
-  .list-header span:nth-child(4) { grid-area: phone; }
-  .list-header span:nth-child(5) { grid-area: lastAccess; }
-  .list-header span:nth-child(6) { grid-area: status; }
-  .list-header span:nth-child(7) { grid-area: actions; text-align: right; }
-
-  .list-row .cell:nth-child(1) { grid-area: name; }
-  .list-row .cell:nth-child(2) { grid-area: email; }
-  .list-row .cell:nth-child(3) { grid-area: idNumber; }
-  .list-row .cell:nth-child(4) { grid-area: phone; }
-  .list-row .cell:nth-child(5) { grid-area: lastAccess; }
-  .list-row .cell:nth-child(6) { grid-area: status; }
-  .list-row .cell:nth-child(7) { grid-area: actions; justify-content: flex-start; }
 }
 
 @include respond-down(md) {

@@ -1,4 +1,4 @@
-{
+﻿{
   "auth": {
     "loginSuccess": "Login realizado com sucesso!",
     "loginError": "Erro no login. Verifique suas credenciais.",
@@ -413,6 +413,10 @@
     "logout": "Sair",
     "students": "Alunos"
   },
+  "modal": {
+    "confirm": "Confirmar",
+    "cancel": "Cancelar"
+  },
   "students": {
     "common": {
       "error": "Erro"
@@ -437,6 +441,8 @@
       "statusAll": "Todos",
       "statusActive": "Ativo",
       "statusInactive": "Inativo",
+      "columnsFilter": "Colunas",
+      "columnsFilterTitle": "Selecionar colunas visíveis",
       "columns": {
         "name": "Nome completo",
         "email": "E-mail",
@@ -512,7 +518,7 @@
     "status": {
       "active": "Ativo",
       "suspended": "Suspenso",
-      "notCurrently": "Não atualmente"
+      "notCurrently": "Inativo"
     }
   }
 }

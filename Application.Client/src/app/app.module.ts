@@ -16,6 +16,7 @@ import { Observable } from 'rxjs';
 import { ToastContainerComponent } from './shared/notification/toast-container.component';
 import { ForgotPasswordComponent } from './page/auth/forgot-password.component';
 import { ResetPasswordComponent } from './page/auth/reset-password.component';
+import { ModalContainerComponent } from './shared/modal/modal-container.component';
 
 export class AppTranslateLoader implements TranslateLoader {
   constructor(private http: HttpClient) {}
@@ -32,6 +33,7 @@ export class AppTranslateLoader implements TranslateLoader {
     ToastContainerComponent,
     ForgotPasswordComponent,
     ResetPasswordComponent,
+    ModalContainerComponent,
   ],
   imports: [
     BrowserModule,

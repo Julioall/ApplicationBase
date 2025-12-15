@@ -420,6 +420,8 @@
       "statusAll": "All",
       "statusActive": "Active",
       "statusInactive": "Inactive",
+      "columnsFilter": "Columns",
+      "columnsFilterTitle": "Show columns",
       "columns": {
         "name": "Full name",
         "email": "Email",
@@ -489,7 +491,7 @@
     "status": {
       "active": "Active",
       "suspended": "Suspended",
-      "notCurrently": "Not currently"
+      "notCurrently": "Inactive"
     }
   },
   "admin": {
@@ -504,5 +506,9 @@
     "theme": "Theme",
     "logout": "Sign out",
     "students": "Students"
+  },
+  "modal": {
+    "confirm": "Confirm",
+    "cancel": "Cancel"
   }
 }

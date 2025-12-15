@@ -23,20 +23,39 @@
             />
           </div>
         </div>
-        <div class="actions-inline" *ngIf="canManageStudents">
-          <input #importInput type="file" accept=".xlsx" hidden (change)="onImport($event)" />
-          <button type="button" class="btn ghost" (click)="importInput.click()" [disabled]="loading || importing">
-            <i class="fa-solid fa-file-import" aria-hidden="true"></i>
-            <span>{{ 'students.list.import' | translate }}</span>
-          </button>
-          <button type="button" class="btn ghost" (click)="onExport()" [disabled]="loading || exporting">
-            <i class="fa-solid fa-file-export" aria-hidden="true"></i>
-            <span>{{ 'students.list.export' | translate }}</span>
-          </button>
-          <button type="button" class="btn primary" (click)="onAdd()">
-            <i class="fa-solid fa-plus" aria-hidden="true"></i>
-            <span>{{ 'students.list.add' | translate }}</span>
-          </button>
+        <div class="actions-inline">
+          <div class="column-filter" (click)="$event.stopPropagation()">
+            <button type="button" class="btn ghost" (click)="toggleColumnMenu($event)">
+              <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+              <span>{{ 'students.list.columnsFilter' | translate }}</span>
+            </button>
+            <div class="column-menu" *ngIf="showColumnMenu">
+              <p class="menu-title">{{ 'students.list.columnsFilterTitle' | translate }}</p>
+              <label class="menu-option" *ngFor="let column of columns">
+                <input
+                  type="checkbox"
+                  [checked]="column.visible"
+                  (change)="toggleColumn(column.id, $event)"
+                />
+                <span>{{ column.labelKey | translate }}</span>
+              </label>
+            </div>
+          </div>
+          <ng-container *ngIf="canManageStudents">
+            <input #importInput type="file" accept=".xlsx" hidden (change)="onImport($event)" />
+            <button type="button" class="btn ghost" (click)="importInput.click()" [disabled]="loading || importing">
+              <i class="fa-solid fa-file-import" aria-hidden="true"></i>
+              <span>{{ 'students.list.import' | translate }}</span>
+            </button>
+            <button type="button" class="btn ghost" (click)="onExport()" [disabled]="loading || exporting">
+              <i class="fa-solid fa-file-export" aria-hidden="true"></i>
+              <span>{{ 'students.list.export' | translate }}</span>
+            </button>
+            <button type="button" class="btn primary" (click)="onAdd()">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              <span>{{ 'students.list.add' | translate }}</span>
+            </button>
+          </ng-container>
         </div>
       </div>
 
@@ -45,13 +64,10 @@
       </p>
 
       <div class="list-panel">
-        <div class="list-header">
-          <span>{{ 'students.list.columns.name' | translate }}</span>
-          <span>{{ 'students.list.columns.email' | translate }}</span>
-          <span>{{ 'students.list.columns.idNumber' | translate }}</span>
-          <span>{{ 'students.list.columns.phone' | translate }}</span>
-          <span>{{ 'students.list.columns.lastAccess' | translate }}</span>
-          <span>{{ 'students.list.columns.status' | translate }}</span>
+        <div class="list-header" [style.gridTemplateColumns]="gridTemplateColumns">
+          <ng-container *ngFor="let column of visibleColumns">
+            <span>{{ column.labelKey | translate }}</span>
+          </ng-container>
           <span class="actions-col">{{ 'students.list.columns.actions' | translate }}</span>
         </div>
 
@@ -62,20 +78,32 @@
           <div *ngIf="!loading && students.length === 0" class="state-row">
             {{ 'students.list.empty' | translate }}
           </div>
-          <div *ngFor="let student of students; trackBy: trackByStudent" class="list-row">
-            <div class="cell name">
-              <div class="main">{{ student.FirstName }} {{ student.LastName }}</div>
-              <div class="meta">{{ student.Institution || ('students.list.noInstitution' | translate) }}</div>
-            </div>
-            <div class="cell">{{ student.Email || '-' }}</div>
-            <div class="cell">{{ student.IdNumber || '-' }}</div>
-            <div class="cell">{{ student.Phone || '-' }}</div>
-            <div class="cell">{{ student.LastAccessAt ? (student.LastAccessAt | date:'short') : '-' }}</div>
-            <div class="cell">
-              <span class="status" [ngClass]="getStatusClass(student)">
-                {{ getStatusLabel(student) }}
-              </span>
-            </div>
+          <div *ngFor="let student of students; trackBy: trackByStudent" class="list-row" [style.gridTemplateColumns]="gridTemplateColumns">
+            <ng-container *ngFor="let column of visibleColumns">
+              <div class="cell" [ngSwitch]="column.id">
+                <div *ngSwitchCase="'name'" class="name">
+                  <div class="main">{{ student.FirstName }} {{ student.LastName }}</div>
+                  <div class="meta">{{ student.Institution || ('students.list.noInstitution' | translate) }}</div>
+                </div>
+                <ng-container *ngSwitchCase="'email'">
+                  {{ student.Email || '-' }}
+                </ng-container>
+                <ng-container *ngSwitchCase="'idNumber'">
+                  {{ student.IdNumber || '-' }}
+                </ng-container>
+                <ng-container *ngSwitchCase="'phone'">
+                  {{ student.Phone || '-' }}
+                </ng-container>
+                <ng-container *ngSwitchCase="'lastAccess'">
+                  {{ student.LastAccessAt ? (student.LastAccessAt | date:'short') : '-' }}
+                </ng-container>
+                <ng-container *ngSwitchCase="'status'">
+                  <span class="status" [ngClass]="getStatusClass(student)">
+                    {{ getStatusLabel(student) }}
+                  </span>
+                </ng-container>
+              </div>
+            </ng-container>
             <div class="cell actions">
               <button type="button" class="btn secondary" (click)="onEdit(student)">{{ 'students.list.edit' | translate }}</button>
               <button type="button" class="btn danger" (click)="onDelete(student)">
