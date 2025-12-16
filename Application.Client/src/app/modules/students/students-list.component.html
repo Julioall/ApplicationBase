@@ -105,9 +105,13 @@
               </div>
             </ng-container>
             <div class="cell actions">
-              <button type="button" class="btn secondary" (click)="onEdit(student)">{{ 'students.list.edit' | translate }}</button>
+              <button type="button" class="btn secondary" (click)="onEdit(student)">
+                <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                <span>{{ 'students.list.edit' | translate }}</span>
+              </button>
               <button type="button" class="btn danger" (click)="onDelete(student)">
-                {{ 'students.list.delete' | translate }}
+                <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                <span>{{ 'students.list.delete' | translate }}</span>
               </button>
             </div>
           </div>

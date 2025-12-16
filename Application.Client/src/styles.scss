@@ -105,7 +105,7 @@ img {
 $btn-radius: var(--radius-md);
 $btn-padding-y: var(--space-3);
 $btn-padding-x: var(--space-4);
-$btn-gap: var(--space-3);
+$btn-gap: var(--space-2);
 $btn-font-weight: var(--font-weight-semibold);
 $btn-shadow: var(--elevation-2);
 $btn-shadow-strong: var(--elevation-3);
@@ -154,6 +154,9 @@ $btn-shadow-strong: var(--elevation-3);
 .btn {
   @include btn-base;
   @include btn-interactions;
+  > i:not(:last-child) {
+    margin-right: $btn-gap;
+  }
 
   &.primary,
   &-primary {

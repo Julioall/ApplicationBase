@@ -107,10 +107,12 @@
               </label>
               <div class="actions">
                 <button type="button" class="btn secondary" (click)="resetToDefault()">
-                  {{ 'adminUserDetail.access.restoreDefault' | translate }}
+                  <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+                  <span>{{ 'adminUserDetail.access.restoreDefault' | translate }}</span>
                 </button>
                 <button type="button" class="btn primary" (click)="addPermission()" [disabled]="!selectedPermission">
-                  {{ 'adminUserDetail.access.add' | translate }}
+                  <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                  <span>{{ 'adminUserDetail.access.add' | translate }}</span>
                 </button>
               </div>
             </div>
