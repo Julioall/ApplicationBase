@@ -5,6 +5,7 @@ import { catchError, map } from 'rxjs/operators';
 import { User } from '../../model/User';
 import { jwtDecode } from 'jwt-decode';
 import { environment } from '../../environment/environment';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ import { environment } from '../../environment/environment';
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/User/add`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private readonly translate: TranslateService) {}
 
   login(email: string, password: string): Observable<any> {
     const url = `${environment.apiUrl}/Authentication/login`;
@@ -31,7 +32,7 @@ export class AuthService {
         return response;
       }),
       catchError(() => {
-        return throwError(() => new Error('Login failed'));
+        return throwError(() => new Error(this.translate.instant('auth.errors.loginFailed')));
       })
     );
   }
@@ -70,7 +71,7 @@ export class AuthService {
   refreshToken(): Observable<any> {
     const refresh = this.getRefreshToken();
     if (!refresh) {
-      return throwError(() => new Error('No refresh token available'));
+      return throwError(() => new Error(this.translate.instant('auth.errors.refreshTokenMissing')));
     }
     const url = `${environment.apiUrl}/Authentication/refresh`;
     return this.http.post<any>(url, { refreshToken: refresh }).pipe(

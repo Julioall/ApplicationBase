@@ -8,17 +8,21 @@ using Application.Tests.Setup;
 using ClosedXML.Excel;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 
 namespace Application.Tests.Services
 {
     public class StudentServiceTests : BaseTest
     {
         private readonly IStudentService _studentService;
+        private readonly IStringLocalizer<Application.Domain.SharedResource> _localizer;
 
         public StudentServiceTests()
         {
             _studentService = _serviceProvider.GetService<IStudentService>()
-                ?? throw new Exception($"{nameof(IStudentService)} nǜo foi encontrado");
+                ?? throw new Exception($"{nameof(IStudentService)} não foi encontrado");
+            _localizer = _serviceProvider.GetService<IStringLocalizer<Application.Domain.SharedResource>>()
+                ?? throw new Exception("Localizador não encontrado");
         }
 
         [Fact]
@@ -218,7 +222,7 @@ namespace Application.Tests.Services
             Assert.Equal(1, importResult.Processed);
             Assert.Equal(1, importResult.Skipped);
             Assert.Single(importResult.Errors);
-            Assert.Contains("Invalid date", importResult.Errors[0].Message);
+            Assert.Contains(_localizer["StudentImportInvalidDateWithValue", "not-a-date"].Value, importResult.Errors[0].Message);
         }
 
         [Fact]
@@ -249,10 +253,10 @@ namespace Application.Tests.Services
             var workbook = new XLWorkbook(stream);
             var ws = workbook.Worksheets.First();
 
-            Assert.Equal("Nome", ws.Cell(1, 1).GetString());
-            Assert.Equal("Sobrenome", ws.Cell(1, 2).GetString());
-            Assert.Equal("Ultimo acesso", ws.Cell(1, 3).GetString());
-            Assert.Equal("Endereco de e-mail", ws.Cell(1, 4).GetString());
+            Assert.Equal(_localizer["StudentExportHeaderFirstName"].Value, ws.Cell(1, 1).GetString());
+            Assert.Equal(_localizer["StudentExportHeaderLastName"].Value, ws.Cell(1, 2).GetString());
+            Assert.Equal(_localizer["StudentExportHeaderLastAccess"].Value, ws.Cell(1, 3).GetString());
+            Assert.Equal(_localizer["StudentExportHeaderEmail"].Value, ws.Cell(1, 4).GetString());
 
             // Two students + header
             Assert.Equal(3, ws.LastRowUsed()!.RowNumber());

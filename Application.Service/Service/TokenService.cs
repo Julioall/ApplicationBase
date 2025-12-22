@@ -1,3 +1,5 @@
+using Application.Domain;
+using Application.Domain.Exceptions;
 using Application.Domain.Model;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.User;
@@ -9,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Extensions.Localization;
 
 namespace Application.Service.Service
 {
@@ -16,11 +19,13 @@ namespace Application.Service.Service
     {
         private readonly IUserService _userService;
         private readonly ILogger<TokenService> _logger;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
-        public TokenService(IUserService userService, ILogger<TokenService> logger)
+        public TokenService(IUserService userService, ILogger<TokenService> logger, IStringLocalizer<SharedResource> localizer)
         {
             _userService = userService;
             _logger = logger;
+            _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
         }
 
         public async Task<TokenResponseDto?> GenerateTokens(LoginDto loginDto)
@@ -95,12 +100,12 @@ namespace Application.Service.Service
             };
         }
 
-        private static JwtSecurityToken CreateJwt(User user)
+        private JwtSecurityToken CreateJwt(User user)
         {
             var signingKeyValue = Environment.GetEnvironmentVariable(ApplicationConstants.JWT_SIGNING_KEY);
             if (string.IsNullOrWhiteSpace(signingKeyValue))
             {
-                throw new ArgumentNullException(nameof(ApplicationConstants.JWT_SIGNING_KEY), "JWT signing key is not configured.");
+                throw new ConfigurationException(_localizer["JwtSigningKeyNotConfigured"]);
             }
 
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKeyValue));

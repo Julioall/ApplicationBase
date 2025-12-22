@@ -130,19 +130,19 @@ namespace Application.Service.Service
 
             if (fileStream.Length == 0)
             {
-                throw new ArgumentException("Import file is empty.", nameof(fileStream));
+                throw new BusinessException(_localizer["StudentImportFileEmpty"]);
             }
 
             if (string.IsNullOrWhiteSpace(fileName) || !fileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
             {
-                throw new InvalidOperationException("Only .xlsx files are supported for import.");
+                throw new BusinessException(_localizer["StudentImportOnlyXlsx"]);
             }
 
             using var workbook = new XLWorkbook(fileStream);
             var worksheet = workbook.Worksheets.FirstOrDefault();
             if (worksheet == null)
             {
-                throw new InvalidOperationException("No worksheet found in the uploaded file.");
+                throw new BusinessException(_localizer["StudentImportWorksheetMissing"]);
             }
 
             var firstRow = worksheet.FirstRowUsed();
@@ -179,7 +179,7 @@ namespace Application.Service.Service
                     result.Errors.Add(new StudentImportError
                     {
                         Row = rowNumber,
-                        Message = "First name and last name are required."
+                        Message = _localizer["StudentImportNamesRequired"]
                     });
                     continue;
                 }
@@ -190,7 +190,7 @@ namespace Application.Service.Service
                     result.Errors.Add(new StudentImportError
                     {
                         Row = rowNumber,
-                        Message = dateError ?? "Invalid date value."
+                        Message = dateError ?? _localizer["StudentImportInvalidDate"]
                     });
                     continue;
                 }
@@ -231,7 +231,7 @@ namespace Application.Service.Service
                             result.Errors.Add(new StudentImportError
                             {
                                 Row = rowNumber,
-                                Message = "Existing student is missing an identifier."
+                                Message = _localizer["StudentImportMissingId"]
                             });
                             continue;
                         }
@@ -281,10 +281,10 @@ namespace Application.Service.Service
             using var workbook = new XLWorkbook();
             var worksheet = workbook.Worksheets.Add("Students");
 
-            worksheet.Cell(1, 1).Value = "Nome";
-            worksheet.Cell(1, 2).Value = "Sobrenome";
-            worksheet.Cell(1, 3).Value = "Ultimo acesso";
-            worksheet.Cell(1, 4).Value = "Endereco de e-mail";
+            worksheet.Cell(1, 1).Value = _localizer["StudentExportHeaderFirstName"].Value;
+            worksheet.Cell(1, 2).Value = _localizer["StudentExportHeaderLastName"].Value;
+            worksheet.Cell(1, 3).Value = _localizer["StudentExportHeaderLastAccess"].Value;
+            worksheet.Cell(1, 4).Value = _localizer["StudentExportHeaderEmail"].Value;
             worksheet.Row(1).Style.Font.Bold = true;
 
             var currentRow = 2;
@@ -409,7 +409,7 @@ namespace Application.Service.Service
             return true;
         }
 
-        private static bool TryParseDateCell(IXLCell cell, out DateTime? value, out string? error)
+        private bool TryParseDateCell(IXLCell cell, out DateTime? value, out string? error)
         {
             value = null;
             error = null;
@@ -438,7 +438,7 @@ namespace Application.Service.Service
                 return true;
             }
 
-            error = $"Invalid date value \"{text}\".";
+            error = _localizer["StudentImportInvalidDateWithValue", text];
             return false;
         }
     }

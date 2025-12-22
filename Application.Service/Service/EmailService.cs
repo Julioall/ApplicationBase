@@ -1,3 +1,5 @@
+using Application.Domain;
+using Application.Domain.Exceptions;
 using Application.Domain.Model;
 using Application.Service.Interface;
 using Microsoft.Extensions.Logging;
@@ -5,6 +7,7 @@ using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
+using Microsoft.Extensions.Localization;
 
 namespace Application.Service.Service
 {
@@ -13,26 +16,23 @@ namespace Application.Service.Service
         private readonly EmailSettings _defaultSettings;
         private readonly ISettingsService _settingsService;
         private readonly ILogger<EmailService> _logger;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
-        public EmailService(IOptions<EmailSettings> settings, ISettingsService settingsService, ILogger<EmailService> logger)
+        public EmailService(IOptions<EmailSettings> settings, ISettingsService settingsService, ILogger<EmailService> logger, IStringLocalizer<SharedResource> localizer)
         {
             _defaultSettings = settings.Value ?? throw new ArgumentNullException(nameof(settings));
             _settingsService = settingsService;
             _logger = logger;
+            _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
         }
 
         public async Task SendPasswordResetAsync(string toEmail)
         {
             var settings = await GetEffectiveSettingsAsync();
 
-            if (string.IsNullOrWhiteSpace(settings.Host))
-                throw new InvalidOperationException("Email host is not configured.");
-            if (string.IsNullOrWhiteSpace(settings.FromEmail))
-                throw new InvalidOperationException("From email is not configured.");
-            if (string.IsNullOrWhiteSpace(settings.Password))
-                throw new InvalidOperationException("SMTP password is not configured.");
+            ValidateEmailSettings(settings);
             if (string.IsNullOrWhiteSpace(toEmail))
-                throw new ArgumentException("Destination email is required.", nameof(toEmail));
+                throw new BusinessException(_localizer["EmailDestinationRequired"]);
 
             var message = BuildResetMessage(toEmail, settings);
             using var client = BuildClient(settings);
@@ -43,22 +43,17 @@ namespace Application.Service.Service
         {
             var settings = await GetEffectiveSettingsAsync();
 
-            if (string.IsNullOrWhiteSpace(settings.Host))
-                throw new InvalidOperationException("Email host is not configured.");
-            if (string.IsNullOrWhiteSpace(settings.FromEmail))
-                throw new InvalidOperationException("From email is not configured.");
-            if (string.IsNullOrWhiteSpace(settings.Password))
-                throw new InvalidOperationException("SMTP password is not configured.");
+            ValidateEmailSettings(settings);
             if (string.IsNullOrWhiteSpace(toEmail))
-                throw new ArgumentException("Destination email is required.", nameof(toEmail));
+                throw new BusinessException(_localizer["EmailDestinationRequired"]);
             if (string.IsNullOrWhiteSpace(code))
-                throw new ArgumentException("Code is required.", nameof(code));
+                throw new BusinessException(_localizer["EmailCodeRequired"]);
 
             var from = new MailAddress(settings.FromEmail, settings.FromName);
             var message = new MailMessage
             {
                 From = from,
-                Subject = "Código de recuperação",
+                Subject = _localizer["EmailRecoverySubject"],
                 Body = BuildRecoveryBody(code, expiresAt),
                 IsBodyHtml = true,
                 BodyEncoding = Encoding.UTF8,
@@ -77,7 +72,7 @@ namespace Application.Service.Service
                 var stored = await _settingsService.GetEmailAsync();
                 if (stored != null && stored.Password.StartsWith("hash:", StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new InvalidOperationException("Email password is stored as hash. Reconfigure SMTP credentials.");
+                    throw new ConfigurationException(_localizer["EmailPasswordStoredAsHash"]);
                 }
                 return stored ?? _defaultSettings;
             }
@@ -91,9 +86,9 @@ namespace Application.Service.Service
         private SmtpClient BuildClient(EmailSettings settings)
         {
             if (string.IsNullOrWhiteSpace(settings.Host))
-                throw new InvalidOperationException("SMTP host não configurado.");
+                throw new ConfigurationException(_localizer["EmailSmtpHostInvalid"]);
             if (settings.Port <= 0)
-                throw new InvalidOperationException("SMTP port inválida.");
+                throw new ConfigurationException(_localizer["EmailSmtpPortInvalid"]);
 
             var client = new SmtpClient(settings.Host, settings.Port)
             {
@@ -103,9 +98,9 @@ namespace Application.Service.Service
             };
 
             if (string.IsNullOrWhiteSpace(settings.FromEmail))
-                throw new InvalidOperationException("FromEmail não configurado para autenticação SMTP.");
+                throw new ConfigurationException(_localizer["EmailFromNotConfigured"]);
             if (string.IsNullOrWhiteSpace(settings.Password))
-                throw new InvalidOperationException("Senha SMTP não configurada.");
+                throw new ConfigurationException(_localizer["EmailPasswordNotConfigured"]);
 
             client.Credentials = new NetworkCredential(settings.FromEmail, settings.Password);
 
@@ -123,7 +118,7 @@ namespace Application.Service.Service
             var message = new MailMessage
             {
                 From = from,
-                Subject = "Recuperação de senha",
+                Subject = _localizer["EmailResetSubject"],
                 Body = BuildResetBody(settings),
                 IsBodyHtml = true,
                 BodyEncoding = Encoding.UTF8,
@@ -133,25 +128,30 @@ namespace Application.Service.Service
             return message;
         }
 
+        private void ValidateEmailSettings(EmailSettings settings)
+        {
+            if (string.IsNullOrWhiteSpace(settings.Host))
+                throw new ConfigurationException(_localizer["EmailHostNotConfigured"]);
+            if (string.IsNullOrWhiteSpace(settings.FromEmail))
+                throw new ConfigurationException(_localizer["EmailFromNotConfigured"]);
+            if (string.IsNullOrWhiteSpace(settings.Password))
+                throw new ConfigurationException(_localizer["EmailPasswordNotConfigured"]);
+        }
+
         public async Task SendTestEmailAsync(string toEmail, EmailSettings? overrideSettings = null)
         {
             var settings = overrideSettings ?? await GetEffectiveSettingsAsync();
 
-            if (string.IsNullOrWhiteSpace(settings.Host))
-                throw new InvalidOperationException("Email host is not configured.");
-            if (string.IsNullOrWhiteSpace(settings.FromEmail))
-                throw new InvalidOperationException("From email is not configured.");
-            if (string.IsNullOrWhiteSpace(settings.Password))
-                throw new InvalidOperationException("SMTP password is not configured.");
+            ValidateEmailSettings(settings);
             if (string.IsNullOrWhiteSpace(toEmail))
-                throw new ArgumentException("Destination email is required.", nameof(toEmail));
+                throw new BusinessException(_localizer["EmailDestinationRequired"]);
 
             var from = new MailAddress(settings.FromEmail, settings.FromName);
             var message = new MailMessage
             {
                 From = from,
-                Subject = "Teste de e-mail",
-                Body = "Teste de envio de e-mail das configurações de serviço.",
+                Subject = _localizer["EmailTestSubject"],
+                Body = _localizer["EmailTestBody"],
                 IsBodyHtml = false,
                 BodyEncoding = Encoding.UTF8,
                 SubjectEncoding = Encoding.UTF8
@@ -166,31 +166,24 @@ namespace Application.Service.Service
             catch (SmtpException smtpEx)
             {
                 _logger.LogError(smtpEx, "SMTP send test failed: StatusCode={StatusCode}, Host={Host}, Port={Port}", smtpEx.StatusCode, client.Host, client.Port);
-                throw new InvalidOperationException($"Falha ao enviar e-mail de teste (SMTP). Verifique host, porta, segurança e credenciais. Código: {smtpEx.StatusCode}", smtpEx);
+                throw new BusinessException(_localizer["EmailTestSendFailedWithCode", smtpEx.StatusCode]);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Send test email failed");
-                throw new InvalidOperationException("Falha ao enviar e-mail de teste. Verifique configuração SMTP.", ex);
+                throw new BusinessException(_localizer["EmailTestSendFailed"]);
             }
         }
 
         private string BuildResetBody(EmailSettings settings)
         {
-            return $@"
-                <p>Recebemos um pedido para redefinir a senha da sua conta.</p>
-                <p>Use o código de verificação enviado para concluir a redefinição no aplicativo.</p>
-                <p>Se você não solicitou, ignore este e-mail.</p>";
+            return _localizer["EmailResetBody"];
         }
 
         private string BuildRecoveryBody(string code, DateTime expiresAt)
         {
             var expiry = expiresAt.ToLocalTime().ToString("g");
-            return $@"
-                <p>Seu código de recuperação é:</p>
-                <p style=""font-size:20px;font-weight:bold;letter-spacing:2px;"">{WebUtility.HtmlEncode(code)}</p>
-                <p>Ele expira em {WebUtility.HtmlEncode(expiry)}.</p>
-                <p>Se você não solicitou, ignore este e-mail.</p>";
+            return _localizer["EmailRecoveryBody", WebUtility.HtmlEncode(code), WebUtility.HtmlEncode(expiry)];
         }
 
         private bool ShouldUseSsl(string secure)

@@ -1,8 +1,10 @@
 using System.Security.Cryptography;
 using System.Text;
+using Application.Domain;
 using Application.Domain.Exceptions;
 using Application.Domain.Model;
 using Application.Service.Interface;
+using Microsoft.Extensions.Localization;
 
 namespace Application.Service.Service.Security
 {
@@ -11,14 +13,16 @@ namespace Application.Service.Service.Security
     /// </summary>
     public class SecretEncryptionService : ISecretEncryptionService
     {
+        private readonly IStringLocalizer<SharedResource> _localizer;
         private readonly byte[] _key;
 
-        public SecretEncryptionService()
+        public SecretEncryptionService(IStringLocalizer<SharedResource> localizer)
         {
+            _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
             var keyMaterial = Environment.GetEnvironmentVariable(ApplicationConstants.SECRET_ENCRYPTION_KEY);
             if (string.IsNullOrWhiteSpace(keyMaterial))
             {
-                throw new ConfigurationException($"Encryption key not configured. Set env var {ApplicationConstants.SECRET_ENCRYPTION_KEY}.");
+                throw new ConfigurationException(_localizer["EncryptionKeyNotConfigured", ApplicationConstants.SECRET_ENCRYPTION_KEY]);
             }
 
             _key = DeriveKey(keyMaterial);
@@ -56,16 +60,16 @@ namespace Application.Service.Service.Security
             {
                 payload = Convert.FromBase64String(cipherText);
             }
-            catch (FormatException ex)
+            catch (FormatException)
             {
-                throw new InvalidOperationException("Encrypted data is invalid base64.", ex);
+                throw new BusinessException(_localizer["EncryptedDataInvalidBase64"]);
             }
 
             using var aes = CreateAes();
             var ivLength = aes.BlockSize / 8;
             if (payload.Length <= ivLength)
             {
-                throw new InvalidOperationException("Encrypted data is too short.");
+                throw new BusinessException(_localizer["EncryptedDataTooShort"]);
             }
 
             var iv = new byte[ivLength];

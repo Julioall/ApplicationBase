@@ -11,6 +11,10 @@
     "resetCodeSent": "Código gerado e enviado por e-mail.",
     "resetPasswordSuccess": "Senha redefinida com sucesso.",
     "resetPasswordInvalid": "Preencha código, e-mail e nova senha para continuar.",
+    "errors": {
+      "loginFailed": "Falha no login.",
+      "refreshTokenMissing": "Nenhum token de atualização disponível."
+    },
     "forgot": {
       "title": "Recuperar acesso",
       "subtitle": "Informe seu e-mail para receber o código de recuperação.",
@@ -428,6 +432,7 @@
       "add": "Novo aluno",
       "import": "Importar planilha",
       "export": "Exportar planilha",
+      "exportFilenamePrefix": "alunos",
       "importTitle": "Importação de alunos",
       "importSuccess": "{{created}} criado(s), {{updated}} atualizado(s).",
       "importWarning": "{{count}} linha(s) com erro.",
@@ -483,6 +488,11 @@
       "institution": "Instituição",
       "lang": "Idioma",
       "langSelectPlaceholder": "Selecione o idioma",
+      "langOptions": {
+        "pt": "Português",
+        "en": "Inglês",
+        "es": "Espanhol"
+      },
       "timeZone": "Fuso horário",
       "isActive": "Aluno está ativo",
       "address": {
@@ -493,6 +503,7 @@
         "state": "Estado",
         "postalCode": "CEP",
         "country": "País",
+        "countryDefault": "Brasil",
         "searchCep": "Buscar CEP",
         "searchingCep": "Buscando...",
         "cepSuccess": "Endereço preenchido pelo CEP"

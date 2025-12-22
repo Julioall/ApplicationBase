@@ -210,6 +210,102 @@
     <value>Muitas tentativas. Tente novamente mais tarde.</value>
   </data>
 
+  <data name="EmailHostNotConfigured" xml:space="preserve">
+    <value>Host de e-mail nÇœo configurado.</value>
+  </data>
+  <data name="EmailFromNotConfigured" xml:space="preserve">
+    <value>Remetente nÇœo configurado.</value>
+  </data>
+  <data name="EmailPasswordNotConfigured" xml:space="preserve">
+    <value>Senha SMTP nÇœo configurada.</value>
+  </data>
+  <data name="EmailDestinationRequired" xml:space="preserve">
+    <value>DestinatÇürio de e-mail Ç¸ obrigatÇürio.</value>
+  </data>
+  <data name="EmailCodeRequired" xml:space="preserve">
+    <value>CÇüdigo de verificaÇõÇœo Ç¸ obrigatÇürio.</value>
+  </data>
+  <data name="EmailSmtpHostInvalid" xml:space="preserve">
+    <value>Host SMTP nÇœo configurado.</value>
+  </data>
+  <data name="EmailSmtpPortInvalid" xml:space="preserve">
+    <value>Porta SMTP invÇ­lida.</value>
+  </data>
+  <data name="EmailTestSendFailed" xml:space="preserve">
+    <value>Falha ao enviar e-mail de teste. Verifique configuraÇõÇœo SMTP.</value>
+  </data>
+  <data name="EmailTestSendFailedWithCode" xml:space="preserve">
+    <value>Falha ao enviar e-mail de teste (SMTP). Verifique host, porta, seguranÇõa e credenciais. CÇüdigo: {0}</value>
+  </data>
+  <data name="EmailResetSubject" xml:space="preserve">
+    <value>RecuperaÇõÇœo de senha</value>
+  </data>
+  <data name="EmailResetBody" xml:space="preserve">
+    <value>&lt;p&gt;Recebemos um pedido para redefinir a senha da sua conta.&lt;/p&gt;&lt;p&gt;Use o cÇüdigo de verificaÇõÇœo enviado para concluir a redefiniÇõÇœo no aplicativo.&lt;/p&gt;&lt;p&gt;Se vocÇ¦ nÇœo solicitou, ignore este e-mail.&lt;/p&gt;</value>
+  </data>
+  <data name="EmailRecoverySubject" xml:space="preserve">
+    <value>CÇüdigo de recuperaÇõÇœo</value>
+  </data>
+  <data name="EmailRecoveryBody" xml:space="preserve">
+    <value>&lt;p&gt;Seu cÇüdigo de recuperaÇõÇœo Ç¸:&lt;/p&gt;&lt;p style="font-size:20px;font-weight:bold;letter-spacing:2px;"&gt;{0}&lt;/p&gt;&lt;p&gt;Ele expira em {1}.&lt;/p&gt;&lt;p&gt;Se vocÇ¦ nÇœo solicitou, ignore este e-mail.&lt;/p&gt;</value>
+  </data>
+  <data name="EmailTestSubject" xml:space="preserve">
+    <value>Teste de e-mail</value>
+  </data>
+  <data name="EmailTestBody" xml:space="preserve">
+    <value>Teste de envio de e-mail das configuraÇõÇœes de serviÇõo.</value>
+  </data>
+  <data name="EmailPasswordStoredAsHash" xml:space="preserve">
+    <value>Senha de e-mail armazenada como hash. Reconfigure as credenciais SMTP.</value>
+  </data>
+
+  <data name="StudentImportFileEmpty" xml:space="preserve">
+    <value>Arquivo de importÇõÇœo vazio.</value>
+  </data>
+  <data name="StudentImportOnlyXlsx" xml:space="preserve">
+    <value>Apenas arquivos .xlsx sÇœo suportados para importaÇõÇœo.</value>
+  </data>
+  <data name="StudentImportWorksheetMissing" xml:space="preserve">
+    <value>Nenhuma planilha encontrada no arquivo enviado.</value>
+  </data>
+  <data name="StudentImportNamesRequired" xml:space="preserve">
+    <value>Primeiro nome e sobrenome sÇœo obrigatÇürios.</value>
+  </data>
+  <data name="StudentImportInvalidDate" xml:space="preserve">
+    <value>Valor de data invÇ­lido.</value>
+  </data>
+  <data name="StudentImportInvalidDateWithValue" xml:space="preserve">
+    <value>Valor de data invÇ­lido: "{0}".</value>
+  </data>
+  <data name="StudentImportMissingId" xml:space="preserve">
+    <value>Aluno existente sem identificador.</value>
+  </data>
+  <data name="StudentExportHeaderFirstName" xml:space="preserve">
+    <value>Nome</value>
+  </data>
+  <data name="StudentExportHeaderLastName" xml:space="preserve">
+    <value>Sobrenome</value>
+  </data>
+  <data name="StudentExportHeaderLastAccess" xml:space="preserve">
+    <value>Ultimo acesso</value>
+  </data>
+  <data name="StudentExportHeaderEmail" xml:space="preserve">
+    <value>EndereÇõo de e-mail</value>
+  </data>
+
+  <data name="EncryptionKeyNotConfigured" xml:space="preserve">
+    <value>Chave de criptografia nÇœo configurada. Defina a variÇ­vel de ambiente {0}.</value>
+  </data>
+  <data name="EncryptedDataInvalidBase64" xml:space="preserve">
+    <value>Dados criptografados invÇ·lidos (base64).</value>
+  </data>
+  <data name="EncryptedDataTooShort" xml:space="preserve">
+    <value>Dados criptografados incompletos.</value>
+  </data>
+  <data name="EmailPasswordDecryptFailed" xml:space="preserve">
+    <value>Falha ao descriptografar senha de e-mail. Reconfigure as credenciais SMTP.</value>
+  </data>
+
 
 
 </root>

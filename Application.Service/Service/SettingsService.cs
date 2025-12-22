@@ -1,6 +1,9 @@
+using Application.Domain;
 using Application.Domain.Interface;
 using Application.Domain.Model;
 using Application.Service.Interface;
+using Application.Domain.Exceptions;
+using Microsoft.Extensions.Localization;
 
 namespace Application.Service.Service
 {
@@ -8,11 +11,13 @@ namespace Application.Service.Service
     {
         private readonly ISettingsRepository _settingsRepository;
         private readonly ISecretEncryptionService _secretEncryptionService;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
-        public SettingsService(ISettingsRepository settingsRepository, ISecretEncryptionService secretEncryptionService)
+        public SettingsService(ISettingsRepository settingsRepository, ISecretEncryptionService secretEncryptionService, IStringLocalizer<SharedResource> localizer)
         {
             _settingsRepository = settingsRepository;
             _secretEncryptionService = secretEncryptionService;
+            _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
         }
 
         public async Task<Configurations> GetOrCreateAsync()
@@ -47,9 +52,9 @@ namespace Application.Service.Service
                         Password = _secretEncryptionService.Decrypt(email.Password)
                     };
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    throw new InvalidOperationException("Failed to decrypt email password. Reconfigure SMTP credentials.", ex);
+                    throw new ConfigurationException(_localizer["EmailPasswordDecryptFailed"]);
                 }
             }
             return email;

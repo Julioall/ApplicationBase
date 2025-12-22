@@ -69,7 +69,7 @@
         <label for="lang">{{ 'students.form.lang' | translate }}</label>
         <select id="lang" formControlName="Lang">
           <option value="">{{ 'students.form.langSelectPlaceholder' | translate }}</option>
-          <option *ngFor="let lang of languages" [value]="lang.value">{{ lang.label }}</option>
+          <option *ngFor="let lang of languages" [value]="lang.value">{{ lang.labelKey | translate }}</option>
         </select>
         <small *ngIf="showError('Lang','pattern')">{{ 'students.form.errors.lang' | translate }}</small>
       </div>

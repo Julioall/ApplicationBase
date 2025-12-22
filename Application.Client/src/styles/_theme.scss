@@ -2,77 +2,82 @@
 :root[data-theme='light'] {
   color-scheme: light;
 
-  /* Grayscale Base – Light */
-  --page-bg: #f7f7f8;
+  /* Backgrounds */
+  --page-bg: #f8f9fa;          /* branco quebrado */
   --surface: #ffffff;
-  --surface-alt: #f1f1f3;
-  --surface-muted: #e6e7eb;
-  --surface-blur: rgba(255, 255, 255, 0.88);
+  --surface-alt: #f2f3f5;
+  --surface-muted: #e9eaee;
+  --surface-blur: rgba(255, 255, 255, 0.9);
 
-  --border-soft: #e1e3e8;
-  --border-strong: #cfd3da;
+  /* Borders */
+  --border-soft: #e2e4e9;
+  --border-strong: #d1d5db;
 
-  --text-primary: #111111;
-  --text-subtle: #5f6368;
+  /* Text */
+  --text-primary: #121212;     /* preto suave */
+  --text-subtle: #60646c;
   --text-inverse: #ffffff;
 
-  /* Neutral accent */
-  --accent: #3a3a3a;
-  --accent-strong: #1f1f1f;
-  --accent-soft: rgba(0, 0, 0, 0.12);
+  /* Accent neutro */
+  --accent: #3f3f46;
+  --accent-strong: #18181b;
+  --accent-soft: rgba(0, 0, 0, 0.1);
+  --accent-rgb: rgb(66, 66, 66);
 
-  /* Bootstrap 5 status */
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #0dcaf0;
+  /* Status */
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #0284c7;
 
-  --surface-contrast: #111111;
-
-  --overlay-strong: rgba(0, 0, 0, 0.45);
-  --overlay-soft: rgba(0, 0, 0, 0.08);
+  /* Overlays & focus */
+  --overlay-strong: rgba(0, 0, 0, 0.4);
+  --overlay-soft: rgba(0, 0, 0, 0.06);
 
   --shadow-rgb: 0, 0, 0;
-  --focus-rgb: 58, 58, 58;
+  --focus-rgb: 63, 63, 70;
 
-  --shadow-soft: 0 10px 32px rgba(var(--shadow-rgb), 0.14);
+  --shadow-soft: 0 12px 30px rgba(var(--shadow-rgb), 0.12);
 }
+
 
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  /* Grayscale Base – Dark */
-  --page-bg: #0e0e10;
-  --surface: #141417;
-  --surface-alt: #1b1b20;
-  --surface-muted: #0f0f12;
-  --surface-blur: rgba(14, 14, 16, 0.88);
+  /* Backgrounds */
+  --page-bg: #0f1013;          /* não é preto absoluto */
+  --surface: #15161a;
+  --surface-alt: #1c1d22;
+  --surface-muted: #121318;
+  --surface-blur: rgba(15, 16, 19, 0.9);
 
-  --border-soft: #242428;
-  --border-strong: #2f2f35;
+  /* Borders */
+  --border-soft: #26272c;
+  --border-strong: #31323a;
 
-  --text-primary: #f2f2f2;
+  /* Text */
+  --text-primary: #e5e7eb;     /* branco suave */
   --text-subtle: #a1a1aa;
-  --text-inverse: #0e0e10;
+  --text-inverse: #0f1013;
 
-  /* Neutral accent */
-  --accent: #d4d4d8;
+  /* Accent neutro */
+  --accent: #d1d5db;
   --accent-strong: #f4f4f5;
-  --accent-soft: rgba(212, 212, 216, 0.18);
+  --accent-soft: rgba(209, 213, 219, 0.16);
+  --accent-rgb: rgb(88, 88, 88);
 
-  /* Bootstrap 5 status */
+  /* Status */
   --success: #22c55e;
   --warning: #f59e0b;
   --danger: #ef4444;
-  --info: #0dcaf0;
+  --info: #38bdf8;
 
-  --surface-contrast: #ffffff;
-
-  --overlay-strong: rgba(0, 0, 0, 0.65);
-  --overlay-soft: rgba(255, 255, 255, 0.05);
+  /* Overlays & focus */
+  --overlay-strong: rgba(0, 0, 0, 0.7);
+  --overlay-soft: rgba(255, 255, 255, 0.04);
 
   --shadow-rgb: 0, 0, 0;
-  --focus-rgb: 212, 212, 216;
+  --focus-rgb: 209, 213, 219;
 
-  --shadow-soft: 0 18px 52px rgba(var(--shadow-rgb), 0.55);
+  --shadow-soft: 0 20px 60px rgba(var(--shadow-rgb), 0.5);
 }

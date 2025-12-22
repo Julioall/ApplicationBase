@@ -19,9 +19,9 @@ export class StudentFormComponent implements OnInit {
   submitted = false;
   studentId?: string;
   languages = [
-    { value: 'pt', label: 'Português' },
-    { value: 'en', label: 'English' },
-    { value: 'es', label: 'Español' },
+    { value: 'pt', labelKey: 'students.form.langOptions.pt' },
+    { value: 'en', labelKey: 'students.form.langOptions.en' },
+    { value: 'es', labelKey: 'students.form.langOptions.es' },
   ];
   timeZones = ['UTC', 'America/Sao_Paulo', 'America/New_York', 'Europe/London'];
   statusOptions = [
@@ -194,7 +194,7 @@ export class StudentFormComponent implements OnInit {
       City: result.city || this.addressGroup.get('City')?.value,
       State: result.state || this.addressGroup.get('State')?.value,
       PostalCode: this.formatCep(result.cep),
-      Country: this.addressGroup.get('Country')?.value || 'Brasil',
+      Country: this.addressGroup.get('Country')?.value || this.translate.instant('students.form.address.countryDefault'),
     });
   }
 

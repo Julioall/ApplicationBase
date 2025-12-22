@@ -24,7 +24,15 @@ namespace Application.Api.RateLimiting
 
             lock (_lock)
             {
-                if (!_cache.TryGetValue(cacheKey, out RateLimitEntry? entry) || entry.ExpiresAt <= now)
+                if (!_cache.TryGetValue(cacheKey, out RateLimitEntry? entry) || entry == null || entry.ExpiresAt <= now)
+                {
+                    entry = new RateLimitEntry
+                    {
+                        Count = 0,
+                        ExpiresAt = now.Add(window)
+                    };
+                }
+                else if (entry is null)
                 {
                     entry = new RateLimitEntry
                     {

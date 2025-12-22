@@ -210,6 +210,102 @@
     <value>Too many attempts. Please try again later.</value>
   </data>
 
+  <data name="EmailHostNotConfigured" xml:space="preserve">
+    <value>Email host is not configured.</value>
+  </data>
+  <data name="EmailFromNotConfigured" xml:space="preserve">
+    <value>Sender (From) is not configured.</value>
+  </data>
+  <data name="EmailPasswordNotConfigured" xml:space="preserve">
+    <value>SMTP password is not configured.</value>
+  </data>
+  <data name="EmailDestinationRequired" xml:space="preserve">
+    <value>Destination email is required.</value>
+  </data>
+  <data name="EmailCodeRequired" xml:space="preserve">
+    <value>Verification code is required.</value>
+  </data>
+  <data name="EmailSmtpHostInvalid" xml:space="preserve">
+    <value>SMTP host is not configured.</value>
+  </data>
+  <data name="EmailSmtpPortInvalid" xml:space="preserve">
+    <value>SMTP port is invalid.</value>
+  </data>
+  <data name="EmailTestSendFailed" xml:space="preserve">
+    <value>Failed to send test email. Check SMTP configuration.</value>
+  </data>
+  <data name="EmailTestSendFailedWithCode" xml:space="preserve">
+    <value>Failed to send SMTP test email. Check host, port, security, and credentials. Code: {0}</value>
+  </data>
+  <data name="EmailResetSubject" xml:space="preserve">
+    <value>Password recovery</value>
+  </data>
+  <data name="EmailResetBody" xml:space="preserve">
+    <value>&lt;p&gt;We received a request to reset your account password.&lt;/p&gt;&lt;p&gt;Use the verification code sent to finish the reset in the app.&lt;/p&gt;&lt;p&gt;If you did not request this, ignore this email.&lt;/p&gt;</value>
+  </data>
+  <data name="EmailRecoverySubject" xml:space="preserve">
+    <value>Recovery code</value>
+  </data>
+  <data name="EmailRecoveryBody" xml:space="preserve">
+    <value>&lt;p&gt;Your recovery code is:&lt;/p&gt;&lt;p style="font-size:20px;font-weight:bold;letter-spacing:2px;"&gt;{0}&lt;/p&gt;&lt;p&gt;It expires on {1}.&lt;/p&gt;&lt;p&gt;If you did not request this, ignore this email.&lt;/p&gt;</value>
+  </data>
+  <data name="EmailTestSubject" xml:space="preserve">
+    <value>Email test</value>
+  </data>
+  <data name="EmailTestBody" xml:space="preserve">
+    <value>Test email from the service configuration.</value>
+  </data>
+  <data name="EmailPasswordStoredAsHash" xml:space="preserve">
+    <value>Email password is stored as hash. Reconfigure SMTP credentials.</value>
+  </data>
+
+  <data name="StudentImportFileEmpty" xml:space="preserve">
+    <value>Import file is empty.</value>
+  </data>
+  <data name="StudentImportOnlyXlsx" xml:space="preserve">
+    <value>Only .xlsx files are supported for import.</value>
+  </data>
+  <data name="StudentImportWorksheetMissing" xml:space="preserve">
+    <value>No worksheet found in the uploaded file.</value>
+  </data>
+  <data name="StudentImportNamesRequired" xml:space="preserve">
+    <value>First name and last name are required.</value>
+  </data>
+  <data name="StudentImportInvalidDate" xml:space="preserve">
+    <value>Invalid date value.</value>
+  </data>
+  <data name="StudentImportInvalidDateWithValue" xml:space="preserve">
+    <value>Invalid date value: "{0}".</value>
+  </data>
+  <data name="StudentImportMissingId" xml:space="preserve">
+    <value>Existing student is missing an identifier.</value>
+  </data>
+  <data name="StudentExportHeaderFirstName" xml:space="preserve">
+    <value>First name</value>
+  </data>
+  <data name="StudentExportHeaderLastName" xml:space="preserve">
+    <value>Last name</value>
+  </data>
+  <data name="StudentExportHeaderLastAccess" xml:space="preserve">
+    <value>Last access</value>
+  </data>
+  <data name="StudentExportHeaderEmail" xml:space="preserve">
+    <value>Email address</value>
+  </data>
+
+  <data name="EncryptionKeyNotConfigured" xml:space="preserve">
+    <value>Encryption key not configured. Set env var {0}.</value>
+  </data>
+  <data name="EncryptedDataInvalidBase64" xml:space="preserve">
+    <value>Encrypted data is invalid base64.</value>
+  </data>
+  <data name="EncryptedDataTooShort" xml:space="preserve">
+    <value>Encrypted data is too short.</value>
+  </data>
+  <data name="EmailPasswordDecryptFailed" xml:space="preserve">
+    <value>Failed to decrypt email password. Reconfigure SMTP credentials.</value>
+  </data>
+
 
 
 </root>

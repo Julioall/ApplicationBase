@@ -11,6 +11,10 @@
     "resetCodeSent": "Code generated and sent by email.",
     "resetPasswordSuccess": "Password reset successfully.",
     "resetPasswordInvalid": "Fill in code, email, and new password to continue.",
+    "errors": {
+      "loginFailed": "Login failed.",
+      "refreshTokenMissing": "No refresh token available."
+    },
     "forgot": {
       "title": "Recover access",
       "subtitle": "Enter your email to receive the recovery code.",
@@ -407,6 +411,7 @@
       "add": "New student",
       "import": "Import",
       "export": "Export",
+      "exportFilenamePrefix": "students",
       "importTitle": "Student import",
       "importSuccess": "{{created}} created, {{updated}} updated.",
       "importWarning": "{{count}} row(s) had errors.",
@@ -461,6 +466,12 @@
       "dateOfBirth": "Date of birth",
       "institution": "Institution",
       "lang": "Language",
+      "langSelectPlaceholder": "Select a language",
+      "langOptions": {
+        "pt": "Portuguese",
+        "en": "English",
+        "es": "Spanish"
+      },
       "timeZone": "Time zone",
       "isActive": "Student is active",
       "address": {
@@ -470,7 +481,8 @@
         "city": "City",
         "state": "State",
         "postalCode": "Postal code",
-        "country": "Country"
+        "country": "Country",
+        "countryDefault": "Brazil"
       },
       "errors": {
         "firstNameRequired": "First name is required.",

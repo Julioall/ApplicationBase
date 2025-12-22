@@ -9,6 +9,10 @@ using Application.Service.Service.Security;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Linq;
 using Application.Domain.Model;
+using Application.Domain.Exceptions;
+using Microsoft.Extensions.Localization;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace Application.Tests.Services
 {
@@ -53,11 +57,22 @@ namespace Application.Tests.Services
             public Task ChangePasswordWithRecoveryCodeAsync(string email, string code, string newPassword) => Task.CompletedTask;
         }
 
+        private sealed class FakeLocalizer : IStringLocalizer<SharedResource>
+        {
+            public LocalizedString this[string name] => new(name, name);
+
+            public LocalizedString this[string name, params object[] arguments] => new(name, string.Format(CultureInfo.InvariantCulture, name, arguments));
+
+            public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures) => Array.Empty<LocalizedString>();
+
+            public IStringLocalizer WithCulture(CultureInfo culture) => this;
+        }
+
         [Fact]
         public async Task GenerateTokens_Should_Return_Tokens_When_Password_Is_Valid()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
 
             var tokens = await service.GenerateTokens(loginDto);
@@ -73,7 +88,7 @@ namespace Application.Tests.Services
         public async Task GenerateTokens_Should_Return_Null_When_Password_Is_Invalid()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Wrong!" };
 
             var tokens = await service.GenerateTokens(loginDto);
@@ -85,7 +100,7 @@ namespace Application.Tests.Services
         public async Task RefreshAsync_Should_Rotate_RefreshToken_When_Valid()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
 
             var initial = await service.GenerateTokens(loginDto);
@@ -103,7 +118,7 @@ namespace Application.Tests.Services
         public async Task RefreshAsync_Should_Return_Null_For_Invalid_Format()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
 
             var refreshed = await service.RefreshAsync("invalid-token");
 
@@ -114,7 +129,7 @@ namespace Application.Tests.Services
         public async Task RefreshAsync_Should_Return_Null_When_User_Not_Found()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
 
             var initial = await service.GenerateTokens(loginDto);
@@ -129,7 +144,7 @@ namespace Application.Tests.Services
         public async Task RefreshAsync_Should_Return_Null_When_Hash_Mismatch()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
 
             var initial = await service.GenerateTokens(loginDto);
@@ -147,7 +162,7 @@ namespace Application.Tests.Services
         public async Task GenerateTokens_Should_Return_Null_When_LoginDto_Is_Null()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
 
             var tokens = await service.GenerateTokens(null!);
 
@@ -158,7 +173,7 @@ namespace Application.Tests.Services
         public async Task GenerateTokens_Should_Throw_When_SigningKey_Missing()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
 
             var previousKey = Environment.GetEnvironmentVariable(ApplicationConstants.JWT_SIGNING_KEY);
@@ -166,7 +181,7 @@ namespace Application.Tests.Services
             {
                 Environment.SetEnvironmentVariable(ApplicationConstants.JWT_SIGNING_KEY, null);
 
-                await Assert.ThrowsAsync<ArgumentNullException>(() => service.GenerateTokens(loginDto));
+                await Assert.ThrowsAsync<ConfigurationException>(() => service.GenerateTokens(loginDto));
             }
             finally
             {
@@ -178,7 +193,7 @@ namespace Application.Tests.Services
         public async Task RefreshAsync_Should_Return_Null_When_Token_Expired()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
 
             var initial = await service.GenerateTokens(loginDto);
@@ -194,7 +209,7 @@ namespace Application.Tests.Services
         public async Task RefreshAsync_Should_Return_Null_When_Expiry_Null()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance);
+            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
 
             var initial = await service.GenerateTokens(loginDto);

@@ -37,7 +37,7 @@ namespace Application.Infrastructure.ConfigurationDb
             return documentStore;
         }
 
-        private static X509Certificate2 GetCertificateFromStore()
+        private static X509Certificate2? GetCertificateFromStore()
         {
             var certificateSubject = Environment.GetEnvironmentVariable(ApplicationConstants.CERTIFICATE_SUBJECT_KEY);
             if (string.IsNullOrWhiteSpace(certificateSubject))
@@ -53,6 +53,10 @@ namespace Application.Infrastructure.ConfigurationDb
                 if (certs.Count > 0)
                 {
                     var certificate = certs.FirstOrDefault();
+                    if (certificate is null)
+                    {
+                        throw new Exception(SharedResourceProvider.GetString("CertificateNotFound", certificateSubject));
+                    }
                     if (!certificate.HasPrivateKey)
                     {
                         throw new Exception(SharedResourceProvider.GetString("CertificateMissingPrivateKey", certificateSubject));
@@ -90,7 +94,7 @@ namespace Application.Infrastructure.ConfigurationDb
 
             try
             {
-                storeInstance.Maintenance.ForDatabase(dbName).Send(new GetStatisticsOperation());
+                storeInstance.Maintenance.ForDatabase(dbName!).Send(new GetStatisticsOperation());
             }
             catch (DatabaseDoesNotExistException)
             {
@@ -101,7 +105,9 @@ namespace Application.Infrastructure.ConfigurationDb
 
                 try
                 {
-                    var urls = Environment.GetEnvironmentVariable(ApplicationConstants.DATABASE_URL_KEY)?.Split(',').ToList();
+                    var urls = Environment.GetEnvironmentVariable(ApplicationConstants.DATABASE_URL_KEY)
+                        ?.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .ToList();
                     int count = urls?.Count ?? 0;
                     storeInstance.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(dbName), count == 0 ? 1 : count));
                 }

@@ -190,7 +190,8 @@ export class StudentsListComponent implements OnInit, OnDestroy {
           const url = window.URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
-          link.download = `alunos-${new Date().toISOString().replace(/[:.]/g, '-')}.xlsx`;
+          const prefix = this.translate.instant('students.list.exportFilenamePrefix') || 'students';
+          link.download = `${prefix}-${new Date().toISOString().replace(/[:.]/g, '-')}.xlsx`;
           link.click();
           window.URL.revokeObjectURL(url);
         },

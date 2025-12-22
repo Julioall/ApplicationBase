@@ -6,7 +6,7 @@ namespace Application.Infrastructure.Service;
 
 public class ServiceRavenDB : IServiceRavenDB
 {
-    public IDocumentStore Store { get; set; }
-    public IDocumentSession Session { get; set; }
-    public IAsyncDocumentSession AsyncSession { get; set; }
+    public IDocumentStore Store { get; set; } = default!;
+    public IDocumentSession Session { get; set; } = default!;
+    public IAsyncDocumentSession AsyncSession { get; set; } = default!;
 }

@@ -10,6 +10,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { LoadingInterceptor } from './service/loading/loading.interceptor';
 import { ProblemInterceptorProvider } from './service/http/problem.interceptor';
+import { AuthInterceptorProvider } from './service/auth/auth.interceptor';
 import { NgxSpinnerModule } from "ngx-spinner";
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
@@ -53,6 +54,7 @@ export class AppTranslateLoader implements TranslateLoader {
     })
   ],
   providers: [
+    AuthInterceptorProvider,
     ProblemInterceptorProvider,
     {
       provide: HTTP_INTERCEPTORS,
