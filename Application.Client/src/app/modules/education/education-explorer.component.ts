@@ -26,7 +26,7 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
   ucs: EducationUc[] = [];
   total = 0;
   pageNumber = 1;
-  pageSize = 10;
+  pageSize = 12;
   loadingSchools = false;
   loadingPrograms = false;
   loadingClasses = false;

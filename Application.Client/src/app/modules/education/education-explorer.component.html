@@ -123,6 +123,14 @@
       </a>
       <div class="uc-meta">
         <p class="uc-program">{{ uc.ProgramNameDerived || selectedProgramName }}</p>
+        <div class="uc-cover" *ngIf="uc.CourseImage; else coverPlaceholder">
+          <img [src]="uc.CourseImage" [alt]="uc.Fullname" />
+        </div>
+        <ng-template #coverPlaceholder>
+          <div class="uc-cover placeholder">
+            <i class="fa-regular fa-image"></i>
+          </div>
+        </ng-template>
         <h3 class="uc-title">{{ uc.Fullname }}</h3>
         <p class="uc-school">{{ uc.SchoolNameDerived || selectedSchoolName }}</p>
       </div>

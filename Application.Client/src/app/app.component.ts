@@ -42,6 +42,7 @@ export class AppComponent implements OnInit, OnDestroy {
   adminShortcuts: NavItem[] = [
     { icon: 'fa-solid fa-user-shield', label: 'home.adminNav.users', path: '/admin/users' },
     { icon: 'fa-solid fa-gears', label: 'home.adminNav.services', path: '/admin/services' },
+    { icon: 'fa-solid fa-school', label: 'navbar.education', path: '/education' },
     { icon: 'fa-solid fa-life-ring', label: 'home.adminNav.support', path: '/support' },
   ];
   notifications: AppNotification[] = [];
