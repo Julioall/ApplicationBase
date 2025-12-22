@@ -35,26 +35,6 @@
             <span>{{ link.label | translate }}</span>
             <span *ngIf="link.badge" class="pill">{{ link.badge | translate }}</span>
           </a>
-          <a
-            *ngIf="canAccessEducation"
-            class="nav-link"
-            [class.active]="isRouteActive('/education')"
-            routerLink="/education"
-            (click)="closeNav()"
-          >
-            <i class="fa-solid fa-school" aria-hidden="true"></i>
-            <span>{{ 'navbar.education' | translate }}</span>
-          </a>
-          <a
-            *ngIf="canAccessStudents"
-            class="nav-link"
-            [class.active]="isRouteActive('/students')"
-            routerLink="/students"
-            (click)="closeNav()"
-          >
-            <i class="fa-solid fa-user-graduate" aria-hidden="true"></i>
-            <span>{{ 'navbar.students' | translate }}</span>
-          </a>
           <a *ngFor="let link of favoriteNav" class="nav-link subtle" href="#" (click)="closeNav()">
             <i class="{{ link.icon }}" aria-hidden="true"></i>
             <span>{{ link.label | translate }}</span>
@@ -70,16 +50,18 @@
             <i class="fa-solid" [ngClass]="sectionState.admin ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
           </button>
           <div class="nav-list" *ngIf="sectionState.admin">
-            <a
-              *ngFor="let link of adminShortcuts"
-              class="nav-link minimal"
-              [class.active]="isRouteActive(link.path)"
-              [routerLink]="link.path"
-              (click)="closeNav()"
-            >
-              <i class="{{ link.icon }}" aria-hidden="true"></i>
-              <span>{{ link.label | translate }}</span>
-            </a>
+            <ng-container *ngFor="let link of adminShortcuts">
+              <a
+                *ngIf="isAdminShortcutVisible(link)"
+                class="nav-link minimal"
+                [class.active]="isRouteActive(link.path)"
+                [routerLink]="link.path"
+                (click)="closeNav()"
+              >
+                <i class="{{ link.icon }}" aria-hidden="true"></i>
+                <span>{{ link.label | translate }}</span>
+              </a>
+            </ng-container>
           </div>
         </div>
       </div>

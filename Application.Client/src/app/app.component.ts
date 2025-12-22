@@ -42,6 +42,7 @@ export class AppComponent implements OnInit, OnDestroy {
   adminShortcuts: NavItem[] = [
     { icon: 'fa-solid fa-user-shield', label: 'home.adminNav.users', path: '/admin/users' },
     { icon: 'fa-solid fa-gears', label: 'home.adminNav.services', path: '/admin/services' },
+    { icon: 'fa-solid fa-user-graduate', label: 'navbar.students', path: '/students' },
     { icon: 'fa-solid fa-school', label: 'navbar.education', path: '/education' },
     { icon: 'fa-solid fa-life-ring', label: 'home.adminNav.support', path: '/support' },
   ];
@@ -291,6 +292,16 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private refreshAdminAccess(): void {
     this.hasAdminAccess = this.authService.hasPermission(ADMIN_PERMISSION);
+  }
+
+  isAdminShortcutVisible(link: NavItem): boolean {
+    if (link.path === '/students') {
+      return this.canAccessStudents;
+    }
+    if (link.path === '/education') {
+      return this.canAccessEducation;
+    }
+    return true;
   }
 
   private startNotificationPolling(): void {
