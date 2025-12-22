@@ -8,82 +8,95 @@
     </div>
 
     <div class="settings-body">
-      <div class="header-actions">
-        <label class="btn ghost" *ngIf="canImport">
-          <i class="fa-solid fa-file-import"></i>
-          <span>{{ 'education.actions.import' | translate }}</span>
-          <input
-            type="file"
-            accept=".json,application/json"
-            (change)="onImportCourses($event)"
-            [disabled]="importing"
-            [attr.aria-label]="('education.actions.import' | translate)"
-          />
-        </label>
-        <button class="btn outline" type="button" (click)="loadSchools()" [disabled]="loadingSchools || loadingPrograms || loadingClasses">
-          <i class="fa-solid fa-rotate"></i>
-          <span>{{ 'education.actions.refresh' | translate }}</span>
-        </button>
-      </div>
-
-      <div class="filters">
-        <div class="filter">
-          <label for="schoolSelect">{{ 'education.filters.school' | translate }}</label>
-          <select
-            id="schoolSelect"
-            class="form-control"
-            [formControl]="schoolControl"
-            (change)="onSchoolChange()"
-            [disabled]="loadingSchools || loadingPrograms"
-            [attr.aria-label]="('education.filters.school' | translate)"
+      <div class="filters-row">
+        <div class="filters-left">
+          <div
+            class="filters-dropdown"
+            [class.is-open]="showFilters"
+            #filtersDropdown
+            (click)="$event.stopPropagation()"
           >
-            <option [ngValue]="''">{{ 'education.filters.selectPlaceholder' | translate }}</option>
-            <option *ngFor="let school of schools" [ngValue]="school.Id">{{ school.Name }}</option>
-          </select>
+            <button class="btn ghost" type="button" (click)="toggleFilters()">
+              <i class="fa-solid fa-sliders"></i>
+              <span>Filtros</span>
+            </button>
+            <div class="filters-panel" *ngIf="showFilters">
+              <div class="filters">
+                <div class="filter">
+                  <label for="schoolSelect">{{ 'education.filters.school' | translate }}</label>
+                  <select
+                    id="schoolSelect"
+                    class="form-control"
+                    [formControl]="schoolControl"
+                    (change)="onSchoolChange()"
+                    [disabled]="loadingSchools || loadingPrograms"
+                    [attr.aria-label]="('education.filters.school' | translate)"
+                  >
+                    <option [ngValue]="''">{{ 'education.filters.selectPlaceholder' | translate }}</option>
+                    <option *ngFor="let school of schools" [ngValue]="school.Id">{{ school.Name }}</option>
+                  </select>
+                </div>
+
+                <div class="filter">
+                  <label for="programSelect">{{ 'education.filters.program' | translate }}</label>
+                  <select
+                    id="programSelect"
+                    class="form-control"
+                    [formControl]="programControl"
+                    (change)="onProgramChange()"
+                    [disabled]="!form.get('schoolId')?.value || loadingPrograms || loadingClasses"
+                    [attr.aria-label]="('education.filters.program' | translate)"
+                  >
+                    <option [ngValue]="''">{{ 'education.filters.selectPlaceholder' | translate }}</option>
+                    <option *ngFor="let program of programs" [ngValue]="program.Id">{{ program.Name }}</option>
+                  </select>
+                </div>
+
+                <div class="filter">
+                  <label for="classSelect">{{ 'education.filters.class' | translate }}</label>
+                  <select
+                    id="classSelect"
+                    class="form-control"
+                    [formControl]="classControl"
+                    (change)="onClassChange()"
+                    [disabled]="!form.get('programId')?.value || loadingClasses"
+                    [attr.aria-label]="('education.filters.class' | translate)"
+                  >
+                    <option [ngValue]="''">{{ 'education.filters.selectPlaceholder' | translate }}</option>
+                    <option *ngFor="let classItem of classes" [ngValue]="classItem.Id">{{ classItem.Name }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="filter">
-          <label for="programSelect">{{ 'education.filters.program' | translate }}</label>
-          <select
-            id="programSelect"
-            class="form-control"
-            [formControl]="programControl"
-            (change)="onProgramChange()"
-            [disabled]="!form.get('schoolId')?.value || loadingPrograms || loadingClasses"
-            [attr.aria-label]="('education.filters.program' | translate)"
-          >
-            <option [ngValue]="''">{{ 'education.filters.selectPlaceholder' | translate }}</option>
-            <option *ngFor="let program of programs" [ngValue]="program.Id">{{ program.Name }}</option>
-          </select>
-        </div>
+        <div class="filters-right">
+          <div class="field search-field no-label">
+            <div class="input-icon">
+              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              <input
+                id="ucSearch"
+                type="search"
+                [formControl]="searchControl"
+                [placeholder]="'education.filters.searchPlaceholder' | translate"
+                [attr.aria-label]="('education.filters.search' | translate)"
+              />
+            </div>
+          </div>
 
-        <div class="filter">
-          <label for="classSelect">{{ 'education.filters.class' | translate }}</label>
-          <select
-            id="classSelect"
-            class="form-control"
-            [formControl]="classControl"
-            (change)="onClassChange()"
-            [disabled]="!form.get('programId')?.value || loadingClasses"
-            [attr.aria-label]="('education.filters.class' | translate)"
-          >
-            <option [ngValue]="''">{{ 'education.filters.selectPlaceholder' | translate }}</option>
-            <option *ngFor="let classItem of classes" [ngValue]="classItem.Id">{{ classItem.Name }}</option>
-          </select>
-        </div>
-
-        <div class="filter search">
-          <label for="ucSearch">{{ 'education.filters.search' | translate }}</label>
-          <div class="search-field">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input
-              id="ucSearch"
-              type="search"
-              class="form-control"
-              [formControl]="searchControl"
-              [placeholder]="'education.filters.searchPlaceholder' | translate"
-              [attr.aria-label]="('education.filters.search' | translate)"
-            />
+          <div class="header-actions">
+            <label class="btn primary" *ngIf="canImport">
+              <i class="fa-solid fa-file-import"></i>
+              <span>{{ 'education.actions.import' | translate }}</span>
+              <input
+                type="file"
+                accept=".json,application/json"
+                (change)="onImportCourses($event)"
+                [disabled]="importing"
+                [attr.aria-label]="('education.actions.import' | translate)"
+              />
+            </label>
           </div>
         </div>
       </div>

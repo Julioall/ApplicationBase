@@ -510,7 +510,7 @@
     "header": {
       "eyebrow": "Academic data",
       "title": "Education",
-      "subtitle": "Import and explore schools, programs, classes and curricular units."
+      "subtitle": "Import and explore schools, courses, classes and curricular units."
     },
     "actions": {
       "import": "Import JSON",
@@ -518,7 +518,7 @@
     },
     "filters": {
       "school": "School",
-      "program": "Program",
+      "program": "Course",
       "class": "Class",
       "search": "Search",
       "searchPlaceholder": "Search units by name",
@@ -526,7 +526,7 @@
     },
     "labels": {
       "school": "School",
-      "program": "Program",
+      "program": "Course",
       "class": "Class",
       "period": "Period",
       "periodUnknown": "Period not available",
@@ -547,7 +547,7 @@
     },
     "errors": {
       "loadSchools": "Could not load schools.",
-      "loadPrograms": "Could not load programs.",
+      "loadPrograms": "Could not load courses.",
       "loadClasses": "Could not load classes.",
       "loadUcs": "Could not load curricular units.",
       "import": "Could not import courses."

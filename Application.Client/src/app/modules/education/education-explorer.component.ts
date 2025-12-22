@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Subscription, debounceTime } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -32,6 +32,8 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
   loadingClasses = false;
   loadingUcs = false;
   importing = false;
+  showFilters = false;
+  @ViewChild('filtersDropdown') filtersDropdownRef?: ElementRef<HTMLElement>;
   private searchSub?: Subscription;
 
   constructor(
@@ -89,6 +91,22 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
   onClassChange(): void {
     this.pageNumber = 1;
     this.loadUcs();
+  }
+
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters;
+  }
+
+  @HostListener('document:click', ['$event'])
+  closeFiltersOnOutsideClick(event: Event): void {
+    if (!this.showFilters) {
+      return;
+    }
+    const dropdownEl = this.filtersDropdownRef?.nativeElement;
+    if (dropdownEl && dropdownEl.contains(event.target as Node)) {
+      return;
+    }
+    this.showFilters = false;
   }
 
   loadSchools(): void {
