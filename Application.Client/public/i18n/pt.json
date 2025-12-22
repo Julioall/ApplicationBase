@@ -536,8 +536,8 @@
   "education": {
     "header": {
       "eyebrow": "Dados acadêmicos",
-      "title": "Explore escolas, cursos, turmas e unidades curriculares",
-      "subtitle": "Navegue na hierarquia fixa Escola → Curso → Turma e visualize cada UC com seu período."
+      "title": "Educação",
+      "subtitle": "Importe e explore escolas, cursos, turmas e unidades curriculares."
     },
     "actions": {
       "import": "Importar JSON",

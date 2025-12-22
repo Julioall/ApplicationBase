@@ -509,8 +509,8 @@
   "education": {
     "header": {
       "eyebrow": "Academic data",
-      "title": "Explore schools, programs, classes and course units",
-      "subtitle": "Navigate the fixed hierarchy from School to Program to Class and view each curricular unit with its period."
+      "title": "Education",
+      "subtitle": "Import and explore schools, programs, classes and curricular units."
     },
     "actions": {
       "import": "Import JSON",
