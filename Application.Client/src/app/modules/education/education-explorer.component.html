@@ -1,167 +1,171 @@
-<div class="page">
-  <div class="page-header">
-    <div class="header-copy">
-      <p class="eyebrow">{{ 'education.header.eyebrow' | translate }}</p>
-      <h1>{{ 'education.header.title' | translate }}</h1>
-      <p class="subtitle">{{ 'education.header.subtitle' | translate }}</p>
-    </div>
-    <div class="header-actions">
-      <label class="btn ghost" *ngIf="canImport">
-        <i class="fa-solid fa-file-import"></i>
-        <span>{{ 'education.actions.import' | translate }}</span>
-        <input
-          type="file"
-          accept=".json,application/json"
-          (change)="onImportCourses($event)"
-          [disabled]="importing"
-          [attr.aria-label]="('education.actions.import' | translate)"
-        />
-      </label>
-      <button class="btn outline" type="button" (click)="loadSchools()" [disabled]="loadingSchools || loadingPrograms || loadingClasses">
-        <i class="fa-solid fa-rotate"></i>
-        <span>{{ 'education.actions.refresh' | translate }}</span>
-      </button>
-    </div>
-  </div>
-
-  <div class="filters">
-    <div class="filter">
-      <label for="schoolSelect">{{ 'education.filters.school' | translate }}</label>
-      <select
-        id="schoolSelect"
-        class="form-control"
-        [formControl]="schoolControl"
-        (change)="onSchoolChange()"
-        [disabled]="loadingSchools || loadingPrograms"
-        [attr.aria-label]="('education.filters.school' | translate)"
-      >
-        <option [ngValue]="''">{{ 'education.filters.selectPlaceholder' | translate }}</option>
-        <option *ngFor="let school of schools" [ngValue]="school.Id">{{ school.Name }}</option>
-      </select>
-    </div>
-
-    <div class="filter">
-      <label for="programSelect">{{ 'education.filters.program' | translate }}</label>
-      <select
-        id="programSelect"
-        class="form-control"
-        [formControl]="programControl"
-        (change)="onProgramChange()"
-        [disabled]="!form.get('schoolId')?.value || loadingPrograms || loadingClasses"
-        [attr.aria-label]="('education.filters.program' | translate)"
-      >
-        <option [ngValue]="''">{{ 'education.filters.selectPlaceholder' | translate }}</option>
-        <option *ngFor="let program of programs" [ngValue]="program.Id">{{ program.Name }}</option>
-      </select>
-    </div>
-
-    <div class="filter">
-      <label for="classSelect">{{ 'education.filters.class' | translate }}</label>
-      <select
-        id="classSelect"
-        class="form-control"
-        [formControl]="classControl"
-        (change)="onClassChange()"
-        [disabled]="!form.get('programId')?.value || loadingClasses"
-        [attr.aria-label]="('education.filters.class' | translate)"
-      >
-        <option [ngValue]="''">{{ 'education.filters.selectPlaceholder' | translate }}</option>
-        <option *ngFor="let classItem of classes" [ngValue]="classItem.Id">{{ classItem.Name }}</option>
-      </select>
-    </div>
-
-    <div class="filter search">
-      <label for="ucSearch">{{ 'education.filters.search' | translate }}</label>
-      <div class="search-field">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input
-          id="ucSearch"
-          type="search"
-          class="form-control"
-          [formControl]="searchControl"
-          [placeholder]="'education.filters.searchPlaceholder' | translate"
-          [attr.aria-label]="('education.filters.search' | translate)"
-        />
+<section class="education-page user-settings">
+  <article class="card settings-shell">
+    <div class="card-lead">
+      <div class="header-copy">
+        <h1>{{ 'education.header.title' | translate }}</h1>
+        <p class="subtitle">{{ 'education.header.subtitle' | translate }}</p>
       </div>
     </div>
-  </div>
 
-  <div class="summary" *ngIf="form.get('classId')?.value">
-    <div class="chip">
-      <i class="fa-solid fa-building"></i>
-      <span>{{ 'education.labels.school' | translate }}:</span>
-      <strong>{{ selectedSchoolName }}</strong>
-    </div>
-    <div class="chip">
-      <i class="fa-solid fa-layer-group"></i>
-      <span>{{ 'education.labels.program' | translate }}:</span>
-      <strong>{{ selectedProgramName }}</strong>
-    </div>
-    <div class="chip">
-      <i class="fa-solid fa-chalkboard-user"></i>
-      <span>{{ 'education.labels.class' | translate }}:</span>
-      <strong>{{ selectedClassName }}</strong>
-    </div>
-    <div class="chip">
-      <i class="fa-regular fa-calendar"></i>
-      <span>{{ 'education.labels.period' | translate }}:</span>
-      <strong>{{ formatClassPeriod() }}</strong>
-    </div>
-  </div>
+    <div class="settings-body">
+      <div class="header-actions">
+        <label class="btn ghost" *ngIf="canImport">
+          <i class="fa-solid fa-file-import"></i>
+          <span>{{ 'education.actions.import' | translate }}</span>
+          <input
+            type="file"
+            accept=".json,application/json"
+            (change)="onImportCourses($event)"
+            [disabled]="importing"
+            [attr.aria-label]="('education.actions.import' | translate)"
+          />
+        </label>
+        <button class="btn outline" type="button" (click)="loadSchools()" [disabled]="loadingSchools || loadingPrograms || loadingClasses">
+          <i class="fa-solid fa-rotate"></i>
+          <span>{{ 'education.actions.refresh' | translate }}</span>
+        </button>
+      </div>
 
-  <section class="cards" *ngIf="hasResults; else emptyState">
-    <article class="uc-card" *ngFor="let uc of ucs; trackBy: trackByUc">
-      <a
-        *ngIf="uc.ViewUrl"
-        class="link icon-only"
-        [href]="uc.ViewUrl"
-        target="_blank"
-        rel="noreferrer"
-        [attr.aria-label]="'education.labels.viewCourse' | translate"
-      >
-        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-      </a>
-      <div class="uc-meta">
-        <p class="uc-program">{{ uc.ProgramNameDerived || selectedProgramName }}</p>
-        <div class="uc-cover" *ngIf="uc.CourseImage; else coverPlaceholder">
-          <img [src]="uc.CourseImage" [alt]="uc.Fullname" />
+      <div class="filters">
+        <div class="filter">
+          <label for="schoolSelect">{{ 'education.filters.school' | translate }}</label>
+          <select
+            id="schoolSelect"
+            class="form-control"
+            [formControl]="schoolControl"
+            (change)="onSchoolChange()"
+            [disabled]="loadingSchools || loadingPrograms"
+            [attr.aria-label]="('education.filters.school' | translate)"
+          >
+            <option [ngValue]="''">{{ 'education.filters.selectPlaceholder' | translate }}</option>
+            <option *ngFor="let school of schools" [ngValue]="school.Id">{{ school.Name }}</option>
+          </select>
         </div>
-        <ng-template #coverPlaceholder>
-          <div class="uc-cover placeholder">
-            <i class="fa-regular fa-image"></i>
+
+        <div class="filter">
+          <label for="programSelect">{{ 'education.filters.program' | translate }}</label>
+          <select
+            id="programSelect"
+            class="form-control"
+            [formControl]="programControl"
+            (change)="onProgramChange()"
+            [disabled]="!form.get('schoolId')?.value || loadingPrograms || loadingClasses"
+            [attr.aria-label]="('education.filters.program' | translate)"
+          >
+            <option [ngValue]="''">{{ 'education.filters.selectPlaceholder' | translate }}</option>
+            <option *ngFor="let program of programs" [ngValue]="program.Id">{{ program.Name }}</option>
+          </select>
+        </div>
+
+        <div class="filter">
+          <label for="classSelect">{{ 'education.filters.class' | translate }}</label>
+          <select
+            id="classSelect"
+            class="form-control"
+            [formControl]="classControl"
+            (change)="onClassChange()"
+            [disabled]="!form.get('programId')?.value || loadingClasses"
+            [attr.aria-label]="('education.filters.class' | translate)"
+          >
+            <option [ngValue]="''">{{ 'education.filters.selectPlaceholder' | translate }}</option>
+            <option *ngFor="let classItem of classes" [ngValue]="classItem.Id">{{ classItem.Name }}</option>
+          </select>
+        </div>
+
+        <div class="filter search">
+          <label for="ucSearch">{{ 'education.filters.search' | translate }}</label>
+          <div class="search-field">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input
+              id="ucSearch"
+              type="search"
+              class="form-control"
+              [formControl]="searchControl"
+              [placeholder]="'education.filters.searchPlaceholder' | translate"
+              [attr.aria-label]="('education.filters.search' | translate)"
+            />
           </div>
-        </ng-template>
-        <h3 class="uc-title">{{ uc.Fullname }}</h3>
-        <p class="uc-school">{{ uc.SchoolNameDerived || selectedSchoolName }}</p>
-      </div>
-      <div class="uc-footer">
-        <div class="uc-period">
-          <i class="fa-regular fa-calendar-days"></i>
-          <span>{{ formatPeriod(uc.StartDate, uc.EndDate, uc.PeriodTextDerived || null) }}</span>
         </div>
       </div>
-    </article>
-  </section>
 
-  <ng-template #emptyState>
-    <div class="empty" *ngIf="!loadingUcs">
-      <i class="fa-regular fa-folder-open"></i>
-      <p>{{ 'education.empty.title' | translate }}</p>
-      <p class="muted">{{ 'education.empty.subtitle' | translate }}</p>
+      <div class="summary" *ngIf="form.get('classId')?.value">
+        <div class="chip">
+          <i class="fa-solid fa-building"></i>
+          <span>{{ 'education.labels.school' | translate }}:</span>
+          <strong>{{ selectedSchoolName }}</strong>
+        </div>
+        <div class="chip">
+          <i class="fa-solid fa-layer-group"></i>
+          <span>{{ 'education.labels.program' | translate }}:</span>
+          <strong>{{ selectedProgramName }}</strong>
+        </div>
+        <div class="chip">
+          <i class="fa-solid fa-chalkboard-user"></i>
+          <span>{{ 'education.labels.class' | translate }}:</span>
+          <strong>{{ selectedClassName }}</strong>
+        </div>
+        <div class="chip">
+          <i class="fa-regular fa-calendar"></i>
+          <span>{{ 'education.labels.period' | translate }}:</span>
+          <strong>{{ formatClassPeriod() }}</strong>
+        </div>
+      </div>
+
+      <section class="cards" *ngIf="hasResults; else emptyState">
+        <article class="uc-card" *ngFor="let uc of ucs; trackBy: trackByUc">
+          <a
+            *ngIf="uc.ViewUrl"
+            class="link icon-only"
+            [href]="uc.ViewUrl"
+            target="_blank"
+            rel="noreferrer"
+            [attr.aria-label]="'education.labels.viewCourse' | translate"
+          >
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+          <div class="uc-meta">
+            <p class="uc-program">{{ uc.ProgramNameDerived || selectedProgramName }}</p>
+            <div class="uc-cover" *ngIf="uc.CourseImage; else coverPlaceholder">
+              <img [src]="uc.CourseImage" [alt]="uc.Fullname" />
+            </div>
+            <ng-template #coverPlaceholder>
+              <div class="uc-cover placeholder">
+                <i class="fa-regular fa-image"></i>
+              </div>
+            </ng-template>
+            <h3 class="uc-title">{{ uc.Fullname }}</h3>
+            <p class="uc-school">{{ uc.SchoolNameDerived || selectedSchoolName }}</p>
+          </div>
+          <div class="uc-footer">
+            <div class="uc-period">
+              <i class="fa-regular fa-calendar-days"></i>
+              <span>{{ formatPeriod(uc.StartDate, uc.EndDate, uc.PeriodTextDerived || null) }}</span>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <ng-template #emptyState>
+        <div class="empty" *ngIf="!loadingUcs">
+          <i class="fa-regular fa-folder-open"></i>
+          <p>{{ 'education.empty.title' | translate }}</p>
+          <p class="muted">{{ 'education.empty.subtitle' | translate }}</p>
+        </div>
+      </ng-template>
+
+      <div class="pagination" *ngIf="hasResults">
+        <button class="btn ghost" type="button" (click)="changePage(-1)" [disabled]="pageNumber <= 1">
+          <i class="fa-solid fa-chevron-left"></i>
+          <span>{{ 'education.pagination.prev' | translate }}</span>
+        </button>
+        <span class="page-indicator">
+              {{ 'education.pagination.page' | translate:{ current: pageNumber, total: totalPages } }}
+        </span>
+        <button class="btn ghost" type="button" (click)="changePage(1)" [disabled]="pageNumber >= totalPages">
+          <span>{{ 'education.pagination.next' | translate }}</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
     </div>
-  </ng-template>
-
-  <div class="pagination" *ngIf="hasResults">
-    <button class="btn ghost" type="button" (click)="changePage(-1)" [disabled]="pageNumber <= 1">
-      <i class="fa-solid fa-chevron-left"></i>
-      <span>{{ 'education.pagination.prev' | translate }}</span>
-    </button>
-    <span class="page-indicator">
-          {{ 'education.pagination.page' | translate:{ current: pageNumber, total: totalPages } }}
-    </span>
-    <button class="btn ghost" type="button" (click)="changePage(1)" [disabled]="pageNumber >= totalPages">
-      <span>{{ 'education.pagination.next' | translate }}</span>
-      <i class="fa-solid fa-chevron-right"></i>
-    </button>
-  </div>
-</div>
+  </article>
+</section>
