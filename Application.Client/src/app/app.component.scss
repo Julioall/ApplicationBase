@@ -417,6 +417,160 @@
   gap: var(--space-3);
 }
 
+.notifications {
+  position: relative;
+}
+
+.notifications-dropdown {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  width: min(380px, 92vw);
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  z-index: 32;
+}
+
+.notifications-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.notifications-header .title {
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
+}
+
+.notifications-header .subtitle {
+  margin: 0;
+  color: var(--text-subtle);
+  font-size: var(--font-size-sm);
+}
+
+.notifications-header .subtitle.muted {
+  color: var(--text-muted);
+}
+
+.link-btn {
+  border: none;
+  background: transparent;
+  color: var(--accent-strong);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  padding: var(--space-1) var(--space-2);
+}
+
+.notifications-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-soft);
+  background: var(--surface-alt);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), transform var(--transition-fast), background var(--transition-fast);
+}
+
+.notification-item:hover {
+  border-color: var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+.notification-item.is-unread {
+  border-color: var(--accent-soft);
+  background: var(--accent-soft);
+}
+
+.notification-icon {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--text-subtle);
+  margin-top: var(--space-2);
+}
+
+.notification-icon.success {
+  background: var(--success);
+}
+
+.notification-icon.error {
+  background: var(--danger);
+}
+
+.notification-icon.warning {
+  background: var(--warning);
+}
+
+.notification-icon.info {
+  background: var(--info);
+}
+
+.notification-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.notification-title {
+  font-weight: var(--font-weight-semibold);
+}
+
+.notification-message {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.notification-meta {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  color: var(--text-subtle);
+  font-size: var(--font-size-xs);
+}
+
+.notification-meta .timestamp {
+  color: var(--text-subtle);
+}
+
+.icon-btn.sm {
+  width: 32px;
+  height: 32px;
+}
+
+.state {
+  text-align: center;
+  color: var(--text-subtle);
+  padding: var(--space-3);
+}
+
+.notification-actions {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.icon-btn.danger {
+  color: var(--danger);
+}
+
 
 @include respond-down(lg) {
   .dashboard-shell {

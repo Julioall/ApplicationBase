@@ -1,4 +1,4 @@
-﻿{
+{
   "auth": {
     "loginSuccess": "Login realizado com sucesso!",
     "loginError": "Erro no login. Verifique suas credenciais.",
@@ -415,7 +415,8 @@
     "admin": "Admin",
     "theme": "Tema",
     "logout": "Sair",
-    "students": "Alunos"
+    "students": "Alunos",
+    "education": "Educação"
   },
   "modal": {
     "confirm": "Confirmar",
@@ -531,5 +532,71 @@
       "suspended": "Suspenso",
       "notCurrently": "Inativo"
     }
+  },
+  "education": {
+    "header": {
+      "eyebrow": "Dados acadêmicos",
+      "title": "Explore escolas, cursos, turmas e unidades curriculares",
+      "subtitle": "Navegue na hierarquia fixa Escola → Curso → Turma e visualize cada UC com seu período."
+    },
+    "actions": {
+      "import": "Importar JSON",
+      "refresh": "Recarregar dados"
+    },
+    "filters": {
+      "school": "Escola",
+      "program": "Curso",
+      "class": "Turma",
+      "search": "Busca",
+      "searchPlaceholder": "Busque UCs pelo nome",
+      "selectPlaceholder": "Selecione"
+    },
+    "labels": {
+      "school": "Escola",
+      "program": "Curso",
+      "class": "Turma",
+      "period": "Período",
+      "periodUnknown": "Período indisponível",
+      "noClassSelected": "Selecione uma turma para ver o período",
+      "error": "Erro",
+      "viewCourse": "Abrir curso"
+    },
+    "empty": {
+      "title": "Nenhuma unidade curricular para exibir",
+      "subtitle": "Selecione uma turma ou faça uma busca para ver resultados."
+    },
+    "import": {
+      "title": "Importar cursos",
+      "success": "{{created}} criadas, {{updated}} atualizadas, {{linked}} vinculadas.",
+      "warning": "{{count}} problemas encontrados na importação.",
+      "errorRow": "{{course}} • {{name}}: {{message}}",
+      "queuedMessage": "Arquivo recebido: o processamento ocorrerá em segundo plano. Você será notificado ao finalizar."
+    },
+    "errors": {
+      "loadSchools": "Não foi possível carregar as escolas.",
+      "loadPrograms": "Não foi possível carregar os cursos.",
+      "loadClasses": "Não foi possível carregar as turmas.",
+      "loadUcs": "Não foi possível carregar as UCs.",
+      "import": "Não foi possível importar os cursos."
+    },
+    "pagination": {
+      "page": "Página {{current}} de {{total}}",
+      "prev": "Anterior",
+      "next": "Próxima"
+    }
+  },
+  "notifications": {
+    "title": "Notificações",
+    "empty": "Nenhuma notificação até o momento.",
+    "loading": "Carregando notificações...",
+    "markAllAsRead": "Marcar todas como lidas",
+    "markAsRead": "Marcar como lida",
+    "delete": "Excluir notificação",
+    "allRead": "Tudo em dia",
+    "unread": "{{count}} não lidas",
+    "view": "Ver",
+    "updatedAt": "Atualizado em {{date}}",
+    "importCompleted": "Importação concluída",
+    "importFailed": "Importação com falha"
   }
 }

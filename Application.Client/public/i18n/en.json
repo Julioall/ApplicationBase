@@ -506,6 +506,58 @@
       "notCurrently": "Inactive"
     }
   },
+  "education": {
+    "header": {
+      "eyebrow": "Academic data",
+      "title": "Explore schools, programs, classes and course units",
+      "subtitle": "Navigate the fixed hierarchy from School to Program to Class and view each curricular unit with its period."
+    },
+    "actions": {
+      "import": "Import JSON",
+      "refresh": "Reload data"
+    },
+    "filters": {
+      "school": "School",
+      "program": "Program",
+      "class": "Class",
+      "search": "Search",
+      "searchPlaceholder": "Search units by name",
+      "selectPlaceholder": "Select"
+    },
+    "labels": {
+      "school": "School",
+      "program": "Program",
+      "class": "Class",
+      "period": "Period",
+      "periodUnknown": "Period not available",
+      "noClassSelected": "Select a class to view its period",
+      "error": "Error",
+      "viewCourse": "Open course"
+    },
+    "empty": {
+      "title": "No curricular units to show",
+      "subtitle": "Select a class or run a search to view results."
+    },
+    "import": {
+      "title": "Import courses",
+      "success": "{{created}} created, {{updated}} updated, {{linked}} linked.",
+      "warning": "{{count}} issues found during import.",
+      "errorRow": "{{course}} • {{name}}: {{message}}",
+      "queuedMessage": "The file was received and will be processed in the background. You will be notified when it finishes."
+    },
+    "errors": {
+      "loadSchools": "Could not load schools.",
+      "loadPrograms": "Could not load programs.",
+      "loadClasses": "Could not load classes.",
+      "loadUcs": "Could not load curricular units.",
+      "import": "Could not import courses."
+    },
+    "pagination": {
+      "page": "Page {{current}} of {{total}}",
+      "prev": "Previous",
+      "next": "Next"
+    }
+  },
   "admin": {
     "pageTitle": "Admin"
   },
@@ -517,10 +569,25 @@
     "admin": "Admin",
     "theme": "Theme",
     "logout": "Sign out",
-    "students": "Students"
+    "students": "Students",
+    "education": "Education"
   },
   "modal": {
     "confirm": "Confirm",
     "cancel": "Cancel"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet.",
+    "loading": "Loading notifications...",
+    "markAllAsRead": "Mark all as read",
+    "markAsRead": "Mark as read",
+    "delete": "Delete notification",
+    "allRead": "All caught up",
+    "unread": "{{count}} unread",
+    "view": "View",
+    "updatedAt": "Updated at {{date}}",
+    "importCompleted": "Import completed",
+    "importFailed": "Import failed"
   }
 }

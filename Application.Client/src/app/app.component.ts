@@ -2,11 +2,13 @@ import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } fro
 import { NavigationEnd, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from './service/auth/auth.service';
-import { Subscription } from 'rxjs';
+import { Subscription, interval } from 'rxjs';
 import { ThemeService } from './service/theme/theme.service';
 import { UserService } from './service/user/user.service';
 import { User } from './model/User';
-import { ADMIN_PERMISSION, MANAGE_STUDENTS_PERMISSION, VIEW_STUDENTS_PERMISSION } from './model/permissions';
+import { ADMIN_PERMISSION, MANAGE_STUDENTS_PERMISSION, MANAGE_EDUCATION_PERMISSION, VIEW_STUDENTS_PERMISSION, VIEW_EDUCATION_PERMISSION } from './model/permissions';
+import { Notification as AppNotification } from './model/notification';
+import { NotificationApiService } from './service/notification/notification-api.service';
 
 type NavItem = {
   icon: string;
@@ -42,6 +44,12 @@ export class AppComponent implements OnInit, OnDestroy {
     { icon: 'fa-solid fa-gears', label: 'home.adminNav.services', path: '/admin/services' },
     { icon: 'fa-solid fa-life-ring', label: 'home.adminNav.support', path: '/support' },
   ];
+  notifications: AppNotification[] = [];
+  unreadNotifications = 0;
+  isNotificationsOpen = false;
+  isLoadingNotifications = false;
+  isMarkingNotifications = false;
+  private notificationPolling?: Subscription;
   private routerSubscription?: Subscription;
   private hasLoadedUser = false;
   private isFetchingUser = false;
@@ -49,13 +57,16 @@ export class AppComponent implements OnInit, OnDestroy {
   hasAdminAccess = false;
 
   @ViewChild('profileMenu') profileMenu?: ElementRef<HTMLDivElement>;
+  @ViewChild('notificationsMenu') notificationsMenu?: ElementRef<HTMLDivElement>;
+  @ViewChild('notificationsTrigger') notificationsTrigger?: ElementRef<HTMLButtonElement>;
 
   constructor(
     private readonly translateService: TranslateService,
-    private readonly authService: AuthService,
-    private readonly router: Router,
-    private readonly themeService: ThemeService,
-    private readonly userService: UserService,
+  private readonly authService: AuthService,
+  private readonly router: Router,
+  private readonly themeService: ThemeService,
+  private readonly userService: UserService,
+  private readonly notificationApiService: NotificationApiService,
   ) {}
 
   ngOnInit(): void {
@@ -80,22 +91,28 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.routerSubscription?.unsubscribe();
+    this.notificationPolling?.unsubscribe();
   }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
-    if (!this.isProfileMenuOpen) {
-      return;
-    }
     const target = event.target as HTMLElement | null;
-    if (this.profileMenu && target && !this.profileMenu.nativeElement.contains(target)) {
+    if (this.isProfileMenuOpen && this.profileMenu && target && !this.profileMenu.nativeElement.contains(target)) {
       this.isProfileMenuOpen = false;
+    }
+
+    const clickedNotificationArea =
+      (this.notificationsMenu && target && this.notificationsMenu.nativeElement.contains(target)) ||
+      (this.notificationsTrigger && target && this.notificationsTrigger.nativeElement.contains(target));
+    if (this.isNotificationsOpen && !clickedNotificationArea) {
+      this.isNotificationsOpen = false;
     }
   }
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
     this.isProfileMenuOpen = false;
+    this.isNotificationsOpen = false;
   }
 
   toggleNav(): void {
@@ -124,6 +141,17 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
   }
 
+  toggleNotifications(event: Event): void {
+    event.stopPropagation();
+    if (!this.authService.isLoggedIn()) {
+      return;
+    }
+    this.isNotificationsOpen = !this.isNotificationsOpen;
+    if (this.isNotificationsOpen) {
+      this.refreshNotifications();
+    }
+  }
+
   closeProfileMenu(): void {
     this.isProfileMenuOpen = false;
   }
@@ -138,6 +166,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.closeProfileMenu();
     this.refreshAdminAccess();
     this.resetUserMetadata();
+    this.stopNotificationPolling();
     this.router.navigate(['/auth']);
   }
 
@@ -147,6 +176,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   get canAccessStudents(): boolean {
     return this.authService.hasAnyPermission([VIEW_STUDENTS_PERMISSION, MANAGE_STUDENTS_PERMISSION]);
+  }
+
+  get canAccessEducation(): boolean {
+    return this.authService.hasAnyPermission([VIEW_EDUCATION_PERMISSION, MANAGE_EDUCATION_PERMISSION]);
   }
 
   isRouteActive(path?: string): boolean {
@@ -165,12 +198,14 @@ export class AppComponent implements OnInit, OnDestroy {
     this.shouldShowDashboardShell = shouldShowShell;
     if (shouldShowShell) {
       this.ensureUserContext();
+      this.startNotificationPolling();
     } else {
       if (isProfileRoute) {
         this.hasLoadedUser = false;
       }
       this.closeNav();
       this.closeProfileMenu();
+      this.stopNotificationPolling();
     }
   }
 
@@ -248,9 +283,121 @@ export class AppComponent implements OnInit, OnDestroy {
     this.userInitialsValue = this.defaultInitials;
     this.hasLoadedUser = false;
     this.isFetchingUser = false;
+    this.notifications = [];
+    this.unreadNotifications = 0;
+    this.isNotificationsOpen = false;
   }
 
   private refreshAdminAccess(): void {
     this.hasAdminAccess = this.authService.hasPermission(ADMIN_PERMISSION);
+  }
+
+  private startNotificationPolling(): void {
+    if (!this.authService.isLoggedIn()) {
+      return;
+    }
+    this.stopNotificationPolling();
+    this.refreshNotifications(false);
+    this.notificationPolling = interval(20000).subscribe(() => this.refreshNotifications(false));
+  }
+
+  private stopNotificationPolling(): void {
+    this.notificationPolling?.unsubscribe();
+    this.notificationPolling = undefined;
+  }
+
+  private refreshNotifications(startLoading: boolean = true): void {
+    if (!this.authService.isLoggedIn()) {
+      return;
+    }
+    this.isLoadingNotifications = startLoading;
+    this.notificationApiService.getLatest(12).subscribe({
+      next: (result) => {
+        this.notifications = result?.Items ?? [];
+        this.unreadNotifications = result?.UnreadCount ?? 0;
+        this.isLoadingNotifications = false;
+      },
+      error: () => {
+        this.isLoadingNotifications = false;
+      },
+    });
+  }
+
+  markNotificationAsRead(notification: AppNotification, event?: Event): void {
+    event?.stopPropagation();
+    if (!notification || notification.IsRead || !notification.Id) {
+      return;
+    }
+
+    this.notificationApiService.markAsRead(notification.Id).subscribe({
+      next: () => {
+        notification.IsRead = true;
+        this.unreadNotifications = Math.max(0, this.unreadNotifications - 1);
+      },
+      error: () => {},
+    });
+  }
+
+  markAllNotificationsAsRead(): void {
+    const unreadIds = this.notifications.filter(n => !n.IsRead && !!n.Id).map(n => n.Id);
+    if (unreadIds.length === 0) {
+      return;
+    }
+    this.isMarkingNotifications = true;
+    this.notificationApiService.markManyAsRead(unreadIds).subscribe({
+      next: () => {
+        this.notifications = this.notifications.map(n => ({ ...n, IsRead: true }));
+        this.unreadNotifications = 0;
+        this.isMarkingNotifications = false;
+      },
+      error: () => {
+        this.isMarkingNotifications = false;
+      },
+    });
+  }
+
+  handleNotificationClick(notification: AppNotification): void {
+    if (!notification) {
+      return;
+    }
+    this.markNotificationAsRead(notification);
+    if (notification.Link) {
+      this.navigateToLink(notification.Link);
+    }
+  }
+
+  deleteNotification(notification: AppNotification, event?: Event): void {
+    event?.stopPropagation();
+    if (!notification?.Id) {
+      return;
+    }
+
+    const id = notification.Id;
+    this.notifications = this.notifications.filter(n => n.Id !== id);
+    if (!notification.IsRead && this.unreadNotifications > 0) {
+      this.unreadNotifications -= 1;
+    }
+
+    this.notificationApiService.delete(id).subscribe({
+      error: () => {
+        // best-effort delete; if it fails, just refresh list next poll
+      },
+    });
+  }
+
+  trackByNotification(index: number, notification: AppNotification): string {
+    return notification?.Id ?? index.toString();
+  }
+
+  private navigateToLink(link: string): void {
+    if (!link) {
+      return;
+    }
+    if (/^https?:\/\//i.test(link)) {
+      window.open(link, '_blank', 'noreferrer');
+    } else {
+      this.router.navigateByUrl(link);
+    }
+    this.isNotificationsOpen = false;
   }
 }

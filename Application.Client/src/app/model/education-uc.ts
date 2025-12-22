@@ -1,0 +1,13 @@
+export interface EducationUc {
+  Id?: string;
+  EadId: number;
+  Fullname: string;
+  StartDate: number;
+  EndDate: number;
+  ViewUrl?: string;
+  CourseImage?: string;
+  CourseCategory?: string;
+  SchoolNameDerived?: string;
+  ProgramNameDerived?: string;
+  PeriodTextDerived?: string;
+}

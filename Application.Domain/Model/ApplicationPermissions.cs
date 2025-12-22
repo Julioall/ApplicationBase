@@ -9,6 +9,8 @@ namespace Application.Domain.Model
         public const string ManageUsers = "manage:users";
         public const string ViewStudents = "view:students";
         public const string ManageStudents = "manage:students";
+        public const string ViewEducation = "view:education";
+        public const string ManageEducation = "manage:education";
 
         public static IReadOnlyCollection<string> DefaultUserPermissions => new[]
         {
@@ -22,7 +24,9 @@ namespace Application.Domain.Model
             ViewProfile,
             ManageUsers,
             ViewStudents,
-            ManageStudents
+            ManageStudents,
+            ViewEducation,
+            ManageEducation
         };
 
         public static IReadOnlyCollection<string> All => new[]
@@ -31,7 +35,9 @@ namespace Application.Domain.Model
             ViewProfile,
             ManageUsers,
             ViewStudents,
-            ManageStudents
+            ManageStudents,
+            ViewEducation,
+            ManageEducation
         };
     }
 }

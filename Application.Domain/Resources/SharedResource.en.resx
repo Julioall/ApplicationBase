@@ -306,6 +306,61 @@
     <value>Failed to decrypt email password. Reconfigure SMTP credentials.</value>
   </data>
 
+  <data name="CourseImportFileEmpty" xml:space="preserve">
+    <value>Courses file cannot be empty.</value>
+  </data>
+  <data name="CourseImportOnlyJson" xml:space="preserve">
+    <value>Upload a .json file with courses.</value>
+  </data>
+  <data name="CourseImportInvalidJson" xml:space="preserve">
+    <value>The courses file is invalid or not valid JSON.</value>
+  </data>
+  <data name="CourseImportCoursesMissing" xml:space="preserve">
+    <value>No courses list found at data.courses.</value>
+  </data>
+  <data name="CourseImportProgramMissing" xml:space="preserve">
+    <value>Program name not found in the summary.</value>
+  </data>
+  <data name="CourseImportSchoolMissing" xml:space="preserve">
+    <value>School name not found in the summary.</value>
+  </data>
+  <data name="CourseImportFieldMissing" xml:space="preserve">
+    <value>Missing required field: {0}.</value>
+  </data>
+  <data name="EducationSchoolRequired" xml:space="preserve">
+    <value>schoolId is required.</value>
+  </data>
+  <data name="EducationProgramRequired" xml:space="preserve">
+    <value>programId is required.</value>
+  </data>
+  <data name="EducationClassRequired" xml:space="preserve">
+    <value>classId is required.</value>
+  </data>
+  <data name="ImportNotFound" xml:space="preserve">
+    <value>Import {0} not found.</value>
+  </data>
+
+
+
+  <data name="NotificationImportCompletedTitle" xml:space="preserve">
+    <value>Import completed</value>
+  </data>
+  <data name="NotificationImportCompletedMessage" xml:space="preserve">
+    <value>File {0} processed {1} new UCs, {2} updated and {3} linked.</value>
+  </data>
+  <data name="NotificationImportFailedTitle" xml:space="preserve">
+    <value>Import failed</value>
+  </data>
+  <data name="NotificationImportFailedMessage" xml:space="preserve">
+    <value>Could not process {0}: {1}</value>
+  </data>
+  <data name="NotificationNotFound" xml:space="preserve">
+    <value>Notification {0} not found.</value>
+  </data>
+  <data name="NotificationsIdsRequired" xml:space="preserve">
+    <value>Please provide at least one notification id.</value>
+  </data>
+
 
 
 </root>

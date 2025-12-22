@@ -15,6 +15,9 @@ namespace Application.Service
             services.AddScoped<ISettingsService, SettingsService>();
             services.AddScoped<ISecretEncryptionService, SecretEncryptionService>();
             services.AddScoped<IStudentService, StudentService>();
+            services.AddScoped<IEducationService, EducationService>();
+            services.AddScoped<INotificationService, NotificationService>();
+            services.AddHostedService<EducationImportBackgroundService>();
             return services;
         }
     }

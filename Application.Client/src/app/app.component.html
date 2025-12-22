@@ -36,6 +36,16 @@
             <span *ngIf="link.badge" class="pill">{{ link.badge | translate }}</span>
           </a>
           <a
+            *ngIf="canAccessEducation"
+            class="nav-link"
+            [class.active]="isRouteActive('/education')"
+            routerLink="/education"
+            (click)="closeNav()"
+          >
+            <i class="fa-solid fa-school" aria-hidden="true"></i>
+            <span>{{ 'navbar.education' | translate }}</span>
+          </a>
+          <a
             *ngIf="canAccessStudents"
             class="nav-link"
             [class.active]="isRouteActive('/students')"
@@ -83,10 +93,86 @@
         </button>
 
         <div class="topbar-user">
-          <button class="icon-btn ghost" type="button" [attr.aria-label]="'home.viewNotifications' | translate">
-            <span class="dot"></span>
-            <i class="fa-regular fa-bell"></i>
-          </button>
+          <div class="notifications" [class.is-open]="isNotificationsOpen">
+            <button
+              #notificationsTrigger
+              class="icon-btn ghost"
+              type="button"
+              [attr.aria-label]="'home.viewNotifications' | translate"
+              [attr.aria-expanded]="isNotificationsOpen"
+              (click)="toggleNotifications($event)"
+            >
+              <span class="dot" *ngIf="unreadNotifications > 0"></span>
+              <i class="fa-regular fa-bell"></i>
+            </button>
+            <div #notificationsMenu class="notifications-dropdown" *ngIf="isNotificationsOpen">
+              <div class="notifications-header">
+                <div>
+                  <p class="title">{{ 'notifications.title' | translate }}</p>
+                  <p class="subtitle" *ngIf="unreadNotifications > 0">
+                    {{ 'notifications.unread' | translate:{ count: unreadNotifications } }}
+                  </p>
+                  <p class="subtitle muted" *ngIf="unreadNotifications === 0">
+                    {{ 'notifications.allRead' | translate }}
+                  </p>
+                </div>
+                <button
+                  class="link-btn"
+                  type="button"
+                  [disabled]="unreadNotifications === 0 || isMarkingNotifications"
+                  (click)="markAllNotificationsAsRead()"
+                >
+                  {{ 'notifications.markAllAsRead' | translate }}
+                </button>
+              </div>
+              <div class="notifications-body" *ngIf="isLoadingNotifications">
+                <p class="state">{{ 'notifications.loading' | translate }}</p>
+              </div>
+              <div class="notifications-body" *ngIf="!isLoadingNotifications">
+                <p class="state" *ngIf="notifications.length === 0">{{ 'notifications.empty' | translate }}</p>
+                <article
+                  class="notification-item"
+                  *ngFor="let notification of notifications; trackBy: trackByNotification"
+                  [class.is-unread]="!notification.IsRead"
+                  (click)="handleNotificationClick(notification)"
+                >
+                  <div class="notification-icon" [ngClass]="notification.Type"></div>
+                  <div class="notification-content">
+                    <div class="notification-title">{{ notification.Title }}</div>
+                    <p class="notification-message">{{ notification.Message }}</p>
+                    <div class="notification-meta">
+                      <span class="pill ghost" *ngIf="notification.Type === 'success'">
+                        {{ 'notifications.importCompleted' | translate }}
+                      </span>
+                      <span class="pill ghost" *ngIf="notification.Type === 'error'">
+                        {{ 'notifications.importFailed' | translate }}
+                      </span>
+                      <span class="timestamp">{{ notification.CreatedAt | date: 'short' }}</span>
+                    </div>
+                  </div>
+                  <div class="notification-actions">
+                    <button
+                      class="icon-btn ghost sm"
+                      type="button"
+                      [attr.aria-label]="'notifications.markAsRead' | translate"
+                      (click)="markNotificationAsRead(notification, $event)"
+                      *ngIf="!notification.IsRead"
+                    >
+                      <i class="fa-regular fa-circle-check"></i>
+                    </button>
+                    <button
+                      class="icon-btn ghost sm danger"
+                      type="button"
+                      [attr.aria-label]="'notifications.delete' | translate"
+                      (click)="deleteNotification(notification, $event)"
+                    >
+                      <i class="fa-regular fa-trash-can"></i>
+                    </button>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
           <div #profileMenu class="profile-menu" [class.is-open]="isProfileMenuOpen">
             <button
               class="profile-trigger"
