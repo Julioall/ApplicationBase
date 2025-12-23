@@ -327,6 +327,9 @@
   <data name="CourseImportFieldMissing" xml:space="preserve">
     <value>Missing required field: {0}.</value>
   </data>
+  <data name="CourseImportFileMissing" xml:space="preserve">
+    <value>Import file not found.</value>
+  </data>
   <data name="EducationSchoolRequired" xml:space="preserve">
     <value>schoolId is required.</value>
   </data>

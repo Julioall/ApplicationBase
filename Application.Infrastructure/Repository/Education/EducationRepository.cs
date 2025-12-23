@@ -290,24 +290,40 @@ namespace Application.Infrastructure.Repository.Education
             return classes;
         }
 
-        public async Task<IReadOnlyCollection<UcDocument>> GetUcsByClassAsync(string classId, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyCollection<UcDocument>> GetUcsByClassAsync(string classId, string? search = null, CancellationToken cancellationToken = default)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(classId);
 
-            var mappings = await _serviceRavenDb.AsyncSession.Query<ClassUcMap, ClassUcMaps_ByClass>()
+            search = NormalizeNull(search);
+
+            var query = _serviceRavenDb.AsyncSession.Query<ClassUcMap, UcSearchIndex>()
                 .Customize(x => x.WaitForNonStaleResults())
                 .Where(m => m.ClassId == classId)
+                .ProjectInto<UcSearchIndex.Result>();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Search(x => x.Fullname, search);
+            }
+
+            var results = await query
+                .OrderBy(x => x.StartDate)
+                .ThenBy(x => x.Fullname)
                 .ToListAsync(cancellationToken);
 
-            if (mappings.Count == 0)
+            if (results.Count == 0)
             {
                 return Array.Empty<UcDocument>();
             }
 
-            var ucIds = mappings.Select(m => m.UcId).Distinct().ToList();
+            var ucIds = results.Select(m => m.UcId).Distinct().ToList();
             var loaded = await _serviceRavenDb.AsyncSession.LoadAsync<UcDocument>(ucIds, cancellationToken);
 
-            return loaded.Values.Where(v => v != null).Select(v => v!).ToList();
+            return results
+                .Select(r => loaded.TryGetValue(r.UcId, out var uc) ? uc : null)
+                .Where(uc => uc != null)
+                .Select(uc => uc!)
+                .ToList();
         }
 
         public async Task<PagedResult<UcDocument>> SearchUcsAsync(string? search, string? classId, string? programId, PaginationQuery query, CancellationToken cancellationToken = default)

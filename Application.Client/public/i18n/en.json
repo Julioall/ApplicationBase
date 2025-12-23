@@ -508,20 +508,19 @@
   },
   "education": {
     "header": {
-      "eyebrow": "Academic data",
-      "title": "Education",
-      "subtitle": "Import and explore schools, courses, classes and curricular units."
+      "eyebrow": "Courses",
+      "title": "Courses",
+      "subtitle": "Browse schools, courses, and classes in one place. Open a class to see its units."
     },
     "actions": {
-      "import": "Import JSON",
+      "import": "Import",
       "refresh": "Reload data"
     },
     "filters": {
       "school": "School",
       "program": "Course",
-      "class": "Class",
       "search": "Search",
-      "searchPlaceholder": "Search units by name",
+      "searchPlaceholder": "Search classes by name",
       "selectPlaceholder": "Select"
     },
     "labels": {
@@ -530,13 +529,25 @@
       "class": "Class",
       "period": "Period",
       "periodUnknown": "Period not available",
-      "noClassSelected": "Select a class to view its period",
       "error": "Error",
       "viewCourse": "Open course"
     },
+    "classes": {
+      "count": "{{count}} classes",
+      "open": "Open class",
+      "loadingUnits": "Loading units...",
+      "emptyUnits": "No units found for this class."
+    },
+    "classDetail": {
+      "title": "Class",
+      "subtitle": "See every unit inside {{class}} and open course links.",
+      "back": "Back",
+      "searchPlaceholder": "Filter units by name",
+      "unitsCount": "{{count}} unit(s)"
+    },
     "empty": {
-      "title": "No curricular units to show",
-      "subtitle": "Select a class or run a search to view results."
+      "title": "No classes to show",
+      "subtitle": "Choose a school and course to list their classes. Open a class to view its units."
     },
     "import": {
       "title": "Import courses",
@@ -570,7 +581,7 @@
     "theme": "Theme",
     "logout": "Sign out",
     "students": "Students",
-    "education": "Education"
+    "education": "Courses"
   },
   "modal": {
     "confirm": "Confirm",

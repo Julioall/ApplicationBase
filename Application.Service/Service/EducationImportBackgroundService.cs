@@ -75,7 +75,7 @@ namespace Application.Service.Service
             if (fileStream == null)
             {
                 pending.Status = EducationImportStatus.Failed;
-                pending.ErrorMessage = "Import file not found.";
+                pending.ErrorMessage = localizer["CourseImportFileMissing"];
                 await importRepository.UpdateAsync(pending, cancellationToken);
                 await notificationService.CreateAsync(
                     localizer["NotificationImportFailedTitle"],

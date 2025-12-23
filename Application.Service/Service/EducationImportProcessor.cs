@@ -131,27 +131,27 @@ namespace Application.Service.Service
                 .ToList();
         }
 
-        private static string GetRequiredString(JsonElement element, string propertyName)
+        private string GetRequiredString(JsonElement element, string propertyName)
         {
             if (!element.TryGetProperty(propertyName, out var value) || value.ValueKind != JsonValueKind.String)
             {
-                throw new BusinessException($"Campo obrigatório ausente: {propertyName}");
+                throw new BusinessException(_localizer["CourseImportFieldMissing", propertyName]);
             }
 
             var text = value.GetString();
             if (string.IsNullOrWhiteSpace(text))
             {
-                throw new BusinessException($"Campo obrigatório ausente: {propertyName}");
+                throw new BusinessException(_localizer["CourseImportFieldMissing", propertyName]);
             }
 
             return text!;
         }
 
-        private static int GetRequiredInt(JsonElement element, string propertyName)
+        private int GetRequiredInt(JsonElement element, string propertyName)
         {
             if (!element.TryGetProperty(propertyName, out var value))
             {
-                throw new BusinessException($"Campo obrigatório ausente: {propertyName}");
+                throw new BusinessException(_localizer["CourseImportFieldMissing", propertyName]);
             }
 
             if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var intValue))
@@ -159,14 +159,14 @@ namespace Application.Service.Service
                 return intValue;
             }
 
-            throw new BusinessException($"Campo obrigatório ausente: {propertyName}");
+            throw new BusinessException(_localizer["CourseImportFieldMissing", propertyName]);
         }
 
-        private static long GetRequiredLong(JsonElement element, string propertyName)
+        private long GetRequiredLong(JsonElement element, string propertyName)
         {
             if (!element.TryGetProperty(propertyName, out var value))
             {
-                throw new BusinessException($"Campo obrigatório ausente: {propertyName}");
+                throw new BusinessException(_localizer["CourseImportFieldMissing", propertyName]);
             }
 
             if (value.ValueKind == JsonValueKind.Number && value.TryGetInt64(out var longValue))
@@ -174,7 +174,7 @@ namespace Application.Service.Service
                 return longValue;
             }
 
-            throw new BusinessException($"Campo obrigatório ausente: {propertyName}");
+            throw new BusinessException(_localizer["CourseImportFieldMissing", propertyName]);
         }
 
         private static string? TryGetString(JsonElement element, string propertyName)

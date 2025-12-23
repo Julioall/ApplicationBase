@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../environment/environment';
@@ -20,19 +20,19 @@ export class EducationService {
   constructor(private readonly http: HttpClient) {}
 
   getSchools(): Observable<EducationSchool[]> {
-    return this.http.get<EducationSchool[]>(`${this.apiUrl}/schools`, { headers: this.getAuthHeaders() })
+    return this.http.get<EducationSchool[]>(`${this.apiUrl}/schools`)
       .pipe(catchError(this.handleError));
   }
 
   getPrograms(schoolId: string): Observable<EducationProgram[]> {
     const params = new HttpParams().set('schoolId', schoolId);
-    return this.http.get<EducationProgram[]>(`${this.apiUrl}/programs`, { headers: this.getAuthHeaders(), params })
+    return this.http.get<EducationProgram[]>(`${this.apiUrl}/programs`, { params })
       .pipe(catchError(this.handleError));
   }
 
   getClasses(programId: string): Observable<EducationClass[]> {
     const params = new HttpParams().set('programId', programId);
-    return this.http.get<EducationClass[]>(`${this.apiUrl}/classes`, { headers: this.getAuthHeaders(), params })
+    return this.http.get<EducationClass[]>(`${this.apiUrl}/classes`, { params })
       .pipe(catchError(this.handleError));
   }
 
@@ -55,28 +55,20 @@ export class EducationService {
       params = params.set('programId', programId);
     }
 
-    return this.http.get<PagedResult<EducationUc>>(`${this.apiUrl}/ucs/search`, { headers: this.getAuthHeaders(), params })
+    return this.http.get<PagedResult<EducationUc>>(`${this.apiUrl}/ucs/search`, { params })
       .pipe(catchError(this.handleError));
+  }
+
+  getClassUcs(classId: string): Observable<EducationUc[]> {
+    const params = new HttpParams().set('classId', classId);
+
+    return this.http.get<EducationUc[]>(`${this.apiUrl}/ucs`, { params }).pipe(catchError(this.handleError));
   }
 
   importCourses(file: File): Observable<CourseImportResult> {
     const formData = new FormData();
     formData.append('file', file, file.name);
-    return this.http.post<CourseImportResult>(`${this.apiUrl}/import`, formData, {
-      headers: this.getAuthHeaders(false)
-    }).pipe(catchError(this.handleError));
-  }
-
-  private getAuthHeaders(includeJson = true): HttpHeaders {
-    const token = localStorage.getItem('token');
-    let headers = new HttpHeaders();
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
-    if (includeJson) {
-      headers = headers.set('Content-Type', 'application/json');
-    }
-    return headers;
+    return this.http.post<CourseImportResult>(`${this.apiUrl}/import`, formData).pipe(catchError(this.handleError));
   }
 
   private handleError(error: unknown): Observable<never> {

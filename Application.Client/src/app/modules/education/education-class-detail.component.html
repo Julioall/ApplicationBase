@@ -1,0 +1,90 @@
+<section class="education-page class-detail">
+  <div class="top-actions">
+    <button type="button" class="back-link" (click)="goBack()">
+      <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+      <span>{{ 'education.classDetail.back' | translate }}</span>
+    </button>
+  </div>
+
+  <article class="card settings-shell">
+    <div class="card-lead">
+      <div class="header-copy">
+        <h1>{{ className || ('education.classDetail.title' | translate) }}</h1>
+        <p class="subtitle">
+          {{ 'education.classDetail.subtitle' | translate:{ class: className || ('education.labels.class' | translate) } }}
+        </p>
+      </div>
+    </div>
+
+    <div class="settings-body">
+      <div class="summary">
+        <div class="chip" *ngIf="schoolName">
+          <i class="fa-solid fa-building-columns"></i>
+          <span>{{ 'education.labels.school' | translate }}:</span>
+          <strong>{{ schoolName }}</strong>
+        </div>
+        <div class="chip" *ngIf="programName">
+          <i class="fa-solid fa-layer-group"></i>
+          <span>{{ 'education.labels.program' | translate }}:</span>
+          <strong>{{ programName }}</strong>
+        </div>
+        <div class="chip" *ngIf="className">
+          <i class="fa-solid fa-chalkboard-user"></i>
+          <span>{{ 'education.labels.class' | translate }}:</span>
+          <strong>{{ className }}</strong>
+        </div>
+        <div class="chip" *ngIf="classPeriodText">
+          <i class="fa-regular fa-calendar"></i>
+          <span>{{ 'education.labels.period' | translate }}:</span>
+          <strong>{{ classPeriodText }}</strong>
+        </div>
+        <div class="chip">
+          <i class="fa-solid fa-list"></i>
+          <span>{{ 'education.classDetail.unitsCount' | translate:{ count: units.length } }}</span>
+        </div>
+      </div>
+
+      <section class="cards" *ngIf="units.length; else emptyState">
+        <article class="uc-card" *ngFor="let uc of units; trackBy: trackByUc">
+          <a
+            *ngIf="uc.ViewUrl"
+            class="btn ghost open-course"
+            [href]="uc.ViewUrl"
+            target="_blank"
+            rel="noreferrer"
+            [attr.aria-label]="'education.labels.viewCourse' | translate"
+          >
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+          <div class="uc-meta">
+            <p class="uc-program">{{ programName || uc.ProgramNameDerived }}</p>
+            <div class="uc-cover" *ngIf="uc.CourseImage; else coverPlaceholder">
+              <img [src]="uc.CourseImage" [alt]="uc.Fullname" />
+            </div>
+            <ng-template #coverPlaceholder>
+              <div class="uc-cover placeholder">
+                <i class="fa-regular fa-image"></i>
+              </div>
+            </ng-template>
+            <h3 class="uc-title">{{ uc.Fullname }}</h3>
+            <p class="uc-school">{{ uc.SchoolNameDerived || schoolName }}</p>
+          </div>
+          <div class="uc-footer">
+            <div class="uc-period">
+              <i class="fa-regular fa-calendar-days"></i>
+              <span>{{ formatPeriod(uc.StartDate, uc.EndDate, uc.PeriodTextDerived || null) }}</span>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <ng-template #emptyState>
+        <div class="empty" *ngIf="!loadingUnits">
+          <i class="fa-regular fa-folder-open"></i>
+          <p>{{ 'education.empty.title' | translate }}</p>
+          <p class="muted">{{ 'education.empty.subtitle' | translate }}</p>
+        </div>
+      </ng-template>
+    </div>
+  </article>
+</section>

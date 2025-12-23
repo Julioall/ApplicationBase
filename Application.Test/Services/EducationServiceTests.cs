@@ -57,6 +57,26 @@ namespace Application.Tests.Services
         }
 
         [Fact]
+        public async Task GetUcsByClass_Should_Filter_By_Search_Term()
+        {
+            var json = BuildCoursesJson();
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+            await _educationService.ImportCoursesAsync(stream, "cursos.json");
+            await _asyncSession.SaveChangesAsync();
+
+            var schools = await _educationService.GetSchoolsAsync();
+            var program = (await _educationService.GetProgramsBySchoolAsync(schools.First().Id!)).First();
+            var classDoc = (await _educationService.GetClassesByProgramAsync(program.Id!)).First();
+
+            var filtered = await _educationService.GetUcsByClassAsync(classDoc.Id!, "Logica");
+            Assert.Single(filtered);
+            Assert.Contains(filtered, uc => uc.Fullname.Contains("Logica"));
+
+            var none = await _educationService.GetUcsByClassAsync(classDoc.Id!, "Inexistente");
+            Assert.Empty(none);
+        }
+
+        [Fact]
         public async Task ImportCourses_Should_Be_Idempotent()
         {
             var json = BuildCoursesJson();

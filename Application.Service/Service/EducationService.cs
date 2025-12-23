@@ -69,10 +69,10 @@ namespace Application.Service.Service
             return _educationRepository.GetClassesByProgramAsync(programId, cancellationToken);
         }
 
-        public Task<IReadOnlyCollection<UcDocument>> GetUcsByClassAsync(string classId, CancellationToken cancellationToken = default)
+        public Task<IReadOnlyCollection<UcDocument>> GetUcsByClassAsync(string classId, string? search = null, CancellationToken cancellationToken = default)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(classId);
-            return _educationRepository.GetUcsByClassAsync(classId, cancellationToken);
+            return _educationRepository.GetUcsByClassAsync(classId, search, cancellationToken);
         }
 
         public Task<PagedResult<UcDocument>> SearchUcsAsync(PaginationQuery query, string? classId = null, string? programId = null, CancellationToken cancellationToken = default)

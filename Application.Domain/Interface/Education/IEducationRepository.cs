@@ -15,7 +15,7 @@ namespace Application.Domain.Interface.Education
         Task<IReadOnlyCollection<School>> GetSchoolsAsync(CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<ProgramDocument>> GetProgramsBySchoolAsync(string schoolId, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<ClassDocument>> GetClassesByProgramAsync(string programId, CancellationToken cancellationToken = default);
-        Task<IReadOnlyCollection<UcDocument>> GetUcsByClassAsync(string classId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyCollection<UcDocument>> GetUcsByClassAsync(string classId, string? search = null, CancellationToken cancellationToken = default);
         Task<PagedResult<UcDocument>> SearchUcsAsync(string? search, string? classId, string? programId, PaginationQuery query, CancellationToken cancellationToken = default);
         Task RecalculateClassPeriodAsync(string classId, CancellationToken cancellationToken = default);
     }

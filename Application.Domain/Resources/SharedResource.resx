@@ -327,6 +327,9 @@
   <data name="CourseImportFieldMissing" xml:space="preserve">
     <value>Campo obrigatÃ³rio ausente: {0}.</value>
   </data>
+  <data name="CourseImportFileMissing" xml:space="preserve">
+    <value>Arquivo de importação não encontrado.</value>
+  </data>
   <data name="EducationSchoolRequired" xml:space="preserve">
     <value>schoolId Ã© obrigatÃ³rio.</value>
   </data>

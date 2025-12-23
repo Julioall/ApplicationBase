@@ -416,7 +416,7 @@
     "theme": "Tema",
     "logout": "Sair",
     "students": "Alunos",
-    "education": "Educação"
+    "education": "Cursos"
   },
   "modal": {
     "confirm": "Confirmar",
@@ -535,35 +535,33 @@
   },
   "education": {
     "header": {
-      "eyebrow": "Dados acadêmicos",
-      "title": "Educação",
-      "subtitle": "Importe e explore escolas, cursos, turmas e unidades curriculares."
+      "eyebrow": "Cursos",
+      "title": "Cursos",
+      "subtitle": "Explore escolas, cursos e turmas em um só lugar. Abra a turma para ver as unidades."
     },
     "actions": {
-      "import": "Importar JSON",
+      "import": "Importar",
       "refresh": "Recarregar dados"
     },
     "filters": {
       "school": "Escola",
       "program": "Curso",
-      "class": "Turma",
       "search": "Busca",
-      "searchPlaceholder": "Busque UCs pelo nome",
+      "searchPlaceholder": "Busque turmas pelo nome",
       "selectPlaceholder": "Selecione"
     },
     "labels": {
       "school": "Escola",
       "program": "Curso",
       "class": "Turma",
-      "period": "Período",
-      "periodUnknown": "Período indisponível",
-      "noClassSelected": "Selecione uma turma para ver o período",
+      "period": "Periodo",
+      "periodUnknown": "Periodo indisponivel",
       "error": "Erro",
       "viewCourse": "Abrir curso"
     },
     "empty": {
-      "title": "Nenhuma unidade curricular para exibir",
-      "subtitle": "Selecione uma turma ou faça uma busca para ver resultados."
+      "title": "Nenhuma turma para exibir",
+      "subtitle": "Escolha uma escola e um curso para listar turmas. Abra a turma para ver as unidades."
     },
     "import": {
       "title": "Importar cursos",
@@ -583,6 +581,19 @@
       "page": "Página {{current}} de {{total}}",
       "prev": "Anterior",
       "next": "Próxima"
+    },
+    "classes": {
+      "count": "{{count}} turmas",
+      "open": "Abrir turma",
+      "loadingUnits": "Carregando unidades...",
+      "emptyUnits": "Nenhuma unidade cadastrada para esta turma."
+    },
+    "classDetail": {
+      "title": "Turma",
+      "subtitle": "Veja todas as unidades da turma {{class}} e acesse os links.",
+      "back": "Voltar",
+      "searchPlaceholder": "Filtre unidades pelo nome",
+      "unitsCount": "{{count}} unidade(s)"
     }
   },
   "notifications": {

@@ -102,16 +102,23 @@ namespace Application.Api.Controllers
         }
 
         [HttpGet("classes/{classId}/ucs")]
+        [HttpGet("ucs")]
         [Authorize(Policy = ApplicationPermissions.ViewEducation)]
         [ProducesResponseType(typeof(IReadOnlyCollection<UcDocument>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetUcs(string classId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetUcs(
+            [FromRoute] string? classId,
+            [FromQuery(Name = "classId")] string? classIdQuery,
+            [FromQuery] string? search,
+            CancellationToken cancellationToken)
         {
+            classId ??= classIdQuery;
+
             if (string.IsNullOrWhiteSpace(classId))
             {
                 return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["EducationClassRequired"], statusCode: StatusCodes.Status400BadRequest);
             }
 
-            var ucs = await _educationService.GetUcsByClassAsync(classId, cancellationToken);
+            var ucs = await _educationService.GetUcsByClassAsync(classId, search, cancellationToken);
             return Ok(ucs);
         }
 
