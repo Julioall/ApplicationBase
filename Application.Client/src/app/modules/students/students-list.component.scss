@@ -8,7 +8,7 @@
   width: 100%;
   max-width: none;
   margin: 0;
-  padding: var(--space-7) var(--space-4);
+  padding: 0;
   color: var(--text-primary);
 }
 
@@ -406,7 +406,7 @@
 
 @include respond-down(md) {
   .students-page {
-    padding: var(--space-5) var(--space-3);
+    padding: 0;
   }
 
   .card.settings-shell {
@@ -417,5 +417,44 @@
     padding: var(--space-3);
     flex-wrap: wrap;
     justify-content: center;
+  }
+}
+
+@include respond-down(md) {
+  .list-header {
+    display: none;
+  }
+
+  .list-row {
+    grid-template-columns: 1fr;
+    min-width: auto;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-3);
+  }
+
+  .list-row .cell {
+    border-left: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+
+    &::before {
+      content: attr(data-label);
+      font-size: var(--font-size-xs);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-subtle);
+    }
+  }
+
+  .cell.actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+
+    &::before {
+      width: 100%;
+    }
   }
 }
