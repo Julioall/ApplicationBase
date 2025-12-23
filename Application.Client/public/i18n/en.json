@@ -540,7 +540,7 @@
     },
     "classDetail": {
       "title": "Class",
-      "subtitle": "See every unit inside {{class}} and open course links.",
+      "subtitle": "See every unit inside the class and open course links.",
       "back": "Back",
       "searchPlaceholder": "Filter units by name",
       "unitsCount": "{{count}} unit(s)"

@@ -590,7 +590,7 @@
     },
     "classDetail": {
       "title": "Turma",
-      "subtitle": "Veja todas as unidades da turma {{class}} e acesse os links.",
+      "subtitle": "Veja todas as unidades da turma e acesse os links.",
       "back": "Voltar",
       "searchPlaceholder": "Filtre unidades pelo nome",
       "unitsCount": "{{count}} unidade(s)"

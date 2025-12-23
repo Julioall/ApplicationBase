@@ -10,9 +10,7 @@
     <div class="card-lead">
       <div class="header-copy">
         <h1>{{ className || ('education.classDetail.title' | translate) }}</h1>
-        <p class="subtitle">
-          {{ 'education.classDetail.subtitle' | translate:{ class: className || ('education.labels.class' | translate) } }}
-        </p>
+        <p class="subtitle">{{ 'education.classDetail.subtitle' | translate }}</p>
       </div>
     </div>
 
@@ -28,19 +26,10 @@
           <span>{{ 'education.labels.program' | translate }}:</span>
           <strong>{{ programName }}</strong>
         </div>
-        <div class="chip" *ngIf="className">
-          <i class="fa-solid fa-chalkboard-user"></i>
-          <span>{{ 'education.labels.class' | translate }}:</span>
-          <strong>{{ className }}</strong>
-        </div>
         <div class="chip" *ngIf="classPeriodText">
           <i class="fa-regular fa-calendar"></i>
           <span>{{ 'education.labels.period' | translate }}:</span>
           <strong>{{ classPeriodText }}</strong>
-        </div>
-        <div class="chip">
-          <i class="fa-solid fa-list"></i>
-          <span>{{ 'education.classDetail.unitsCount' | translate:{ count: units.length } }}</span>
         </div>
       </div>
 
