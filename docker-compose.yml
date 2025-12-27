@@ -1,0 +1,111 @@
+services:
+  # ASP.NET Core 8 API (serves Angular build as static files)
+  app-api:
+    build:
+      context: .
+      dockerfile: Application.Web/Dockerfile
+    container_name: app-api
+    ports:
+      - "5095:8080"
+    environment:
+      # Runtime
+      ASPNETCORE_ENVIRONMENT: "Production"
+      # JWT
+      JWT_ISSUER: "https://localhost"
+      JWT_AUDIENCE: "https://localhost"
+      JWT_SIGNING_KEY: "changeme-super-secret"
+      # Secret encryption
+      APP_SECRET_ENCRYPTION_KEY: "changeme-encryption-key"
+      # RavenDB
+      RAVENDBSETTINGS_URLS: "http://raven-db:8080"
+      RAVENDBSETTINGS_DATABASE_NAME: "ApplicationDb"
+      RAVENDBSETTINGS_CERTIFICATE_SUBJECT: ""
+      # Evolution API integration
+      EVOLUTION_API_BASE_URL: "http://evolution-api:8080"
+      EVOLUTION_API_KEY: "changeme-evolution-key"
+    depends_on:
+      raven-db:
+        condition: service_healthy
+      evolution-api:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - backend-network
+
+  # RavenDB (unsecured for development)
+  raven-db:
+    image: ravendb/ravendb:latest
+    container_name: raven-db
+    ports:
+      - "8081:8080"
+    environment:
+      RAVEN_License_Eula_Accepted: "true"
+      RAVEN_Setup_Mode: "None"
+      RAVEN_Security_UnsecuredAccessAllowed: "PublicNetwork"
+    healthcheck:
+      test: ["CMD-SHELL", "/bin/bash -c 'echo > /dev/tcp/localhost/8080'"]
+      interval: 10s
+      timeout: 3s
+      retries: 15
+      start_period: 20s
+    volumes:
+      - ravendb-data:/ravendb/data
+    networks:
+      - backend-network
+
+  # Evolution API (WhatsApp)
+  evolution-api:
+    image: atendai/evolution-api:latest
+    container_name: evolution-api
+    ports:
+      - "8082:8080"
+    environment:
+      AUTHENTICATION_API_KEY: "mude-me"
+      DATABASE_PROVIDER: "mysql"
+      DATABASE_CONNECTION_URI: "mysql://evolution:evolution@evolution-db:3306/evolution"
+      DATABASE_CONNECTION_CLIENT_NAME: "evolution_exchange"
+      CACHE_REDIS_ENABLED: "false"
+    healthcheck:
+      test: ["CMD-SHELL", "/bin/bash -c 'echo > /dev/tcp/localhost/8080'"]
+      interval: 10s
+      timeout: 3s
+      retries: 15
+      start_period: 20s
+    volumes:
+      - evolution-store:/evolution/store
+      - evolution-instances:/evolution/instances
+    networks:
+      - backend-network
+    depends_on:
+      evolution-db:
+        condition: service_healthy
+
+  # MySQL for Evolution API
+  evolution-db:
+    image: mysql:8.0
+    container_name: evolution-db
+    environment:
+      MYSQL_DATABASE: "evolution"
+      MYSQL_USER: "evolution"
+      MYSQL_PASSWORD: "evolution"
+      MYSQL_ROOT_PASSWORD: "root"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 20s
+    volumes:
+      - evolution-mysql:/var/lib/mysql
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    driver: bridge
+
+volumes:
+  ravendb-data:
+  evolution-store:
+  evolution-instances:
+  evolution-mysql:
