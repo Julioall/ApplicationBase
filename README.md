@@ -76,6 +76,17 @@ Base monolítica pronta para produção com ASP.NET Core 8, Angular 18 e RavenDB
 - **Permissoes:** claim type `permissions`. Defaults: usuario (`view:home`, `view:profile`); adicionais: `manage:users`, `view:students`, `manage:students`, `view:education`, `manage:education`.
 
 ## Banco de Dados (RavenDB)
+### RavenDB em modo seguro (TLS)
+- A UI do RavenDB fica em `https://localhost:8081` (certificado autoassinado).
+- O certificado gerado esta em `certs/ravendb.cer`.
+- Para confiar no certificado (Windows, usuario atual):
+```powershell
+certutil -user -addstore Root certs\ravendb.cer
+```
+- Para remover a confianca (opcional):
+```powershell
+certutil -user -delstore Root 8830AF74BB45DFABB929C9ED5E18EC5F050D6039
+```
 - Configuração via env: `RAVENDBSETTINGS_URLS` (vírgula separada), `RAVENDBSETTINGS_DATABASE_NAME`, `RAVENDBSETTINGS_CERTIFICATE_SUBJECT` (busca certificado no store do usuário atual, exige chave privada).
 - Conexão e criação de DB/índices em `DocumentStoreHolderAlternative`. Convens: `MaxNumberOfRequestsPerSession=30`, optimistic concurrency, `IdentityPartsSeparator='-'`.
 - Anexos: avatar salvo como attachment (`profile-picture`) com content-type preservado.

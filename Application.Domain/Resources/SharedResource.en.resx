@@ -68,6 +68,9 @@
   <data name="EnvVarNotDefined" xml:space="preserve">
     <value>Environment variable [{0}] is not defined.</value>
   </data>
+  <data name="FileNotFound" xml:space="preserve">
+    <value>File not found: {0}.</value>
+  </data>
   <data name="InvalidRavenDbUrls" xml:space="preserve">
     <value>Invalid RavenDB URLs: {0}.</value>
   </data>

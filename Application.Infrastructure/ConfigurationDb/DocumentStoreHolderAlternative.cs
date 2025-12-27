@@ -10,6 +10,9 @@ using System.Security.Cryptography.X509Certificates;
 using Application.Infrastructure.Indexes;
 using Raven.Client.Documents.Indexes;
 using Application.Domain.Localization;
+using System.IO;
+using System.Net.Http;
+using System.Net.Security;
 
 namespace Application.Infrastructure.ConfigurationDb
 {
@@ -24,21 +27,53 @@ namespace Application.Infrastructure.ConfigurationDb
 
             var urls = url.Split(',').ToArray();
 
+            var certificate = GetCertificateFromStore();
             var documentStore = new DocumentStore
             {
                 Urls = urls,
-                Certificate = GetCertificateFromStore(),
+                Certificate = certificate,
                 Conventions = GetConventions(),
                 Database = db
             };
 
+            if (certificate != null)
+            {
+                documentStore.Conventions.CreateHttpClient = handler =>
+                {
+                    handler.ServerCertificateCustomValidationCallback = (_, cert, _, errors) =>
+                        errors == SslPolicyErrors.None || (cert != null && cert.Thumbprint == certificate.Thumbprint);
+                    return new HttpClient(handler);
+                };
+            }
+
             documentStore.Initialize();
+            CreateDatabaseIfDontExist(documentStore, db, true);
             IndexCreation.CreateIndexes(typeof(User_ByEmail).Assembly, documentStore);
             return documentStore;
         }
 
         private static X509Certificate2? GetCertificateFromStore()
         {
+            var certificatePath = Environment.GetEnvironmentVariable(ApplicationConstants.CERTIFICATE_PATH_KEY);
+            if (!string.IsNullOrWhiteSpace(certificatePath))
+            {
+                var certificatePassword = Environment.GetEnvironmentVariable(ApplicationConstants.CERTIFICATE_PASSWORD_KEY);
+                if (string.IsNullOrWhiteSpace(certificatePassword))
+                {
+                    throw new Exception(SharedResourceProvider.GetString("EnvVarNotDefined", ApplicationConstants.CERTIFICATE_PASSWORD_KEY));
+                }
+
+                if (!File.Exists(certificatePath))
+                {
+                    throw new Exception(SharedResourceProvider.GetString("FileNotFound", certificatePath));
+                }
+
+                return new X509Certificate2(
+                    certificatePath,
+                    certificatePassword,
+                    X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.EphemeralKeySet);
+            }
+
             var certificateSubject = Environment.GetEnvironmentVariable(ApplicationConstants.CERTIFICATE_SUBJECT_KEY);
             if (string.IsNullOrWhiteSpace(certificateSubject))
             {

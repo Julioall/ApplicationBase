@@ -68,7 +68,7 @@
   <data name="EnvVarNotDefined" xml:space="preserve">
     <value>Variável de ambiente [{0}] não definida.</value>
   </data>
-  <data name="InvalidRavenDbUrls" xml:space="preserve">
+    <data name="FileNotFound" xml:space="preserve">`r`n    <value>Arquivo nao encontrado: {0}.</value>`r`n  </data>`r`n<data name="InvalidRavenDbUrls" xml:space="preserve">
     <value>URLs do RavenDB inválidas: {0}.</value>
   </data>
   <data name="StartupValidationFailed" xml:space="preserve">
@@ -376,6 +376,7 @@
 
 
 </root>
+
 
 
 
