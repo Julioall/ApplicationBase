@@ -8,6 +8,7 @@ import { NotificationService } from '../../service/notification/notification.ser
 import { ThemeService } from '../../service/theme/theme.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DEFAULT_USER_PERMISSIONS } from '../../model/permissions';
+import { passwordValidators } from '../../shared/validators/password-rules';
 
 @Component({
   selector: 'app-register',
@@ -45,7 +46,7 @@ export class RegisterComponent implements OnInit {
     this.registerForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      password: ['', passwordValidators()],
       confirmPassword: ['', Validators.required],
       updates: [true],
     }, { validators: this.passwordMatchValidator });

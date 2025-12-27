@@ -74,7 +74,9 @@
             {{
               registerForm.get('password')?.hasError('required')
                 ? ('auth.register.passwordRequired' | translate)
-                : ('auth.register.passwordMin' | translate)
+                : registerForm.get('password')?.hasError('minlength')
+                  ? ('auth.register.passwordMin' | translate)
+                  : ('profile.password.requirements' | translate)
             }}
           </small>
         </label>

@@ -5,6 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, interval, Subscription } from 'rxjs';
 import { NotificationService } from '../../service/notification/notification.service';
 import { UserService } from '../../service/user/user.service';
+import { passwordValidators } from '../../shared/validators/password-rules';
 
 @Component({
   selector: 'app-reset-password',
@@ -44,11 +45,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
         ],
         newPassword: [
           '',
-          [
-            Validators.required,
-            Validators.minLength(8),
-            Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]).+$/),
-          ],
+          passwordValidators(),
         ],
         confirmPassword: ['', [Validators.required]],
       },

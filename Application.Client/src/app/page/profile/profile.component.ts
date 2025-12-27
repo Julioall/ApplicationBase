@@ -8,6 +8,7 @@ import { UserProfile } from '../../model/UserProfile';
 import { ChangePasswordPayload, UpdateProfilePayload, UserService } from '../../service/user/user.service';
 import { NotificationService } from '../../service/notification/notification.service';
 import { ThemeService } from '../../service/theme/theme.service';
+import { passwordValidators } from '../../shared/validators/password-rules';
 
 type HydratedUser = User & { Account: UserAccount; Profile: UserProfile };
 
@@ -100,11 +101,7 @@ export class ProfileComponent implements OnInit {
         currentPassword: ['', [Validators.required]],
         newPassword: [
           '',
-          [
-            Validators.required,
-            Validators.minLength(8),
-            Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]).+$/),
-          ],
+          passwordValidators(),
         ],
         confirmPassword: ['', [Validators.required]],
       },
@@ -116,11 +113,7 @@ export class ProfileComponent implements OnInit {
         code: ['', [Validators.required, Validators.pattern(/^\\d{6}$/)]],
         newPassword: [
           '',
-          [
-            Validators.required,
-            Validators.minLength(8),
-            Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]).+$/),
-          ],
+          passwordValidators(),
         ],
         confirmPassword: ['', [Validators.required]],
       },

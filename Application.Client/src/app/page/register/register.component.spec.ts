@@ -60,8 +60,8 @@ describe('RegisterComponent', () => {
     component.registerForm.setValue({
       fullName: 'Usuário Teste',
       email: 'teste@exemplo.com',
-      password: '12345678',
-      confirmPassword: '12345678',
+      password: 'Test@123',
+      confirmpassword: 'Test@123',
       updates: true,
     });
 
@@ -86,8 +86,8 @@ describe('RegisterComponent', () => {
     component.registerForm.setValue({
       fullName: 'Usuário Teste',
       email: 'novo@exemplo.com',
-      password: '12345678',
-      confirmPassword: '12345678',
+      password: 'Test@123',
+      confirmpassword: 'Test@123',
       updates: true,
     });
 
@@ -99,3 +99,4 @@ describe('RegisterComponent', () => {
     expect(notificationService.showSuccess).toHaveBeenCalled();
   });
 });
+

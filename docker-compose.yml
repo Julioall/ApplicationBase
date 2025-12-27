@@ -13,7 +13,7 @@ services:
       # JWT
       JWT_ISSUER: "https://localhost"
       JWT_AUDIENCE: "https://localhost"
-      JWT_SIGNING_KEY: "changeme-super-secret"
+      JWT_SIGNING_KEY: "changeme-super-secret-32-bytes-minimum"
       # Secret encryption
       APP_SECRET_ENCRYPTION_KEY: "changeme-encryption-key"
       # RavenDB
