@@ -2,71 +2,78 @@
 Base monolítica pronta para produção com ASP.NET Core 8, Angular 18 e RavenDB. Inclui autenticação JWT com rotação de refresh tokens, autorização por permissões, gerenciamento completo de usuários, recuperação de senha, configuração de SMTP (com criptografia de segredo), i18n full-stack e tratamento unificado de erros via ProblemDetails.
 
 ## Visão Geral
-- **Arquitetura:** Clean/Onion (Domain → Service → Infrastructure → Web/API → Client).
+- **Arquitetura:** Clean/Onion (Domain -> Service -> Infrastructure -> Web/API -> Client).
 - **Stack:** ASP.NET Core 8, Angular 18, RavenDB, FluentValidation, JWT Bearer, ngx-translate, ngx-spinner, FontAwesome, Bootstrap.
-- **Principais entregas:** CRUD de usuários, permissões granulares, perfil com avatar (anexo RavenDB), troca de senha e fluxo completo de recuperação, configurações de e-mail persistidas e criptografadas, interceptores de erros e loading, temas claro/escuro, i18n (pt/en) e ProblemDetails padronizado.
+- **Principais entregas:** CRUD de usuarios, permissao granular, perfil com avatar (attachment RavenDB), troca de senha e recuperacao completa, SMTP com segredo criptografado, i18n full-stack e ProblemDetails, modulo de estudantes (CRUD + importacao/exportacao XLSX), modulo de educacao (escolas/programas/turmas/UCs, busca e importacao assincrona, alunos por UC).
 
 ## Funcionalidades
-- Autenticação JWT (2h) + refresh token rotativo (7d) com hash PBKDF2.
-- Cadastro/login, CRUD de usuários, consulta por permissão, e lista de permissões disponíveis.
-- Perfil: edição de dados, foto (upload multipart ou data URL), offsets/zoom do avatar, funções/cargo/departamento/organização/localização.
-- Segurança da conta: troca de senha, geração/validação/uso de código de recuperação (6 dígitos, TTL 10 min, cooldown 1 min, 5 tentativas).
-- Administração: painel Angular para usuários (lista, detalhes, gestão de permissões) e configuração de serviços (SMTP).
-- E-mail: envio de reset/recovery, teste de SMTP e persistência de credenciais criptografadas.
-- Observabilidade de erros: ProblemDetails com `traceId`, ModelState → ValidationProblemDetails, i18n backend/frontend.
-- UX: toasts centralizados, loading global, tema claro/escuro, shell dashboard com navegação protegida por permissões.
+- Autenticacao JWT (2h) + refresh token rotativo (7d) com hash PBKDF2.
+- Cadastro/login, CRUD de usuarios, consulta por permissao e lista de permissoes disponiveis.
+- Perfil: edicao de dados, foto (upload multipart ou data URL), offsets/zoom do avatar, funcoes/cargo/departamento/organizacao/localizacao.
+- Seguranca da conta: geracao/validacao/uso de codigo de recuperacao (6 digitos, TTL 10 min, cooldown 1 min, 5 tentativas) e troca de senha.
+- Administracao: painel Angular para usuarios e gestao de permissoes, configuracao de servicos (SMTP).
+- Estudantes: CRUD, importacao XLSX, exportacao XLSX, status ativo/suspenso, filtros por texto e ativo.
+- Educacao: catalogo de escolas/programas/turmas/UCs, busca paginada, alunos por UC, importacao assincrona de cursos.
+- E-mail: envio de reset/recovery, teste de SMTP e persistencia de credenciais criptografadas.
+- Observabilidade de erros: ProblemDetails com `traceId`, ModelState -> ValidationProblemDetails, i18n backend/frontend.
+- UX: toasts centralizados, loading global, tema claro/escuro, shell dashboard com navegacao protegida por permissoes.
 
 ## Arquitetura e Camadas (Backend)
 - **Domain (`Application.Domain`):**
-  - Modelos: `User` (Account+Profile), `ApplicationPermissions` (claim `permissions`, defaults user/admin), `ApplicationConstants` (env keys), `Configurations`/`EmailSettings`.
-  - DTOs: `LoginDto`, `CreateUserDto`, `ChangePasswordDto`, `RefreshRequestDto`, `TokenResponseDto`, `UpdateProfileDto`, `Generate/Validate/VerifyRecoveryCodeDto`, `SendResetEmailDto`, `PasswordInput`.
-  - Validações: `UserValidator` (e-mail, nome, data, permissões), `PasswordValidator` (força mínima).
-  - Exceções: `DomainException` + `Conflict/NotFound/Forbidden/Business/ConfigurationException`.
-  - i18n: `SharedResource` (.resx pt/en) e `SharedResourceProvider` para usos estáticos.
+  - Modelos: `User`, `ApplicationPermissions`, `ApplicationConstants`, `Configurations`/`EmailSettings`, `Student`, `School`, `ProgramDocument`, `ClassDocument`, `UcDocument`, `EducationImport`.
+  - DTOs: auth/usuario/perfil, `CreateStudentDto`/`UpdateStudentDto`, `StudentImportResult`, `PaginationQuery`.
+  - Validacoes: `UserValidator`, `PasswordValidator`, `StudentValidator`.
+  - Excecoes: `DomainException` + `Conflict/NotFound/Forbidden/Business/ConfigurationException`.
+  - i18n: `SharedResource` (.resx pt/en) e `SharedResourceProvider` para usos estaticos.
 
 - **Service (`Application.Service`):**
-  - `UserService`: valida domínio, normaliza permissões, hash de senha (PBKDF2), CRUD, perfil/arquivo de avatar (Raven attachment), troca de senha (revoga refresh), recuperação (gera código 6 dígitos, TTL 10 min, cooldown 1 min, 5 tentativas, envia e-mail opcional).
-  - `TokenService`: autentica, gera JWT com permissões, emite/rotaciona refresh tokens (id.secret + hash), expiração 2h/7d.
-  - `EmailService`: envio de reset e código de recuperação via SMTP, envio de teste; usa configurações persistidas ou default.
-  - `SettingsService`: persiste `Configurations.Email` no RavenDB; de/para criptografia de senha SMTP.
-  - Segurança: `SecureHash` (PBKDF2) e `SecretEncryptionService` (AES key derivada do env `APP_SECRET_ENCRYPTION_KEY`).
-  - DI: registrado em `DependencyInjectionModuleService` (IUserService, ITokenService, IEmailService, ISettingsService, ISecretEncryptionService).
+  - `UserService`, `TokenService`, `EmailService`, `SettingsService`.
+  - `StudentService`: CRUD, validacao, importacao/exportacao XLSX, regras de status.
+  - `EducationService`: escolas/programas/turmas/UCs, busca paginada, alunos por UC, enfileiramento de importacao.
+  - Background: `EducationImportBackgroundService` + `EducationImportProcessor`.
+  - Seguranca: `SecureHash` (PBKDF2) e `SecretEncryptionService` (AES key derivada do env `APP_SECRET_ENCRYPTION_KEY`).
+  - DI: registrado em `DependencyInjectionModuleService`.
 
 - **Infrastructure (`Application.Infrastructure`):**
-  - DocumentStore RavenDB: `DocumentStoreHolderAlternative` (URLs via `RAVENDBSETTINGS_URLS`, certificado por assunto em store, convenções, criação de DB, índices).
-  - Repositórios: `UserRepository` (CRUD, consultas, refresh token, permissões, profile picture como attachment), `SettingsRepository` (Configurations), `ServiceRavenDB` para sessão/async session.
-  - Índices: `User_ByEmail`.
-  - DI: `DependencyInjectionModuleInfra` registra `IDocumentStore`, `IServiceRavenDB`, repositórios e cria índices.
+  - DocumentStore RavenDB: `DocumentStoreHolderAlternative` (URLs via `RAVENDBSETTINGS_URLS`, certificado por assunto, convencoes, criacao de DB, indices).
+  - Repositorios: `UserRepository`, `SettingsRepository`, `StudentRepository`, `EducationRepository`, `EducationImportRepository`.
+  - Indices: `User_ByEmail`, `UcSearchIndex`, `Classes_BySchoolAndProgram`, `ClassUcMaps_ByClass`, `StudentUcMaps_ByUc`.
+  - DI: `DependencyInjectionModuleInfra` registra `IDocumentStore`, `IServiceRavenDB` e repositorios.
 
 - **Web/API (`Application.Web`):**
-  - Pipeline: localization (pt-BR default; pt/en-US/en) → `ProblemDetailsMiddleware` → `MiddlewareServiceRavenDbStore` (abre/salva/dispose sessão) → static files → CORS liberado → HTTPS → AuthZ → controllers → SPA fallback.
-  - Autenticação: JWT Bearer configurado com env (`JWT_ISSUER`, `JWT_AUDIENCE`, `JWT_SIGNING_KEY`). Policies por permissão (`ApplicationPermissions.All`).
-  - Middlewares/Filters: `ProblemDetailsMiddleware` (FluentValidation → 400 ValidationProblemDetails; DomainException → status específico; 401; 500; todos com traceId), `ValidationProblemDetailsFilter` (ModelState → 400 ValidationProblemDetails).
+  - Pipeline: localization (pt-BR default; pt/en-US/en) -> `ProblemDetailsMiddleware` -> `MiddlewareServiceRavenDbStore` -> static files -> CORS -> HTTPS -> AuthZ -> controllers -> SPA fallback.
+  - Autenticacao: JWT Bearer com env (`JWT_ISSUER`, `JWT_AUDIENCE`, `JWT_SIGNING_KEY`). Policies por permissao (`ApplicationPermissions.All`).
   - Controllers:
     - `AuthenticationController`: `POST /api/authentication/login`, `POST /api/authentication/refresh`.
-    - `UserController`: cadastro público, `GET /api/user/all|get/{id}|email/{email}|permission/{permission}|permissions`, `GET /api/user/me`, `PUT /api/user/update`, `PUT /api/user/{id}/permissions`, `PUT /api/user/profile` (multipart ou JSON/data URL), `PUT /api/user/change-password`, fluxo de recuperação `POST /api/user/recovery/code|validate|verify`, `DELETE /api/user/delete/{id}`.
-    - `EmailController`: `POST /api/email/reset` (envia e-mail se usuário existe), `GET/PUT /api/email/settings` (SMTP), `POST /api/email/test` (testa com override opcional).
-  - Swagger está comentado/desativado.
+    - `UserController`: cadastro publico, CRUD, perfil, permissao e recuperacao.
+    - `EmailController`: reset, settings SMTP e teste.
+    - `StudentsController`: CRUD, importacao/exportacao XLSX.
+    - `EducationController`: escolas/programas/turmas/UCs, busca, importacao e alunos por UC.
+  - Swagger esta comentado/desativado.
 
 ## Camada Client (Angular 18 - `Application.Client`)
-- **Roteamento:** home (`/home`), perfil (`/profile`), admin (`/admin/*`), auth/login, registro, forgot/reset password. Guards: `AuthGuard` + `PermissionGuard` (JWT decode de claim `permissions`).
-- **Componentes/Páginas:**
+- **Roteamento:** home (`/home`), perfil (`/profile`), admin (`/admin/*`), estudantes (`/students`), educacao (`/education`), auth/login, registro, forgot/reset password. Guards: `AuthGuard` + `PermissionGuard` (JWT decode de claim `permissions`).
+- **Componentes/Paginas:**
   - `AppComponent`: shell dashboard com side-nav, topbar, menu de perfil, toasts e spinner.
-  - Auth: `AuthComponent` (login), `RegisterComponent` (signup), `ForgotPasswordComponent` e `ResetPasswordComponent` (fluxo de código 6 dígitos e nova senha).
-  - Perfil: `ProfileComponent` (edição de dados, avatar com offset/zoom, troca de senha, geração/uso de código de recuperação, seleção de idioma e tema).
-  - Admin: `AdminUsersComponent` (lista/paginação), `AdminUserDetailComponent` (detalhe e gestão de permissões), `AdminServicesComponent` (SMTP com teste), `AdminEmailSettingsComponent` (card estático/teaser).
+  - Auth: `AuthComponent` (login), `RegisterComponent`, `ForgotPasswordComponent`, `ResetPasswordComponent`.
+  - Perfil: `ProfileComponent` (edicao, avatar, troca de senha, recuperacao, idioma/tema).
+  - Admin: `AdminUsersComponent`, `AdminUserDetailComponent`, `AdminServicesComponent`, `AdminEmailSettingsComponent`.
+  - Estudantes: `StudentsListComponent`, `StudentFormComponent` (novo/edicao), import/export.
+  - Educacao: `EducationExplorerComponent`, `EducationClassesComponent`, `EducationClassDetailComponent` (UCs, alunos, importacao).
   - Compartilhados: navbar, toast container, loading spinner.
-- **Serviços e interceptors:** `AuthService` (login/refresh/signup), `UserService` (CRUD/profile/permissões/recovery), `EmailSettingsService` (SMTP), `ProblemInterceptor` (ProblemDetails → toast), `LoadingInterceptor` (spinner global), `ThemeService` (tema persistido), `NotificationService` (toasts).
-- **i18n:** `ngx-translate` com `public/i18n/en.json` e `pt.json`; loader HTTP, fallback en, detecção de idioma do navegador.
-- **UI/estilo:** SCSS com variáveis em `src/styles/_variables.scss` + temas em `src/styles/_theme.scss`; FontAwesome; Bootstrap 5.
+- **Servicos e interceptors:** `AuthService`, `UserService`, `EmailSettingsService`, `StudentsService`, `EducationService`, `ProblemInterceptor`, `LoadingInterceptor`, `ThemeService`, `NotificationService`.
+- **i18n:** `ngx-translate` com `public/i18n/en.json` e `pt.json`; loader HTTP, fallback en, deteccao de idioma do navegador.
+- **UI/estilo:** SCSS com variaveis em `src/styles/_variables.scss` + temas em `src/styles/_theme.scss`; FontAwesome; Bootstrap 5.
 - **Config:** `environment.ts` aponta `apiUrl: http://localhost:5095/api`; `proxy.conf.js` direciona `/api` para SPA proxy ASP.NET.
 
 ## Fluxos & Endpoints
-- **Autenticação:** `POST /api/authentication/login` → { token, refreshToken, expiresAt }; `POST /api/authentication/refresh` (refresh rotativo). Claims incluem `permissions`.
-- **Usuários:** `POST /api/user/add` (público, cria com permissões default), `PUT /api/user/update`, `PUT /api/user/{id}/permissions`, `DELETE /api/user/delete/{id}`, `GET /api/user/all|get/{id}|email/{email}|permission/{permission}|permissions`, `GET /api/user/me`.
-- **Perfil/Senha:** `PUT /api/user/profile` (multipart ou JSON), `PUT /api/user/change-password`, recuperação `POST /api/user/recovery/code|validate|verify`.
+- **Autenticacao:** `POST /api/authentication/login` -> { token, refreshToken, expiresAt }; `POST /api/authentication/refresh` (refresh rotativo). Claims incluem `permissions`.
+- **Usuarios:** `POST /api/user/add` (publico), `PUT /api/user/update`, `PUT /api/user/{id}/permissions`, `DELETE /api/user/delete/{id}`, `GET /api/user/all|get/{id}|email/{email}|permission/{permission}|permissions`, `GET /api/user/me`.
+- **Perfil/Senha:** `PUT /api/user/profile` (multipart ou JSON), `PUT /api/user/change-password`, recuperacao `POST /api/user/recovery/code|validate|verify`.
 - **E-mail/SMTP:** `POST /api/email/reset` (silencioso para e-mail inexistente), `GET/PUT /api/email/settings`, `POST /api/email/test`.
-- **Permissões:** claim type `permissions`. Defaults: usuário (`view:home`, `view:profile`), admin adiciona `manage:users`. Policies geradas dinamicamente.
+- **Estudantes:** `GET /api/students` (query `PageNumber`, `PageSize`, `Search`, `IsActive`), `GET /api/students/{id}`, `POST /api/students`, `PUT /api/students/{id}`, `DELETE /api/students/{id}`, `POST /api/students/import` (multipart XLSX), `GET /api/students/export`.
+- **Educacao:** `GET /api/education/schools`, `GET /api/education/programs?schoolId=...`, `GET /api/education/classes?programId=...`, `GET /api/education/ucs?classId=...`, `GET /api/education/ucs/search?PageNumber=1&PageSize=50&Search=...`, `GET /api/education/ucs/students?eadId=123`, `POST /api/education/import` (multipart).
+- **Permissoes:** claim type `permissions`. Defaults: usuario (`view:home`, `view:profile`); adicionais: `manage:users`, `view:students`, `manage:students`, `view:education`, `manage:education`.
 
 ## Banco de Dados (RavenDB)
 - Configuração via env: `RAVENDBSETTINGS_URLS` (vírgula separada), `RAVENDBSETTINGS_DATABASE_NAME`, `RAVENDBSETTINGS_CERTIFICATE_SUBJECT` (busca certificado no store do usuário atual, exige chave privada).
@@ -139,37 +146,59 @@ Application.Test/                 # Testes de controllers, services, validators,
 - Front com interceptors de erro/loading, toasts centralizados, tema persistido, i18n, guards de rota.
 
 ## Glossário
-- **ProblemDetails / ValidationProblemDetails:** respostas RFC 7807 com `traceId` para exceções e ModelState/FluentValidation.
-- **DomainException:** exceções de negócio com status code específico.
-- **ApplicationPermissions:** claim `permissions` usada em policies. Defaults: user (`view:home`, `view:profile`), admin (`manage:users`).
+- **ProblemDetails / ValidationProblemDetails:** respostas RFC 7807 com `traceId` para excecoes e ModelState/FluentValidation.
+- **DomainException:** excecoes de negocio com status code especifico.
+- **ApplicationPermissions:** claim `permissions` usada em policies. Defaults: user (`view:home`, `view:profile`); demais: `manage:users`, `view:students`, `manage:students`, `view:education`, `manage:education`.
 - **Refresh Token Rotativo:** token composto `id.secret`; `id` armazenado em texto, `secret` em hash; rotacionado a cada refresh.
-- **Recovery Code:** código de 6 dígitos, TTL 10 min, cooldown 1 min, 5 tentativas; revoga quando expira ou excede tentativas.
-- **SecretEncryptionService:** AES CBC/PKCS7 com chave derivada de `APP_SECRET_ENCRYPTION_KEY` para armazenar senha SMTP de forma reversível.
-
+- **Recovery Code:** codigo de 6 digitos, TTL 10 min, cooldown 1 min, 5 tentativas; revoga quando expira ou excede tentativas.
+- **SecretEncryptionService:** AES CBC/PKCS7 com chave derivada de `APP_SECRET_ENCRYPTION_KEY` para armazenar senha SMTP de forma reversivel.
 
 ## Prompt base
-Você é o Codex trabalhando no monorepo ApplicationBase (Angular 18 + @ngx-translate no front e API .NET 8 com RavenDB). Siga estas regras em qualquer implementação:
+Voce e o Codex trabalhando no monorepo ApplicationBase (Angular 18 + @ngx-translate no front e API .NET 8 com RavenDB). Siga estas regras em qualquer implementacao:
 
 Front-end (Application.Client)
-- Sempre internacionalize: use o pipe/serviço `@ngx-translate/core`; todas as strings devem virar chaves em `public/i18n/en.json` e `public/i18n/pt.json` (defaultLanguage = en, fallback configurado). Evite textos literais em templates/TS.
-- Notificações: nunca use alert/snackbar genérico. Use `NotificationService` (`showSuccess|showError|showWarning|showInfo`) que renderiza os toasts via `app-toast-container`.
-- HTTP: baseie-se em `environment.apiUrl`; use `HttpClient` e deixe `LoadingInterceptor` + `ProblemInterceptor` cuidarem de spinner e erros `application/problem+json`. Não duplique handling de loading/erro.
+- Sempre internacionalize: use o pipe/servico `@ngx-translate/core`; todas as strings devem virar chaves em `public/i18n/en.json` e `public/i18n/pt.json` (defaultLanguage = en, fallback configurado). Evite textos literais em templates/TS.
+- Notificacoes: nunca use alert/snackbar generico. Use `NotificationService` (`showSuccess|showError|showWarning|showInfo`) que renderiza os toasts via `app-toast-container`.
+- HTTP: baseie-se em `environment.apiUrl`; use `HttpClient` e deixe `LoadingInterceptor` + `ProblemInterceptor` cuidarem de spinner e erros `application/problem+json`. Nao duplique handling de loading/erro.
 - Forms: use Reactive Forms (`FormBuilder` + validators). Mensagens de erro e toasts devem ser traduzidas. Mantenha acessibilidade (aria-labels, etc.).
-- Permissões/rotas: proteja com `AuthGuard`/`PermissionGuard` usando as claims `permissions` (ex.: `view:home`, `view:profile`, `manage:users`). Respeite tokens armazenados pelo `AuthService`.
-- Preferências: idioma em `preferredLanguage` (localStorage) via `TranslateService`; tema com `ThemeService` (`light`/`dark`), sem criar lógica paralela.
-- Componentes/shared: reutilize estilos e padrões existentes (navbar, dashboard shell, avatar handling, ngx-spinner). Nada de bibliotecas de UI ou notificações extras sem necessidade.
-- Testes: escreva specs Jasmine/Karma quando alterar lógica; mocke `TranslateService`/pipe e `NotificationService` como nos specs atuais.
+- Permissoes/rotas: proteja com `AuthGuard`/`PermissionGuard` usando as claims `permissions`. Permissoes atuais: `view:home`, `view:profile`, `manage:users`, `view:students`, `manage:students`, `view:education`, `manage:education`. Respeite tokens armazenados pelo `AuthService`.
+- Preferencias: idioma em `preferredLanguage` (localStorage) via `TranslateService`; tema com `ThemeService` (`light`/`dark`), sem criar logica paralela.
+- Componentes/shared: reutilize estilos e padroes existentes (navbar, dashboard shell, avatar handling, ngx-spinner). Nada de bibliotecas de UI ou notificacoes extras sem necessidade.
+- Estudantes: use `StudentsService` para CRUD, importacao (`/students/import`, XLSX) e exportacao (`/students/export`) e mantenha toasts i18n.
+- Educacao: use `EducationService` para escolas/programas/turmas/UCs, busca paginada, alunos por UC e importacao (`/education/import`) via multipart.
+- Testes: escreva specs Jasmine/Karma quando alterar logica; mocke `TranslateService`/pipe e `NotificationService` como nos specs atuais.
 
 Back-end (Application.Web/.Domain/.Service/.Infrastructure)
-- Globalização: mensagens via `IStringLocalizer<SharedResource>` com chaves nos resx `Application.Domain/Resources/SharedResource.resx` e `SharedResource.en.resx`. Não retornar strings cruas.
-- Erros/validação: use FluentValidation para regras de domínio; lance `DomainException` (`BusinessException`, `NotFoundException`, etc.) e deixe o `ProblemDetailsMiddleware`/`ValidationProblemDetailsFilter` gerar `application/problem+json`.
-- Autorização/autenticação: JWT com claim `permissions` (constantes em `Application.Domain/Model/ApplicationPermissions.cs`); proteja endpoints com `[Authorize(Policy = ...)]`. Respeite rate limiting via `IRateLimiter` quando aplicável.
-- Persistência: RavenDB via `IServiceRavenDB` e repositórios (`IUserRepository`, `ISettingsRepository`, etc.). Para arquivos (ex.: avatar), use attachments. Não abra sessões diretas.
-- Serviços: siga o padrão das services (UserService, TokenService, EmailService, SettingsService) e mantenha regras de segurança (hash de senha com `SecureHash`, refresh tokens, códigos de recuperação com TTL).
-- Configuração: JWT keys e SECRET_ENCRYPTION_KEY vêm de env vars (`ApplicationConstants`). Mantenha JsonSerializer sem naming policy (camel-case desativado já no Program.cs).
-- Testes: use xUnit; para cenários com RavenDB, herde de `BaseTest` (RavenTestDriver, cultura pt) e mocke localizador/serviços conforme os testes existentes.
+- Globalizacao: mensagens via `IStringLocalizer<SharedResource>` com chaves nos resx `Application.Domain/Resources/SharedResource.resx` e `SharedResource.en.resx`. Nao retornar strings cruas.
+- Erros/validacao: use FluentValidation para regras de dominio; lance `DomainException` (`BusinessException`, `NotFoundException`, etc.) e deixe o `ProblemDetailsMiddleware`/`ValidationProblemDetailsFilter` gerar `application/problem+json`.
+- Autorizacao/autenticacao: JWT com claim `permissions` (constantes em `Application.Domain/Model/ApplicationPermissions.cs`); proteja endpoints com `[Authorize(Policy = ...)]`. Respeite rate limiting via `IRateLimiter` quando aplicavel.
+- Persistencia: RavenDB via `IServiceRavenDB` e repositorios (`IUserRepository`, `ISettingsRepository`, `IEducationRepository`, `IStudentRepository`, etc.). Para arquivos (ex.: avatar, imports), use attachments. Nao abra sessoes diretas.
+- Servicos: siga o padrao das services (UserService, TokenService, EmailService, SettingsService, EducationService, StudentService) e mantenha regras de seguranca (hash de senha com `SecureHash`, refresh tokens, codigos de recuperacao com TTL).
+- Educacao: importacao e processamento assincrono com `EducationImportBackgroundService` + `EducationImportProcessor`; endpoints em `EducationController` com policies `view:education`/`manage:education`.
+- Estudantes: `StudentsController` com CRUD, importacao XLSX e exportacao; valide com `StudentValidator` e mensagens localizadas.
+- Configuracao: JWT keys e SECRET_ENCRYPTION_KEY vem de env vars (`ApplicationConstants`). Mantenha JsonSerializer sem naming policy (camel-case desativado ja no Program.cs).
+- Testes: use xUnit; para cenarios com RavenDB, herde de `BaseTest` (RavenTestDriver, cultura pt) e mocke localizador/servicos conforme os testes existentes.
 
-Saída esperada: código alinhado a essas práticas, com traduções e notificações corretas, seguindo os padrões de arquitetura e testes do repositório.
+Exemplos de endpoints e payloads (referencia rapida)
+```
+POST /api/authentication/login
+{ "email": "user@example.com", "password": "Secret123!" }
 
----
-MIT — contribuições são bem-vindas.
+POST /api/user/add
+{ "Name": "Ana", "Email": "ana@corp.com", "Password": "Secret123!" }
+
+GET /api/students?PageNumber=1&PageSize=10&Search=ana&IsActive=true
+
+POST /api/students
+{ "FirstName": "Ana", "LastName": "Silva", "Email": "ana@corp.com" }
+
+GET /api/education/programs?schoolId=schools/1-A
+GET /api/education/classes?programId=programs/1-A
+GET /api/education/ucs/search?PageNumber=1&PageSize=50&Search=ux
+GET /api/education/ucs/students?eadId=27535
+
+POST /api/education/import (multipart: file)
+POST /api/students/import (multipart: file)
+```
+
+Saida esperada: codigo alinhado a essas praticas, com traducoes e notificacoes corretas, seguindo os padroes de arquitetura e testes do repositorio.
