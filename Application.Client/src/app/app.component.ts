@@ -32,7 +32,7 @@ export class AppComponent implements OnInit, OnDestroy {
   sectionState: Record<'admin', boolean> = { admin: false };
   primaryNav: NavItem[] = [
     { icon: 'fa-solid fa-compass', label: 'home.primaryNav.panel', path: '/home' },
-    { icon: 'fa-solid fa-people-group', label: 'home.primaryNav.classes' },
+    { icon: 'fa-solid fa-school', label: 'navbar.education', path: '/education' },
     { icon: 'fa-solid fa-signal', label: 'home.primaryNav.metrics' },
     { icon: 'fa-solid fa-clipboard-check', label: 'home.primaryNav.todo' },
   ];
@@ -43,7 +43,6 @@ export class AppComponent implements OnInit, OnDestroy {
     { icon: 'fa-solid fa-user-shield', label: 'home.adminNav.users', path: '/admin/users' },
     { icon: 'fa-solid fa-gears', label: 'home.adminNav.services', path: '/admin/services' },
     { icon: 'fa-solid fa-user-graduate', label: 'navbar.students', path: '/students' },
-    { icon: 'fa-solid fa-school', label: 'navbar.education', path: '/education' },
     { icon: 'fa-solid fa-life-ring', label: 'home.adminNav.support', path: '/support' },
   ];
   notifications: AppNotification[] = [];
@@ -297,9 +296,6 @@ export class AppComponent implements OnInit, OnDestroy {
   isAdminShortcutVisible(link: NavItem): boolean {
     if (link.path === '/students') {
       return this.canAccessStudents;
-    }
-    if (link.path === '/education') {
-      return this.canAccessEducation;
     }
     return true;
   }

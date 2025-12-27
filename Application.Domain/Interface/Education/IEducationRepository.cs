@@ -1,6 +1,7 @@
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.Education;
 using Application.Domain.Model.Education.Dtos;
+using Application.Domain.Model.Students;
 
 namespace Application.Domain.Interface.Education
 {
@@ -12,6 +13,8 @@ namespace Application.Domain.Interface.Education
         Task<UcUpsertResult> UpsertUcAsync(UcDocument uc, CancellationToken cancellationToken = default);
         Task<UcDocument?> GetUcByEadIdAsync(int eadId, CancellationToken cancellationToken = default);
         Task<ClassUcMap> EnsureClassUcMapAsync(string classId, string ucId, CancellationToken cancellationToken = default);
+        Task<StudentUcMap> EnsureStudentUcMapAsync(string studentId, string ucId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyCollection<Student>> GetStudentsByUcAsync(string ucId, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<School>> GetSchoolsAsync(CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<ProgramDocument>> GetProgramsBySchoolAsync(string schoolId, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<ClassDocument>> GetClassesByProgramAsync(string programId, CancellationToken cancellationToken = default);

@@ -69,6 +69,16 @@
   }
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  label.btn input[type='file'] {
+    display: none;
+  }
+}
+
 .settings-body {
   display: flex;
   flex-direction: column;
@@ -94,6 +104,12 @@
     strong {
       color: var(--text-primary);
     }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      font-weight: 600;
+    }
   }
 }
 
@@ -118,6 +134,18 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
   word-break: break-word;
   position: relative;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent-strong);
+    outline-offset: 2px;
+  }
 
   .open-course {
     position: absolute;
@@ -205,9 +233,73 @@
   }
 }
 
+.uc-students {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 1.5rem;
+  background: var(--surface-alt);
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .muted {
+      margin: 0.15rem 0 0;
+      color: var(--text-muted);
+    }
+  }
+
+  .panel-body {
+    .state {
+      margin: 0;
+      color: var(--text-muted);
+    }
+  }
+
+  .students-table {
+    display: grid;
+    gap: 0.5rem;
+
+    .table-row {
+      display: grid;
+      grid-template-columns: minmax(200px, 1.2fr) minmax(200px, 1.2fr) minmax(140px, 0.8fr);
+      gap: 0.75rem;
+      align-items: center;
+      padding: 0.65rem 0.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .table-head {
+      font-weight: 600;
+      color: var(--text-strong);
+    }
+
+    .table-row:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
 @media (max-width: 1200px) {
   .cards {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .uc-students .students-table .table-row {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
   }
 }
 

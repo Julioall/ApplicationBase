@@ -105,7 +105,7 @@ namespace Application.Service.Service
             {
                 result.CreatedUcs++;
             }
-            else if (upsertResult.Updated)
+            else
             {
                 result.UpdatedUcs++;
             }

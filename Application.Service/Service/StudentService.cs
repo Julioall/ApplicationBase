@@ -1,14 +1,19 @@
 using Application.Domain;
 using Application.Domain.Exceptions;
 using Application.Domain.Interface.Students;
+using Application.Domain.Interface.Education;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.Students;
 using Application.Domain.Model.Students.Dtos;
 using Application.Domain.Model.ValueObjects;
+using Application.Domain.Model.Education;
 using Application.Service.Interface;
 using ClosedXML.Excel;
 using FluentValidation;
 using System.Globalization;
+using System.IO;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Localization;
 
 namespace Application.Service.Service
@@ -16,12 +21,15 @@ namespace Application.Service.Service
     public class StudentService : IStudentService
     {
         private readonly IStudentRepository _studentRepository;
+        private readonly IEducationRepository _educationRepository;
         private readonly IValidator<Student> _studentValidator;
         private readonly IStringLocalizer<SharedResource> _localizer;
+        private static readonly Regex CourseIdRegex = new(@"courseid_(\d+)_participants", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        public StudentService(IStudentRepository studentRepository, IValidator<Student> studentValidator, IStringLocalizer<SharedResource> localizer)
+        public StudentService(IStudentRepository studentRepository, IEducationRepository educationRepository, IValidator<Student> studentValidator, IStringLocalizer<SharedResource> localizer)
         {
             _studentRepository = studentRepository ?? throw new ArgumentNullException(nameof(studentRepository));
+            _educationRepository = educationRepository ?? throw new ArgumentNullException(nameof(educationRepository));
             _studentValidator = studentValidator ?? throw new ArgumentNullException(nameof(studentValidator));
             _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
         }
@@ -133,7 +141,18 @@ namespace Application.Service.Service
                 throw new BusinessException(_localizer["StudentImportFileEmpty"]);
             }
 
-            if (string.IsNullOrWhiteSpace(fileName) || !fileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                throw new BusinessException(_localizer["StudentImportOnlyXlsx"]);
+            }
+
+            var extension = Path.GetExtension(fileName);
+            if (string.Equals(extension, ".json", StringComparison.OrdinalIgnoreCase))
+            {
+                return await ImportParticipantsAsync(fileStream, fileName);
+            }
+
+            if (!string.Equals(extension, ".xlsx", StringComparison.OrdinalIgnoreCase))
             {
                 throw new BusinessException(_localizer["StudentImportOnlyXlsx"]);
             }
@@ -255,6 +274,140 @@ namespace Application.Service.Service
 
                         await UpdateStudentAsync(existingStudent.Id!, updateDto);
                         result.Updated++;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    result.Skipped++;
+                    result.Errors.Add(new StudentImportError
+                    {
+                        Row = rowNumber,
+                        Message = ex.Message
+                    });
+                }
+            }
+
+            return result;
+        }
+
+        private async Task<StudentImportResult> ImportParticipantsAsync(Stream fileStream, string fileName)
+        {
+            var courseId = ExtractCourseId(fileName);
+            var uc = await _educationRepository.GetUcByEadIdAsync(courseId);
+
+            var participants = await LoadParticipantsAsync(fileStream);
+            if (participants.Count == 0)
+            {
+                return new StudentImportResult();
+            }
+
+            var result = new StudentImportResult();
+            var existing = (await _studentRepository.GetAllAsync()).ToList();
+            var existingByEmail = existing
+                .Where(s => !string.IsNullOrWhiteSpace(s.Email))
+                .ToDictionary(s => s.Email!.Trim().ToLowerInvariant(), s => s);
+
+            var rowNumber = 0;
+            foreach (var participant in participants)
+            {
+                rowNumber++;
+                result.Processed++;
+
+                var firstName = participant.FirstName?.Trim() ?? string.Empty;
+                var lastName = participant.LastName?.Trim() ?? string.Empty;
+                var email = participant.Email?.Trim();
+
+                if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
+                {
+                    result.Skipped++;
+                    result.Errors.Add(new StudentImportError
+                    {
+                        Row = rowNumber,
+                        Message = _localizer["StudentImportNamesRequired"]
+                    });
+                    continue;
+                }
+
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    result.Skipped++;
+                    result.Errors.Add(new StudentImportError
+                    {
+                        Row = rowNumber,
+                        Message = _localizer["StudentImportEmailRequired"]
+                    });
+                    continue;
+                }
+
+                if (!TryParseDateText(participant.LastAccessAt, out var lastAccessAt, out var dateError))
+                {
+                    result.Skipped++;
+                    result.Errors.Add(new StudentImportError
+                    {
+                        Row = rowNumber,
+                        Message = dateError ?? _localizer["StudentImportInvalidDate"]
+                    });
+                    continue;
+                }
+
+                try
+                {
+                    Student? existingStudent = null;
+                    var emailKey = email.ToLowerInvariant();
+                    existingByEmail.TryGetValue(emailKey, out existingStudent);
+
+                    if (existingStudent == null)
+                    {
+                        var dto = new CreateStudentDto
+                        {
+                            FirstName = firstName,
+                            LastName = lastName,
+                            Email = email,
+                            IsActive = true,
+                            Status = StudentStatus.Active,
+                            LastAccessAt = EnsureUtc(lastAccessAt)
+                        };
+
+                        var created = await CreateStudentAsync(dto);
+                        existingByEmail[emailKey] = created;
+                        result.Created++;
+
+                        await EnsureStudentUcLinkAsync(created.Id, uc);
+                    }
+                    else
+                    {
+                        if (string.IsNullOrWhiteSpace(existingStudent.Id))
+                        {
+                            result.Skipped++;
+                            result.Errors.Add(new StudentImportError
+                            {
+                                Row = rowNumber,
+                                Message = _localizer["StudentImportMissingId"]
+                            });
+                            continue;
+                        }
+
+                        var updateDto = new UpdateStudentDto
+                        {
+                            FirstName = firstName,
+                            LastName = lastName,
+                            Email = email,
+                            IdNumber = existingStudent.IdNumber,
+                            Phone = existingStudent.Phone,
+                            DateOfBirth = existingStudent.DateOfBirth,
+                            Address = CloneAddress(existingStudent.Address),
+                            Institution = existingStudent.Institution,
+                            Lang = existingStudent.Lang,
+                            TimeZone = existingStudent.TimeZone,
+                            IsActive = existingStudent.IsActive,
+                            Status = existingStudent.Status ?? StudentStatus.Active,
+                            LastAccessAt = EnsureUtc(lastAccessAt ?? existingStudent.LastAccessAt)
+                        };
+
+                        await UpdateStudentAsync(existingStudent.Id!, updateDto);
+                        result.Updated++;
+
+                        await EnsureStudentUcLinkAsync(existingStudent.Id, uc);
                     }
                 }
                 catch (Exception ex)
@@ -440,6 +593,118 @@ namespace Application.Service.Service
 
             error = _localizer["StudentImportInvalidDateWithValue", text];
             return false;
+        }
+
+        private bool TryParseDateText(string? text, out DateTime? value, out string? error)
+        {
+            value = null;
+            error = null;
+
+            var trimmed = text?.Trim();
+            if (string.IsNullOrWhiteSpace(trimmed))
+            {
+                return true;
+            }
+
+            var formats = new[] { "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH:mm:ss" };
+            if (DateTime.TryParseExact(trimmed, formats, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var parsed) ||
+                DateTime.TryParse(trimmed, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out parsed) ||
+                DateTime.TryParse(trimmed, CultureInfo.CurrentCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out parsed))
+            {
+                value = EnsureUtc(parsed);
+                return true;
+            }
+
+            error = _localizer["StudentImportInvalidDateWithValue", trimmed];
+            return false;
+        }
+
+        private int ExtractCourseId(string fileName)
+        {
+            var name = Path.GetFileName(fileName);
+            var match = CourseIdRegex.Match(name ?? string.Empty);
+            if (!match.Success || !int.TryParse(match.Groups[1].Value, out var courseId))
+            {
+                throw new BusinessException(_localizer["StudentImportCourseIdMissing"]);
+            }
+
+            return courseId;
+        }
+
+        private async Task<List<Participant>> LoadParticipantsAsync(Stream fileStream)
+        {
+            try
+            {
+                using var document = await JsonDocument.ParseAsync(fileStream);
+                if (document.RootElement.ValueKind != JsonValueKind.Array)
+                {
+                    throw new BusinessException(_localizer["StudentImportInvalidJson"]);
+                }
+
+                var participants = new List<Participant>();
+                foreach (var element in document.RootElement.EnumerateArray())
+                {
+                    if (element.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var child in element.EnumerateArray())
+                        {
+                            if (child.ValueKind == JsonValueKind.Object)
+                            {
+                                participants.Add(ReadParticipant(child));
+                            }
+                        }
+                    }
+                    else if (element.ValueKind == JsonValueKind.Object)
+                    {
+                        participants.Add(ReadParticipant(element));
+                    }
+                }
+
+                return participants;
+            }
+            catch (JsonException)
+            {
+                throw new BusinessException(_localizer["StudentImportInvalidJson"]);
+            }
+        }
+
+        private static Participant ReadParticipant(JsonElement element)
+        {
+            return new Participant
+            {
+                FirstName = GetJsonString(element, "nome"),
+                LastName = GetJsonString(element, "sobrenome"),
+                LastAccessAt = GetJsonString(element, "ltimoacesso"),
+                Email = GetJsonString(element, "endereodee-mail")
+            };
+        }
+
+        private static string? GetJsonString(JsonElement element, string propertyName)
+        {
+            if (element.TryGetProperty(propertyName, out var property) && property.ValueKind == JsonValueKind.String)
+            {
+                return property.GetString();
+            }
+
+            return null;
+        }
+
+        private async Task EnsureStudentUcLinkAsync(string? studentId, UcDocument? uc)
+        {
+            if (string.IsNullOrWhiteSpace(studentId) || uc?.Id == null)
+            {
+                return;
+            }
+
+            await _educationRepository.EnsureStudentUcMapAsync(studentId, uc.Id);
+        }
+
+        private sealed class Participant
+        {
+            public string? FirstName { get; set; }
+            public string? LastName { get; set; }
+            public string? LastAccessAt { get; set; }
+            public string? Email { get; set; }
         }
     }
 }

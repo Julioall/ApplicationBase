@@ -10,6 +10,7 @@ import { EducationUc } from '../../model/education-uc';
 import { PagedResult } from '../../model/paged-result';
 import { UcSearchQuery } from '../../model/uc-search-query';
 import { CourseImportResult } from '../../model/course-import-result';
+import { Student } from '../../model/student';
 
 @Injectable({
   providedIn: 'root'
@@ -63,6 +64,12 @@ export class EducationService {
     const params = new HttpParams().set('classId', classId);
 
     return this.http.get<EducationUc[]>(`${this.apiUrl}/ucs`, { params }).pipe(catchError(this.handleError));
+  }
+
+  getUcStudents(eadId: number): Observable<Student[]> {
+    const params = new HttpParams().set('eadId', eadId);
+    return this.http.get<Student[]>(`${this.apiUrl}/ucs/students`, { params })
+      .pipe(catchError(this.handleError));
   }
 
   importCourses(file: File): Observable<CourseImportResult> {

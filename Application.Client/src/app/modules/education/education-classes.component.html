@@ -1,0 +1,61 @@
+<section class="classes-page user-settings">
+  <article class="card settings-shell">
+    <div class="card-lead">
+      <div class="header-copy">
+        <p class="eyebrow">{{ 'classes.eyebrow' | translate }}</p>
+        <h1>{{ 'classes.title' | translate }}</h1>
+        <p class="subtitle">{{ 'classes.subtitle' | translate }}</p>
+      </div>
+    </div>
+
+    <div class="settings-body">
+      <div class="filters-row">
+        <div class="field search-field no-label">
+          <div class="input-icon">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input
+              type="search"
+              [formControl]="searchControl"
+              [placeholder]="'classes.searchPlaceholder' | translate"
+              [attr.aria-label]="('classes.searchPlaceholder' | translate)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="classes-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>{{ 'classes.classesTitle' | translate }}</h2>
+              <p class="muted">{{ 'classes.classesSubtitle' | translate }}</p>
+            </div>
+            <span class="pill" *ngIf="groupedUcs.length">{{ groupedUcs.length }}</span>
+          </div>
+
+          <div class="panel-body" *ngIf="loadingUcs">
+            <p class="state">{{ 'classes.loadingUnits' | translate }}</p>
+          </div>
+
+          <div class="panel-body" *ngIf="!loadingUcs && groupedUcs.length === 0">
+            <p class="state">{{ 'classes.emptyClasses' | translate }}</p>
+          </div>
+
+          <div class="event-group" *ngIf="!loadingUcs && groupedUcs.length > 0">
+            <button class="group-card" type="button" *ngFor="let group of groupedUcs" (click)="openClassGroup(group)">
+              <div class="group-header">
+                <div>
+                  <p class="group-eyebrow">{{ 'classes.groupLabel' | translate }}</p>
+                  <h3 class="group-title">{{ group.category }}</h3>
+                </div>
+                <span class="pill">{{ group.items.length }}</span>
+              </div>
+              <p class="group-meta">{{ getGroupMeta(group) }}</p>
+              <span class="group-action">{{ 'classes.openUnits' | translate }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+</section>

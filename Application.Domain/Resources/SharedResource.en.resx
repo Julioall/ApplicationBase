@@ -263,7 +263,16 @@
     <value>Import file is empty.</value>
   </data>
   <data name="StudentImportOnlyXlsx" xml:space="preserve">
-    <value>Only .xlsx files are supported for import.</value>
+    <value>Only .xlsx or .json files are supported for import.</value>
+  </data>
+  <data name="StudentImportCourseIdMissing" xml:space="preserve">
+    <value>Could not identify the course ID from the file name.</value>
+  </data>
+  <data name="StudentImportInvalidJson" xml:space="preserve">
+    <value>Invalid JSON file for participant import.</value>
+  </data>
+  <data name="StudentImportEmailRequired" xml:space="preserve">
+    <value>Email is required for participant import.</value>
   </data>
   <data name="StudentImportWorksheetMissing" xml:space="preserve">
     <value>No worksheet found in the uploaded file.</value>
@@ -367,3 +376,4 @@
 
 
 </root>
+

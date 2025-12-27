@@ -9,32 +9,100 @@
   <article class="card settings-shell">
     <div class="card-lead">
       <div class="header-copy">
-        <h1>{{ className || ('education.classDetail.title' | translate) }}</h1>
-        <p class="subtitle">{{ 'education.classDetail.subtitle' | translate }}</p>
+        <h1>
+          {{ isUcDetail ? (selectedUc?.Fullname || ('education.ucDetail.title' | translate)) : (className || ('education.classDetail.title' | translate)) }}
+        </h1>
+        <p class="subtitle">
+          {{ isUcDetail ? ('education.ucDetail.subtitle' | translate) : ('education.classDetail.subtitle' | translate) }}
+        </p>
+      </div>
+      <div class="header-actions" *ngIf="isUcDetail">
+        <label class="btn primary">
+          <i class="fa-solid fa-file-import"></i>
+          <span>{{ 'education.ucDetail.import' | translate }}</span>
+          <input
+            type="file"
+            accept=".json,application/json"
+            (change)="onImportParticipants($event)"
+            [disabled]="importingParticipants"
+            [attr.aria-label]="('education.ucDetail.import' | translate)"
+          />
+        </label>
       </div>
     </div>
 
     <div class="settings-body">
       <div class="summary">
-        <div class="chip" *ngIf="schoolName">
+        <div class="chip" *ngIf="displaySchoolName">
           <i class="fa-solid fa-building-columns"></i>
           <span>{{ 'education.labels.school' | translate }}:</span>
-          <strong>{{ schoolName }}</strong>
+          <strong>{{ displaySchoolName }}</strong>
         </div>
-        <div class="chip" *ngIf="programName">
+        <div class="chip" *ngIf="displayProgramName">
           <i class="fa-solid fa-layer-group"></i>
           <span>{{ 'education.labels.program' | translate }}:</span>
-          <strong>{{ programName }}</strong>
+          <strong>{{ displayProgramName }}</strong>
         </div>
-        <div class="chip" *ngIf="classPeriodText">
+        <div class="chip" *ngIf="className">
+          <i class="fa-solid fa-chalkboard-user"></i>
+          <span>{{ 'education.labels.class' | translate }}:</span>
+          <strong>{{ className }}</strong>
+        </div>
+        <div class="chip" *ngIf="displayPeriodText">
           <i class="fa-regular fa-calendar"></i>
           <span>{{ 'education.labels.period' | translate }}:</span>
-          <strong>{{ classPeriodText }}</strong>
+          <strong>{{ displayPeriodText }}</strong>
+        </div>
+        <div class="chip" *ngIf="isUcDetail && selectedUc?.ViewUrl">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <a [href]="selectedUc?.ViewUrl" target="_blank" rel="noreferrer">
+            {{ 'education.labels.viewCourse' | translate }}
+          </a>
         </div>
       </div>
 
-      <section class="cards" *ngIf="units.length; else emptyState">
-        <article class="uc-card" *ngFor="let uc of units; trackBy: trackByUc">
+      <section class="uc-students" *ngIf="isUcDetail && selectedUc; else classList">
+        <div class="section-header">
+          <div>
+            <h2>{{ 'education.ucDetail.studentsTitle' | translate }}</h2>
+            <p class="muted">{{ 'education.ucDetail.studentsSubtitle' | translate }}</p>
+          </div>
+          <span class="pill" *ngIf="students.length">{{ students.length }}</span>
+        </div>
+
+        <div class="panel-body" *ngIf="loadingStudents">
+          <p class="state">{{ 'education.ucDetail.studentsLoading' | translate }}</p>
+        </div>
+
+        <div class="panel-body" *ngIf="!loadingStudents && students.length === 0">
+          <p class="state">{{ 'education.ucDetail.studentsEmpty' | translate }}</p>
+        </div>
+
+        <div class="students-table" *ngIf="!loadingStudents && students.length > 0">
+          <div class="table-row table-head">
+            <span>{{ 'education.ucDetail.studentsName' | translate }}</span>
+            <span>{{ 'education.ucDetail.studentsEmail' | translate }}</span>
+            <span>{{ 'education.ucDetail.studentsPhone' | translate }}</span>
+          </div>
+          <div class="table-row" *ngFor="let student of students; trackBy: trackByStudent">
+            <span>{{ getStudentName(student) }}</span>
+            <span>{{ student.Email || '-' }}</span>
+            <span>{{ student.Phone || '-' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <ng-template #classList>
+        <section class="cards" *ngIf="units.length; else emptyState">
+          <article
+            class="uc-card"
+            *ngFor="let uc of units; trackBy: trackByUc"
+            role="button"
+            tabindex="0"
+            (click)="openUc(uc)"
+            (keydown.enter)="openUc(uc)"
+            (keydown.space)="openUc(uc); $event.preventDefault()"
+          >
           <a
             *ngIf="uc.ViewUrl"
             class="btn ghost open-course"
@@ -42,6 +110,7 @@
             target="_blank"
             rel="noreferrer"
             [attr.aria-label]="'education.labels.viewCourse' | translate"
+            (click)="$event.stopPropagation()"
           >
             <i class="fa-solid fa-arrow-up-right-from-square"></i>
           </a>
@@ -64,8 +133,9 @@
               <span>{{ formatPeriod(uc.StartDate, uc.EndDate, uc.PeriodTextDerived || null) }}</span>
             </div>
           </div>
-        </article>
-      </section>
+          </article>
+        </section>
+      </ng-template>
 
       <ng-template #emptyState>
         <div class="empty" *ngIf="!loadingUnits">

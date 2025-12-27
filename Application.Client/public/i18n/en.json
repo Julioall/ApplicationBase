@@ -545,6 +545,26 @@
       "searchPlaceholder": "Filter units by name",
       "unitsCount": "{{count}} unit(s)"
     },
+    "ucDetail": {
+      "title": "Curricular unit",
+      "subtitle": "Details of the selected unit.",
+      "import": "Import link",
+      "importTitle": "Import link",
+      "importSuccess": "{{created}} created, {{updated}} updated. {{skipped}} skipped.",
+      "importWarning": "{{count}} record(s) had issues in the file.",
+      "importError": "Could not import participants.",
+      "importMissingCourse": "Selected unit is missing an identifier for linking.",
+      "notFound": "Could not find the selected unit.",
+      "studentsTitle": "Linked students",
+      "studentsSubtitle": "Students linked to this curricular unit.",
+      "studentsLoading": "Loading students...",
+      "studentsEmpty": "No students linked to this unit.",
+      "studentsName": "Name",
+      "studentsEmail": "Email",
+      "studentsPhone": "Phone",
+      "studentFallback": "Student",
+      "loadStudentsError": "Could not load linked students."
+    },
     "empty": {
       "title": "No classes to show",
       "subtitle": "Choose a school and course to list their classes. Open a class to view its units."
@@ -567,6 +587,40 @@
       "page": "Page {{current}} of {{total}}",
       "prev": "Previous",
       "next": "Next"
+    }
+  },
+  "classes": {
+    "eyebrow": "Classes",
+    "title": "Classes",
+    "subtitle": "See all units and the students linked to each one.",
+    "searchPlaceholder": "Search units",
+    "classesTitle": "Classes",
+    "classesSubtitle": "Select a class to open the units tab.",
+    "openUnits": "Open units",
+    "countLabel": "{{count}} units",
+    "detailsTitle": "Class details",
+    "classInfoTitle": "Class information",
+    "unitInfoTitle": "Unit information",
+    "schoolLabel": "School",
+    "programLabel": "Program",
+    "periodLabel": "Period",
+    "unitLabel": "Unit",
+    "viewLabel": "View",
+    "viewLink": "Open unit",
+    "periodFallback": "Period not available",
+    "groupLabel": "Category",
+    "uncategorized": "Uncategorized",
+    "studentsTitle": "Linked students",
+    "studentsCount": "{{count}} students",
+    "selectUnit": "Select a unit to view linked students.",
+    "emptyClasses": "No classes found.",
+    "emptyUnits": "No units found.",
+    "emptyStudents": "No students linked to this unit yet.",
+    "loadingUnits": "Loading units...",
+    "loadingStudents": "Loading students...",
+    "errors": {
+      "loadUnits": "Could not load units.",
+      "loadStudents": "Could not load linked students."
     }
   },
   "admin": {

@@ -15,7 +15,7 @@ namespace Application.Tests.Services
         public EducationServiceTests()
         {
             _educationService = _serviceProvider.GetService<IEducationService>()
-                ?? throw new Exception($"{nameof(IEducationService)} nÃ£o foi encontrado");
+                ?? throw new Exception($"{nameof(IEducationService)} não foi encontrado");
         }
 
         [Fact]
@@ -24,9 +24,9 @@ namespace Application.Tests.Services
             var json = BuildCoursesJson();
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
-            var result = await _educationService.ImportCoursesAsync(stream, "cursos.json");
+            var result = await _educationService.ImportCoursesAsync(stream, "import.json");
             await _asyncSession.SaveChangesAsync();
-
+                
             Assert.Equal(2, result.Processed);
             Assert.Equal(2, result.CreatedUcs);
             Assert.Equal(0, result.UpdatedUcs);
@@ -61,7 +61,7 @@ namespace Application.Tests.Services
         {
             var json = BuildCoursesJson();
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
-            await _educationService.ImportCoursesAsync(stream, "cursos.json");
+            await _educationService.ImportCoursesAsync(stream, "import.json");
             await _asyncSession.SaveChangesAsync();
 
             var schools = await _educationService.GetSchoolsAsync();
@@ -81,11 +81,11 @@ namespace Application.Tests.Services
         {
             var json = BuildCoursesJson();
             using var first = new MemoryStream(Encoding.UTF8.GetBytes(json));
-            await _educationService.ImportCoursesAsync(first, "cursos.json");
+            await _educationService.ImportCoursesAsync(first, "import.json");
             await _asyncSession.SaveChangesAsync();
 
             using var second = new MemoryStream(Encoding.UTF8.GetBytes(json));
-            var result = await _educationService.ImportCoursesAsync(second, "cursos.json");
+            var result = await _educationService.ImportCoursesAsync(second, "import.json");
             await _asyncSession.SaveChangesAsync();
 
             Assert.Equal(2, result.Processed);
@@ -99,7 +99,7 @@ namespace Application.Tests.Services
         {
             var json = BuildCoursesJson();
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
-            await _educationService.ImportCoursesAsync(stream, "cursos.json");
+            await _educationService.ImportCoursesAsync(stream, "import.json");
             await _asyncSession.SaveChangesAsync();
 
             var schools = await _educationService.GetSchoolsAsync();

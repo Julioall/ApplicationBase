@@ -1,11 +1,13 @@
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.Education;
 using Application.Domain.Model.Education.Dtos;
+using Application.Domain.Model.Students;
 
 namespace Application.Service.Interface
 {
     public interface IEducationService
     {
+        Task<CourseImportResult> ImportCoursesAsync(Stream fileStream, string fileName, CancellationToken cancellationToken = default);
         Task<EducationImport> EnqueueImportAsync(Stream fileStream, string fileName, CancellationToken cancellationToken = default);
         Task<EducationImport?> GetImportAsync(string id, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<School>> GetSchoolsAsync(CancellationToken cancellationToken = default);
@@ -13,5 +15,6 @@ namespace Application.Service.Interface
         Task<IReadOnlyCollection<ClassDocument>> GetClassesByProgramAsync(string programId, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<UcDocument>> GetUcsByClassAsync(string classId, string? search = null, CancellationToken cancellationToken = default);
         Task<PagedResult<UcDocument>> SearchUcsAsync(PaginationQuery query, string? classId = null, string? programId = null, CancellationToken cancellationToken = default);
+        Task<IReadOnlyCollection<Student>> GetStudentsByUcEadIdAsync(int eadId, CancellationToken cancellationToken = default);
     }
 }

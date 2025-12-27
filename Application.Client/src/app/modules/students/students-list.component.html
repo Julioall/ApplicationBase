@@ -42,7 +42,7 @@
             </div>
           </div>
           <ng-container *ngIf="canManageStudents">
-            <input #importInput type="file" accept=".xlsx" hidden (change)="onImport($event)" />
+            <input #importInput type="file" accept=".xlsx,.json" hidden (change)="onImport($event)" />
             <button type="button" class="btn ghost" (click)="importInput.click()" [disabled]="loading || importing">
               <i class="fa-solid fa-file-import" aria-hidden="true"></i>
               <span>{{ 'students.list.import' | translate }}</span>

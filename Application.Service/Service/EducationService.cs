@@ -7,6 +7,7 @@ using Application.Domain.Interface.Education;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.Education;
 using Application.Domain.Model.Education.Dtos;
+using Application.Domain.Model.Students;
 using Application.Service.Interface;
 using Microsoft.Extensions.Localization;
 
@@ -52,6 +53,70 @@ namespace Application.Service.Service
             return import;
         }
 
+        public async Task<CourseImportResult> ImportCoursesAsync(Stream fileStream, string fileName, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(fileStream);
+
+            if (fileStream.Length == 0)
+            {
+                throw new BusinessException(_localizer["CourseImportFileEmpty"]);
+            }
+
+            if (string.IsNullOrWhiteSpace(fileName) || !fileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new BusinessException(_localizer["CourseImportOnlyJson"]);
+            }
+
+            if (fileStream.CanSeek)
+            {
+                fileStream.Position = 0;
+            }
+
+            JsonDocument document;
+            try
+            {
+                document = await JsonDocument.ParseAsync(fileStream, cancellationToken: cancellationToken);
+            }
+            catch (Exception)
+            {
+                throw new BusinessException(_localizer["CourseImportInvalidJson"]);
+            }
+
+            using var _ = document;
+            var coursesElement = ExtractCoursesElement(document.RootElement);
+            var result = new CourseImportResult();
+            var classPeriods = new Dictionary<string, (long Min, long Max, ClassDocument ClassDoc)>();
+
+            foreach (var courseElement in coursesElement.EnumerateArray())
+            {
+                result.Processed++;
+                try
+                {
+                    await ProcessCourseAsync(courseElement, classPeriods, result, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    result.Errors.Add(new CourseImportError
+                    {
+                        CourseCategory = TryGetString(courseElement, "coursecategory"),
+                        UcName = TryGetString(courseElement, "fullname"),
+                        Message = ex.Message
+                    });
+                }
+            }
+
+            foreach (var period in classPeriods.Values)
+            {
+                if (period.ClassDoc.StartDate != period.Min || period.ClassDoc.EndDate != period.Max)
+                {
+                    period.ClassDoc.StartDate = period.Min;
+                    period.ClassDoc.EndDate = period.Max;
+                }
+            }
+
+            return result;
+        }
+
         public Task<IReadOnlyCollection<School>> GetSchoolsAsync(CancellationToken cancellationToken = default)
         {
             return _educationRepository.GetSchoolsAsync(cancellationToken);
@@ -79,6 +144,22 @@ namespace Application.Service.Service
         {
             ArgumentNullException.ThrowIfNull(query);
             return _educationRepository.SearchUcsAsync(query.Search, classId, programId, query, cancellationToken);
+        }
+
+        public async Task<IReadOnlyCollection<Student>> GetStudentsByUcEadIdAsync(int eadId, CancellationToken cancellationToken = default)
+        {
+            if (eadId <= 0)
+            {
+                throw new ArgumentException("Invalid UC id.", nameof(eadId));
+            }
+
+            var uc = await _educationRepository.GetUcByEadIdAsync(eadId, cancellationToken);
+            if (uc == null || string.IsNullOrWhiteSpace(uc.Id))
+            {
+                return Array.Empty<Student>();
+            }
+
+            return await _educationRepository.GetStudentsByUcAsync(uc.Id, cancellationToken);
         }
 
         public Task<EducationImport?> GetImportAsync(string id, CancellationToken cancellationToken = default)
@@ -148,7 +229,7 @@ namespace Application.Service.Service
             {
                 result.CreatedUcs++;
             }
-            else if (upsertResult.Updated)
+            else
             {
                 result.UpdatedUcs++;
             }

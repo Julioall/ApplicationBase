@@ -259,11 +259,20 @@
     <value>Senha de e-mail armazenada como hash. Reconfigure as credenciais SMTP.</value>
   </data>
 
-  <data name="StudentImportFileEmpty" xml:space="preserve">
-    <value>Arquivo de importÇõÇœo vazio.</value>
+    <data name="StudentImportFileEmpty" xml:space="preserve">
+    <value>Arquivo de importacao vazio.</value>
   </data>
   <data name="StudentImportOnlyXlsx" xml:space="preserve">
-    <value>Apenas arquivos .xlsx sÇœo suportados para importaÇõÇœo.</value>
+    <value>Apenas arquivos .xlsx ou .json sao suportados para importacao.</value>
+  </data>
+  <data name="StudentImportCourseIdMissing" xml:space="preserve">
+    <value>Nao foi possivel identificar o ID do curso pelo nome do arquivo.</value>
+  </data>
+  <data name="StudentImportInvalidJson" xml:space="preserve">
+    <value>Arquivo JSON invalido para importacao de participantes.</value>
+  </data>
+  <data name="StudentImportEmailRequired" xml:space="preserve">
+    <value>E-mail e obrigatorio para importacao de participantes.</value>
   </data>
   <data name="StudentImportWorksheetMissing" xml:space="preserve">
     <value>Nenhuma planilha encontrada no arquivo enviado.</value>
@@ -367,3 +376,6 @@
 
 
 </root>
+
+
+

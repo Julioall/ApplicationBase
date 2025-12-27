@@ -10,6 +10,7 @@ using Application.Infrastructure.Indexes;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
 using Application.Domain.Model.Education.Dtos;
+using Application.Domain.Model.Students;
 
 namespace Application.Infrastructure.Repository.Education
 {
@@ -252,6 +253,55 @@ namespace Application.Infrastructure.Repository.Education
 
             await _serviceRavenDb.AsyncSession.StoreAsync(map, mapId, cancellationToken);
             return map;
+        }
+
+        public async Task<StudentUcMap> EnsureStudentUcMapAsync(string studentId, string ucId, CancellationToken cancellationToken = default)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(studentId);
+            ArgumentException.ThrowIfNullOrWhiteSpace(ucId);
+
+            var mapId = $"student_uc_maps/{studentId}/{ucId}";
+            var existing = await _serviceRavenDb.AsyncSession.LoadAsync<StudentUcMap>(mapId, cancellationToken);
+            if (existing != null)
+            {
+                return existing;
+            }
+
+            var map = new StudentUcMap
+            {
+                Id = mapId,
+                StudentId = studentId,
+                UcId = ucId,
+                ImportedAt = DateTime.UtcNow
+            };
+
+            await _serviceRavenDb.AsyncSession.StoreAsync(map, mapId, cancellationToken);
+            return map;
+        }
+
+        public async Task<IReadOnlyCollection<Student>> GetStudentsByUcAsync(string ucId, CancellationToken cancellationToken = default)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(ucId);
+
+            var mappings = await _serviceRavenDb.AsyncSession.Query<StudentUcMap, StudentUcMaps_ByUc>()
+                .Customize(x => x.WaitForNonStaleResults())
+                .Where(m => m.UcId == ucId)
+                .ToListAsync(cancellationToken);
+
+            if (mappings.Count == 0)
+            {
+                return Array.Empty<Student>();
+            }
+
+            var studentIds = mappings.Select(m => m.StudentId).Distinct().ToList();
+            var loaded = await _serviceRavenDb.AsyncSession.LoadAsync<Student>(studentIds, cancellationToken);
+
+            return loaded.Values
+                .Where(s => s != null)
+                .Select(s => s!)
+                .OrderBy(s => s.LastName)
+                .ThenBy(s => s.FirstName)
+                .ToList();
         }
 
         public async Task<IReadOnlyCollection<School>> GetSchoolsAsync(CancellationToken cancellationToken = default)

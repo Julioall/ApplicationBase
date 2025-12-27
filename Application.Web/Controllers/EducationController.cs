@@ -3,6 +3,7 @@ using Application.Domain.Exceptions;
 using Application.Domain.Model;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.Education;
+using Application.Domain.Model.Students;
 using Application.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -130,6 +131,20 @@ namespace Application.Api.Controllers
             var safeQuery = query ?? new PaginationQuery();
             var paged = await _educationService.SearchUcsAsync(safeQuery, classId, programId, cancellationToken);
             return Ok(paged);
+        }
+
+        [HttpGet("ucs/students")]
+        [Authorize(Policy = ApplicationPermissions.ViewEducation)]
+        [ProducesResponseType(typeof(IReadOnlyCollection<Student>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetStudentsByUc([FromQuery] int? eadId, CancellationToken cancellationToken)
+        {
+            if (!eadId.HasValue || eadId.Value <= 0)
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["InvalidRequestDetail"], statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            var students = await _educationService.GetStudentsByUcEadIdAsync(eadId.Value, cancellationToken);
+            return Ok(students);
         }
     }
 }
