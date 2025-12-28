@@ -10,6 +10,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY Application.Web/Application.Api.csproj Application.Web/
 COPY Application.Domain/Application.Domain.csproj Application.Domain/
+COPY Application.Shared/Application.Shared.csproj Application.Shared/
 COPY Application.Infrastructure/Application.Infrastructure.csproj Application.Infrastructure/
 COPY Application.Service/Application.Service.csproj Application.Service/
 COPY Application.Client/Application.Client.esproj Application.Client/

@@ -1,12 +1,14 @@
 using Application.Domain.Interface;
 using Application.Domain.Interface.Students;
 using Application.Domain.Interface.Education;
+using Application.Infrastructure.Background;
 using Application.Infrastructure.Repository.Education;
 using Application.Infrastructure.Repository;
 using Application.Infrastructure.ConfigurationDb;
 using Application.Infrastructure.Indexes;
 using Application.Infrastructure.Repository.Students;
 using Application.Infrastructure.Service;
+using Application.Shared.Background;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Raven.Client.Documents;
@@ -27,6 +29,7 @@ namespace Application.Infrastructure
             });
 
             services.TryAddScoped<IServiceRavenDB, ServiceRavenDB>();
+            services.TryAddScoped<IBackgroundJobScheduler, HangfireBackgroundJobScheduler>();
             services.TryAddScoped<IUserRepository, UserRepository>();
             services.TryAddScoped<ISettingsRepository, SettingsRepository>();
             services.TryAddScoped<IStudentRepository, StudentRepository>();

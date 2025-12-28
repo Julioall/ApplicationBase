@@ -26,6 +26,8 @@ services:
       EVOLUTION_API_BASE_URL: "http://evolution-api:8080"
       EVOLUTION_API_KEY: "changeme-evolution-key"
       EVOLUTION_API_INTEGRATION: "WHATSAPP-BAILEYS"
+      # Hangfire
+      HANGFIRE_CONNECTION_STRING: "Host=postgresql;Port=5432;Database=evolution;Username=evolution;Password=evolution"
     depends_on:
       raven-db:
         condition: service_healthy
@@ -72,7 +74,7 @@ services:
     environment:
       AUTHENTICATION_API_KEY: "changeme-evolution-key"
       DATABASE_PROVIDER: "postgresql"
-      DATABASE_CONNECTION_URI: "postgresql://evolution:evolution@evolution-db:5432/evolution"
+      DATABASE_CONNECTION_URI: "postgresql://evolution:evolution@postgresql:5432/evolution"
       DATABASE_CONNECTION_CLIENT_NAME: "evolution_exchange"
       CACHE_REDIS_ENABLED: "false"
     healthcheck:
@@ -87,13 +89,13 @@ services:
     networks:
       - backend-network
     depends_on:
-      evolution-db:
+      postgresql:
         condition: service_healthy
 
   # Postgres for Evolution API
-  evolution-db:
+  postgresql:
     image: postgres:16
-    container_name: evolution-db
+    container_name: postgresql
     environment:
       POSTGRES_DB: "evolution"
       POSTGRES_USER: "evolution"

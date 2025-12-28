@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.Infrastructure"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.Service", "Application.Service\Application.Service.csproj", "{CFB0CCEE-CF3D-40DF-BF28-4AF8966FAEA3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.Shared", "Application.Shared\Application.Shared.csproj", "{F3D3F6C4-5B1C-4A51-9E9B-9A5F9C2B3C1D}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.Api", "Application.Web\Application.Api.csproj", "{8C6B048F-7EE3-4526-AB45-417AF1580045}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Tests", "Application.Test\Application.Tests.csproj", "{355F090F-0468-A304-61F5-61A1DBFA738E}"
@@ -39,6 +41,10 @@ Global
 		{CFB0CCEE-CF3D-40DF-BF28-4AF8966FAEA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFB0CCEE-CF3D-40DF-BF28-4AF8966FAEA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFB0CCEE-CF3D-40DF-BF28-4AF8966FAEA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3D3F6C4-5B1C-4A51-9E9B-9A5F9C2B3C1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3D3F6C4-5B1C-4A51-9E9B-9A5F9C2B3C1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3D3F6C4-5B1C-4A51-9E9B-9A5F9C2B3C1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3D3F6C4-5B1C-4A51-9E9B-9A5F9C2B3C1D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8C6B048F-7EE3-4526-AB45-417AF1580045}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8C6B048F-7EE3-4526-AB45-417AF1580045}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C6B048F-7EE3-4526-AB45-417AF1580045}.Release|Any CPU.ActiveCfg = Release|Any CPU

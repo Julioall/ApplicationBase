@@ -21,5 +21,8 @@
         public const string EVOLUTION_API_BASE_URL = "EVOLUTION_API_BASE_URL";
         public const string EVOLUTION_API_KEY = "EVOLUTION_API_KEY";
         public const string EVOLUTION_API_INTEGRATION = "EVOLUTION_API_INTEGRATION";
+
+        // Hangfire
+        public const string HANGFIRE_CONNECTION_STRING_KEY = "HANGFIRE_CONNECTION_STRING";
     }
 }

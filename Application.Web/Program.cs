@@ -10,6 +10,8 @@ using Application.Domain.Localization;
 using Application.Domain.Model;
 using Application.Infrastructure;
 using Application.Service;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Localization;
@@ -18,6 +20,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Application.Api.RateLimiting;
+using Application.Api.Hangfire;
 
 public class Program
 {
@@ -29,6 +32,24 @@ public class Program
         builder.Services.AddMemoryCache();
         builder.Services.Configure<RateLimitSettings>(builder.Configuration.GetSection("RateLimiting"));
         builder.Services.AddSingleton<IRateLimiter, MemoryRateLimiter>();
+
+        var hangfireConnectionString = Environment.GetEnvironmentVariable(ApplicationConstants.HANGFIRE_CONNECTION_STRING_KEY);
+        if (string.IsNullOrWhiteSpace(hangfireConnectionString))
+        {
+            throw new ArgumentNullException(nameof(hangfireConnectionString), SharedResourceProvider.GetString("EnvVarNotDefined", ApplicationConstants.HANGFIRE_CONNECTION_STRING_KEY));
+        }
+
+        builder.Services.AddHangfire(config =>
+        {
+            config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage(options =>
+                {
+                    options.UseNpgsqlConnection(hangfireConnectionString);
+                });
+        });
+        builder.Services.AddHangfireServer();
 
         // Service configuration
         builder.Services.AddScoped<ValidationProblemDetailsFilter>();
@@ -172,6 +193,10 @@ public class Program
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseHangfireDashboard("/hangfire", new DashboardOptions
+        {
+            Authorization = new[] { new HangfireDashboardAuthorizationFilter() }
+        });
 
         app.MapHealthChecks("/health/startup", new HealthCheckOptions
         {
