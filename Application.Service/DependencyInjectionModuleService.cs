@@ -20,7 +20,6 @@ namespace Application.Service
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<IEducationService, EducationService>();
             services.AddScoped<INotificationService, NotificationService>();
-            services.AddHostedService<EducationImportBackgroundService>();
             return services;
         }
     }

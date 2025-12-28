@@ -75,6 +75,11 @@ namespace Application.Tests.Services
             {
                 return Task.CompletedTask;
             }
+
+            public Task DisconnectAsync(WhatsAppInstance instance, CancellationToken cancellationToken = default)
+            {
+                return Task.CompletedTask;
+            }
         }
     }
 }

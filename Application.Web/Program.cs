@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using Application.Api.Filters;
+using Application.Api.Background;
 using Application.Api.Health;
 using Application.Api.Middlewares;
 using Application.Domain;
@@ -139,6 +140,7 @@ public class Program
         DependencyInjectionModuleDomain.AddDomainDependencies(builder.Services);
         DependencyInjectionModuleInfra.AddInfraDependencies(builder.Services);
         DependencyInjectionModuleService.AddServiceDependencies(builder.Services);
+        builder.Services.AddHostedService<EducationImportBackgroundService>();
 
 
         var app = builder.Build();

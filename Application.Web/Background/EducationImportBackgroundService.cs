@@ -1,11 +1,12 @@
 using System.Text.Json;
 using System.Linq;
-using Application.Domain.Interface;
 using Application.Domain.Interface.Education;
 using Application.Domain.Model.Education;
 using Application.Domain.Model.Education.Dtos;
 using Application.Domain.Model.Notification;
+using Application.Infrastructure.Service;
 using Application.Service.Interface;
+using Application.Service.Service;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
@@ -13,7 +14,7 @@ using Microsoft.Extensions.Logging;
 using Raven.Client.Documents;
 using Application.Domain.Exceptions;
 
-namespace Application.Service.Service
+namespace Application.Api.Background
 {
     public class EducationImportBackgroundService : BackgroundService
     {

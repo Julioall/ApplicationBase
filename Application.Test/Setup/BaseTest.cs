@@ -1,5 +1,4 @@
 using Application.Domain;
-using Application.Domain.Interface;
 using Application.Domain.Model;
 using Application.Infrastructure;
 using Application.Infrastructure.Indexes;

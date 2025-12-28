@@ -1,6 +1,6 @@
-using Application.Domain.Interface;
 using Application.Domain.Interface.Education;
 using Application.Domain.Model.Education;
+using Application.Infrastructure.Service;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
 

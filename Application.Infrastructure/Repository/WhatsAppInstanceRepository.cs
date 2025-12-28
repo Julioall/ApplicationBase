@@ -1,5 +1,6 @@
 using Application.Domain.Interface;
 using Application.Domain.Model.WhatsApp;
+using Application.Infrastructure.Service;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
 
@@ -44,6 +45,7 @@ namespace Application.Infrastructure.Repository
         public async Task<int> CountUserInstancesAsync(string ownerUserId)
         {
             return await _serviceRavenDb.AsyncSession.Query<WhatsAppInstance>()
+                .Customize(x => x.WaitForNonStaleResults())
                 .Where(instance => instance.IsPrivateUserInstance && instance.OwnerUserId == ownerUserId && instance.IsActive)
                 .CountAsync();
         }

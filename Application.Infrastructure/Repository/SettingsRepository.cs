@@ -1,9 +1,10 @@
-using Application.Domain.Interface;
 using Application.Domain.Model;
+using Application.Infrastructure.Service;
 using System.Linq;
 using System.Threading.Tasks;
 using Raven.Client.Documents.Linq;
 using Raven.Client.Documents;
+using Application.Domain.Interface;
 
 namespace Application.Infrastructure.Repository
 {

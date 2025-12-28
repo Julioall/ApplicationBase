@@ -1,5 +1,6 @@
 using Application.Domain.Interface;
 using Application.Domain.Model.Notification;
+using Application.Infrastructure.Service;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
 using System.Linq;

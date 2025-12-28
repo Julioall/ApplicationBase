@@ -1,8 +1,8 @@
-using Application.Domain.Interface;
 using Application.Domain.Interface.Students;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.Students;
 using Application.Infrastructure.Indexes;
+using Application.Infrastructure.Service;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
 using System.Linq;
