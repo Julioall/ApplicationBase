@@ -375,6 +375,98 @@
 
 
 
+  <data name="WhatsAppProviderRequired" xml:space="preserve">
+    <value>Provedor do WhatsApp e obrigatorio.</value>
+  </data>
+  <data name="WhatsAppProviderInvalid" xml:space="preserve">
+    <value>Provedor do WhatsApp invalido.</value>
+  </data>
+  <data name="WhatsAppBaseUrlRequired" xml:space="preserve">
+    <value>Base URL do WhatsApp e obrigatoria.</value>
+  </data>
+  <data name="WhatsAppApiKeyRequired" xml:space="preserve">
+    <value>Chave de API do WhatsApp e obrigatoria.</value>
+  </data>
+  <data name="WhatsAppInstanceRequired" xml:space="preserve">
+    <value>Nome da instancia do WhatsApp e obrigatorio.</value>
+  </data>
+  <data name="WhatsAppPhoneRequired" xml:space="preserve">
+    <value>Numero de telefone de destino e obrigatorio.</value>
+  </data>
+  <data name="WhatsAppPhoneInvalid" xml:space="preserve">
+    <value>Numero de telefone de destino invalido.</value>
+  </data>
+  <data name="WhatsAppMessageRequired" xml:space="preserve">
+    <value>Mensagem do WhatsApp e obrigatoria.</value>
+  </data>
+  <data name="WhatsAppMessageTooLong" xml:space="preserve">
+    <value>Mensagem do WhatsApp muito longa.</value>
+  </data>
+  <data name="WhatsAppNotEnabled" xml:space="preserve">
+    <value>Servico de WhatsApp desativado.</value>
+  </data>
+  <data name="WhatsAppProviderNotSupported" xml:space="preserve">
+    <value>Provedor do WhatsApp nao suportado: {0}.</value>
+  </data>
+  <data name="WhatsAppBaseUrlMissing" xml:space="preserve">
+    <value>Base URL do WhatsApp nao configurada.</value>
+  </data>
+  <data name="WhatsAppApiKeyMissing" xml:space="preserve">
+    <value>Chave de API do WhatsApp nao configurada.</value>
+  </data>
+  <data name="WhatsAppInstanceMissing" xml:space="preserve">
+    <value>Nome da instancia do WhatsApp nao configurado.</value>
+  </data>
+  <data name="WhatsAppSendFailed" xml:space="preserve">
+    <value>Falha ao enviar mensagem WhatsApp. Codigo: {0}.</value>
+  </data>
+  <data name="WhatsAppApiKeyDecryptFailed" xml:space="preserve">
+    <value>Falha ao descriptografar chave de API do WhatsApp.</value>
+  </data>
+  <data name="WhatsAppTestSent" xml:space="preserve">
+    <value>Mensagem de teste do WhatsApp enviada.</value>
+  </data>
+
+  <data name="WhatsAppMaxUserInstancesInvalid" xml:space="preserve">
+    <value>Quantidade maxima de instancias por usuario deve ser maior que zero.</value>
+  </data>
+  <data name="WhatsAppInstanceNameRequired" xml:space="preserve">
+    <value>Nome da instancia e obrigatorio.</value>
+  </data>
+  <data name="WhatsAppInstanceNameTooLong" xml:space="preserve">
+    <value>Nome da instancia muito longo.</value>
+  </data>
+  <data name="WhatsAppOwnerRequired" xml:space="preserve">
+    <value>Usuario responsavel pela instancia e obrigatorio.</value>
+  </data>
+  <data name="WhatsAppUserQuotaExceeded" xml:space="preserve">
+    <value>Voce atingiu o limite de {0} instancia(s) de WhatsApp.</value>
+  </data>
+  <data name="WhatsAppInstanceIdRequired" xml:space="preserve">
+    <value>Id da instancia e obrigatorio.</value>
+  </data>
+  <data name="WhatsAppInstanceNotFound" xml:space="preserve">
+    <value>Instancia de WhatsApp {0} nao encontrada.</value>
+  </data>
+  <data name="WhatsAppInstanceForbidden" xml:space="preserve">
+    <value>Acesso a esta instancia de WhatsApp nao permitido.</value>
+  </data>
+  <data name="WhatsAppInstanceInactive" xml:space="preserve">
+    <value>Esta instancia de WhatsApp esta inativa.</value>
+  </data>
+  <data name="WhatsAppInstanceProvisionFailed" xml:space="preserve">
+    <value>Nao foi possivel provisionar a instancia de WhatsApp.</value>
+  </data>
+  <data name="WhatsAppQrFetchFailed" xml:space="preserve">
+    <value>Nao foi possivel obter o QR code do WhatsApp.</value>
+  </data>
+  <data name="WhatsAppStatusFetchFailed" xml:space="preserve">
+    <value>Nao foi possivel obter o status do WhatsApp.</value>
+  </data>
+  <data name="WhatsAppIntegrationMissing" xml:space="preserve">
+    <value>Integracao do WhatsApp nao configurada.</value>
+  </data>
+
 </root>
 
 

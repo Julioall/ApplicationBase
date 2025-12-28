@@ -4,6 +4,7 @@ using Application.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Application.Domain.Model;
 
 namespace Application.Api.Controllers
 {
@@ -58,6 +59,7 @@ namespace Application.Api.Controllers
             await _notificationService.DeleteAsync(id, cancellationToken);
             return NoContent();
         }
+
     }
 
     public class MarkNotificationsRequest

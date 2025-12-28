@@ -6,7 +6,14 @@ import { Subscription, interval } from 'rxjs';
 import { ThemeService } from './service/theme/theme.service';
 import { UserService } from './service/user/user.service';
 import { User } from './model/User';
-import { ADMIN_PERMISSION, MANAGE_STUDENTS_PERMISSION, MANAGE_EDUCATION_PERMISSION, VIEW_STUDENTS_PERMISSION, VIEW_EDUCATION_PERMISSION } from './model/permissions';
+import {
+  ADMIN_PERMISSION,
+  MANAGE_SERVICES_PERMISSION,
+  MANAGE_STUDENTS_PERMISSION,
+  MANAGE_EDUCATION_PERMISSION,
+  VIEW_STUDENTS_PERMISSION,
+  VIEW_EDUCATION_PERMISSION,
+} from './model/permissions';
 import { Notification as AppNotification } from './model/notification';
 import { NotificationApiService } from './service/notification/notification-api.service';
 
@@ -294,8 +301,14 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   isAdminShortcutVisible(link: NavItem): boolean {
+    if (link.path === '/admin/services') {
+      return this.authService.hasPermission(MANAGE_SERVICES_PERMISSION);
+    }
     if (link.path === '/students') {
       return this.canAccessStudents;
+    }
+    if (link.path === '/admin/users' || link.path === '/support') {
+      return this.hasAdminAccess;
     }
     return true;
   }

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { AdminRoutingModule } from './admin-routing.module';
 import { AdminUsersComponent } from './admin-users.component';
@@ -10,6 +10,6 @@ import { AdminEmailSettingsComponent } from './admin-email-settings.component';
 
 @NgModule({
   declarations: [AdminUsersComponent, AdminServicesComponent, AdminUserDetailComponent, AdminEmailSettingsComponent],
-  imports: [CommonModule, FormsModule, AdminRoutingModule, TranslateModule]
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, AdminRoutingModule, TranslateModule]
 })
 export class AdminModule { }

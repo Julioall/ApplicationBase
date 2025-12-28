@@ -239,6 +239,55 @@
       "recoveryGeneratedAndSent": "Code generated and sent by email."
     }
   },
+  "profileWhatsApp": {
+    "title": "My WhatsApp instances",
+    "subtitle": "Connect your personal WhatsApp numbers for direct messaging.",
+    "quota": "Limit: {{max}} instance(s)",
+    "labels": {
+      "displayName": "Display name"
+    },
+    "placeholders": {
+      "displayName": "My WhatsApp"
+    },
+    "actions": {
+      "create": "Create instance",
+      "creating": "Creating..."
+    },
+    "table": {
+      "name": "Name",
+      "status": "Status",
+      "createdAt": "Created",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "disabled": "Disabled",
+      "error": "Error"
+    },
+    "state": {
+      "empty": "You do not have WhatsApp instances yet.",
+      "loading": "Loading instances..."
+    },
+    "qr": {
+      "title": "Pair {{name}}",
+      "empty": "QR code unavailable.",
+      "alt": "WhatsApp QR code"
+    },
+    "messages": {
+      "settingsLoadError": "Could not load WhatsApp settings.",
+      "instancesLoadError": "Could not load your WhatsApp instances.",
+      "nameRequired": "Enter a display name.",
+      "instanceCreated": "WhatsApp instance created.",
+      "instanceCreateError": "Could not create WhatsApp instance.",
+      "quotaReached": "You reached your instance limit.",
+      "statusRefreshError": "Could not refresh status.",
+      "qrLoadError": "Could not load QR code.",
+      "instanceDeactivated": "WhatsApp instance deactivated.",
+      "instanceDeactivateError": "Could not deactivate WhatsApp instance."
+    }
+  },
   "adminEmail": {
     "title": "Email service",
     "subtitle": "Configure the email service used for password recovery and automated communications.",
@@ -303,6 +352,78 @@
       "smtpPasswordRequiredTest": "Enter the SMTP password to run the test.",
       "testSuccess": "Test email sent (check your inbox).",
       "testError": "Failed to send test email."
+    }
+  },
+  "adminWhatsApp": {
+    "title": "WhatsApp instances",
+    "subtitle": "Manage shared WhatsApp instances for institutional messaging.",
+    "sections": {
+      "settings": "Governance",
+      "instances": "Instances",
+      "personal": "My instances",
+      "shared": "Shared instances"
+    },
+    "quota": "Limit: {{max}} instance(s)",
+    "labels": {
+      "maxUserInstances": "Max user instances",
+      "displayName": "Display name",
+      "phoneNumber": "Phone number"
+    },
+    "helpers": {
+      "maxUserInstances": "Limit the number of private instances each user can create."
+    },
+    "placeholders": {
+      "displayName": "Admissions team",
+      "search": "Search by name or owner",
+      "phoneNumber": "+55 11 99999-9999"
+    },
+    "actions": {
+      "save": "Save",
+      "saving": "Saving...",
+      "create": "Create instance",
+      "creating": "Creating...",
+      "search": "Search"
+    },
+    "table": {
+      "name": "Name",
+      "status": "Status",
+      "owner": "Owner",
+      "createdAt": "Created",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "disabled": "Disabled",
+      "error": "Error"
+    },
+    "state": {
+      "empty": "No WhatsApp instances yet.",
+      "loading": "Loading instances..."
+    },
+    "qr": {
+      "title": "Pair {{name}}",
+      "empty": "QR code unavailable.",
+      "alt": "WhatsApp QR code"
+    },
+    "messages": {
+      "settingsLoadError": "Could not load WhatsApp settings.",
+      "settingsSaved": "Settings saved successfully.",
+      "settingsSaveError": "Error saving WhatsApp settings.",
+      "settingsInvalid": "Check the WhatsApp settings.",
+      "instancesLoadError": "Could not load WhatsApp instances.",
+      "instanceNameRequired": "Enter a display name.",
+      "phoneRequired": "Enter the phone number with country code.",
+      "instanceCreated": "WhatsApp instance created.",
+      "instanceCreateError": "Could not create WhatsApp instance.",
+      "quotaReached": "You reached your instance limit.",
+      "instanceRenamed": "WhatsApp instance renamed.",
+      "instanceRenameError": "Could not rename WhatsApp instance.",
+      "statusRefreshError": "Could not refresh status.",
+      "qrLoadError": "Could not load QR code.",
+      "instanceDeactivated": "WhatsApp instance deactivated.",
+      "instanceDeactivateError": "Could not deactivate WhatsApp instance."
     }
   },
   "adminEmailSettings": {

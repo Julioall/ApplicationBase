@@ -43,7 +43,7 @@
         </div>
       </div>
 
-      <div class="nav-footer" *ngIf="hasAdminAccess">
+      <div class="nav-footer">
         <div class="nav-section" [class.is-collapsed]="!sectionState.admin">
           <button class="section-toggle" type="button" (click)="toggleSection('admin')">
             <span class="section-label">{{ 'home.settings' | translate }}</span>

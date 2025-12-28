@@ -377,6 +377,99 @@
   </data>
 
 
+  <data name="WhatsAppProviderRequired" xml:space="preserve">
+    <value>WhatsApp provider is required.</value>
+  </data>
+  <data name="WhatsAppProviderInvalid" xml:space="preserve">
+    <value>WhatsApp provider is invalid.</value>
+  </data>
+  <data name="WhatsAppBaseUrlRequired" xml:space="preserve">
+    <value>WhatsApp base URL is required.</value>
+  </data>
+  <data name="WhatsAppApiKeyRequired" xml:space="preserve">
+    <value>WhatsApp API key is required.</value>
+  </data>
+  <data name="WhatsAppInstanceRequired" xml:space="preserve">
+    <value>WhatsApp instance name is required.</value>
+  </data>
+  <data name="WhatsAppPhoneRequired" xml:space="preserve">
+    <value>Destination phone number is required.</value>
+  </data>
+  <data name="WhatsAppPhoneInvalid" xml:space="preserve">
+    <value>Destination phone number is invalid.</value>
+  </data>
+  <data name="WhatsAppMessageRequired" xml:space="preserve">
+    <value>Message body is required.</value>
+  </data>
+  <data name="WhatsAppMessageTooLong" xml:space="preserve">
+    <value>Message body is too long.</value>
+  </data>
+  <data name="WhatsAppNotEnabled" xml:space="preserve">
+    <value>WhatsApp service is disabled.</value>
+  </data>
+  <data name="WhatsAppProviderNotSupported" xml:space="preserve">
+    <value>WhatsApp provider not supported: {0}.</value>
+  </data>
+  <data name="WhatsAppBaseUrlMissing" xml:space="preserve">
+    <value>WhatsApp base URL is not configured.</value>
+  </data>
+  <data name="WhatsAppApiKeyMissing" xml:space="preserve">
+    <value>WhatsApp API key is not configured.</value>
+  </data>
+  <data name="WhatsAppInstanceMissing" xml:space="preserve">
+    <value>WhatsApp instance name is not configured.</value>
+  </data>
+  <data name="WhatsAppSendFailed" xml:space="preserve">
+    <value>Failed to send WhatsApp message. Status code: {0}.</value>
+  </data>
+  <data name="WhatsAppApiKeyDecryptFailed" xml:space="preserve">
+    <value>Failed to decrypt WhatsApp API key. Reconfigure credentials.</value>
+  </data>
+  <data name="WhatsAppTestSent" xml:space="preserve">
+    <value>WhatsApp test message sent.</value>
+  </data>
+
+
+
+  <data name="WhatsAppMaxUserInstancesInvalid" xml:space="preserve">
+    <value>Max user instances must be greater than zero.</value>
+  </data>
+  <data name="WhatsAppInstanceNameRequired" xml:space="preserve">
+    <value>Instance name is required.</value>
+  </data>
+  <data name="WhatsAppInstanceNameTooLong" xml:space="preserve">
+    <value>Instance name is too long.</value>
+  </data>
+  <data name="WhatsAppOwnerRequired" xml:space="preserve">
+    <value>Instance owner is required.</value>
+  </data>
+  <data name="WhatsAppUserQuotaExceeded" xml:space="preserve">
+    <value>You reached the limit of {0} WhatsApp instance(s).</value>
+  </data>
+  <data name="WhatsAppInstanceIdRequired" xml:space="preserve">
+    <value>Instance id is required.</value>
+  </data>
+  <data name="WhatsAppInstanceNotFound" xml:space="preserve">
+    <value>WhatsApp instance {0} not found.</value>
+  </data>
+  <data name="WhatsAppInstanceForbidden" xml:space="preserve">
+    <value>Access to this WhatsApp instance is not allowed.</value>
+  </data>
+  <data name="WhatsAppInstanceInactive" xml:space="preserve">
+    <value>This WhatsApp instance is inactive.</value>
+  </data>
+  <data name="WhatsAppInstanceProvisionFailed" xml:space="preserve">
+    <value>Could not provision WhatsApp instance.</value>
+  </data>
+  <data name="WhatsAppQrFetchFailed" xml:space="preserve">
+    <value>Could not fetch WhatsApp QR code.</value>
+  </data>
+  <data name="WhatsAppStatusFetchFailed" xml:space="preserve">
+    <value>Could not fetch WhatsApp status.</value>
+  </data>
+  <data name="WhatsAppIntegrationMissing" xml:space="preserve">
+    <value>WhatsApp integration is not configured.</value>
+  </data>
 
 </root>
 

@@ -13,7 +13,7 @@ const routes: Routes = [
   { path: 'profile', loadChildren: () => import('./page/profile/profile.module').then(m => m.ProfileModule), canActivate: [AuthGuard, PermissionGuard], data: { permissions: ['view:profile'] } },
   { path: 'students', loadChildren: () => import('./modules/students/students.module').then(m => m.StudentsModule), canActivate: [AuthGuard, PermissionGuard], data: { permissions: ['view:students'] } },
   { path: 'education', loadChildren: () => import('./modules/education/education.module').then(m => m.EducationModule), canActivate: [AuthGuard, PermissionGuard], data: { permissions: ['view:education'] } },
-  { path: 'admin', loadChildren: () => import('./page/admin/admin.module').then(m => m.AdminModule), canActivate: [AuthGuard, PermissionGuard], data: { permissions: ['manage:users'] } },
+  { path: 'admin', loadChildren: () => import('./page/admin/admin.module').then(m => m.AdminModule), canActivate: [AuthGuard, PermissionGuard], data: { permissions: ['manage:services', 'manage:users'] } },
   { path: 'auth', component: AuthComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },

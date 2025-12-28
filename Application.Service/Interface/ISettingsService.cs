@@ -8,5 +8,7 @@ namespace Application.Service.Interface
         Task<Configurations> GetOrCreateAsync();
         Task<EmailSettings> GetEmailAsync();
         Task<EmailSettings> SaveEmailAsync(EmailSettings settings);
+        Task<WhatsAppSettings> GetWhatsAppAsync();
+        Task<WhatsAppSettings> SaveWhatsAppAsync(WhatsAppSettings settings);
     }
 }

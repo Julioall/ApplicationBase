@@ -14,6 +14,9 @@ namespace Application.Service
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ISettingsService, SettingsService>();
             services.AddScoped<ISecretEncryptionService, SecretEncryptionService>();
+            services.AddHttpClient<EvolutionWhatsAppInstanceProvider>();
+            services.AddScoped<IWhatsAppInstanceProvider, EvolutionWhatsAppInstanceProvider>();
+            services.AddScoped<IWhatsAppInstanceService, WhatsAppInstanceService>();
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<IEducationService, EducationService>();
             services.AddScoped<INotificationService, NotificationService>();

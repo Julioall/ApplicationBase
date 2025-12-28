@@ -69,12 +69,21 @@ namespace Application.Tests.Controllers
         {
             public EmailSettings Current { get; set; } = new EmailSettings();
             public EmailSettings? Saved { get; private set; }
+            public WhatsAppSettings WhatsAppCurrent { get; set; } = new WhatsAppSettings();
 
             public Task<Configurations> GetOrCreateAsync() => Task.FromResult(new Configurations { Email = Current });
             public Task<EmailSettings> GetEmailAsync() => Task.FromResult(Current);
             public Task<EmailSettings> SaveEmailAsync(EmailSettings settings)
             {
                 Saved = settings;
+                return Task.FromResult(settings);
+            }
+
+            public Task<WhatsAppSettings> GetWhatsAppAsync() => Task.FromResult(WhatsAppCurrent);
+
+            public Task<WhatsAppSettings> SaveWhatsAppAsync(WhatsAppSettings settings)
+            {
+                WhatsAppCurrent = settings;
                 return Task.FromResult(settings);
             }
         }

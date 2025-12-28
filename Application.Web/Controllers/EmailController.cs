@@ -76,7 +76,7 @@ namespace Application.Api.Controllers
                 ?? User?.FindFirstValue(ClaimTypes.Name);
         }
 
-        [Authorize]
+        [Authorize(Policy = ApplicationPermissions.ManageEmail)]
         [HttpGet("settings")]
         public async Task<ActionResult<EmailSettings>> GetSettings()
         {
@@ -84,7 +84,7 @@ namespace Application.Api.Controllers
             return Ok(email);
         }
 
-        [Authorize]
+        [Authorize(Policy = ApplicationPermissions.ManageEmail)]
         [HttpPut("settings")]
         public async Task<ActionResult> UpdateSettings([FromBody] EmailSettings settings)
         {
@@ -112,7 +112,7 @@ namespace Application.Api.Controllers
             return Ok(saved);
         }
 
-        [Authorize]
+        [Authorize(Policy = ApplicationPermissions.ManageEmail)]
         [HttpPost("test")]
         public async Task<ActionResult> SendTest([FromBody] SendResetEmailDto? request)
         {

@@ -33,6 +33,7 @@ namespace Application.Infrastructure
             services.TryAddScoped<IEducationRepository, EducationRepository>();
             services.TryAddScoped<IEducationImportRepository, EducationImportRepository>();
             services.TryAddScoped<INotificationRepository, NotificationRepository>();
+            services.TryAddScoped<IWhatsAppInstanceRepository, WhatsAppInstanceRepository>();
 
             return services;
         }

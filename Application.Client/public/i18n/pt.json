@@ -239,6 +239,55 @@
       "recoveryGeneratedAndSent": "Código gerado e enviado por e-mail."
     }
   },
+  "profileWhatsApp": {
+    "title": "Minhas instancias de WhatsApp",
+    "subtitle": "Conecte seus numeros pessoais de WhatsApp para mensagens diretas.",
+    "quota": "Limite: {{max}} instancia(s)",
+    "labels": {
+      "displayName": "Nome de exibicao"
+    },
+    "placeholders": {
+      "displayName": "Meu WhatsApp"
+    },
+    "actions": {
+      "create": "Criar instancia",
+      "creating": "Criando..."
+    },
+    "table": {
+      "name": "Nome",
+      "status": "Status",
+      "createdAt": "Criado em",
+      "actions": "Acoes"
+    },
+    "status": {
+      "pending": "Pendente",
+      "connected": "Conectado",
+      "disconnected": "Desconectado",
+      "disabled": "Desativado",
+      "error": "Erro"
+    },
+    "state": {
+      "empty": "Voce ainda nao tem instancias de WhatsApp.",
+      "loading": "Carregando instancias..."
+    },
+    "qr": {
+      "title": "Parear {{name}}",
+      "empty": "QR code indisponivel.",
+      "alt": "QR code do WhatsApp"
+    },
+    "messages": {
+      "settingsLoadError": "Nao foi possivel carregar as configuracoes de WhatsApp.",
+      "instancesLoadError": "Nao foi possivel carregar suas instancias de WhatsApp.",
+      "nameRequired": "Informe um nome de exibicao.",
+      "instanceCreated": "Instancia de WhatsApp criada.",
+      "instanceCreateError": "Nao foi possivel criar a instancia de WhatsApp.",
+      "quotaReached": "Voce atingiu o limite de instancias.",
+      "statusRefreshError": "Nao foi possivel atualizar o status.",
+      "qrLoadError": "Nao foi possivel carregar o QR code.",
+      "instanceDeactivated": "Instancia de WhatsApp desativada.",
+      "instanceDeactivateError": "Nao foi possivel desativar a instancia de WhatsApp."
+    }
+  },
   "adminEmail": {
     "title": "Serviço de e-mail",
     "subtitle": "Configuração do serviço de envio de e-mails para recuperação de senha e comunicações automáticas.",
@@ -303,6 +352,78 @@
       "smtpPasswordRequiredTest": "Informe a senha do SMTP para testar.",
       "testSuccess": "E-mail de teste enviado (verifique a caixa de entrada).",
       "testError": "Falha ao enviar e-mail de teste."
+    }
+  },
+  "adminWhatsApp": {
+    "title": "Instancias de WhatsApp",
+    "subtitle": "Gerencie instancias compartilhadas de WhatsApp para uso institucional.",
+    "sections": {
+      "settings": "Governanca",
+      "instances": "Instancias",
+      "personal": "Minhas instancias",
+      "shared": "Instancias compartilhadas"
+    },
+    "quota": "Limite: {{max}} instancia(s)",
+    "labels": {
+      "maxUserInstances": "Maximo de instancias por usuario",
+      "displayName": "Nome de exibicao",
+      "phoneNumber": "Numero de telefone"
+    },
+    "helpers": {
+      "maxUserInstances": "Limite de instancias privadas por usuario."
+    },
+    "placeholders": {
+      "displayName": "Equipe de atendimento",
+      "search": "Buscar por nome ou dono",
+      "phoneNumber": "+55 11 99999-9999"
+    },
+    "actions": {
+      "save": "Salvar",
+      "saving": "Salvando...",
+      "create": "Criar instancia",
+      "creating": "Criando...",
+      "search": "Buscar"
+    },
+    "table": {
+      "name": "Nome",
+      "status": "Status",
+      "owner": "Dono",
+      "createdAt": "Criado em",
+      "actions": "Acoes"
+    },
+    "status": {
+      "pending": "Pendente",
+      "connected": "Conectado",
+      "disconnected": "Desconectado",
+      "disabled": "Desativado",
+      "error": "Erro"
+    },
+    "state": {
+      "empty": "Nenhuma instancia de WhatsApp ainda.",
+      "loading": "Carregando instancias..."
+    },
+    "qr": {
+      "title": "Parear {{name}}",
+      "empty": "QR code indisponivel.",
+      "alt": "QR code do WhatsApp"
+    },
+    "messages": {
+      "settingsLoadError": "Nao foi possivel carregar as configuracoes de WhatsApp.",
+      "settingsSaved": "Configuracoes salvas com sucesso.",
+      "settingsSaveError": "Erro ao salvar configuracoes de WhatsApp.",
+      "settingsInvalid": "Verifique as configuracoes de WhatsApp.",
+      "instancesLoadError": "Nao foi possivel carregar as instancias de WhatsApp.",
+      "instanceNameRequired": "Informe um nome de exibicao.",
+      "phoneRequired": "Informe o numero com codigo do pais e DDD.",
+      "instanceCreated": "Instancia de WhatsApp criada.",
+      "instanceCreateError": "Nao foi possivel criar a instancia de WhatsApp.",
+      "quotaReached": "Voce atingiu o limite de instancias.",
+      "instanceRenamed": "Instancia de WhatsApp renomeada.",
+      "instanceRenameError": "Nao foi possivel renomear a instancia de WhatsApp.",
+      "statusRefreshError": "Nao foi possivel atualizar o status.",
+      "qrLoadError": "Nao foi possivel carregar o QR code.",
+      "instanceDeactivated": "Instancia de WhatsApp desativada.",
+      "instanceDeactivateError": "Nao foi possivel desativar a instancia de WhatsApp."
     }
   },
   "adminEmailSettings": {

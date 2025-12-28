@@ -23,13 +23,14 @@ namespace Application.Service.Service
         public async Task<Configurations> GetOrCreateAsync()
         {
             var cfg = await _settingsRepository.GetAsync();
-            if (cfg != null && cfg.Email != null)
+            if (cfg != null && cfg.Email != null && cfg.WhatsApp != null)
             {
                 return cfg;
             }
 
             var created = cfg ?? new Configurations();
             created.Email ??= new EmailSettings();
+            created.WhatsApp ??= new WhatsAppSettings();
             await _settingsRepository.SaveAsync(created);
             return created;
         }
@@ -82,6 +83,22 @@ namespace Application.Service.Service
 
             // return plain text back to caller (do not re-encrypt)
             return settings ?? new EmailSettings();
+        }
+
+        public async Task<WhatsAppSettings> GetWhatsAppAsync()
+        {
+            var cfg = await GetOrCreateAsync();
+            return cfg.WhatsApp ?? new WhatsAppSettings();
+        }
+
+        public async Task<WhatsAppSettings> SaveWhatsAppAsync(WhatsAppSettings settings)
+        {
+            var cfg = await GetOrCreateAsync();
+            var whatsapp = settings ?? new WhatsAppSettings();
+            cfg.WhatsApp = whatsapp;
+            await _settingsRepository.SaveAsync(cfg);
+
+            return settings ?? new WhatsAppSettings();
         }
     }
 }

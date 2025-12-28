@@ -167,6 +167,13 @@ Application.Test/                 # Testes de controllers, services, validators,
 ## Prompt base
 Voce e o Codex trabalhando no monorepo ApplicationBase (Angular 18 + @ngx-translate no front e API .NET 8 com RavenDB). Siga estas regras em qualquer implementacao:
 
+Docker (ambiente padrao)
+- Use `docker compose up -d` para subir o stack completo. A API serve o build Angular como arquivos estaticos.
+- Portas locais: API `http://localhost:5095` (container `app-api`), RavenDB `https://localhost:8081` (container `raven-db`), Evolution API `http://localhost:8082` (container `evolution-api`).
+- Variaveis do container `app-api` estao em `docker-compose.yml` (JWT_*, APP_SECRET_ENCRYPTION_KEY, RAVENDBSETTINGS_*, EVOLUTION_API_*). Ajuste valores ali, nao no `launchSettings.json`.
+- RavenDB roda em modo secured e usa certificado montado de `./certs` em `/certs` dentro dos containers. Se precisar acessar fora do Docker, instale o certificado localmente.
+- Logs: `docker compose logs -f app-api` para API; `docker compose logs -f raven-db` para o banco.
+
 Front-end (Application.Client)
 - Sempre internacionalize: use o pipe/servico `@ngx-translate/core`; todas as strings devem virar chaves em `public/i18n/en.json` e `public/i18n/pt.json` (defaultLanguage = en, fallback configurado). Evite textos literais em templates/TS.
 - Notificacoes: nunca use alert/snackbar generico. Use `NotificationService` (`showSuccess|showError|showWarning|showInfo`) que renderiza os toasts via `app-toast-container`.
