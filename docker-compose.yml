@@ -71,8 +71,8 @@ services:
       - "8082:8080"
     environment:
       AUTHENTICATION_API_KEY: "changeme-evolution-key"
-      DATABASE_PROVIDER: "mysql"
-      DATABASE_CONNECTION_URI: "mysql://evolution:evolution@evolution-db:3306/evolution"
+      DATABASE_PROVIDER: "postgresql"
+      DATABASE_CONNECTION_URI: "postgresql://evolution:evolution@evolution-db:5432/evolution"
       DATABASE_CONNECTION_CLIENT_NAME: "evolution_exchange"
       CACHE_REDIS_ENABLED: "false"
     healthcheck:
@@ -90,23 +90,22 @@ services:
       evolution-db:
         condition: service_healthy
 
-  # MySQL for Evolution API
+  # Postgres for Evolution API
   evolution-db:
-    image: mysql:8.0
+    image: postgres:16
     container_name: evolution-db
     environment:
-      MYSQL_DATABASE: "evolution"
-      MYSQL_USER: "evolution"
-      MYSQL_PASSWORD: "evolution"
-      MYSQL_ROOT_PASSWORD: "root"
+      POSTGRES_DB: "evolution"
+      POSTGRES_USER: "evolution"
+      POSTGRES_PASSWORD: "evolution"
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -proot"]
+      test: ["CMD-SHELL", "pg_isready -U evolution -d evolution"]
       interval: 10s
       timeout: 5s
       retries: 15
       start_period: 20s
     volumes:
-      - evolution-mysql:/var/lib/mysql
+      - evolution-postgres:/var/lib/postgresql/data
     networks:
       - backend-network
 
@@ -118,4 +117,4 @@ volumes:
   ravendb-data:
   evolution-store:
   evolution-instances:
-  evolution-mysql:
+  evolution-postgres:

@@ -10,5 +10,6 @@ namespace Application.Domain.Interface
         Task<int> CountUserInstancesAsync(string ownerUserId);
         Task CreateAsync(WhatsAppInstance instance);
         Task UpdateAsync(WhatsAppInstance instance);
+        Task DeleteAsync(string id);
     }
 }

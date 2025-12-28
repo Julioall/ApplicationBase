@@ -59,5 +59,11 @@ namespace Application.Infrastructure.Repository
             await _serviceRavenDb.AsyncSession.StoreAsync(instance);
             await _serviceRavenDb.AsyncSession.SaveChangesAsync();
         }
+
+        public async Task DeleteAsync(string id)
+        {
+            _serviceRavenDb.AsyncSession.Delete(id);
+            await _serviceRavenDb.AsyncSession.SaveChangesAsync();
+        }
     }
 }

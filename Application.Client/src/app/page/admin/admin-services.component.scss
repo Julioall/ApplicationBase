@@ -86,6 +86,10 @@
   flex-wrap: wrap;
 }
 
+.section-bar.whatsapp-actions {
+  justify-content: flex-end;
+}
+
 .section-lead {
   display: flex;
   flex-direction: column;
@@ -162,6 +166,12 @@
       opacity: 0.85;
       cursor: not-allowed;
     }
+  }
+
+  .helper {
+    margin: 0;
+    color: var(--text-subtle);
+    font-size: var(--font-size-sm);
   }
 }
 
@@ -259,11 +269,9 @@
   align-items: center;
   padding: var(--space-2);
   border-radius: var(--radius-md);
+  color: var(--text-primary);
 }
 
-.instances-table.personal .instance-row {
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-}
 
 .instance-row.header {
   font-weight: var(--font-weight-semibold);
@@ -285,6 +293,20 @@
   justify-content: flex-end;
   gap: var(--space-1);
   flex-wrap: wrap;
+}
+
+.instance-row .btn.danger {
+  background: var(--danger);
+  color: var(--text-inverse);
+  border-color: transparent;
+
+  &:hover {
+    background: var(--danger);
+    color: var(--text-inverse);
+    filter: brightness(1.06);
+    box-shadow: var(--shadow-soft);
+    transform: translateY(-1px);
+  }
 }
 
 .instance-row input {
@@ -363,6 +385,12 @@
   border-radius: var(--radius-md);
 }
 
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
 .checkbox-inline {
   display: inline-flex;
   align-items: center;
@@ -372,6 +400,66 @@
     width: auto;
     padding: 0;
   }
+}
+
+.toggle-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.toggle-track {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-full);
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  background: var(--text-subtle);
+  transition: transform var(--transition-fast), background var(--transition-fast);
+}
+
+.toggle-input:checked + .toggle-track {
+  background: var(--accent-soft);
+  border-color: var(--accent-strong);
+}
+
+.toggle-input:checked + .toggle-track .toggle-thumb {
+  transform: translateX(20px);
+  background: var(--accent-strong);
+}
+
+.toggle-input:focus-visible + .toggle-track {
+  box-shadow: var(--elevation-focus);
+}
+
+.toggle-input:disabled + .toggle-track {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.toggle-label {
+  color: var(--text-subtle);
+  font-size: var(--font-size-sm);
 }
 
 .send-test {

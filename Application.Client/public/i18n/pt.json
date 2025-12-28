@@ -242,7 +242,7 @@
   "profileWhatsApp": {
     "title": "Minhas instancias de WhatsApp",
     "subtitle": "Conecte seus numeros pessoais de WhatsApp para mensagens diretas.",
-    "quota": "Limite: {{max}} instancia(s)",
+    "quota": "Limite: {{max}} instancia(s) pessoais",
     "labels": {
       "displayName": "Nome de exibicao"
     },
@@ -273,6 +273,7 @@
     "qr": {
       "title": "Parear {{name}}",
       "empty": "QR code indisponivel.",
+      "loading": "Carregando QR...",
       "alt": "QR code do WhatsApp"
     },
     "messages": {
@@ -358,8 +359,10 @@
     "title": "Instancias de WhatsApp",
     "subtitle": "Gerencie instancias compartilhadas de WhatsApp para uso institucional.",
     "sections": {
+      "manage": "Gerenciar WhatsApp",
       "settings": "Governanca",
       "instances": "Instancias",
+      "create": "Criar instancia",
       "personal": "Minhas instancias",
       "shared": "Instancias compartilhadas"
     },
@@ -367,10 +370,13 @@
     "labels": {
       "maxUserInstances": "Maximo de instancias por usuario",
       "displayName": "Nome de exibicao",
-      "phoneNumber": "Numero de telefone"
+      "phoneNumber": "Numero de telefone",
+      "sharedInstance": "Instancia compartilhada"
     },
     "helpers": {
-      "maxUserInstances": "Limite de instancias privadas por usuario."
+      "maxUserInstances": "Limite de instancias privadas por usuario.",
+      "quotaReached": "Limite de instancias pessoais atingido. Para obter mais instancias contate o administrador.",
+      "sharedInstance": "Marque esta instancia para uso compartilhado."
     },
     "placeholders": {
       "displayName": "Equipe de atendimento",
@@ -378,15 +384,19 @@
       "phoneNumber": "+55 11 99999-9999"
     },
     "actions": {
+      "edit": "Editar WhatsApp",
+      "cancel": "Cancelar",
       "save": "Salvar",
       "saving": "Salvando...",
       "create": "Criar instancia",
       "creating": "Criando...",
-      "search": "Buscar"
+      "search": "Buscar",
+      "stopQr": "Encerrar QR"
     },
     "table": {
       "name": "Nome",
       "status": "Status",
+      "phone": "Numero",
       "owner": "Dono",
       "createdAt": "Criado em",
       "actions": "Acoes"
@@ -418,6 +428,10 @@
       "instanceCreated": "Instancia de WhatsApp criada.",
       "instanceCreateError": "Nao foi possivel criar a instancia de WhatsApp.",
       "quotaReached": "Voce atingiu o limite de instancias.",
+      "instanceDisconnected": "Instancia de WhatsApp desconectada.",
+      "instanceDisconnectError": "Nao foi possivel desconectar a instancia de WhatsApp.",
+      "instanceDeleted": "Instancia de WhatsApp excluida.",
+      "instanceDeleteError": "Nao foi possivel excluir a instancia de WhatsApp.",
       "instanceRenamed": "Instancia de WhatsApp renomeada.",
       "instanceRenameError": "Nao foi possivel renomear a instancia de WhatsApp.",
       "statusRefreshError": "Nao foi possivel atualizar o status.",

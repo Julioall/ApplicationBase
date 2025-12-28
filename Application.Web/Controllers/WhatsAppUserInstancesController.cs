@@ -85,12 +85,21 @@ namespace Application.Api.Controllers
             return Ok(new WhatsAppInstanceStatusResponse { Status = instance.Status, IsActive = instance.IsActive });
         }
 
-        [HttpPost("{id}/deactivate")]
+        [HttpPost("{id}/disconnect")]
         [ProducesResponseType(typeof(WhatsAppInstanceResponse), StatusCodes.Status200OK)]
-        public async Task<ActionResult<WhatsAppInstanceResponse>> Deactivate(string id, CancellationToken cancellationToken = default)
+        public async Task<ActionResult<WhatsAppInstanceResponse>> Disconnect(string id, CancellationToken cancellationToken = default)
         {
             var ownerId = await GetOwnerUserIdAsync();
-            var instance = await _instanceService.DeactivateInstanceAsync(ownerId, id, false, cancellationToken);
+            var instance = await _instanceService.DisconnectInstanceAsync(ownerId, id, false, cancellationToken);
+            return Ok(MapUserResponse(instance));
+        }
+
+        [HttpPost("{id}/deactivate")]
+        [ProducesResponseType(typeof(WhatsAppInstanceResponse), StatusCodes.Status200OK)]
+        public async Task<ActionResult<WhatsAppInstanceResponse>> Delete(string id, CancellationToken cancellationToken = default)
+        {
+            var ownerId = await GetOwnerUserIdAsync();
+            var instance = await _instanceService.DeleteInstanceAsync(ownerId, id, false, cancellationToken);
             return Ok(MapUserResponse(instance));
         }
 
@@ -141,7 +150,9 @@ namespace Application.Api.Controllers
                 DisplayName = instance.DisplayName,
                 Status = instance.Status,
                 IsActive = instance.IsActive,
-                CreatedAt = instance.CreatedAt
+                CreatedAt = instance.CreatedAt,
+                OwnerUserId = instance.OwnerUserId,
+                PhoneNumber = instance.PhoneNumber
             };
         }
     }

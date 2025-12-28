@@ -70,19 +70,24 @@ namespace Application.Service.Service
             return instance;
         }
 
-        public async Task<WhatsAppInstance> DeactivateInstanceAsync(string ownerUserId, string id, bool isAdminContext, CancellationToken cancellationToken = default)
+        public async Task<WhatsAppInstance> DisconnectInstanceAsync(string ownerUserId, string id, bool isAdminContext, CancellationToken cancellationToken = default)
         {
             var instance = await GetInstanceForContextAsync(ownerUserId, id, isAdminContext);
-            if (!instance.IsActive)
-            {
-                return instance;
-            }
+            EnsureActive(instance);
 
-            await _provider.DeactivateAsync(instance, cancellationToken);
-            instance.IsActive = false;
-            instance.Status = WhatsAppInstanceStatus.Disabled;
+            await _provider.DisconnectAsync(instance, cancellationToken);
+            instance.Status = WhatsAppInstanceStatus.Disconnected;
             instance.UpdatedAt = DateTime.UtcNow;
             await _repository.UpdateAsync(instance);
+            return instance;
+        }
+
+        public async Task<WhatsAppInstance> DeleteInstanceAsync(string ownerUserId, string id, bool isAdminContext, CancellationToken cancellationToken = default)
+        {
+            var instance = await GetInstanceForContextAsync(ownerUserId, id, isAdminContext);
+
+            await _provider.DeactivateAsync(instance, cancellationToken);
+            await _repository.DeleteAsync(instance.Id);
             return instance;
         }
 

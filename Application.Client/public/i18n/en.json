@@ -242,7 +242,7 @@
   "profileWhatsApp": {
     "title": "My WhatsApp instances",
     "subtitle": "Connect your personal WhatsApp numbers for direct messaging.",
-    "quota": "Limit: {{max}} instance(s)",
+    "quota": "Limit: {{max}} personal instance(s)",
     "labels": {
       "displayName": "Display name"
     },
@@ -273,6 +273,7 @@
     "qr": {
       "title": "Pair {{name}}",
       "empty": "QR code unavailable.",
+      "loading": "Loading QR...",
       "alt": "WhatsApp QR code"
     },
     "messages": {
@@ -358,8 +359,10 @@
     "title": "WhatsApp instances",
     "subtitle": "Manage shared WhatsApp instances for institutional messaging.",
     "sections": {
+      "manage": "Manage WhatsApp",
       "settings": "Governance",
       "instances": "Instances",
+      "create": "Create instance",
       "personal": "My instances",
       "shared": "Shared instances"
     },
@@ -367,10 +370,13 @@
     "labels": {
       "maxUserInstances": "Max user instances",
       "displayName": "Display name",
-      "phoneNumber": "Phone number"
+      "phoneNumber": "Phone number",
+      "sharedInstance": "Shared instance"
     },
     "helpers": {
-      "maxUserInstances": "Limit the number of private instances each user can create."
+      "maxUserInstances": "Limit the number of private instances each user can create.",
+      "quotaReached": "You reached your personal instance limit. Contact the administrator for more slots.",
+      "sharedInstance": "Mark this instance as shared for institutional use."
     },
     "placeholders": {
       "displayName": "Admissions team",
@@ -378,15 +384,19 @@
       "phoneNumber": "+55 11 99999-9999"
     },
     "actions": {
+      "edit": "Edit WhatsApp",
+      "cancel": "Cancel",
       "save": "Save",
       "saving": "Saving...",
       "create": "Create instance",
       "creating": "Creating...",
-      "search": "Search"
+      "search": "Search",
+      "stopQr": "Stop QR"
     },
     "table": {
       "name": "Name",
       "status": "Status",
+      "phone": "Phone",
       "owner": "Owner",
       "createdAt": "Created",
       "actions": "Actions"
@@ -418,6 +428,10 @@
       "instanceCreated": "WhatsApp instance created.",
       "instanceCreateError": "Could not create WhatsApp instance.",
       "quotaReached": "You reached your instance limit.",
+      "instanceDisconnected": "WhatsApp instance disconnected.",
+      "instanceDisconnectError": "Could not disconnect WhatsApp instance.",
+      "instanceDeleted": "WhatsApp instance deleted.",
+      "instanceDeleteError": "Could not delete WhatsApp instance.",
       "instanceRenamed": "WhatsApp instance renamed.",
       "instanceRenameError": "Could not rename WhatsApp instance.",
       "statusRefreshError": "Could not refresh status.",

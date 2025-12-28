@@ -7,6 +7,7 @@ namespace Application.Service.Interface
         Task ProvisionAsync(WhatsAppInstance instance, CancellationToken cancellationToken = default);
         Task<string> GetQrCodeAsync(WhatsAppInstance instance, CancellationToken cancellationToken = default);
         Task<string> GetStatusAsync(WhatsAppInstance instance, CancellationToken cancellationToken = default);
+        Task DisconnectAsync(WhatsAppInstance instance, CancellationToken cancellationToken = default);
         Task DeactivateAsync(WhatsAppInstance instance, CancellationToken cancellationToken = default);
     }
 }

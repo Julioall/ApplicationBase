@@ -226,139 +226,46 @@
       <p class="subtitle">{{ 'adminWhatsApp.subtitle' | translate }}</p>
     </div>
 
-    <div class="settings-body">
-      <div class="section-block" *ngIf="canManageSharedInstances">
-        <div class="section-lead">
-          <h3>{{ 'adminWhatsApp.sections.settings' | translate }}</h3>
-        </div>
-        <form class="form-section inline-form" [formGroup]="whatsappSettingsForm" (ngSubmit)="saveWhatsAppSettings()">
-          <div class="field-row">
-            <label class="field-label" for="maxUserInstances">{{ 'adminWhatsApp.labels.maxUserInstances' | translate }}</label>
-            <div class="field-control">
-              <input id="maxUserInstances" type="number" min="1" formControlName="maxUserInstances" />
-              <small class="helper">{{ 'adminWhatsApp.helpers.maxUserInstances' | translate }}</small>
-            </div>
-          </div>
-          <div class="actions-inline">
-            <button class="btn primary" type="submit" [disabled]="isWhatsAppSettingsSaving">
-              <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
-              <span>
-                {{
-                  isWhatsAppSettingsSaving
-                    ? ('adminWhatsApp.actions.saving' | translate)
-                    : ('adminWhatsApp.actions.save' | translate)
-                }}
-              </span>
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div class="section-block" *ngIf="canManagePersonalInstances">
-        <div class="section-bar">
-          <div class="section-lead">
-            <h3>{{ 'adminWhatsApp.sections.personal' | translate }}</h3>
-            <span class="subtitle">{{ 'adminWhatsApp.quota' | translate:{ max: maxUserInstances } }}</span>
-          </div>
-        </div>
-
-        <form class="form-section inline-form" [formGroup]="createUserWhatsAppForm" (ngSubmit)="createUserInstance()">
-          <div class="field-row">
-            <label class="field-label" for="userInstanceDisplayName">{{ 'adminWhatsApp.labels.displayName' | translate }}</label>
-            <div class="field-control">
-              <input
-                id="userInstanceDisplayName"
-                type="text"
-                formControlName="displayName"
-                [placeholder]="'adminWhatsApp.placeholders.displayName' | translate"
-                [disabled]="!canCreateUserInstance"
-              />
-            </div>
-          </div>
-          <div class="field-row">
-            <label class="field-label" for="userInstancePhone">{{ 'adminWhatsApp.labels.phoneNumber' | translate }}</label>
-            <div class="field-control">
-              <input
-                id="userInstancePhone"
-                type="tel"
-                formControlName="phoneNumber"
-                [placeholder]="'adminWhatsApp.placeholders.phoneNumber' | translate"
-                [disabled]="!canCreateUserInstance"
-              />
-            </div>
-          </div>
-          <div class="actions-inline">
-            <button class="btn primary" type="submit" [disabled]="!canCreateUserInstance || isUserInstanceCreating">
-              <i class="fa-solid fa-plus" aria-hidden="true"></i>
-              <span>
-                {{
-                  isUserInstanceCreating
-                    ? ('adminWhatsApp.actions.creating' | translate)
-                    : ('adminWhatsApp.actions.create' | translate)
-                }}
-              </span>
-            </button>
-          </div>
-        </form>
-
-        <div class="instances-table personal" *ngIf="!isUserInstancesLoading; else userInstancesLoading">
-          <div class="instance-row header">
-            <span>{{ 'adminWhatsApp.table.name' | translate }}</span>
-            <span>{{ 'adminWhatsApp.table.status' | translate }}</span>
-            <span>{{ 'adminWhatsApp.table.createdAt' | translate }}</span>
-            <span>{{ 'adminWhatsApp.table.actions' | translate }}</span>
-          </div>
-          <div class="instance-row" *ngFor="let instance of userInstances">
-            <div class="cell name">{{ instance.displayName }}</div>
-            <div class="cell status">
-              <span class="status-pill" [ngClass]="'status-' + instance.status">
-                {{ (statusLabels[instance.status] || 'adminWhatsApp.status.pending') | translate }}
-              </span>
-            </div>
-            <div class="cell created">{{ instance.createdAt | date: 'short' }}</div>
-            <div class="cell actions">
-              <button class="btn subtle" type="button" (click)="refreshUserStatus(instance)" [disabled]="isUserStatusRefreshing">
-                <i class="fa-solid fa-rotate" aria-hidden="true"></i>
-              </button>
-              <button class="btn subtle" type="button" (click)="openUserQr(instance)">
-                <i class="fa-solid fa-qrcode" aria-hidden="true"></i>
-              </button>
-              <button class="btn danger" type="button" (click)="deactivateUserInstance(instance)" [disabled]="isUserInstanceDeactivating">
-                <i class="fa-solid fa-ban" aria-hidden="true"></i>
-              </button>
-            </div>
-          </div>
-          <div class="instance-empty" *ngIf="userInstances.length === 0">
-            {{ 'adminWhatsApp.state.empty' | translate }}
-          </div>
-        </div>
-        <ng-template #userInstancesLoading>
-          <div class="instance-empty">{{ 'adminWhatsApp.state.loading' | translate }}</div>
+    <div class="section-bar whatsapp-actions" *ngIf="canManagePersonalInstances || canManageSharedInstances">
+      <div class="actions-inline">
+        <ng-container *ngIf="!isWhatsAppEditing; else whatsappEditingActions">
+          <button class="btn primary" type="button" (click)="startWhatsAppEdit()">
+            <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+            <span>{{ 'adminWhatsApp.actions.edit' | translate }}</span>
+          </button>
+        </ng-container>
+        <ng-template #whatsappEditingActions>
+          <button
+            class="btn secondary"
+            type="button"
+            (click)="cancelWhatsAppEdit()"
+            [disabled]="isWhatsAppSettingsSaving || isWhatsAppInstanceCreating || isUserInstanceCreating"
+          >
+            {{ 'adminWhatsApp.actions.cancel' | translate }}
+          </button>
+          <button class="btn primary" type="button" (click)="finishWhatsAppEdit()">
+            <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+            <span>{{ 'adminWhatsApp.actions.save' | translate }}</span>
+          </button>
         </ng-template>
       </div>
+    </div>
 
-      <div class="section-block" *ngIf="canManageSharedInstances">
-        <div class="section-bar">
-          <div class="section-lead">
-            <h3>{{ 'adminWhatsApp.sections.shared' | translate }}</h3>
-          </div>
-          <div class="actions-inline">
-            <div class="search-row">
-              <input
-                type="text"
-                [(ngModel)]="searchTerm"
-                [ngModelOptions]="{ standalone: true }"
-                [placeholder]="'adminWhatsApp.placeholders.search' | translate"
-              />
-              <button class="btn subtle" type="button" (click)="loadAdminInstances()">
-                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                <span>{{ 'adminWhatsApp.actions.search' | translate }}</span>
-              </button>
-            </div>
-          </div>
+    <div class="settings-body">
+
+      <div class="section-block" *ngIf="isWhatsAppEditing && (canManagePersonalInstances || canManageSharedInstances)">
+        <div class="section-lead">
+          <h3>{{ 'adminWhatsApp.sections.create' | translate }}</h3>
+          <span class="subtitle" *ngIf="canManagePersonalInstances">
+            {{ 'adminWhatsApp.quota' | translate:{ max: maxUserInstances } }}
+          </span>
         </div>
 
-        <form class="form-section inline-form" [formGroup]="createWhatsAppForm" (ngSubmit)="createAdminInstance()">
+        <form
+          class="form-section inline-form"
+          [formGroup]="createWhatsAppForm"
+          (ngSubmit)="createInstance()"
+        >
           <div class="field-row">
             <label class="field-label" for="instanceDisplayName">{{ 'adminWhatsApp.labels.displayName' | translate }}</label>
             <div class="field-control">
@@ -367,6 +274,7 @@
                 type="text"
                 formControlName="displayName"
                 [placeholder]="'adminWhatsApp.placeholders.displayName' | translate"
+                [disabled]="!canCreateInstance"
               />
             </div>
           </div>
@@ -378,15 +286,35 @@
                 type="tel"
                 formControlName="phoneNumber"
                 [placeholder]="'adminWhatsApp.placeholders.phoneNumber' | translate"
+                [disabled]="!canCreateInstance"
               />
             </div>
           </div>
+          <div class="field-row" *ngIf="canManageSharedInstances">
+            <span class="field-label">{{ 'adminWhatsApp.labels.sharedInstance' | translate }}</span>
+            <div class="field-control">
+              <label class="toggle-switch">
+                <input
+                  type="checkbox"
+                  class="toggle-input"
+                  formControlName="isShared"
+                  [disabled]="!canManagePersonalInstances"
+                />
+                <span class="toggle-track" aria-hidden="true">
+                  <span class="toggle-thumb"></span>
+                </span>
+              </label>
+            </div>
+          </div>
+          <p class="helper" *ngIf="!isSharedSelection && canManagePersonalInstances && !canCreateUserInstance">
+            {{ 'adminWhatsApp.helpers.quotaReached' | translate }}
+          </p>
           <div class="actions-inline">
-            <button class="btn primary" type="submit" [disabled]="isWhatsAppInstanceCreating">
+            <button class="btn primary" type="submit" [disabled]="!canCreateInstance || isWhatsAppInstanceCreating || isUserInstanceCreating">
               <i class="fa-solid fa-plus" aria-hidden="true"></i>
               <span>
                 {{
-                  isWhatsAppInstanceCreating
+                  (isWhatsAppInstanceCreating || isUserInstanceCreating)
                     ? ('adminWhatsApp.actions.creating' | translate)
                     : ('adminWhatsApp.actions.create' | translate)
                 }}
@@ -394,16 +322,24 @@
             </button>
           </div>
         </form>
+      </div>
 
-        <div class="instances-table" *ngIf="!isWhatsAppInstancesLoading; else instancesLoading">
+      <div class="section-block" *ngIf="canManagePersonalInstances || canManageSharedInstances">
+        <div class="section-bar">
+          <div class="section-lead">
+            <h3>{{ 'adminWhatsApp.sections.instances' | translate }}</h3>
+          </div>
+        </div>
+
+        <div class="instances-table unified" *ngIf="!isUserInstancesLoading && !isWhatsAppInstancesLoading; else instancesLoading">
           <div class="instance-row header">
             <span>{{ 'adminWhatsApp.table.name' | translate }}</span>
             <span>{{ 'adminWhatsApp.table.status' | translate }}</span>
-            <span>{{ 'adminWhatsApp.table.owner' | translate }}</span>
             <span>{{ 'adminWhatsApp.table.createdAt' | translate }}</span>
+            <span>{{ 'adminWhatsApp.table.phone' | translate }}</span>
             <span>{{ 'adminWhatsApp.table.actions' | translate }}</span>
           </div>
-          <div class="instance-row" *ngFor="let instance of adminInstances">
+          <div class="instance-row" *ngFor="let instance of combinedInstances">
             <div class="cell name">
               <ng-container *ngIf="editingInstanceId === instance.id; else nameView">
                 <input type="text" [(ngModel)]="editingDisplayName" [ngModelOptions]="{ standalone: true }" />
@@ -417,13 +353,18 @@
                 {{ (statusLabels[instance.status] || 'adminWhatsApp.status.pending') | translate }}
               </span>
             </div>
-            <div class="cell owner">{{ instance.ownerUserId || '-' }}</div>
             <div class="cell created">{{ instance.createdAt | date: 'short' }}</div>
+            <div class="cell phone">{{ instance.phoneNumber || '-' }}</div>
             <div class="cell actions">
-              <button class="btn subtle" type="button" (click)="refreshStatus(instance)" [disabled]="isWhatsAppStatusRefreshing">
+              <button class="btn subtle" type="button" (click)="refreshStatus(instance)" [disabled]="isWhatsAppStatusRefreshing || isUserStatusRefreshing">
                 <i class="fa-solid fa-rotate" aria-hidden="true"></i>
               </button>
-              <button class="btn subtle" type="button" (click)="openQr(instance)">
+              <button
+                class="btn subtle"
+                type="button"
+                (click)="openQr(instance)"
+                [disabled]="(instance.status || '').toLowerCase() === 'connected'"
+              >
                 <i class="fa-solid fa-qrcode" aria-hidden="true"></i>
               </button>
               <ng-container *ngIf="editingInstanceId === instance.id; else editButtons">
@@ -439,12 +380,27 @@
                   <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
                 </button>
               </ng-template>
-              <button class="btn danger" type="button" (click)="deactivateInstance(instance)" [disabled]="isWhatsAppInstanceDeactivating">
+              <button
+                class="btn danger"
+                type="button"
+                *ngIf="(instance.status || '').toLowerCase() === 'connected'"
+                (click)="disconnectInstance(instance)"
+                [disabled]="isWhatsAppInstanceDisconnecting"
+              >
                 <i class="fa-solid fa-ban" aria-hidden="true"></i>
+              </button>
+              <button
+                class="btn danger"
+                type="button"
+                *ngIf="(instance.status || '').toLowerCase() === 'disconnected'"
+                (click)="deleteInstance(instance)"
+                [disabled]="isWhatsAppInstanceDeactivating || isUserInstanceDeactivating"
+              >
+                <i class="fa-solid fa-trash" aria-hidden="true"></i>
               </button>
             </div>
           </div>
-          <div class="instance-empty" *ngIf="adminInstances.length === 0">
+          <div class="instance-empty" *ngIf="combinedInstances.length === 0">
             {{ 'adminWhatsApp.state.empty' | translate }}
           </div>
         </div>
@@ -466,8 +422,19 @@
       <div class="modal-body">
         <img *ngIf="qrCode; else qrEmpty" [src]="getQrCodeSrc()" [attr.alt]="'adminWhatsApp.qr.alt' | translate" />
         <ng-template #qrEmpty>
-          <p>{{ 'adminWhatsApp.qr.empty' | translate }}</p>
+          <p>{{ 'adminWhatsApp.qr.loading' | translate }}</p>
         </ng-template>
+      </div>
+      <div class="modal-actions">
+        <button
+          class="btn secondary"
+          type="button"
+          (click)="stopQrRequest()"
+          [disabled]="isWhatsAppInstanceDisconnecting"
+          *ngIf="!isQrInstanceConnected"
+        >
+          {{ 'adminWhatsApp.actions.stopQr' | translate }}
+        </button>
       </div>
     </div>
   </div>

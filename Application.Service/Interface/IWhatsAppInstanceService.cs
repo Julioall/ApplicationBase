@@ -10,7 +10,8 @@ namespace Application.Service.Interface
         Task<WhatsAppInstance> CreateAdminInstanceAsync(string ownerUserId, CreateWhatsAppInstanceRequest request, CancellationToken cancellationToken = default);
         Task<WhatsAppInstance> CreateUserInstanceAsync(string ownerUserId, CreateWhatsAppInstanceRequest request, CancellationToken cancellationToken = default);
         Task<WhatsAppInstance> RenameInstanceAsync(string ownerUserId, string id, UpdateWhatsAppInstanceRequest request, bool isAdminContext, CancellationToken cancellationToken = default);
-        Task<WhatsAppInstance> DeactivateInstanceAsync(string ownerUserId, string id, bool isAdminContext, CancellationToken cancellationToken = default);
+        Task<WhatsAppInstance> DisconnectInstanceAsync(string ownerUserId, string id, bool isAdminContext, CancellationToken cancellationToken = default);
+        Task<WhatsAppInstance> DeleteInstanceAsync(string ownerUserId, string id, bool isAdminContext, CancellationToken cancellationToken = default);
         Task<string> GetQrCodeAsync(string ownerUserId, string id, bool isAdminContext, CancellationToken cancellationToken = default);
         Task<WhatsAppInstance> RefreshStatusAsync(string ownerUserId, string id, bool isAdminContext, CancellationToken cancellationToken = default);
     }

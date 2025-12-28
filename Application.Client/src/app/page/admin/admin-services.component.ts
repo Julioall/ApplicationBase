@@ -43,7 +43,6 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
   maxUserInstances = 1;
   whatsappSettingsForm!: FormGroup;
   createWhatsAppForm!: FormGroup;
-  createUserWhatsAppForm!: FormGroup;
   adminInstances: WhatsAppInstance[] = [];
   userInstances: WhatsAppInstance[] = [];
   isWhatsAppSettingsSaving = false;
@@ -51,6 +50,8 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
   isWhatsAppInstanceCreating = false;
   isWhatsAppInstanceRenaming = false;
   isWhatsAppInstanceDeactivating = false;
+  isWhatsAppEditing = false;
+  isWhatsAppInstanceDisconnecting = false;
   isWhatsAppStatusRefreshing = false;
   isUserInstancesLoading = false;
   isUserInstanceCreating = false;
@@ -78,6 +79,7 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     starttls: 'adminEmail.secure.starttls',
     ssl: 'adminEmail.secure.ssl',
   };
+  readonly sharedKey = 'adminWhatsApp.sharedLabel';
 
   constructor(
     private emailSettingsService: EmailSettingsService,
@@ -94,6 +96,7 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     this.canManageSharedInstances = this.authService.hasPermission(MANAGE_WHATSAPP_PERMISSION);
     this.canManagePersonalInstances = this.authService.hasPermission(MANAGE_WHATSAPP_SELF_PERMISSION);
     this.initWhatsAppForms();
+    this.resetCreateForm();
     if (this.canManageEmail) {
       this.loadSettings();
     }
@@ -132,11 +135,7 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     this.createWhatsAppForm = this.fb.group({
       displayName: ['', [Validators.required, Validators.maxLength(80)]],
       phoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[1-9]\d{9,14}$/)]],
-    });
-
-    this.createUserWhatsAppForm = this.fb.group({
-      displayName: ['', [Validators.required, Validators.maxLength(80)]],
-      phoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[1-9]\d{9,14}$/)]],
+      isShared: [false],
     });
   }
 
@@ -189,6 +188,9 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     if (!this.canManageSharedInstances) {
       return;
     }
+    if (!this.isWhatsAppEditing) {
+      return;
+    }
     if (this.whatsappSettingsForm.invalid) {
       this.whatsappSettingsForm.markAllAsTouched();
       this.notificationService.showWarning(this.t('adminWhatsApp.messages.settingsInvalid'));
@@ -231,8 +233,11 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     });
   }
 
-  createAdminInstance(): void {
-    if (!this.canManageSharedInstances) {
+  createInstance(): void {
+    if (!this.canManagePersonalInstances && !this.canManageSharedInstances) {
+      return;
+    }
+    if (!this.isWhatsAppEditing) {
       return;
     }
     if (this.createWhatsAppForm.invalid) {
@@ -245,6 +250,7 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
       displayName: (this.createWhatsAppForm.get('displayName')?.value || '').trim(),
       phoneNumber: (this.createWhatsAppForm.get('phoneNumber')?.value || '').trim(),
     };
+    const isShared = this.resolveSharedSelection();
 
     if (!payload.displayName) {
       this.notificationService.showWarning(this.t('adminWhatsApp.messages.instanceNameRequired'));
@@ -255,22 +261,47 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.isWhatsAppInstanceCreating = true;
-    this.whatsAppInstancesService.createAdminInstance(payload).subscribe({
+    if (isShared) {
+      if (!this.canManageSharedInstances) {
+        return;
+      }
+      this.isWhatsAppInstanceCreating = true;
+      this.whatsAppInstancesService.createAdminInstance(payload).subscribe({
+        next: (instance) => {
+          this.isWhatsAppInstanceCreating = false;
+          this.adminInstances = [instance, ...this.adminInstances];
+          this.resetCreateForm(isShared);
+          this.notificationService.showSuccess(this.t('adminWhatsApp.messages.instanceCreated'));
+        },
+        error: () => {
+          this.isWhatsAppInstanceCreating = false;
+          this.notificationService.showError(this.t('adminWhatsApp.messages.instanceCreateError'));
+        },
+      });
+      return;
+    }
+
+    if (!this.canCreateUserInstance) {
+      this.notificationService.showWarning(this.t('adminWhatsApp.messages.quotaReached'));
+      return;
+    }
+
+    this.isUserInstanceCreating = true;
+    this.whatsAppInstancesService.createUserInstance(payload).subscribe({
       next: (instance) => {
-        this.isWhatsAppInstanceCreating = false;
-        this.adminInstances = [instance, ...this.adminInstances];
-        this.createWhatsAppForm.reset();
+        this.isUserInstanceCreating = false;
+        this.userInstances = [instance, ...this.userInstances];
+        this.resetCreateForm(false);
         this.notificationService.showSuccess(this.t('adminWhatsApp.messages.instanceCreated'));
       },
       error: () => {
-        this.isWhatsAppInstanceCreating = false;
+        this.isUserInstanceCreating = false;
         this.notificationService.showError(this.t('adminWhatsApp.messages.instanceCreateError'));
       },
     });
   }
 
-  startRename(instance: WhatsAppInstance): void {
+  startRename(instance: WhatsAppInstance & { isShared: boolean }): void {
     this.editingInstanceId = instance.id;
     this.editingDisplayName = instance.displayName;
   }
@@ -280,7 +311,7 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     this.editingDisplayName = '';
   }
 
-  saveRename(instance: WhatsAppInstance): void {
+  saveRename(instance: WhatsAppInstance & { isShared: boolean }): void {
     const name = (this.editingDisplayName || '').trim();
     if (!name) {
       this.notificationService.showWarning(this.t('adminWhatsApp.messages.instanceNameRequired'));
@@ -288,10 +319,18 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     }
 
     this.isWhatsAppInstanceRenaming = true;
-    this.whatsAppInstancesService.renameAdminInstance(instance.id, { displayName: name }).subscribe({
+    const request$ = instance.isShared
+      ? this.whatsAppInstancesService.renameAdminInstance(instance.id, { displayName: name })
+      : this.whatsAppInstancesService.renameUserInstance(instance.id, { displayName: name });
+
+    request$.subscribe({
       next: (updated) => {
         this.isWhatsAppInstanceRenaming = false;
-        this.adminInstances = this.adminInstances.map((item) => (item.id === updated.id ? updated : item));
+        if (instance.isShared) {
+          this.adminInstances = this.adminInstances.map((item) => (item.id === updated.id ? updated : item));
+        } else {
+          this.userInstances = this.userInstances.map((item) => (item.id === updated.id ? updated : item));
+        }
         this.cancelRename();
         this.notificationService.showSuccess(this.t('adminWhatsApp.messages.instanceRenamed'));
       },
@@ -302,17 +341,23 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     });
   }
 
-  refreshStatus(instance: WhatsAppInstance): void {
-    if (!this.canManageSharedInstances) {
-      return;
-    }
+  refreshStatus(instance: WhatsAppInstance & { isShared: boolean }): void {
     this.isWhatsAppStatusRefreshing = true;
-    this.whatsAppInstancesService.getAdminStatus(instance.id).subscribe({
+    const request$ = instance.isShared
+      ? this.whatsAppInstancesService.getAdminStatus(instance.id)
+      : this.whatsAppInstancesService.getUserStatus(instance.id);
+    request$.subscribe({
       next: (status) => {
         this.isWhatsAppStatusRefreshing = false;
-        this.adminInstances = this.adminInstances.map((item) =>
-          item.id === instance.id ? { ...item, status: status.status } : item,
-        );
+        if (instance.isShared) {
+          this.adminInstances = this.adminInstances.map((item) =>
+            item.id === instance.id ? { ...item, status: status.status } : item,
+          );
+        } else {
+          this.userInstances = this.userInstances.map((item) =>
+            item.id === instance.id ? { ...item, status: status.status } : item,
+          );
+        }
       },
       error: () => {
         this.isWhatsAppStatusRefreshing = false;
@@ -321,23 +366,14 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     });
   }
 
-  openQr(instance: WhatsAppInstance): void {
-    if (!this.canManageSharedInstances) {
-      return;
-    }
-    this.whatsAppInstancesService.getAdminQr(instance.id).subscribe({
-      next: (resp) => {
-        this.qrCode = resp.qrCode;
-        this.qrInstanceLabel = instance.displayName;
-        this.qrModalOpen = true;
-        this.qrInstanceId = instance.id;
-        this.qrIsAdminContext = true;
-        this.startQrPolling();
-      },
-      error: () => {
-        this.notificationService.showError(this.t('adminWhatsApp.messages.qrLoadError'));
-      },
-    });
+  openQr(instance: WhatsAppInstance & { isShared: boolean }): void {
+    this.qrCode = '';
+    this.qrInstanceLabel = instance.displayName;
+    this.qrModalOpen = true;
+    this.qrInstanceId = instance.id;
+    this.qrIsAdminContext = instance.isShared;
+    this.fetchQrCode(instance.id, instance.isShared);
+    this.startQrPolling();
   }
 
   closeQr(): void {
@@ -346,6 +382,10 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     this.qrInstanceLabel = '';
     this.qrInstanceId = undefined;
     this.clearQrTimers();
+  }
+
+  stopQrRequest(): void {
+    this.closeQr();
   }
 
   getQrCodeSrc(): string {
@@ -358,20 +398,64 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     return `data:image/png;base64,${this.qrCode}`;
   }
 
-  deactivateInstance(instance: WhatsAppInstance): void {
-    if (!this.canManageSharedInstances) {
+  disconnectInstance(instance: WhatsAppInstance & { isShared: boolean }): void {
+    if ((instance.status || '').toLowerCase() !== 'connected') {
       return;
     }
-    this.isWhatsAppInstanceDeactivating = true;
-    this.whatsAppInstancesService.deactivateAdminInstance(instance.id).subscribe({
+
+    this.isWhatsAppInstanceDisconnecting = true;
+    const request$ = instance.isShared
+      ? this.whatsAppInstancesService.disconnectAdminInstance(instance.id)
+      : this.whatsAppInstancesService.disconnectUserInstance(instance.id);
+
+    request$.subscribe({
       next: (updated) => {
-        this.isWhatsAppInstanceDeactivating = false;
-        this.adminInstances = this.adminInstances.map((item) => (item.id === updated.id ? updated : item));
-        this.notificationService.showSuccess(this.t('adminWhatsApp.messages.instanceDeactivated'));
+        this.isWhatsAppInstanceDisconnecting = false;
+        if (instance.isShared) {
+          this.adminInstances = this.adminInstances.map((item) => (item.id === updated.id ? updated : item));
+        } else {
+          this.userInstances = this.userInstances.map((item) => (item.id === updated.id ? updated : item));
+        }
+        this.notificationService.showSuccess(this.t('adminWhatsApp.messages.instanceDisconnected'));
       },
       error: () => {
-        this.isWhatsAppInstanceDeactivating = false;
-        this.notificationService.showError(this.t('adminWhatsApp.messages.instanceDeactivateError'));
+        this.isWhatsAppInstanceDisconnecting = false;
+        this.notificationService.showError(this.t('adminWhatsApp.messages.instanceDisconnectError'));
+      },
+    });
+  }
+
+  deleteInstance(instance: WhatsAppInstance & { isShared: boolean }): void {
+    if ((instance.status || '').toLowerCase() !== 'disconnected') {
+      return;
+    }
+
+    if (instance.isShared) {
+      this.isWhatsAppInstanceDeactivating = true;
+      this.whatsAppInstancesService.deactivateAdminInstance(instance.id).subscribe({
+        next: (updated) => {
+          this.isWhatsAppInstanceDeactivating = false;
+          this.adminInstances = this.adminInstances.filter((item) => item.id !== updated.id);
+          this.notificationService.showSuccess(this.t('adminWhatsApp.messages.instanceDeleted'));
+        },
+        error: () => {
+          this.isWhatsAppInstanceDeactivating = false;
+          this.notificationService.showError(this.t('adminWhatsApp.messages.instanceDeleteError'));
+        },
+      });
+      return;
+    }
+
+    this.isUserInstanceDeactivating = true;
+    this.whatsAppInstancesService.deactivateUserInstance(instance.id).subscribe({
+      next: (updated) => {
+        this.isUserInstanceDeactivating = false;
+        this.userInstances = this.userInstances.filter((item) => item.id !== updated.id);
+        this.notificationService.showSuccess(this.t('adminWhatsApp.messages.instanceDeleted'));
+      },
+      error: () => {
+        this.isUserInstanceDeactivating = false;
+        this.notificationService.showError(this.t('adminWhatsApp.messages.instanceDeleteError'));
       },
     });
   }
@@ -426,6 +510,25 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     this.showPassword = false;
   }
 
+  startWhatsAppEdit(): void {
+    if (!this.canManagePersonalInstances && !this.canManageSharedInstances) {
+      return;
+    }
+    this.isWhatsAppEditing = true;
+  }
+
+  cancelWhatsAppEdit(): void {
+    this.isWhatsAppEditing = false;
+    if (this.canManageSharedInstances) {
+      this.loadWhatsAppSettings();
+    }
+    this.resetCreateForm();
+  }
+
+  finishWhatsAppEdit(): void {
+    this.isWhatsAppEditing = false;
+  }
+
   private buildSettingsPayload(): EmailSettings {
     const { testEmail, password, ...rest } = this.emailConfig;
     const payload: Partial<EmailSettings> = { ...rest };
@@ -464,6 +567,17 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     return activeCount < this.maxUserInstances;
   }
 
+  get canCreateInstance(): boolean {
+    if (this.resolveSharedSelection()) {
+      return this.canManageSharedInstances;
+    }
+    return this.canManagePersonalInstances && this.canCreateUserInstance;
+  }
+
+  get isSharedSelection(): boolean {
+    return this.resolveSharedSelection();
+  }
+
   loadUserInstances(): void {
     if (!this.canManagePersonalInstances) {
       return;
@@ -481,102 +595,33 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     });
   }
 
-  createUserInstance(): void {
-    if (!this.canManagePersonalInstances) {
-      return;
-    }
-    if (!this.canCreateUserInstance) {
-      this.notificationService.showWarning(this.t('adminWhatsApp.messages.quotaReached'));
-      return;
-    }
-    if (this.createUserWhatsAppForm.invalid) {
-      this.createUserWhatsAppForm.markAllAsTouched();
-      this.notificationService.showWarning(this.t('adminWhatsApp.messages.instanceNameRequired'));
-      return;
-    }
-
-    const payload: CreateWhatsAppInstanceRequest = {
-      displayName: (this.createUserWhatsAppForm.get('displayName')?.value || '').trim(),
-      phoneNumber: (this.createUserWhatsAppForm.get('phoneNumber')?.value || '').trim(),
-    };
-
-    if (!payload.displayName) {
-      this.notificationService.showWarning(this.t('adminWhatsApp.messages.instanceNameRequired'));
-      return;
-    }
-    if (!payload.phoneNumber) {
-      this.notificationService.showWarning(this.t('adminWhatsApp.messages.phoneRequired'));
-      return;
-    }
-
-    this.isUserInstanceCreating = true;
-    this.whatsAppInstancesService.createUserInstance(payload).subscribe({
-      next: (instance) => {
-        this.isUserInstanceCreating = false;
-        this.userInstances = [instance, ...this.userInstances];
-        this.createUserWhatsAppForm.reset();
-        this.notificationService.showSuccess(this.t('adminWhatsApp.messages.instanceCreated'));
-      },
-      error: () => {
-        this.isUserInstanceCreating = false;
-        this.notificationService.showError(this.t('adminWhatsApp.messages.instanceCreateError'));
-      },
-    });
+  get combinedInstances(): Array<WhatsAppInstance & { isShared: boolean }> {
+    const personal = this.userInstances.map((instance) => ({ ...instance, isShared: false }));
+    const shared = this.adminInstances.map((instance) => ({ ...instance, isShared: true }));
+    return [...personal, ...shared].sort(
+      (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime(),
+    );
   }
 
-  refreshUserStatus(instance: WhatsAppInstance): void {
-    if (!this.canManagePersonalInstances) {
-      return;
+  private resolveSharedSelection(): boolean {
+    if (!this.canManageSharedInstances) {
+      return false;
     }
-    this.isUserStatusRefreshing = true;
-    this.whatsAppInstancesService.getUserStatus(instance.id).subscribe({
-      next: (status) => {
-        this.isUserStatusRefreshing = false;
-        this.userInstances = this.userInstances.map((item) =>
-          item.id === instance.id ? { ...item, status: status.status } : item,
-        );
-      },
-      error: () => {
-        this.isUserStatusRefreshing = false;
-        this.notificationService.showError(this.t('adminWhatsApp.messages.statusRefreshError'));
-      },
-    });
+    if (!this.canManagePersonalInstances) {
+      return true;
+    }
+    return !!this.createWhatsAppForm.get('isShared')?.value;
   }
 
-  openUserQr(instance: WhatsAppInstance): void {
-    if (!this.canManagePersonalInstances) {
-      return;
-    }
-    this.whatsAppInstancesService.getUserQr(instance.id).subscribe({
-      next: (resp) => {
-        this.qrCode = resp.qrCode;
-        this.qrInstanceLabel = instance.displayName;
-        this.qrModalOpen = true;
-        this.qrInstanceId = instance.id;
-        this.qrIsAdminContext = false;
-        this.startQrPolling();
-      },
-      error: () => {
-        this.notificationService.showError(this.t('adminWhatsApp.messages.qrLoadError'));
-      },
-    });
-  }
-
-  deactivateUserInstance(instance: WhatsAppInstance): void {
-    if (!this.canManagePersonalInstances) {
-      return;
-    }
-    this.isUserInstanceDeactivating = true;
-    this.whatsAppInstancesService.deactivateUserInstance(instance.id).subscribe({
-      next: (updated) => {
-        this.isUserInstanceDeactivating = false;
-        this.userInstances = this.userInstances.map((item) => (item.id === updated.id ? updated : item));
-        this.notificationService.showSuccess(this.t('adminWhatsApp.messages.instanceDeactivated'));
-      },
-      error: () => {
-        this.isUserInstanceDeactivating = false;
-        this.notificationService.showError(this.t('adminWhatsApp.messages.instanceDeactivateError'));
-      },
+  private resetCreateForm(isShared?: boolean): void {
+    const sharedValue =
+      typeof isShared === 'boolean'
+        ? isShared
+        : this.canManageSharedInstances && !this.canManagePersonalInstances;
+    this.createWhatsAppForm.reset({
+      displayName: '',
+      phoneNumber: '',
+      isShared: sharedValue,
     });
   }
 
@@ -587,6 +632,8 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     if (!instanceId || !this.qrModalOpen) {
       return;
     }
+
+    this.fetchQrCode(instanceId, this.qrIsAdminContext);
 
     this.qrPollingTimer = setInterval(() => {
       if (!this.qrModalOpen || this.qrInstanceId !== instanceId) {
@@ -622,18 +669,38 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
         this.clearQrTimers();
         return;
       }
-      const refresh$ = this.qrIsAdminContext
-        ? this.whatsAppInstancesService.getAdminQr(instanceId)
-        : this.whatsAppInstancesService.getUserQr(instanceId);
-
-      refresh$.subscribe({
-        next: (resp) => {
-          if (resp.qrCode && resp.qrCode !== this.qrCode) {
-            this.qrCode = resp.qrCode;
-          }
-        },
-      });
+      this.fetchQrCode(instanceId, this.qrIsAdminContext);
     }, 10000);
+  }
+
+  private fetchQrCode(instanceId: string, isAdminContext: boolean): void {
+    const refresh$ = isAdminContext
+      ? this.whatsAppInstancesService.getAdminQr(instanceId)
+      : this.whatsAppInstancesService.getUserQr(instanceId);
+
+    refresh$.subscribe({
+      next: (resp) => {
+        if (resp.qrCode && resp.qrCode !== this.qrCode) {
+          this.qrCode = resp.qrCode;
+        }
+      },
+      error: () => {
+        this.notificationService.showError(this.t('adminWhatsApp.messages.qrLoadError'));
+      },
+    });
+  }
+
+  private getQrInstance(): WhatsAppInstance | undefined {
+    if (!this.qrInstanceId) {
+      return undefined;
+    }
+    const list = this.qrIsAdminContext ? this.adminInstances : this.userInstances;
+    return list.find((item) => item.id === this.qrInstanceId);
+  }
+
+  get isQrInstanceConnected(): boolean {
+    const instance = this.getQrInstance();
+    return (instance?.status || '').toLowerCase() === 'connected';
   }
 
   private clearQrTimers(): void {

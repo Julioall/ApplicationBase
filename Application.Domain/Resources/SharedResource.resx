@@ -463,6 +463,9 @@
   <data name="WhatsAppStatusFetchFailed" xml:space="preserve">
     <value>Nao foi possivel obter o status do WhatsApp.</value>
   </data>
+  <data name="WhatsAppInstanceDisconnectFailed" xml:space="preserve">
+    <value>Nao foi possivel desconectar a instancia de WhatsApp.</value>
+  </data>
   <data name="WhatsAppIntegrationMissing" xml:space="preserve">
     <value>Integracao do WhatsApp nao configurada.</value>
   </data>

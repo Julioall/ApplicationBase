@@ -65,6 +65,7 @@ class WhatsAppInstancesServiceStub {
       isActive: true,
       createdAt: new Date().toISOString(),
       ownerUserId: 'users/1-A',
+      phoneNumber: '+5511999999999',
     },
   ];
 

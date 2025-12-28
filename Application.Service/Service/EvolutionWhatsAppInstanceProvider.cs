@@ -52,13 +52,16 @@ namespace Application.Service.Service
         public async Task<string> GetQrCodeAsync(WhatsAppInstance instance, CancellationToken cancellationToken = default)
         {
             var endpoint = BuildUrl($"/instance/connect/{instance.InternalInstanceName}");
+            var queryParts = new List<string>();
             if (!string.IsNullOrWhiteSpace(instance.PhoneNumber))
             {
-                var query = $"?number={Uri.EscapeDataString(instance.PhoneNumber)}";
-                endpoint = $"{endpoint}{query}";
+                queryParts.Add($"number={Uri.EscapeDataString(instance.PhoneNumber)}");
             }
+            queryParts.Add($"ts={DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}");
+            endpoint = $"{endpoint}?{string.Join("&", queryParts)}";
             using var request = new HttpRequestMessage(HttpMethod.Get, endpoint);
             request.Headers.Add("apikey", ResolveApiKey());
+            request.Headers.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue { NoCache = true };
 
             using var response = await _httpClient.SendAsync(request, cancellationToken);
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -91,6 +94,21 @@ namespace Application.Service.Service
                 nestedKey: null,
                 containerKeys: new[] { "instance", "data", "response" }) ?? string.Empty;
             return NormalizeStatus(raw);
+        }
+
+        public async Task DisconnectAsync(WhatsAppInstance instance, CancellationToken cancellationToken = default)
+        {
+            var endpoint = BuildUrl($"/instance/logout/{instance.InternalInstanceName}");
+            using var request = new HttpRequestMessage(HttpMethod.Delete, endpoint);
+            request.Headers.Add("apikey", ResolveApiKey());
+
+            using var response = await _httpClient.SendAsync(request, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                var body = await response.Content.ReadAsStringAsync(cancellationToken);
+                _logger.LogWarning("Evolution instance logout failed. Status={StatusCode}, Response={Response}", (int)response.StatusCode, body);
+                throw new BusinessException(_localizer["WhatsAppInstanceDisconnectFailed"]);
+            }
         }
 
         public async Task DeactivateAsync(WhatsAppInstance instance, CancellationToken cancellationToken = default)

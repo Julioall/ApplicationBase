@@ -19,6 +19,7 @@ namespace Application.Domain.Model.Dtos
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? OwnerUserId { get; set; }
+        public string? PhoneNumber { get; set; }
     }
 
     public class WhatsAppInstanceStatusResponse

@@ -11,6 +11,7 @@ export interface WhatsAppInstance {
   isActive: boolean;
   createdAt: string;
   ownerUserId?: string;
+  phoneNumber?: string;
 }
 
 export interface CreateWhatsAppInstanceRequest {
@@ -80,6 +81,12 @@ export class WhatsAppInstancesService {
       .pipe(map((resp: any) => this.normalizeInstance(resp)));
   }
 
+  disconnectAdminInstance(id: string): Observable<WhatsAppInstance> {
+    return this.http
+      .post<WhatsAppInstance | any>(`${this.adminBaseUrl}/${id}/disconnect`, {}, { headers: this.getAuthHeaders() })
+      .pipe(map((resp: any) => this.normalizeInstance(resp)));
+  }
+
   getAdminQr(id: string): Observable<WhatsAppQrResponse> {
     return this.http
       .post<WhatsAppQrResponse | any>(`${this.adminBaseUrl}/${id}/qr`, {}, { headers: this.getAuthHeaders() })
@@ -116,6 +123,12 @@ export class WhatsAppInstancesService {
       .pipe(map((resp: any) => this.normalizeInstance(resp)));
   }
 
+  disconnectUserInstance(id: string): Observable<WhatsAppInstance> {
+    return this.http
+      .post<WhatsAppInstance | any>(`${this.userBaseUrl}/${id}/disconnect`, {}, { headers: this.getAuthHeaders() })
+      .pipe(map((resp: any) => this.normalizeInstance(resp)));
+  }
+
   getUserQr(id: string): Observable<WhatsAppQrResponse> {
     return this.http
       .post<WhatsAppQrResponse | any>(`${this.userBaseUrl}/${id}/qr`, {}, { headers: this.getAuthHeaders() })
@@ -143,6 +156,7 @@ export class WhatsAppInstancesService {
       isActive: resp.isActive ?? resp.IsActive ?? true,
       createdAt: resp.createdAt ?? resp.CreatedAt ?? new Date().toISOString(),
       ownerUserId: resp.ownerUserId ?? resp.OwnerUserId,
+      phoneNumber: resp.phoneNumber ?? resp.PhoneNumber,
     };
   }
 
