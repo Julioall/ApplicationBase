@@ -8,6 +8,7 @@ namespace Application.Domain.Interface
         Task AddAsync(User user);
         Task DeleteAsync(string id);
         Task<IEnumerable<User>> GetAllAsync();
+        Task<bool> AnyAsync();
         Task<User> GetByIdAsync(string id);
         Task<IEnumerable<User>> GetByPermissionAsync(string permission);
         Task<User> GetByEmailAsync(string email);

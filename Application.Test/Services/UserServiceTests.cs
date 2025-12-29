@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Application.Domain.Exceptions;
+using Application.Domain.Model;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
 using Application.Service.Service.Security;
@@ -101,6 +102,41 @@ namespace Application.Tests.Services
         {
             var user = CreateValidUser("weak@user.com", withHash: false);
             await Assert.ThrowsAsync<ValidationException>(() => _userService.AddAsync(user, "weak"));
+        }
+
+        [Fact]
+        public async Task AddAsync_Should_Assign_All_Permissions_To_First_User()
+        {
+            var user = CreateValidUser("first@user.com", withHash: false);
+            user.Account.Permissions = new();
+
+            await _userService.AddAsync(user, "Valid123!");
+            await _asyncSession.SaveChangesAsync();
+
+            var saved = await _userService.GetByEmailAsync(user.Account.Email);
+            Assert.NotNull(saved);
+            Assert.Equal(
+                ApplicationPermissions.All.OrderBy(p => p),
+                saved!.Account.Permissions.OrderBy(p => p));
+        }
+
+        [Fact]
+        public async Task AddAsync_Should_Not_Grant_All_Permissions_To_Subsequent_Users()
+        {
+            var existing = CreateValidUser("existing@user.com");
+            _session.Store(existing);
+            _session.SaveChanges();
+
+            var user = CreateValidUser("second@user.com", withHash: false);
+            user.Account.Permissions = new() { "view:home" };
+
+            await _userService.AddAsync(user, "Valid123!");
+            await _asyncSession.SaveChangesAsync();
+
+            var saved = await _userService.GetByEmailAsync(user.Account.Email);
+            Assert.NotNull(saved);
+            Assert.Equal(new[] { "view:home" }, saved!.Account.Permissions);
+            Assert.DoesNotContain(ApplicationPermissions.ManageUsers, saved.Account.Permissions);
         }
 
         [Fact]

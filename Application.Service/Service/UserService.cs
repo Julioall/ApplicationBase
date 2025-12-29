@@ -46,6 +46,12 @@ namespace Application.Service.Service
             user.Account.PasswordHash = SecureHash.HashSecret(password);
             user.Account.DateJoined ??= DateTime.UtcNow;
 
+            var isFirstUser = !await _userRepository.AnyAsync();
+            if (isFirstUser)
+            {
+                user.Account.Permissions = ApplicationPermissions.All.ToList();
+            }
+
             EnsurePermissions(user);
 
             _userValidator.ValidateAndThrow(user);

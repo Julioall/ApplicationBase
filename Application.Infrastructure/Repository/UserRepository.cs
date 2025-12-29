@@ -3,6 +3,7 @@ using Application.Domain.Model.User;
 using Application.Infrastructure.Indexes;
 using Application.Infrastructure.Service;
 using Raven.Client.Documents;
+using Raven.Client.Documents.Linq;
 using System.IO;
 using System.Linq;
 
@@ -35,6 +36,11 @@ namespace Application.Infrastructure.Repository
         public async Task<IEnumerable<User>> GetAllAsync()
         {
             return await _serviceRavenDb.AsyncSession.Query<User>().ToListAsync();
+        }
+
+        public async Task<bool> AnyAsync()
+        {
+            return await _serviceRavenDb.AsyncSession.Query<User>().AnyAsync();
         }
 
         public async Task<User> GetByIdAsync(string id)
