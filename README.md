@@ -78,14 +78,19 @@ Base monolítica pronta para produção com ASP.NET Core 8, Angular 18 e RavenDB
 ## Banco de Dados (RavenDB)
 ### RavenDB em modo seguro (TLS)
 - A UI do RavenDB fica em `https://localhost:8081` (certificado autoassinado).
-- O certificado gerado esta em `certs/ravendb.cer`.
+- Gere o certificado de dev (cria `certs/ravendb.pfx` e atualiza `certs/ravendb.cer`) em cada maquina nova:
+```powershell
+pwsh ./certs/generate-ravendb-cert.ps1
+```
+  Usa a senha padrao `changeme-ravendb-cert`; se alterar, atualize tambem `RAVEN_Security_Certificate_Password` e `RAVENDBSETTINGS_CERTIFICATE_PASSWORD` no `docker-compose.yml`.
 - Para confiar no certificado (Windows, usuario atual):
 ```powershell
 certutil -user -addstore Root certs\ravendb.cer
 ```
 - Para remover a confianca (opcional):
 ```powershell
-certutil -user -delstore Root 8830AF74BB45DFABB929C9ED5E18EC5F050D6039
+certutil -user -delstore Root <thumbprint>
+# pegue o thumbprint via: certutil -user -store Root | findstr ravendb
 ```
 - Configuração via env: `RAVENDBSETTINGS_URLS` (vírgula separada), `RAVENDBSETTINGS_DATABASE_NAME`, `RAVENDBSETTINGS_CERTIFICATE_SUBJECT` (busca certificado no store do usuário atual, exige chave privada).
 - Conexão e criação de DB/índices em `DocumentStoreHolderAlternative`. Convens: `MaxNumberOfRequestsPerSession=30`, optimistic concurrency, `IdentityPartsSeparator='-'`.
