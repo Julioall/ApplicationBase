@@ -17,7 +17,7 @@
             <i class="fa fa-cubes"></i>
           </div>
           <div class="brand-copy">
-            <span class="brand-title">ApplicationBase</span>
+            <span class="brand-title">{{ 'home.brandTitle' | translate }}</span>
             <span class="brand-subtitle">{{ 'home.brandSubtitle' | translate }}</span>
           </div>
         </div>
@@ -204,6 +204,34 @@
       <section class="route-content">
         <router-outlet></router-outlet>
       </section>
+
+      <footer class="dashboard-footer">
+        <div class="footer-meta">
+          <span class="rights">&copy; &#64;julioall</span>
+        </div>
+        <div class="footer-social">
+          <a href="mailto:julio.all&#64;outlook.com" class="email-btn" aria-label="E-mail de Julio Alves">
+            <i class="fa-solid fa-envelope"></i>
+            <span>Email</span>
+          </a>
+          <a href="https://instagram.com/julioall" target="_blank" rel="noreferrer noopener" aria-label="Instagram de Julio Alves">
+            <i class="fa-brands fa-instagram"></i>
+            <span>Instagram</span>
+          </a>
+          <a href="https://discord.gg/julioall" target="_blank" rel="noreferrer noopener" aria-label="Discord de Julio Alves">
+            <i class="fa-brands fa-discord"></i>
+            <span>Discord</span>
+          </a>
+          <a href="https://www.linkedin.com/in/julioall/" target="_blank" rel="noreferrer noopener" aria-label="LinkedIn de Julio Alves">
+            <i class="fa-brands fa-linkedin"></i>
+            <span>LinkedIn</span>
+          </a>
+          <a href="https://wa.me/qr/R2JWZR5YSPS4D1" target="_blank" rel="noreferrer noopener" aria-label="WhatsApp de Julio Alves">
+            <i class="fa-brands fa-whatsapp"></i>
+            <span>WhatsApp</span>
+          </a>
+        </div>
+      </footer>
     </main>
   </div>
 </ng-container>

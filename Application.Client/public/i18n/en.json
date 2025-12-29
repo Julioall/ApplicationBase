@@ -90,7 +90,8 @@
     }
   },
   "home": {
-    "brandSubtitle": "Workspace",
+    "brandTitle": "Academic Portal",
+    "brandSubtitle": "by Julio",
     "navigation": "Navigation",
     "favorites": "Favorites",
     "shortcuts": "Shortcuts",
