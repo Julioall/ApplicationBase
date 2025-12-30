@@ -54,6 +54,27 @@ namespace Application.Tests.Services
                 service.CreateUserInstanceAsync("users/1-A", new CreateWhatsAppInstanceRequest { DisplayName = "Second", PhoneNumber = "+5511999999999" }));
         }
 
+        [Fact]
+        public async Task CreateInstance_Should_Block_Duplicate_Phone_Number()
+        {
+            await _settingsService.SaveWhatsAppAsync(new WhatsAppSettings { MaxUserInstances = 2 });
+
+            var service = new WhatsAppInstanceService(
+                _repository,
+                _settingsService,
+                new StubProvider(),
+                _createValidator,
+                _updateValidator,
+                _localizer);
+
+            const string phone = "+5511888888888";
+
+            await service.CreateAdminInstanceAsync("admins/1-A", new CreateWhatsAppInstanceRequest { DisplayName = "Shared", PhoneNumber = phone });
+
+            await Assert.ThrowsAsync<BusinessException>(() =>
+                service.CreateUserInstanceAsync("users/1-A", new CreateWhatsAppInstanceRequest { DisplayName = "Personal", PhoneNumber = phone }));
+        }
+
         private sealed class StubProvider : IWhatsAppInstanceProvider
         {
             public Task ProvisionAsync(WhatsAppInstance instance, CancellationToken cancellationToken = default)

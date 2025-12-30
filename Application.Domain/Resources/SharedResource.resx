@@ -439,6 +439,9 @@
   <data name="WhatsAppOwnerRequired" xml:space="preserve">
     <value>Usuario responsavel pela instancia e obrigatorio.</value>
   </data>
+  <data name="WhatsAppPhoneInUse" xml:space="preserve">
+    <value>O numero {0} ja esta em uso por outra instancia do WhatsApp.</value>
+  </data>
   <data name="WhatsAppUserQuotaExceeded" xml:space="preserve">
     <value>Voce atingiu o limite de {0} instancia(s) de WhatsApp.</value>
   </data>

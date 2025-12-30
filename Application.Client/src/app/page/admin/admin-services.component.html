@@ -360,7 +360,7 @@
                 <i class="fa-solid fa-rotate" aria-hidden="true"></i>
               </button>
               <button
-                class="btn subtle"
+                class="btn subtle qr-button"
                 type="button"
                 (click)="openQr(instance)"
                 [disabled]="(instance.status || '').toLowerCase() === 'connected'"
@@ -392,7 +392,7 @@
               <button
                 class="btn danger"
                 type="button"
-                *ngIf="(instance.status || '').toLowerCase() === 'disconnected'"
+                *ngIf="['disconnected', 'pending'].includes((instance.status || '').toLowerCase())"
                 (click)="deleteInstance(instance)"
                 [disabled]="isWhatsAppInstanceDeactivating || isUserInstanceDeactivating"
               >
@@ -420,7 +420,12 @@
         </button>
       </div>
       <div class="modal-body">
-        <img *ngIf="qrCode; else qrEmpty" [src]="getQrCodeSrc()" [attr.alt]="'adminWhatsApp.qr.alt' | translate" />
+        <img
+          *ngIf="qrCode; else qrEmpty"
+          class="qr-image"
+          [src]="getQrCodeSrc()"
+          [attr.alt]="'adminWhatsApp.qr.alt' | translate"
+        />
         <ng-template #qrEmpty>
           <p>{{ 'adminWhatsApp.qr.loading' | translate }}</p>
         </ng-template>

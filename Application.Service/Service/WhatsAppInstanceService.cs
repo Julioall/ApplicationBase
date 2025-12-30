@@ -120,12 +120,15 @@ namespace Application.Service.Service
                 throw new BusinessException(_localizer["WhatsAppOwnerRequired"]);
             }
 
+            var normalizedPhone = NormalizePhoneNumber(phoneNumber);
+            await EnsurePhoneNumberAvailableAsync(normalizedPhone);
+
             var instance = new WhatsAppInstance
             {
                 DisplayName = displayName.Trim(),
                 InternalInstanceName = GenerateInternalName(ownerUserId, isPrivate),
                 OwnerUserId = ownerUserId,
-                PhoneNumber = phoneNumber.Trim(),
+                PhoneNumber = normalizedPhone,
                 IsPrivateUserInstance = isPrivate,
                 Status = WhatsAppInstanceStatus.Pending,
                 IsActive = true,
@@ -204,6 +207,20 @@ namespace Application.Service.Service
                 normalized = normalized.Replace("--", "-", StringComparison.Ordinal);
             }
             return normalized.Trim('-');
+        }
+
+        private async Task EnsurePhoneNumberAvailableAsync(string phoneNumber)
+        {
+            var existing = await _repository.GetActiveByPhoneNumberAsync(phoneNumber);
+            if (existing != null)
+            {
+                throw new BusinessException(_localizer["WhatsAppPhoneInUse", phoneNumber]);
+            }
+        }
+
+        private static string NormalizePhoneNumber(string phoneNumber)
+        {
+            return phoneNumber.Trim();
         }
     }
 }

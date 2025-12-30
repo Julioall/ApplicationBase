@@ -1,6 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { EmailSettingsService, EmailSettings } from '../../service/email/email-settings.service';
 import { WhatsAppSettingsService, WhatsAppSettings } from '../../service/whatsapp/whatsapp-settings.service';
 import {
@@ -67,6 +69,7 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
   private qrRefreshTimer?: ReturnType<typeof setInterval>;
   private qrInstanceId?: string;
   private qrIsAdminContext = false;
+  private qrStop$?: Subject<void>;
   readonly statusLabels: Record<string, string> = {
     pending: 'adminWhatsApp.status.pending',
     connected: 'adminWhatsApp.status.connected',
@@ -110,6 +113,7 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.stopQrSubscriptions();
     this.clearQrTimers();
   }
 
@@ -381,6 +385,7 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
     this.qrCode = '';
     this.qrInstanceLabel = '';
     this.qrInstanceId = undefined;
+    this.stopQrSubscriptions();
     this.clearQrTimers();
   }
 
@@ -426,7 +431,8 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
   }
 
   deleteInstance(instance: WhatsAppInstance & { isShared: boolean }): void {
-    if ((instance.status || '').toLowerCase() !== 'disconnected') {
+    const status = (instance.status || '').toLowerCase();
+    if (status !== 'disconnected' && status !== 'pending') {
       return;
     }
 
@@ -627,6 +633,8 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
 
   private startQrPolling(): void {
     this.clearQrTimers();
+    this.stopQrSubscriptions();
+    this.qrStop$ = new Subject<void>();
 
     const instanceId = this.qrInstanceId;
     if (!instanceId || !this.qrModalOpen) {
@@ -640,12 +648,18 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
         this.clearQrTimers();
         return;
       }
+      if (this.shouldStopQrRequests(instanceId, this.qrIsAdminContext)) {
+        return;
+      }
       const request$ = this.qrIsAdminContext
         ? this.whatsAppInstancesService.getAdminStatus(instanceId)
         : this.whatsAppInstancesService.getUserStatus(instanceId);
 
-      request$.subscribe({
+      request$.pipe(takeUntil(this.qrStop$!)).subscribe({
         next: (status) => {
+          if (this.shouldStopQrRequests(instanceId, this.qrIsAdminContext)) {
+            return;
+          }
           const normalized = (status.status || '').toLowerCase();
           if (this.qrIsAdminContext) {
             this.adminInstances = this.adminInstances.map((item) =>
@@ -669,17 +683,29 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
         this.clearQrTimers();
         return;
       }
+      if (this.shouldStopQrRequests(instanceId, this.qrIsAdminContext)) {
+        return;
+      }
       this.fetchQrCode(instanceId, this.qrIsAdminContext);
     }, 10000);
   }
 
   private fetchQrCode(instanceId: string, isAdminContext: boolean): void {
+    if (!this.qrStop$) {
+      this.qrStop$ = new Subject<void>();
+    }
+    if (this.shouldStopQrRequests(instanceId, isAdminContext)) {
+      return;
+    }
     const refresh$ = isAdminContext
       ? this.whatsAppInstancesService.getAdminQr(instanceId)
       : this.whatsAppInstancesService.getUserQr(instanceId);
 
-    refresh$.subscribe({
+    refresh$.pipe(takeUntil(this.qrStop$)).subscribe({
       next: (resp) => {
+        if (this.shouldStopQrRequests(instanceId, isAdminContext)) {
+          return;
+        }
         if (resp.qrCode && resp.qrCode !== this.qrCode) {
           this.qrCode = resp.qrCode;
         }
@@ -688,6 +714,18 @@ export class AdminServicesComponent implements OnInit, OnDestroy {
         this.notificationService.showError(this.t('adminWhatsApp.messages.qrLoadError'));
       },
     });
+  }
+
+  private shouldStopQrRequests(instanceId: string, isAdminContext: boolean): boolean {
+    return !this.qrModalOpen || this.qrInstanceId !== instanceId || this.qrIsAdminContext !== isAdminContext;
+  }
+
+  private stopQrSubscriptions(): void {
+    if (this.qrStop$) {
+      this.qrStop$.next();
+      this.qrStop$.complete();
+      this.qrStop$ = undefined;
+    }
   }
 
   private getQrInstance(): WhatsAppInstance | undefined {

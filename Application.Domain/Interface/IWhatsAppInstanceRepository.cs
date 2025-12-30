@@ -8,6 +8,7 @@ namespace Application.Domain.Interface
         Task<IReadOnlyCollection<WhatsAppInstance>> GetAdminInstancesAsync(string? search = null);
         Task<IReadOnlyCollection<WhatsAppInstance>> GetUserInstancesAsync(string ownerUserId);
         Task<int> CountUserInstancesAsync(string ownerUserId);
+        Task<WhatsAppInstance?> GetActiveByPhoneNumberAsync(string phoneNumber);
         Task CreateAsync(WhatsAppInstance instance);
         Task UpdateAsync(WhatsAppInstance instance);
         Task DeleteAsync(string id);

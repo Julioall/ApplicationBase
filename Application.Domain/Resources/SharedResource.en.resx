@@ -443,6 +443,9 @@
   <data name="WhatsAppOwnerRequired" xml:space="preserve">
     <value>Instance owner is required.</value>
   </data>
+  <data name="WhatsAppPhoneInUse" xml:space="preserve">
+    <value>Phone number {0} is already being used by another WhatsApp instance.</value>
+  </data>
   <data name="WhatsAppUserQuotaExceeded" xml:space="preserve">
     <value>You reached the limit of {0} WhatsApp instance(s).</value>
   </data>

@@ -50,6 +50,20 @@ namespace Application.Infrastructure.Repository
                 .CountAsync();
         }
 
+        public async Task<WhatsAppInstance?> GetActiveByPhoneNumberAsync(string phoneNumber)
+        {
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+            {
+                return null;
+            }
+
+            var normalized = phoneNumber.Trim();
+            return await _serviceRavenDb.AsyncSession.Query<WhatsAppInstance>()
+                .Customize(x => x.WaitForNonStaleResults())
+                .Where(instance => instance.IsActive && instance.PhoneNumber == normalized)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task CreateAsync(WhatsAppInstance instance)
         {
             await _serviceRavenDb.AsyncSession.StoreAsync(instance);
