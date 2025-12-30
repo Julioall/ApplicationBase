@@ -1,0 +1,142 @@
+<section class="todo-page">
+  <article class="card settings-shell todo-board">
+    <div class="card-lead">
+      <div class="lead-row">
+        <div class="header-copy">
+          <h1>{{ 'todo.title' | translate }}</h1>
+          <p class="subtitle">{{ 'todo.subtitle' | translate }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-body">
+      <div class="board-toolbar">
+        <button class="btn primary" type="button" (click)="openCreate()" [disabled]="!canManage">
+          <i class="fa-regular fa-square-plus"></i>
+          <span>{{ 'todo.newTask' | translate }}</span>
+        </button>
+      </div>
+
+      <section class="board-grid" *ngIf="!isLoading; else loadingState">
+        <div class="board-column" *ngFor="let column of columns" [attr.data-status]="column.status">
+          <div class="column-head">
+            <div class="column-title" [ngClass]="getStatusClass(column.status)">
+              <span class="status-dot"></span>
+              <span class="title-label">{{ column.label | translate }}</span>
+            </div>
+            <span class="pill ghost count">{{ column.items.length }}</span>
+          </div>
+          <div
+            class="column-dropzone"
+            cdkDropList
+            [id]="column.id"
+            [cdkDropListData]="column.items"
+            [cdkDropListConnectedTo]="connectedDropListIds"
+            (cdkDropListDropped)="onDrop($event, column.status)"
+            [cdkDropListDisabled]="!canManage"
+          >
+            <p class="empty" *ngIf="column.items.length === 0">{{ 'todo.emptyColumn' | translate }}</p>
+            <article class="task-card" *ngFor="let task of column.items" cdkDrag [cdkDragDisabled]="!canManage" (click)="selectTask(task)">
+              <div class="task-top">
+                <div class="task-title">
+                  <span class="status-dot small" [ngClass]="getStatusClass(task.Status)"></span>
+                  <span class="title-text">{{ task.Title }}</span>
+                </div>
+                <span class="badge" *ngIf="task.Category">{{ task.Category }}</span>
+              </div>
+              <p class="task-description" *ngIf="task.Description">{{ task.Description }}</p>
+              <div class="task-meta">
+                <span class="pill priority" *ngIf="task.Priority">#{{ task.Priority }}</span>
+                <span class="pill due" *ngIf="getDueBadge(task) as due" [ngClass]="due.variant">{{ due.key | translate: due.params }}</span>
+                <span class="pill done" *ngIf="task.CompletedAt && task.Status === TodoStatus.Done">
+                  {{ 'todo.completedAt' | translate }} {{ task.CompletedAt | date: 'shortDate' }}
+                </span>
+              </div>
+              <div class="task-progress" *ngIf="task.Steps?.length">
+                <div class="progress-meta">
+                  <span class="pill ghost tiny">{{ getCompletedSteps(task) }}/{{ task.Steps.length }}</span>
+                  <span class="percent">{{ getCompletionPercent(task) }}%</span>
+                </div>
+                <div class="progress-rail slim">
+                  <div class="progress-fill" [style.width.%]="getCompletionPercent(task)"></div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </div>
+  </article>
+</section>
+
+<div class="create-modal-backdrop" *ngIf="isCreateModalOpen" (click)="cancelCreate()">
+  <div class="create-modal" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <div>
+        <p class="eyebrow">{{ 'todo.modal.eyebrow' | translate }}</p>
+        <h2>{{ 'todo.modal.title' | translate }}</h2>
+        <p class="subtitle">{{ 'todo.modal.subtitle' | translate }}</p>
+      </div>
+      <button class="btn ghost" type="button" (click)="cancelCreate()" aria-label="Close create modal">
+        <i class="fa-regular fa-circle-xmark"></i>
+      </button>
+    </header>
+    <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="modal-form">
+      <div class="modal-grid">
+        <label class="field">
+          <span>{{ 'todo.fields.title' | translate }}</span>
+          <input type="text" formControlName="Title" [placeholder]="'todo.fields.titlePlaceholder' | translate" />
+        </label>
+        <label class="field">
+          <span>{{ 'todo.fields.category' | translate }}</span>
+          <input type="text" formControlName="Category" [placeholder]="'todo.fields.categoryPlaceholder' | translate" />
+        </label>
+        <label class="field">
+          <span>{{ 'todo.fields.priority' | translate }}</span>
+          <select formControlName="Priority">
+            <option [ngValue]="null">{{ 'todo.fields.priorityNone' | translate }}</option>
+            <option [ngValue]="1">1</option>
+            <option [ngValue]="2">2</option>
+            <option [ngValue]="3">3</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>{{ 'todo.fields.startDate' | translate }}</span>
+          <input type="date" formControlName="StartDate" />
+        </label>
+        <label class="field">
+          <span>{{ 'todo.fields.dueDate' | translate }}</span>
+          <input type="date" formControlName="DueDate" />
+        </label>
+        <label class="field full-row">
+          <span>{{ 'todo.fields.description' | translate }}</span>
+          <textarea rows="3" formControlName="Description" [placeholder]="'todo.fields.descriptionPlaceholder' | translate"></textarea>
+        </label>
+      </div>
+
+      <div class="form-actions modal-actions">
+        <button class="btn ghost" type="button" (click)="cancelCreate()">{{ 'todo.actions.cancel' | translate }}</button>
+        <button class="btn primary" type="submit">{{ 'todo.actions.create' | translate }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="detail-modal-backdrop" *ngIf="selectedTask" (click)="closeDetail()">
+  <div class="detail-modal" (click)="$event.stopPropagation()">
+    <app-todo-task-detail
+      [task]="selectedTask"
+      [canManage]="canManage"
+      (closed)="closeDetail()"
+      (taskUpdated)="handleTaskUpdated($event)"
+      (archived)="handleTaskArchived($event)"
+    ></app-todo-task-detail>
+  </div>
+</div>
+
+<ng-template #loadingState>
+  <div class="loading-state">
+    <i class="fa-regular fa-compass"></i>
+    <p>{{ 'todo.loading' | translate }}</p>
+  </div>
+</ng-template>

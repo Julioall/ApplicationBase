@@ -24,17 +24,19 @@
       </div>
       <div class="nav-scroll">
         <div class="nav-list">
-          <a
-            *ngFor="let link of primaryNav"
-            class="nav-link"
-            [class.active]="link.path ? isRouteActive(link.path) : false"
-            href="#"
-            (click)="onNavClick(link, $event)"
-          >
-            <i class="{{ link.icon }}" aria-hidden="true"></i>
-            <span>{{ link.label | translate }}</span>
-            <span *ngIf="link.badge" class="pill">{{ link.badge | translate }}</span>
-          </a>
+          <ng-container *ngFor="let link of primaryNav">
+            <a
+              *ngIf="isNavVisible(link)"
+              class="nav-link"
+              [class.active]="link.path ? isRouteActive(link.path) : false"
+              href="#"
+              (click)="onNavClick(link, $event)"
+            >
+              <i class="{{ link.icon }}" aria-hidden="true"></i>
+              <span>{{ link.label | translate }}</span>
+              <span *ngIf="link.badge" class="pill">{{ link.badge | translate }}</span>
+            </a>
+          </ng-container>
           <a *ngFor="let link of favoriteNav" class="nav-link subtle" href="#" (click)="closeNav()">
             <i class="{{ link.icon }}" aria-hidden="true"></i>
             <span>{{ link.label | translate }}</span>

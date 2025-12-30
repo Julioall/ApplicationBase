@@ -8,6 +8,7 @@ import { StudentsService } from '../../service/students/students.service';
 import { NotificationService } from '../../service/notification/notification.service';
 import { Student } from '../../model/student';
 import { AuthService } from '../../service/auth/auth.service';
+import { ModalService } from '../../shared/modal/modal.service';
 
 class FakeLoader implements TranslateLoader {
   getTranslation(): any {
@@ -32,6 +33,10 @@ class AuthServiceStub {
   hasPermission = jasmine.createSpy('hasPermission').and.returnValue(true);
 }
 
+class ModalServiceStub {
+  confirm = jasmine.createSpy('confirm').and.returnValue(Promise.resolve(true));
+}
+
 describe('StudentsListComponent', () => {
   let component: StudentsListComponent;
   let fixture: ComponentFixture<StudentsListComponent>;
@@ -54,6 +59,7 @@ describe('StudentsListComponent', () => {
         { provide: NotificationService, useClass: NotificationStub },
         { provide: Router, useValue: { navigate: routerNavigate } },
         { provide: AuthService, useClass: AuthServiceStub },
+        { provide: ModalService, useClass: ModalServiceStub },
       ]
     }).compileComponents();
 
@@ -73,9 +79,8 @@ describe('StudentsListComponent', () => {
     expect(routerNavigate).toHaveBeenCalled();
   });
 
-  it('should delete student when confirmed', () => {
-    spyOn(window, 'confirm').and.returnValue(true);
-    component.onDelete(component.students[0]);
+  it('should delete student when confirmed', async () => {
+    await component.onDelete(component.students[0]);
     expect(studentsService.deleteStudent).toHaveBeenCalledWith('students-1');
   });
 });

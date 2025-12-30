@@ -786,6 +786,66 @@
       "loadStudents": "NÇœo foi possÇðvel carregar os alunos vinculados."
     }
   },
+  "todo": {
+    "eyebrow": "Fluxo",
+    "title": "Quadro de tarefas",
+    "subtitle": "Organize tarefas, contextos e checklists.",
+    "detail": "Detalhes da tarefa",
+    "newTask": "Nova tarefa",
+    "loading": "Carregando tarefas...",
+    "emptyColumn": "Nada aqui ainda.",
+    "completedAt": "Concluida",
+    "steps": {
+      "title": "Etapas",
+      "subtitle": "Arraste para reordenar ou clique para editar.",
+      "label": "etapas",
+      "add": "Adicionar etapa",
+      "placeholder": "Descreva a proxima etapa"
+    },
+    "fields": {
+      "title": "Titulo",
+      "titlePlaceholder": "O que precisa ser feito?",
+      "description": "Descricao",
+      "descriptionPlaceholder": "Adicione uma descricao curta",
+      "category": "Categoria",
+      "categoryPlaceholder": "Tag ou area",
+      "priority": "Prioridade",
+      "priorityNone": "Sem prioridade",
+      "startDate": "Inicio",
+      "dueDate": "Prazo",
+      "context": "Contexto"
+    },
+    "status": {
+      "notStarted": "Nao iniciada",
+      "inProgress": "Em andamento",
+      "done": "Concluida"
+    },
+    "actions": {
+      "create": "Criar tarefa",
+      "cancel": "Cancelar",
+      "close": "Fechar",
+      "archive": "Arquivar"
+    },
+    "notifications": {
+      "created": "Tarefa criada",
+      "updated": "Tarefa atualizada",
+      "archived": "Tarefa arquivada",
+      "stepAdded": "Etapa adicionada",
+      "stepUpdated": "Etapa atualizada",
+      "stepDeleted": "Etapa removida",
+      "stepsReordered": "Etapas reordenadas"
+    },
+    "badge": {
+      "dueToday": "Vence hoje",
+      "dueIn": "Vence em {{count}} dia(s)",
+      "dueAgo": "Venceu ha {{count}} dia(s)"
+    },
+    "modal": {
+      "eyebrow": "Criar",
+      "title": "Nova tarefa",
+      "subtitle": "Preencha o basico e coloque a tarefa no quadro."
+    }
+  },
   "notifications": {
     "title": "Notificações",
     "empty": "Nenhuma notificação até o momento.",

@@ -1,12 +1,14 @@
 using Application.Domain.Interface;
 using Application.Domain.Interface.Students;
 using Application.Domain.Interface.Education;
+using Application.Domain.Interface.Todo;
 using Application.Infrastructure.Background;
 using Application.Infrastructure.Repository.Education;
 using Application.Infrastructure.Repository;
 using Application.Infrastructure.ConfigurationDb;
 using Application.Infrastructure.Indexes;
 using Application.Infrastructure.Repository.Students;
+using Application.Infrastructure.Repository.Todo;
 using Application.Infrastructure.Service;
 using Application.Shared.Background;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,6 +39,7 @@ namespace Application.Infrastructure
             services.TryAddScoped<IEducationImportRepository, EducationImportRepository>();
             services.TryAddScoped<INotificationRepository, NotificationRepository>();
             services.TryAddScoped<IWhatsAppInstanceRepository, WhatsAppInstanceRepository>();
+            services.TryAddScoped<ITodoRepository, TodoRepository>();
 
             return services;
         }

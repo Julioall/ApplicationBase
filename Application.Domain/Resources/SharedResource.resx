@@ -472,6 +472,39 @@
   <data name="WhatsAppIntegrationMissing" xml:space="preserve">
     <value>Integracao do WhatsApp nao configurada.</value>
   </data>
+  <data name="TodoTitleRequired" xml:space="preserve">
+    <value>Titulo da tarefa e obrigatorio.</value>
+  </data>
+  <data name="TodoStatusInvalid" xml:space="preserve">
+    <value>Status da tarefa invalido.</value>
+  </data>
+  <data name="TodoPriorityInvalid" xml:space="preserve">
+    <value>Prioridade deve estar entre 1 e 3.</value>
+  </data>
+  <data name="TodoDateRangeInvalid" xml:space="preserve">
+    <value>Data de inicio deve ser menor ou igual a data de vencimento.</value>
+  </data>
+  <data name="TodoContextTypeRequired" xml:space="preserve">
+    <value>ContextType e obrigatorio quando ContextId for informado.</value>
+  </data>
+  <data name="TodoContextIdRequired" xml:space="preserve">
+    <value>ContextId e obrigatorio quando ContextType for informado.</value>
+  </data>
+  <data name="TodoStepTitleRequired" xml:space="preserve">
+    <value>Titulo da etapa e obrigatorio.</value>
+  </data>
+  <data name="TodoStepIdRequired" xml:space="preserve">
+    <value>Identificador da etapa e obrigatorio.</value>
+  </data>
+  <data name="TodoStepOrderInvalid" xml:space="preserve">
+    <value>Ordem das etapas invalida.</value>
+  </data>
+  <data name="TodoTaskNotFound" xml:space="preserve">
+    <value>Tarefa {0} nao encontrada.</value>
+  </data>
+  <data name="TodoStepNotFound" xml:space="preserve">
+    <value>Etapa {0} nao encontrada.</value>
+  </data>
 
 </root>
 

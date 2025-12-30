@@ -20,6 +20,7 @@ namespace Application.Service
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<IEducationService, EducationService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<ITodoService, TodoService>();
             return services;
         }
     }

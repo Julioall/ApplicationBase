@@ -762,6 +762,66 @@
   "admin": {
     "pageTitle": "Admin"
   },
+  "todo": {
+    "eyebrow": "Workflow",
+    "title": "Todo board",
+    "subtitle": "Organize tasks, contexts and checklists.",
+    "detail": "Task details",
+    "newTask": "New task",
+    "loading": "Loading tasks...",
+    "emptyColumn": "Nothing here yet.",
+    "completedAt": "Completed",
+    "steps": {
+      "title": "Steps",
+      "subtitle": "Drag to reorder or click to edit.",
+      "label": "steps",
+      "add": "Add step",
+      "placeholder": "Describe the next step"
+    },
+    "fields": {
+      "title": "Title",
+      "titlePlaceholder": "What needs to be done?",
+      "description": "Description",
+      "descriptionPlaceholder": "Add a short description",
+      "category": "Category",
+      "categoryPlaceholder": "Tag or area",
+      "priority": "Priority",
+      "priorityNone": "No priority",
+      "startDate": "Start date",
+      "dueDate": "Due date",
+      "context": "Context"
+    },
+    "status": {
+      "notStarted": "Not started",
+      "inProgress": "In progress",
+      "done": "Done"
+    },
+    "actions": {
+      "create": "Create task",
+      "cancel": "Cancel",
+      "close": "Close",
+      "archive": "Archive"
+    },
+    "notifications": {
+      "created": "Task created",
+      "updated": "Task updated",
+      "archived": "Task archived",
+      "stepAdded": "Step added",
+      "stepUpdated": "Step updated",
+      "stepDeleted": "Step removed",
+      "stepsReordered": "Steps reordered"
+    },
+    "badge": {
+      "dueToday": "Due today",
+      "dueIn": "Due in {{count}} day(s)",
+      "dueAgo": "{{count}} day(s) ago"
+    },
+    "modal": {
+      "eyebrow": "Create",
+      "title": "New task",
+      "subtitle": "Define the essentials and place the task on the board."
+    }
+  },
   "navbar": {
     "logo": "App",
     "title": "Application",

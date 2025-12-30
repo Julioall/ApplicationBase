@@ -61,7 +61,7 @@ describe('RegisterComponent', () => {
       fullName: 'Usuário Teste',
       email: 'teste@exemplo.com',
       password: 'Test@123',
-      confirmpassword: 'Test@123',
+      confirmPassword: 'Test@123',
       updates: true,
     });
 
@@ -87,7 +87,7 @@ describe('RegisterComponent', () => {
       fullName: 'Usuário Teste',
       email: 'novo@exemplo.com',
       password: 'Test@123',
-      confirmpassword: 'Test@123',
+      confirmPassword: 'Test@123',
       updates: true,
     });
 

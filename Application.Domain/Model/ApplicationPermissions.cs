@@ -15,6 +15,8 @@ namespace Application.Domain.Model
         public const string ManageStudents = "manage:students";
         public const string ViewEducation = "view:education";
         public const string ManageEducation = "manage:education";
+        public const string ViewTodo = "view:todo";
+        public const string ManageTodo = "manage:todo";
 
         public static IReadOnlyCollection<string> DefaultUserPermissions => new[]
         {
@@ -23,7 +25,9 @@ namespace Application.Domain.Model
             ManageServices,
             ManageWhatsAppSelf,
             ViewEducation,
-            ManageEducation
+            ManageEducation,
+            ViewTodo,
+            ManageTodo
         };
 
         public static IReadOnlyCollection<string> DefaultAdminPermissions => new[]
@@ -38,7 +42,9 @@ namespace Application.Domain.Model
             ViewStudents,
             ManageStudents,
             ViewEducation,
-            ManageEducation
+            ManageEducation,
+            ViewTodo,
+            ManageTodo
         };
 
         public static IReadOnlyCollection<string> All => new[]
@@ -53,7 +59,9 @@ namespace Application.Domain.Model
             ViewStudents,
             ManageStudents,
             ViewEducation,
-            ManageEducation
+            ManageEducation,
+            ViewTodo,
+            ManageTodo
         };
     }
 }

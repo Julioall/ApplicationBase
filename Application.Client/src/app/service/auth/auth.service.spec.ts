@@ -1,8 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { of } from 'rxjs';
 import { AuthService } from './auth.service';
 import { environment } from '../../environment/environment';
 import { User } from '../../model/User';
+
+class FakeLoader implements TranslateLoader {
+  getTranslation(): any {
+    return of({});
+  }
+}
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -10,7 +18,7 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule, TranslateModule.forRoot({ loader: { provide: TranslateLoader, useClass: FakeLoader } })],
       providers: [AuthService],
     });
     service = TestBed.inject(AuthService);
@@ -70,7 +78,7 @@ describe('AuthService', () => {
 
     service.login('user@test.com', 'wrong').subscribe({
       next: () => fail('expected error'),
-      error: (err) => expect(err.message).toContain('Login failed'),
+      error: (err) => expect(err.message).toContain('auth.errors.loginFailed'),
     });
 
     const req = httpMock.expectOne(`${environment.apiUrl}/Authentication/login`);

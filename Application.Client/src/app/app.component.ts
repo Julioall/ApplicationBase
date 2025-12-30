@@ -13,6 +13,8 @@ import {
   MANAGE_EDUCATION_PERMISSION,
   VIEW_STUDENTS_PERMISSION,
   VIEW_EDUCATION_PERMISSION,
+  VIEW_TODO_PERMISSION,
+  MANAGE_TODO_PERMISSION,
 } from './model/permissions';
 import { Notification as AppNotification } from './model/notification';
 import { NotificationApiService } from './service/notification/notification-api.service';
@@ -22,6 +24,7 @@ type NavItem = {
   label: string;
   badge?: string;
   path?: string;
+  permissions?: string[];
 };
 
 @Component({
@@ -41,7 +44,7 @@ export class AppComponent implements OnInit, OnDestroy {
     { icon: 'fa-solid fa-compass', label: 'home.primaryNav.panel', path: '/home' },
     { icon: 'fa-solid fa-school', label: 'navbar.education', path: '/education' },
     { icon: 'fa-solid fa-signal', label: 'home.primaryNav.metrics' },
-    { icon: 'fa-solid fa-clipboard-check', label: 'home.primaryNav.todo' },
+    { icon: 'fa-solid fa-clipboard-check', label: 'home.primaryNav.todo', path: '/todo', permissions: [VIEW_TODO_PERMISSION, MANAGE_TODO_PERMISSION] },
   ];
   favoriteNav: NavItem[] = [
     { icon: 'fa-regular fa-file-lines', label: 'home.favoriteNav.reports' },
@@ -195,6 +198,14 @@ export class AppComponent implements OnInit, OnDestroy {
       return false;
     }
     return this.router.url.startsWith(path);
+  }
+
+  isNavVisible(link: NavItem): boolean {
+    if (!link.permissions || link.permissions.length === 0) {
+      return true;
+    }
+
+    return this.authService.hasAnyPermission(link.permissions);
   }
 
   private updateShellVisibility(url: string): void {

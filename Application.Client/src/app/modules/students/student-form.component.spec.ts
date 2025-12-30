@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { of } from 'rxjs';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -28,6 +29,7 @@ describe('StudentFormComponent', () => {
       declarations: [StudentFormComponent],
       imports: [
         ReactiveFormsModule,
+        HttpClientTestingModule,
         TranslateModule.forRoot({ loader: { provide: TranslateLoader, useClass: FakeLoader } })
       ],
       providers: [

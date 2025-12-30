@@ -1,0 +1,56 @@
+<div
+  class="steps-list"
+  cdkDropList
+  [cdkDropListData]="steps"
+  (cdkDropListDropped)="onDrop($event)"
+  [cdkDropListDisabled]="!canEdit"
+>
+  <div class="step-row" *ngFor="let step of steps; trackBy: trackById" cdkDrag [cdkDragDisabled]="!canEdit">
+    <button class="drag-handle" type="button" cdkDragHandle [disabled]="!canEdit" aria-label="Reorder">
+      <span>⋮⋮</span>
+    </button>
+    <label class="checkbox">
+      <input
+        type="checkbox"
+        [checked]="step.IsCompleted"
+        (change)="onToggle(step, $any($event.target).checked)"
+        [disabled]="!canEdit"
+      />
+      <span class="fakebox"></span>
+    </label>
+    <div class="step-body" [class.completed]="step.IsCompleted">
+      <span *ngIf="editingStepId !== step.Id" (click)="startEditing(step)">{{ step.Title }}</span>
+      <input
+        *ngIf="editingStepId === step.Id"
+        type="text"
+        [(ngModel)]="editingTitle"
+        (blur)="commitEdit(step)"
+        (keydown.enter)="commitEdit(step); $event.preventDefault()"
+        [disabled]="!canEdit"
+      />
+      <small *ngIf="step.CompletedAt" class="timestamp">{{ step.CompletedAt | date: 'short' }}</small>
+    </div>
+    <button class="icon-btn ghost sm danger" type="button" *ngIf="canEdit" (click)="deleteStep.emit(step.Id)">
+      <i class="fa-regular fa-trash-can"></i>
+    </button>
+  </div>
+</div>
+
+<div class="add-inline" *ngIf="canEdit">
+  <button class="drag-handle ghost" type="button" disabled aria-hidden="true">⋮⋮</button>
+  <label class="checkbox ghost">
+    <input type="checkbox" disabled />
+    <span class="fakebox"></span>
+  </label>
+  <input
+    type="text"
+    class="new-step"
+    [(ngModel)]="newStepTitle"
+    [placeholder]="'todo.steps.placeholder' | translate"
+    (keydown.enter)="submitNewStep()"
+  />
+  <button class="btn ghost sm" type="button" (click)="submitNewStep()">
+    <i class="fa-regular fa-plus"></i>
+    <span>{{ 'todo.steps.add' | translate }}</span>
+  </button>
+</div>
