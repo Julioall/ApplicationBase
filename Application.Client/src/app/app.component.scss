@@ -679,39 +679,14 @@
   margin-right: calc(var(--main-padding-x) * -1);
   width: calc(100% + (var(--main-padding-x) * 2));
   padding: var(--space-3) var(--space-3);
-  border-top: 1px solid var(--border-soft);
-  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-alt) 100%);
+  border-top: none;
+  background: var(--page-bg);
   border-radius: 0;
   display: grid;
   gap: var(--space-1);
   box-shadow: none;
   font-size: var(--font-size-xs);
   text-align: center;
-}
-
-.footer-meta {
-  display: grid;
-  gap: var(--space-1);
-  color: var(--text-subtle);
-  line-height: 1.4;
-  justify-items: center;
-}
-
-.footer-meta .rights {
-  margin: 0;
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-}
-
-.footer-meta .detail {
-  margin: 0;
-  display: inline-flex;
-  gap: var(--space-1);
-}
-
-.footer-meta a {
-  color: var(--accent-strong);
-  font-weight: var(--font-weight-semibold);
 }
 
 .footer-social {
@@ -745,6 +720,13 @@
 
 .footer-social a:hover i {
   color: var(--accent-strong);
+}
+
+.footer-legal {
+  color: var(--text-subtle);
+  font-size: var(--font-size-2xs, 11px);
+  line-height: 1.4;
+  opacity: 0.8;
 }
 
 @include respond-down(md) {
