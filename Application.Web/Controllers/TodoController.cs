@@ -5,7 +5,9 @@ using Application.Domain.Model.Todo.Dtos;
 using Application.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
+using System.IO;
 using System.Security.Claims;
 
 namespace Application.Api.Controllers
@@ -15,6 +17,8 @@ namespace Application.Api.Controllers
     [Authorize]
     public class TodoController : ControllerBase
     {
+        private const long MaxImageBytes = 5 * 1024 * 1024;
+
         private readonly ITodoService _todoService;
         private readonly IUserService _userService;
         private readonly IStringLocalizer<SharedResource> _localizer;
@@ -32,15 +36,6 @@ namespace Application.Api.Controllers
         public async Task<IActionResult> GetTasks([FromQuery] TodoTaskSearchQuery? query)
         {
             var criteria = query ?? new TodoTaskSearchQuery();
-            if (string.IsNullOrWhiteSpace(criteria.AssignedToUserId))
-            {
-                var currentUserId = await TryGetCurrentUserIdAsync();
-                if (!string.IsNullOrWhiteSpace(currentUserId))
-                {
-                    criteria.AssignedToUserId = currentUserId;
-                }
-            }
-
             var tasks = await _todoService.GetTasksAsync(criteria);
             return Ok(tasks);
         }
@@ -52,6 +47,49 @@ namespace Application.Api.Controllers
         {
             var task = await _todoService.GetByIdAsync(id);
             return Ok(task);
+        }
+
+        [HttpPost("images")]
+        [Authorize(Policy = ApplicationPermissions.ManageTodo)]
+        [RequestSizeLimit(MaxImageBytes)]
+        [ProducesResponseType(typeof(TodoImageUploadResultDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UploadImage([FromForm] IFormFile? file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["InvalidRequestDetail"], statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            if (!file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["ProfilePictureContentTypeInvalid"], statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            if (file.Length > MaxImageBytes)
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["ProfilePictureTooLarge"], statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            var userId = await RequireCurrentUserIdAsync();
+            await using var stream = file.OpenReadStream();
+            var imageId = await _todoService.UploadImageAsync(userId, stream, file.ContentType, file.FileName ?? "image");
+
+            var url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/api/todo/images/{Uri.EscapeDataString(imageId)}";
+            return Ok(new TodoImageUploadResultDto { Url = url, ImageId = imageId });
+        }
+
+        [HttpGet("images/{imageId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetImage(string imageId)
+        {
+            var image = await _todoService.GetImageAsync(imageId);
+            if (image == null)
+            {
+                return NotFound();
+            }
+
+            return File(image.Value.Data, image.Value.ContentType);
         }
 
         [HttpPost]
@@ -91,6 +129,15 @@ namespace Application.Api.Controllers
         public async Task<IActionResult> Archive(string id)
         {
             await _todoService.ArchiveAsync(id);
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Policy = ApplicationPermissions.ManageTodo)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> Delete(string id)
+        {
+            await _todoService.DeleteAsync(id);
             return NoContent();
         }
 

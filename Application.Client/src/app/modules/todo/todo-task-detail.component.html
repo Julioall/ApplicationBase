@@ -1,45 +1,29 @@
 <section class="task-detail" *ngIf="task">
   <div class="detail-header">
-    <div>
-      <p class="eyebrow">{{ 'todo.detail' | translate }}</p>
-      <h2>{{ task.Title }}</h2>
-      <p class="muted" *ngIf="task.Description">{{ task.Description }}</p>
+    <div class="eyebrow-row">
+      <span class="eyebrow">{{ task.StartDate | date: 'dd-MM-yyyy' }} → {{ task.DueDate | date: 'dd-MM-yyyy' }}</span>
+      <span class="priority-inline" *ngIf="task.Priority as pr">
+        <ng-container [ngSwitch]="pr">
+          <ng-container *ngSwitchCase="1">
+            <i class="fa-solid fa-bolt low"></i>
+            <i class="fa-solid fa-bolt muted"></i>
+            <i class="fa-solid fa-bolt muted"></i>
+          </ng-container>
+          <ng-container *ngSwitchCase="2">
+            <i class="fa-solid fa-bolt medium"></i>
+            <i class="fa-solid fa-bolt medium"></i>
+            <i class="fa-solid fa-bolt muted"></i>
+          </ng-container>
+          <ng-container *ngSwitchCase="3">
+            <i class="fa-solid fa-bolt high"></i>
+            <i class="fa-solid fa-bolt high"></i>
+            <i class="fa-solid fa-bolt high"></i>
+          </ng-container>
+        </ng-container>
+      </span>
     </div>
-    <div class="header-actions">
-      <select [ngModel]="task.Status" (ngModelChange)="updateStatus($event)" [disabled]="!canManage">
-        <option *ngFor="let status of statuses" [ngValue]="status.value">{{ status.label | translate }}</option>
-      </select>
-      <button class="icon-btn ghost" type="button" (click)="close()">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-  </div>
-
-  <div class="meta-grid">
-    <div class="meta-card" *ngIf="task.Category">
-      <p class="label">{{ 'todo.fields.category' | translate }}</p>
-      <p class="value">{{ task.Category }}</p>
-    </div>
-    <div class="meta-card" *ngIf="task.Priority">
-      <p class="label">{{ 'todo.fields.priority' | translate }}</p>
-      <p class="value">#{{ task.Priority }}</p>
-    </div>
-    <div class="meta-card" *ngIf="task.StartDate">
-      <p class="label">{{ 'todo.fields.startDate' | translate }}</p>
-      <p class="value">{{ task.StartDate | date }}</p>
-    </div>
-    <div class="meta-card" *ngIf="task.DueDate">
-      <p class="label">{{ 'todo.fields.dueDate' | translate }}</p>
-      <p class="value">{{ task.DueDate | date }}</p>
-    </div>
-    <div class="meta-card" *ngIf="task.CompletedAt">
-      <p class="label">{{ 'todo.completedAt' | translate }}</p>
-      <p class="value">{{ task.CompletedAt | date: 'short' }}</p>
-    </div>
-    <div class="meta-card" *ngIf="task.ContextType && task.ContextId">
-      <p class="label">{{ 'todo.fields.context' | translate }}</p>
-      <p class="value">{{ task.ContextType }} — {{ task.ContextId }}</p>
-    </div>
+    <h2>{{ task.Title }}</h2>
+    <div class="muted description-html" *ngIf="task.Description" [innerHTML]="task.Description"></div>
   </div>
 
   <section class="steps-section">
@@ -65,9 +49,13 @@
   </section>
 
   <footer class="detail-footer" *ngIf="canManage">
-    <button class="btn danger ghost" type="button" (click)="archive()">
-      <i class="fa-regular fa-box-archive"></i>
+    <button class="btn ghost" type="button" (click)="archive()">
+      <i class="fa-solid fa-box-archive"></i>
       <span>{{ 'todo.actions.archive' | translate }}</span>
+    </button>
+    <button class="btn danger ghost" type="button" (click)="deleteTask()">
+      <i class="fa-regular fa-trash-can"></i>
+      <span>{{ 'todo.actions.delete' | translate }}</span>
     </button>
     <button class="btn ghost" type="button" (click)="close()">{{ 'todo.actions.close' | translate }}</button>
   </footer>

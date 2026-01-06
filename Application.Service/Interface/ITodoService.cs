@@ -1,5 +1,6 @@
 using Application.Domain.Model.Todo;
 using Application.Domain.Model.Todo.Dtos;
+using System.IO;
 
 namespace Application.Service.Interface
 {
@@ -14,5 +15,8 @@ namespace Application.Service.Interface
         Task<TodoTaskDto> UpdateStepAsync(string taskId, string stepId, UpdateTodoStepDto dto);
         Task<TodoTaskDto> ReorderStepsAsync(string taskId, ReorderTodoStepsDto dto);
         Task<TodoTaskDto> DeleteStepAsync(string taskId, string stepId);
+        Task<string> UploadImageAsync(string uploadedByUserId, Stream stream, string contentType, string fileName);
+        Task<(byte[] Data, string ContentType, string FileName)?> GetImageAsync(string imageId);
+        Task DeleteAsync(string id);
     }
 }

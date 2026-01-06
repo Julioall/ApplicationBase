@@ -65,5 +65,15 @@ namespace Application.Infrastructure.Repository.Todo
         {
             await _serviceRavenDb.AsyncSession.StoreAsync(entity);
         }
+
+        public async Task DeleteAsync(string id)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(id);
+            var existing = await _serviceRavenDb.AsyncSession.LoadAsync<TodoTask>(id);
+            if (existing != null)
+            {
+                _serviceRavenDb.AsyncSession.Delete(existing);
+            }
+        }
     }
 }

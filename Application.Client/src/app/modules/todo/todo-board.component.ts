@@ -1,10 +1,14 @@
 import { CdkDragDrop, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { finalize } from 'rxjs/operators';
 import { AuthService } from '../../service/auth/auth.service';
 import { TodoService } from '../../service/todo/todo.service';
 import { MANAGE_TODO_PERMISSION, VIEW_TODO_PERMISSION } from '../../model/permissions';
 import { CreateTodoTask, TodoStatus, TodoTask, UpdateTodoTask } from '../../model/todo';
+import { QuillModules } from 'ngx-quill';
+import { NotificationService } from '../../service/notification/notification.service';
+import { TranslateService } from '@ngx-translate/core';
 
 type TodoColumn = {
   status: TodoStatus;
@@ -27,6 +31,29 @@ export class TodoBoardComponent implements OnInit {
   isCreateModalOpen = false;
   isLoading = false;
   connectedDropListIds: string[] = [];
+  categoryOptions: string[] = [];
+  selectedCategories: string[] = [];
+  isUploadingImage = false;
+  readonly priorityLevels = [1, 2, 3];
+  private quillEditor: any;
+  readonly descriptionModules: QuillModules = {
+    toolbar: {
+      container: [
+        [{ header: [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ color: [] }, { background: [] }],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        [{ indent: '-1' }, { indent: '+1' }],
+        [{ align: [] }],
+        [{ size: [] }],
+        ['link', 'image'],
+        ['clean'],
+      ],
+      handlers: {
+        image: () => this.handleImageUpload(),
+      },
+    },
+  };
   readonly statusIcons: Record<TodoStatus, string> = {
     [TodoStatus.NotStarted]: 'fa-regular fa-circle',
     [TodoStatus.InProgress]: 'fa-solid fa-spinner',
@@ -36,16 +63,33 @@ export class TodoBoardComponent implements OnInit {
   constructor(
     private readonly todoService: TodoService,
     private readonly fb: FormBuilder,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly notification: NotificationService,
+    private readonly translate: TranslateService
   ) {
     this.createForm = this.fb.group({
       Title: ['', Validators.required],
       Description: [''],
       Category: [''],
-      Priority: [null],
+      Priority: [1],
       StartDate: [null],
       DueDate: [null],
     });
+  }
+
+  setPriority(priority: number | null): void {
+    this.createForm.patchValue({ Priority: priority });
+  }
+
+  isPriorityActive(current?: number | null, level?: number): boolean {
+    if (!current || !level) {
+      return false;
+    }
+    return current >= level;
+  }
+
+  onEditorCreated(quill: any): void {
+    this.quillEditor = quill;
   }
 
   ngOnInit(): void {
@@ -66,6 +110,8 @@ export class TodoBoardComponent implements OnInit {
     }
     this.isCreateModalOpen = true;
     this.createForm.reset();
+    this.selectedCategories = [];
+    this.createForm.patchValue({ Priority: 1 });
   }
 
   cancelCreate(): void {
@@ -82,7 +128,8 @@ export class TodoBoardComponent implements OnInit {
     const payload: CreateTodoTask = {
       Title: formValue.Title,
       Description: formValue.Description,
-      Category: formValue.Category,
+      Category: this.selectedCategories[0] ?? formValue.Category ?? null,
+      Categories: this.selectedCategories.length > 0 ? this.selectedCategories : null,
       Priority: formValue.Priority ? Number(formValue.Priority) : null,
       StartDate: formValue.StartDate || null,
       DueDate: formValue.DueDate || null,
@@ -92,6 +139,7 @@ export class TodoBoardComponent implements OnInit {
       next: (task) => {
         this.tasks = [task, ...this.tasks];
         this.refreshColumns();
+        this.refreshCategories();
         this.isCreateModalOpen = false;
         this.selectedTask = task;
       },
@@ -107,15 +155,91 @@ export class TodoBoardComponent implements OnInit {
     this.selectedTask = null;
   }
 
+  handleImageUpload(): void {
+    if (!this.canManage) {
+      return;
+    }
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.style.display = 'none';
+    document.body.appendChild(input);
+
+    input.onchange = () => {
+      const file = input.files?.[0];
+      document.body.removeChild(input);
+
+      if (!file) {
+        return;
+      }
+
+      this.isUploadingImage = true;
+      this.todoService
+        .uploadImage(file)
+        .pipe(finalize(() => (this.isUploadingImage = false)))
+        .subscribe({
+          next: ({ url }) => {
+            const editor = this.quillEditor;
+            if (!editor) {
+              return;
+            }
+            const range = editor.getSelection(true) || { index: editor.getLength(), length: 0 };
+            editor.insertEmbed(range.index, 'image', url, 'user');
+            editor.setSelection(range.index + 1);
+          },
+          error: () => {
+            const message = this.translate.instant('todo.notifications.imageUploadFailed');
+            this.notification.showError(message !== 'todo.notifications.imageUploadFailed' ? message : 'Não foi possível enviar a imagem.');
+          },
+        });
+    };
+
+    input.click();
+  }
+
+  onCategoryEnter(event: Event, input: HTMLInputElement): void {
+    event.preventDefault();
+    this.addCategory(input.value);
+    input.value = '';
+  }
+
+  addCategory(value: string): void {
+    const trimmed = value?.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    const exists = this.selectedCategories.some((c) => c.localeCompare(trimmed, undefined, { sensitivity: 'accent' }) === 0);
+    if (exists) {
+      return;
+    }
+
+    this.selectedCategories = [...this.selectedCategories, trimmed];
+  }
+
+  removeCategory(category: string): void {
+    this.selectedCategories = this.selectedCategories.filter((c) => c !== category);
+  }
+
+  getTaskCategories(task: TodoTask): string[] {
+    if (task.Categories && task.Categories.length > 0) {
+      return task.Categories;
+    }
+    return task.Category ? [task.Category] : [];
+  }
+
   handleTaskUpdated(task: TodoTask): void {
     this.replaceTask(task);
     this.refreshColumns();
+    this.refreshCategories();
     this.selectedTask = this.tasks.find(t => t.Id === task.Id) ?? null;
   }
 
   handleTaskArchived(taskId: string): void {
     this.tasks = this.tasks.filter(t => t.Id !== taskId);
     this.refreshColumns();
+    this.refreshCategories();
     this.selectedTask = null;
   }
 
@@ -193,11 +317,12 @@ export class TodoBoardComponent implements OnInit {
     this.isLoading = true;
     this.todoService.getTasks().subscribe({
       next: (tasks) => {
-        this.tasks = tasks ?? [];
-        this.refreshColumns();
-        this.syncSelectedTask();
-        this.isLoading = false;
-      },
+            this.tasks = tasks ?? [];
+            this.refreshColumns();
+            this.syncSelectedTask();
+            this.refreshCategories();
+            this.isLoading = false;
+          },
       error: () => {
         this.isLoading = false;
       },
@@ -250,6 +375,19 @@ export class TodoBoardComponent implements OnInit {
     this.connectedDropListIds = this.columns.map(c => c.id);
   }
 
+  private refreshCategories(): void {
+    const categories = new Set<string>();
+    this.tasks.forEach(task => {
+      const taskCategories = task.Categories && task.Categories.length > 0 ? task.Categories : (task.Category ? [task.Category] : []);
+      taskCategories.forEach((cat: string | null | undefined) => {
+        if (cat) {
+          categories.add(cat);
+        }
+      });
+    });
+    this.categoryOptions = Array.from(categories).sort((a, b) => a.localeCompare(b));
+  }
+
   getStatusClass(status: TodoStatus): string {
     if (status === TodoStatus.NotStarted) {
       return 'NotStarted';
@@ -258,6 +396,29 @@ export class TodoBoardComponent implements OnInit {
       return 'InProgress';
     }
     return 'Done';
+  }
+
+  getPriorityLabel(priority?: number | null): string {
+    if (priority === 1) {
+      const text = this.translate.instant('todo.priority.low');
+      return text !== 'todo.priority.low' ? text : 'Baixa';
+    }
+    if (priority === 2) {
+      const text = this.translate.instant('todo.priority.medium');
+      return text !== 'todo.priority.medium' ? text : 'Media';
+    }
+    if (priority === 3) {
+      const text = this.translate.instant('todo.priority.high');
+      return text !== 'todo.priority.high' ? text : 'Alta';
+    }
+    return '';
+  }
+
+  getPriorityClass(priority?: number | null): string {
+    if (priority === 1) return 'low';
+    if (priority === 2) return 'medium';
+    if (priority === 3) return 'high';
+    return '';
   }
 
   getCompletionPercent(task: TodoTask): number {

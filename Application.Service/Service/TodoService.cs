@@ -4,7 +4,9 @@ using Application.Domain.Interface.Todo;
 using Application.Domain.Model.Todo;
 using Application.Domain.Model.Todo.Dtos;
 using Application.Service.Interface;
+using HtmlAgilityPack;
 using FluentValidation;
+using Ganss.Xss;
 using Microsoft.Extensions.Localization;
 
 namespace Application.Service.Service
@@ -19,6 +21,8 @@ namespace Application.Service.Service
         private readonly IValidator<UpdateTodoStepDto> _updateStepValidator;
         private readonly IValidator<ReorderTodoStepsDto> _reorderValidator;
         private readonly IStringLocalizer<SharedResource> _localizer;
+        private readonly ITodoImageRepository _todoImageRepository;
+        private readonly HtmlSanitizer _htmlSanitizer;
 
         public TodoService(
             ITodoRepository repository,
@@ -28,7 +32,8 @@ namespace Application.Service.Service
             IValidator<CreateTodoStepDto> createStepValidator,
             IValidator<UpdateTodoStepDto> updateStepValidator,
             IValidator<ReorderTodoStepsDto> reorderValidator,
-            IStringLocalizer<SharedResource> localizer)
+            IStringLocalizer<SharedResource> localizer,
+            ITodoImageRepository todoImageRepository)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _taskValidator = taskValidator ?? throw new ArgumentNullException(nameof(taskValidator));
@@ -38,6 +43,8 @@ namespace Application.Service.Service
             _updateStepValidator = updateStepValidator ?? throw new ArgumentNullException(nameof(updateStepValidator));
             _reorderValidator = reorderValidator ?? throw new ArgumentNullException(nameof(reorderValidator));
             _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
+            _todoImageRepository = todoImageRepository ?? throw new ArgumentNullException(nameof(todoImageRepository));
+            _htmlSanitizer = BuildSanitizer();
         }
 
         public async Task<IReadOnlyList<TodoTaskDto>> GetTasksAsync(TodoTaskSearchQuery query)
@@ -67,12 +74,16 @@ namespace Application.Service.Service
 
             await _createValidator.ValidateAndThrowAsync(dto);
 
+            var sanitizedDescription = await ProcessDescriptionAsync(dto.Description, currentUserId);
+            var categories = NormalizeCategories(dto.Categories, dto.Category);
+
             var task = new TodoTask
             {
                 Title = dto.Title.Trim(),
-                Description = Normalize(dto.Description),
+                Description = sanitizedDescription,
                 Status = dto.Status ?? TodoStatus.NotStarted,
-                Category = Normalize(dto.Category),
+                Category = categories.FirstOrDefault(),
+                Categories = categories.ToList(),
                 Priority = dto.Priority,
                 StartDate = dto.StartDate,
                 DueDate = dto.DueDate,
@@ -137,8 +148,13 @@ namespace Application.Service.Service
                 task.Title = dto.Title.Trim();
             }
 
-            task.Description = dto.Description != null ? Normalize(dto.Description) : task.Description;
-            task.Category = dto.Category != null ? Normalize(dto.Category) : task.Category;
+            task.Description = dto.Description != null ? await ProcessDescriptionAsync(dto.Description, task.CreatedByUserId) : task.Description;
+            if (dto.Categories != null || dto.Category != null)
+            {
+                var categories = NormalizeCategories(dto.Categories, dto.Category);
+                task.Categories = categories.ToList();
+                task.Category = categories.FirstOrDefault();
+            }
             task.Priority = dto.Priority ?? task.Priority;
             task.StartDate = dto.StartDate ?? task.StartDate;
             task.DueDate = dto.DueDate ?? task.DueDate;
@@ -343,6 +359,33 @@ namespace Application.Service.Service
             return ToDto(task);
         }
 
+        public async Task DeleteAsync(string id)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(id);
+            var task = await _repository.GetByIdAsync(id);
+            if (task == null)
+            {
+                throw new NotFoundException(_localizer["TodoTaskNotFound", id]);
+            }
+
+            await _repository.DeleteAsync(id);
+        }
+
+        public async Task<string> UploadImageAsync(string uploadedByUserId, Stream stream, string contentType, string fileName)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(uploadedByUserId);
+            ArgumentNullException.ThrowIfNull(stream);
+            ArgumentException.ThrowIfNullOrWhiteSpace(contentType);
+            ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+
+            return await _todoImageRepository.StoreAsync(stream, contentType, fileName, uploadedByUserId);
+        }
+
+        public Task<(byte[] Data, string ContentType, string FileName)?> GetImageAsync(string imageId)
+        {
+            return _todoImageRepository.GetAsync(imageId);
+        }
+
         private TodoTaskSearchQuery NormalizeQuery(TodoTaskSearchQuery query)
         {
             return new TodoTaskSearchQuery
@@ -352,6 +395,147 @@ namespace Application.Service.Service
                 AssignedToUserId = Normalize(query.AssignedToUserId),
                 IncludeArchived = query.IncludeArchived
             };
+        }
+
+        private async Task<string?> ProcessDescriptionAsync(string? html, string? uploadedByUserId)
+        {
+            if (string.IsNullOrWhiteSpace(html))
+            {
+                return null;
+            }
+
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+
+            var imgNodes = doc.DocumentNode.SelectNodes("//img[@src]");
+            if (imgNodes != null)
+            {
+                foreach (var img in imgNodes)
+                {
+                    var src = img.GetAttributeValue("src", string.Empty);
+                    if (string.IsNullOrWhiteSpace(src) || !src.StartsWith("data:image/", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    var replacement = await StoreDataImageAsync(src, uploadedByUserId);
+                    if (!string.IsNullOrWhiteSpace(replacement))
+                    {
+                        img.SetAttributeValue("src", replacement);
+                    }
+                }
+            }
+
+            return SanitizeHtml(doc.DocumentNode.OuterHtml);
+        }
+
+        private async Task<string?> StoreDataImageAsync(string dataUri, string? uploadedByUserId)
+        {
+            var commaIndex = dataUri.IndexOf(',', StringComparison.Ordinal);
+            if (commaIndex < 0)
+            {
+                return null;
+            }
+
+            var meta = dataUri[..commaIndex];
+            var base64 = dataUri[(commaIndex + 1)..];
+
+            var semicolonIndex = meta.IndexOf(';');
+            var contentType = semicolonIndex > 0 ? meta[5..semicolonIndex] : "image/png";
+
+            byte[] bytes;
+            try
+            {
+                bytes = Convert.FromBase64String(base64);
+            }
+            catch
+            {
+                return null;
+            }
+
+            var fileName = $"inline-image{GetExtensionFromContentType(contentType)}";
+            await using var stream = new MemoryStream(bytes);
+            var imageId = await _todoImageRepository.StoreAsync(stream, contentType, fileName, uploadedByUserId);
+            return $"/api/todo/images/{Uri.EscapeDataString(imageId)}";
+        }
+
+        private static string GetExtensionFromContentType(string contentType)
+        {
+            return contentType.ToLowerInvariant() switch
+            {
+                "image/png" => ".png",
+                "image/jpeg" => ".jpg",
+                "image/gif" => ".gif",
+                "image/webp" => ".webp",
+                _ => ".img"
+            };
+        }
+
+        private static IReadOnlyCollection<string> NormalizeCategories(IEnumerable<string>? categories, string? fallbackCategory)
+        {
+            var list = new List<string>();
+            if (categories != null)
+            {
+                list.AddRange(categories);
+            }
+
+            if (!string.IsNullOrWhiteSpace(fallbackCategory))
+            {
+                list.Add(fallbackCategory);
+            }
+
+            var normalized = list
+                .Select(c => Normalize(c))
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            return normalized;
+        }
+
+        private string? SanitizeHtml(string? html)
+        {
+            if (string.IsNullOrWhiteSpace(html))
+            {
+                return null;
+            }
+
+            var sanitized = _htmlSanitizer.Sanitize(html);
+            return string.IsNullOrWhiteSpace(sanitized) ? null : sanitized;
+        }
+
+        private static HtmlSanitizer BuildSanitizer()
+        {
+            var sanitizer = new HtmlSanitizer();
+
+            sanitizer.AllowedSchemes.Clear();
+            sanitizer.AllowedSchemes.Add("http");
+            sanitizer.AllowedSchemes.Add("https");
+
+            sanitizer.AllowedTags.UnionWith(new[]
+            {
+                "p", "br", "strong", "b", "em", "i", "u", "s", "ol", "ul", "li", "blockquote", "a", "img", "h1", "h2", "h3", "span"
+            });
+
+            sanitizer.AllowedAttributes.UnionWith(new[]
+            {
+                "href", "target", "rel", "title", "src", "alt", "width", "height", "class", "style"
+            });
+
+            sanitizer.AllowedClasses.UnionWith(new[]
+            {
+                "ql-align-center", "ql-align-right", "ql-align-justify",
+                "ql-size-large", "ql-size-small", "ql-size-huge",
+                "ql-indent-1", "ql-indent-2", "ql-indent-3", "ql-indent-4", "ql-indent-5",
+                "ql-direction-rtl"
+            });
+
+            sanitizer.AllowedCssProperties.UnionWith(new[]
+            {
+                "color", "background-color", "font-size", "text-align", "font-weight", "font-style", "text-decoration"
+            });
+
+            return sanitizer;
         }
 
         private static string? Normalize(string? value)
@@ -430,6 +614,9 @@ namespace Application.Service.Service
                 Description = task.Description,
                 Status = task.Status,
                 Category = task.Category,
+                Categories = (task.Categories != null && task.Categories.Any()
+                    ? task.Categories
+                    : string.IsNullOrWhiteSpace(task.Category) ? Array.Empty<string>() : new[] { task.Category }),
                 Priority = task.Priority,
                 StartDate = task.StartDate,
                 DueDate = task.DueDate,

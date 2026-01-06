@@ -42,11 +42,32 @@
                   <span class="status-dot small" [ngClass]="getStatusClass(task.Status)"></span>
                   <span class="title-text">{{ task.Title }}</span>
                 </div>
-                <span class="badge" *ngIf="task.Category">{{ task.Category }}</span>
+                <div class="badge-row" *ngIf="getTaskCategories(task) as cats">
+                  <span class="badge" *ngFor="let cat of cats">{{ cat }}</span>
+                </div>
               </div>
-              <p class="task-description" *ngIf="task.Description">{{ task.Description }}</p>
+              <div class="task-description" *ngIf="task.Description" [innerHTML]="task.Description"></div>
               <div class="task-meta">
-                <span class="pill priority" *ngIf="task.Priority">#{{ task.Priority }}</span>
+                <span class="pill priority" *ngIf="task.Priority as pr" [ngClass]="getPriorityClass(pr)">
+                  <span class="bolt-pill">
+                    <ng-container *ngIf="pr === 1">
+                      <i class="fa-solid fa-bolt low"></i>
+                      <i class="fa-solid fa-bolt muted"></i>
+                      <i class="fa-solid fa-bolt muted"></i>
+                    </ng-container>
+                    <ng-container *ngIf="pr === 2">
+                      <i class="fa-solid fa-bolt low"></i>
+                      <i class="fa-solid fa-bolt medium"></i>
+                      <i class="fa-solid fa-bolt muted"></i>
+                    </ng-container>
+                    <ng-container *ngIf="pr === 3">
+                      <i class="fa-solid fa-bolt low"></i>
+                      <i class="fa-solid fa-bolt medium"></i>
+                      <i class="fa-solid fa-bolt high"></i>
+                    </ng-container>
+                  </span>
+                  <span class="priority-text">{{ getPriorityLabel(pr) }}</span>
+                </span>
                 <span class="pill due" *ngIf="getDueBadge(task) as due" [ngClass]="due.variant">{{ due.key | translate: due.params }}</span>
                 <span class="pill done" *ngIf="task.CompletedAt && task.Status === TodoStatus.Done">
                   {{ 'todo.completedAt' | translate }} {{ task.CompletedAt | date: 'shortDate' }}
@@ -77,41 +98,78 @@
         <h2>{{ 'todo.modal.title' | translate }}</h2>
         <p class="subtitle">{{ 'todo.modal.subtitle' | translate }}</p>
       </div>
-      <button class="btn ghost" type="button" (click)="cancelCreate()" aria-label="Close create modal">
-        <i class="fa-regular fa-circle-xmark"></i>
-      </button>
     </header>
     <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="modal-form">
       <div class="modal-grid">
-        <label class="field">
+        <label class="field full-row rich-text-field">
           <span>{{ 'todo.fields.title' | translate }}</span>
           <input type="text" formControlName="Title" [placeholder]="'todo.fields.titlePlaceholder' | translate" />
         </label>
-        <label class="field">
-          <span>{{ 'todo.fields.category' | translate }}</span>
-          <input type="text" formControlName="Category" [placeholder]="'todo.fields.categoryPlaceholder' | translate" />
-        </label>
-        <label class="field">
-          <span>{{ 'todo.fields.priority' | translate }}</span>
-          <select formControlName="Priority">
-            <option [ngValue]="null">{{ 'todo.fields.priorityNone' | translate }}</option>
-            <option [ngValue]="1">1</option>
-            <option [ngValue]="2">2</option>
-            <option [ngValue]="3">3</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>{{ 'todo.fields.startDate' | translate }}</span>
-          <input type="date" formControlName="StartDate" />
-        </label>
-        <label class="field">
-          <span>{{ 'todo.fields.dueDate' | translate }}</span>
-          <input type="date" formControlName="DueDate" />
-        </label>
         <label class="field full-row">
           <span>{{ 'todo.fields.description' | translate }}</span>
-          <textarea rows="3" formControlName="Description" [placeholder]="'todo.fields.descriptionPlaceholder' | translate"></textarea>
+          <quill-editor
+            class="rich-editor"
+            formControlName="Description"
+            [placeholder]="'todo.fields.descriptionPlaceholder' | translate"
+            [modules]="descriptionModules"
+            [format]="'html'"
+            theme="snow"
+            (onEditorCreated)="onEditorCreated($event)"
+          ></quill-editor>
         </label>
+        <label class="field date-field">
+          <span class="sr-only">{{ 'todo.fields.startDate' | translate }}</span>
+          <i class="fa-regular fa-calendar date-icon" aria-hidden="true"></i>
+          <input type="date" formControlName="StartDate" [placeholder]="'todo.fields.startDate' | translate" />
+        </label>
+        <label class="field date-field">
+          <span class="sr-only">{{ 'todo.fields.dueDate' | translate }}</span>
+          <i class="fa-regular fa-calendar date-icon" aria-hidden="true"></i>
+          <input type="date" formControlName="DueDate" [placeholder]="'todo.fields.dueDate' | translate" />
+        </label>
+        <label class="field">
+          <span>{{ 'todo.fields.category' | translate }}</span>
+          <input
+            type="text"
+            formControlName="Category"
+            [placeholder]="'todo.fields.categoryPlaceholder' | translate"
+            list="todo-category-options"
+            autocomplete="off"
+            #categoryInput
+            (keydown.enter)="onCategoryEnter($event, categoryInput)"
+          />
+          <datalist id="todo-category-options">
+            <option *ngFor="let option of categoryOptions" [value]="option"></option>
+          </datalist>
+          <div class="chip-row" *ngIf="selectedCategories.length">
+            <span class="chip" *ngFor="let cat of selectedCategories">
+              {{ cat }}
+              <button type="button" (click)="removeCategory(cat)" aria-label="Remove category">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </span>
+          </div>
+        </label>
+        <div class="field priority-field">
+          <span>{{ 'todo.fields.priority' | translate }}</span>
+          <div class="priority-rating">
+            <div class="bolt-row" role="radiogroup" aria-label="Priority">
+              <button
+                type="button"
+                *ngFor="let level of priorityLevels"
+                [attr.aria-checked]="createForm.value.Priority === level"
+              role="radio"
+              (click)="setPriority(level)"
+              [class.is-active]="createForm.value.Priority === level"
+              [class.is-level-1]="level === 1"
+              [class.is-level-2]="level === 2"
+              [class.is-level-3]="level === 3"
+            >
+              <i class="fa-solid fa-bolt"></i>
+            </button>
+          </div>
+        </div>
+        </div>
       </div>
 
       <div class="form-actions modal-actions">

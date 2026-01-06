@@ -18,6 +18,7 @@ export interface TodoTask {
   Description?: string | null;
   Status: TodoStatus;
   Category?: string | null;
+  Categories?: string[] | null;
   Priority?: number | null;
   StartDate?: string | null;
   DueDate?: string | null;
@@ -56,6 +57,7 @@ export interface CreateTodoTask {
   Description?: string | null;
   Status?: TodoStatus;
   Category?: string | null;
+  Categories?: string[] | null;
   Priority?: number | null;
   StartDate?: string | null;
   DueDate?: string | null;
@@ -70,10 +72,16 @@ export interface UpdateTodoTask {
   Description?: string | null;
   Status?: TodoStatus;
   Category?: string | null;
+  Categories?: string[] | null;
   Priority?: number | null;
   StartDate?: string | null;
   DueDate?: string | null;
   ContextType?: string | null;
   ContextId?: string | null;
   AssignedToUserId?: string | null;
+}
+
+export interface TodoImageUpload {
+  url: string;
+  imageId: string;
 }

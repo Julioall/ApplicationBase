@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { TodoService } from '../../service/todo/todo.service';
 import { TodoStatus, TodoStep, TodoTask } from '../../model/todo';
 
@@ -21,8 +22,9 @@ export class TodoTaskDetailComponent {
     { value: TodoStatus.InProgress, label: 'todo.status.inProgress' },
     { value: TodoStatus.Done, label: 'todo.status.done' },
   ];
+  readonly priorityLevels = [1, 2, 3];
 
-  constructor(private readonly todoService: TodoService) {}
+  constructor(private readonly todoService: TodoService, private readonly translate: TranslateService) {}
 
   close(): void {
     this.closed.emit();
@@ -122,8 +124,70 @@ export class TodoTaskDetailComponent {
     return this.task.Steps.filter((s) => s.IsCompleted).length;
   }
 
+  getStatusLabel(status: TodoStatus): string {
+    const translation = this.translate.instant(this.statuses.find((s) => s.value === status)?.label ?? '');
+    return translation || TodoStatus[status];
+  }
+
+  getStatusClass(status: TodoStatus): string {
+    if (status === TodoStatus.NotStarted) return 'NotStarted';
+    if (status === TodoStatus.InProgress) return 'InProgress';
+    return 'Done';
+  }
+
+  isPriorityActive(current?: number | null, level?: number): boolean {
+    if (!current || !level) {
+      return false;
+    }
+    return current >= level;
+  }
+
+  getPriorityLabel(priority?: number | null): string {
+    if (priority === 1) {
+      const text = this.translate.instant('todo.priority.low');
+      return text !== 'todo.priority.low' ? text : 'Baixa';
+    }
+    if (priority === 2) {
+      const text = this.translate.instant('todo.priority.medium');
+      return text !== 'todo.priority.medium' ? text : 'Média';
+    }
+    if (priority === 3) {
+      const text = this.translate.instant('todo.priority.high');
+      return text !== 'todo.priority.high' ? text : 'Alta';
+    }
+    return '';
+  }
+
+  getPriorityClass(priority?: number | null): string {
+    if (priority === 1) return 'low';
+    if (priority === 2) return 'medium';
+    if (priority === 3) return 'high';
+    return '';
+  }
+
+  getTaskCategories(): string[] {
+    if (this.task?.Categories && this.task.Categories.length > 0) {
+      return this.task.Categories;
+    }
+    if (this.task?.Category) {
+      return [this.task.Category];
+    }
+    return [];
+  }
+
   private emitUpdated(task: TodoTask): void {
     this.task = task;
     this.taskUpdated.emit(task);
+  }
+
+  deleteTask(): void {
+    if (!this.task || !this.canManage) {
+      return;
+    }
+    const taskId = this.task.Id;
+    this.todoService.deleteTask(taskId).subscribe({
+      next: () => this.archived.emit(taskId),
+      error: () => {},
+    });
   }
 }

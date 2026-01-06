@@ -8,5 +8,6 @@ namespace Application.Domain.Interface.Todo
         Task<IReadOnlyList<TodoTask>> SearchAsync(TodoTaskSearchQuery query);
         Task AddAsync(TodoTask entity);
         Task UpdateAsync(TodoTask entity);
+        Task DeleteAsync(string id);
     }
 }

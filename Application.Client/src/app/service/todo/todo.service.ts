@@ -9,6 +9,7 @@ import {
   CreateTodoTask,
   ReorderTodoSteps,
   TodoFilter,
+  TodoImageUpload,
   TodoTask,
   UpdateTodoStep,
   UpdateTodoTask,
@@ -91,6 +92,19 @@ export class TodoService {
     return this.http
       .delete<TodoTask>(`${this.apiUrl}/${taskId}/steps/${stepId}`, { headers: this.getAuthHeaders() })
       .pipe(tap(() => this.notification.showSuccess(this.translate.instant('todo.notifications.stepDeleted'))));
+  }
+
+  deleteTask(taskId: string): Observable<void> {
+    return this.http
+      .delete<void>(`${this.apiUrl}/${taskId}`, { headers: this.getAuthHeaders() })
+      .pipe(tap(() => this.notification.showSuccess(this.translate.instant('todo.notifications.deleted'))));
+  }
+
+  uploadImage(file: File): Observable<TodoImageUpload> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.http.post<TodoImageUpload>(`${this.apiUrl}/images`, formData, { headers: this.getAuthHeaders(false) });
   }
 
   private getAuthHeaders(includeJson = true): HttpHeaders {

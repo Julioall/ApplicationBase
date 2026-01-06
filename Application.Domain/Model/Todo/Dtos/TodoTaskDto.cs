@@ -7,6 +7,7 @@ namespace Application.Domain.Model.Todo.Dtos
         public string? Description { get; set; }
         public TodoStatus Status { get; set; }
         public string? Category { get; set; }
+        public IReadOnlyCollection<string>? Categories { get; set; }
         public int? Priority { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? DueDate { get; set; }

@@ -21,6 +21,10 @@ namespace Application.Domain.Validation.Todo
                 .When(t => t.Priority.HasValue)
                 .WithMessage("TodoPriorityInvalid");
 
+            RuleForEach(t => t.Categories)
+                .Must(cat => !string.IsNullOrWhiteSpace(cat))
+                .WithMessage("TodoCategoryInvalid");
+
             RuleFor(t => t)
                 .Must(HaveValidDates)
                 .WithMessage("TodoDateRangeInvalid");
@@ -89,6 +93,10 @@ namespace Application.Domain.Validation.Todo
                 .When(t => t.Priority.HasValue)
                 .WithMessage("TodoPriorityInvalid");
 
+            RuleForEach(t => t.Categories)
+                .Must(cat => string.IsNullOrWhiteSpace(cat) == false)
+                .WithMessage("TodoCategoryInvalid");
+
             RuleFor(t => t)
                 .Must(HaveValidDates)
                 .WithMessage("TodoDateRangeInvalid");
@@ -139,6 +147,10 @@ namespace Application.Domain.Validation.Todo
                 .InclusiveBetween(1, 3)
                 .When(t => t.Priority.HasValue)
                 .WithMessage("TodoPriorityInvalid");
+
+            RuleForEach(t => t.Categories)
+                .Must(cat => string.IsNullOrWhiteSpace(cat) == false)
+                .WithMessage("TodoCategoryInvalid");
 
             RuleFor(t => t)
                 .Must(HaveValidDates)

@@ -40,6 +40,7 @@ namespace Application.Infrastructure
             services.TryAddScoped<INotificationRepository, NotificationRepository>();
             services.TryAddScoped<IWhatsAppInstanceRepository, WhatsAppInstanceRepository>();
             services.TryAddScoped<ITodoRepository, TodoRepository>();
+            services.TryAddScoped<ITodoImageRepository, TodoImageRepository>();
 
             return services;
         }
