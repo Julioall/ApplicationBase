@@ -1,7 +1,7 @@
 <section class="task-detail" *ngIf="task">
   <div class="detail-header">
-    <div class="eyebrow-row">
-      <span class="eyebrow">{{ task.StartDate | date: 'dd-MM-yyyy' }} → {{ task.DueDate | date: 'dd-MM-yyyy' }}</span>
+    <div class="head-top">
+      <h2>{{ task.Title }}</h2>
       <span class="priority-inline" *ngIf="task.Priority as pr">
         <ng-container [ngSwitch]="pr">
           <ng-container *ngSwitchCase="1">
@@ -22,15 +22,29 @@
         </ng-container>
       </span>
     </div>
-    <h2>{{ task.Title }}</h2>
     <div class="muted description-html" *ngIf="task.Description" [innerHTML]="task.Description"></div>
+    <div class="chip-row" *ngIf="getTaskCategories().length">
+      <span class="chip" *ngFor="let cat of getTaskCategories()">#{{ cat }}</span>
+    </div>
+    <div class="date-row" *ngIf="task.StartDate || task.DueDate">
+      <span class="eyebrow date-label">
+        <span *ngIf="task.StartDate">
+          <span class="date-tag">{{ 'todo.fields.startDate' | translate }}</span>
+          <span>{{ task.StartDate | date: 'dd/MM/yyyy' }}</span>
+        </span>
+        <span class="date-separator" *ngIf="task.StartDate && task.DueDate">-&gt;</span>
+        <span *ngIf="task.DueDate">
+          <span class="date-tag">{{ 'todo.fields.dueDate' | translate }}</span>
+          <span>{{ task.DueDate | date: 'dd/MM/yyyy' }}</span>
+        </span>
+      </span>
+    </div>
   </div>
 
   <section class="steps-section">
     <div class="steps-head">
       <div>
         <p class="label">{{ 'todo.steps.title' | translate }}</p>
-        <p class="muted">{{ 'todo.steps.subtitle' | translate }}</p>
       </div>
       <div class="pill ghost">
         {{ getCompletedSteps() }}/{{ task.Steps.length || 0 }}

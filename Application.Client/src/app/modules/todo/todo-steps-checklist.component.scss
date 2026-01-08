@@ -6,13 +6,37 @@
 
 .step-row {
   display: grid;
-  grid-template-columns: auto auto 1fr auto;
+  grid-template-columns: auto auto 1fr auto auto;
   align-items: center;
   gap: 0.5rem;
   background: var(--surface);
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
   padding: 0.45rem 0.6rem;
+}
+
+.step-row .icon-btn {
+  background: transparent;
+  box-shadow: none;
+}
+
+.step-row .icon-btn:hover {
+  background: transparent;
+}
+
+.step-row .icon-btn.success {
+  color: var(--success);
+  border: none;
+}
+
+.step-row .icon-btn.danger {
+  color: var(--danger);
+  border: none;
+}
+
+.step-row .icon-btn.success:hover,
+.step-row .icon-btn.danger:hover {
+  color: inherit;
 }
 
 .drag-handle {
@@ -78,11 +102,11 @@
 }
 
 .add-inline {
-  display: grid;
-  grid-template-columns: auto auto 1fr auto;
+  display: flex;
   gap: 0.5rem;
   align-items: center;
   margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .add-inline .new-step {

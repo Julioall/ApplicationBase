@@ -91,7 +91,7 @@
   },
   "home": {
     "brandTitle": "Academic Portal",
-    "brandSubtitle": "by Julio",
+    "brandSubtitle": "",
     "navigation": "Navigation",
     "favorites": "Favorites",
     "shortcuts": "Shortcuts",
@@ -796,12 +796,13 @@
       "inProgress": "In progress",
       "done": "Done"
     },
-    "actions": {
-      "create": "Create task",
-      "cancel": "Cancel",
-      "close": "Close",
-      "archive": "Archive"
-    },
+      "actions": {
+        "create": "Create task",
+        "cancel": "Cancel",
+        "close": "Close",
+        "archive": "Archive",
+        "delete": "Delete"
+      },
     "notifications": {
       "created": "Task created",
       "updated": "Task updated",
@@ -815,6 +816,11 @@
       "dueToday": "Due today",
       "dueIn": "Due in {{count}} day(s)",
       "dueAgo": "{{count}} day(s) ago"
+    },
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
     },
     "modal": {
       "eyebrow": "Create",

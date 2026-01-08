@@ -91,7 +91,7 @@
   },
   "home": {
     "brandTitle": "Portal Acadêmico",
-    "brandSubtitle": "by Julio",
+    "brandSubtitle": "",
     "navigation": "Navegação",
     "favorites": "Favoritos",
     "shortcuts": "Atalhos",
@@ -824,7 +824,8 @@
       "create": "Criar tarefa",
       "cancel": "Cancelar",
       "close": "Fechar",
-      "archive": "Arquivar"
+      "archive": "Arquivar",
+      "delete": "Excluir"
     },
     "notifications": {
       "created": "Tarefa criada",
@@ -839,6 +840,11 @@
       "dueToday": "Vence hoje",
       "dueIn": "Vence em {{count}} dia(s)",
       "dueAgo": "Venceu ha {{count}} dia(s)"
+    },
+    "priority": {
+      "low": "Baixa",
+      "medium": "Media",
+      "high": "Alta"
     },
     "modal": {
       "eyebrow": "Criar",

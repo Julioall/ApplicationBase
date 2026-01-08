@@ -37,49 +37,43 @@
           >
             <p class="empty" *ngIf="column.items.length === 0">{{ 'todo.emptyColumn' | translate }}</p>
             <article class="task-card" *ngFor="let task of column.items" cdkDrag [cdkDragDisabled]="!canManage" (click)="selectTask(task)">
-              <div class="task-top">
+              <div class="task-head">
                 <div class="task-title">
-                  <span class="status-dot small" [ngClass]="getStatusClass(task.Status)"></span>
                   <span class="title-text">{{ task.Title }}</span>
                 </div>
-                <div class="badge-row" *ngIf="getTaskCategories(task) as cats">
-                  <span class="badge" *ngFor="let cat of cats">{{ cat }}</span>
+                <div class="priority-icons" *ngIf="task.Priority as pr" [ngSwitch]="pr">
+                  <ng-container *ngSwitchCase="1">
+                    <i class="fa-solid fa-bolt low"></i>
+                    <i class="fa-solid fa-bolt muted"></i>
+                    <i class="fa-solid fa-bolt muted"></i>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="2">
+                    <i class="fa-solid fa-bolt medium"></i>
+                    <i class="fa-solid fa-bolt medium"></i>
+                    <i class="fa-solid fa-bolt muted"></i>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="3">
+                    <i class="fa-solid fa-bolt high"></i>
+                    <i class="fa-solid fa-bolt high"></i>
+                    <i class="fa-solid fa-bolt high"></i>
+                  </ng-container>
                 </div>
               </div>
-              <div class="task-description" *ngIf="task.Description" [innerHTML]="task.Description"></div>
-              <div class="task-meta">
-                <span class="pill priority" *ngIf="task.Priority as pr" [ngClass]="getPriorityClass(pr)">
-                  <span class="bolt-pill">
-                    <ng-container *ngIf="pr === 1">
-                      <i class="fa-solid fa-bolt low"></i>
-                      <i class="fa-solid fa-bolt muted"></i>
-                      <i class="fa-solid fa-bolt muted"></i>
-                    </ng-container>
-                    <ng-container *ngIf="pr === 2">
-                      <i class="fa-solid fa-bolt low"></i>
-                      <i class="fa-solid fa-bolt medium"></i>
-                      <i class="fa-solid fa-bolt muted"></i>
-                    </ng-container>
-                    <ng-container *ngIf="pr === 3">
-                      <i class="fa-solid fa-bolt low"></i>
-                      <i class="fa-solid fa-bolt medium"></i>
-                      <i class="fa-solid fa-bolt high"></i>
-                    </ng-container>
+              <div class="task-description preview" *ngIf="task.Description" [innerHTML]="task.Description"></div>
+              <div class="chip-row" *ngIf="getTaskCategories(task).length">
+                <span class="chip" *ngFor="let cat of getTaskCategories(task)">#{{ cat }}</span>
+              </div>
+              <div class="task-footer">
+                <div class="task-dates" *ngIf="task.StartDate || task.DueDate">
+                  <span *ngIf="task.StartDate" class="date-pill">
+                    <span class="date-label">{{ 'todo.fields.startDate' | translate }}</span>
+                    <span class="date-value">{{ task.StartDate | date: 'dd/MM/yyyy' }}</span>
                   </span>
-                  <span class="priority-text">{{ getPriorityLabel(pr) }}</span>
-                </span>
-                <span class="pill due" *ngIf="getDueBadge(task) as due" [ngClass]="due.variant">{{ due.key | translate: due.params }}</span>
-                <span class="pill done" *ngIf="task.CompletedAt && task.Status === TodoStatus.Done">
-                  {{ 'todo.completedAt' | translate }} {{ task.CompletedAt | date: 'shortDate' }}
-                </span>
-              </div>
-              <div class="task-progress" *ngIf="task.Steps?.length">
-                <div class="progress-meta">
-                  <span class="pill ghost tiny">{{ getCompletedSteps(task) }}/{{ task.Steps.length }}</span>
-                  <span class="percent">{{ getCompletionPercent(task) }}%</span>
-                </div>
-                <div class="progress-rail slim">
-                  <div class="progress-fill" [style.width.%]="getCompletionPercent(task)"></div>
+                  <span class="date-separator" *ngIf="task.StartDate && task.DueDate">-&gt;</span>
+                  <span *ngIf="task.DueDate" class="date-pill">
+                    <span class="date-label">{{ 'todo.fields.dueDate' | translate }}</span>
+                    <span class="date-value">{{ task.DueDate | date: 'dd/MM/yyyy' }}</span>
+                  </span>
                 </div>
               </div>
             </article>
@@ -104,18 +98,6 @@
         <label class="field full-row rich-text-field">
           <span>{{ 'todo.fields.title' | translate }}</span>
           <input type="text" formControlName="Title" [placeholder]="'todo.fields.titlePlaceholder' | translate" />
-        </label>
-        <label class="field full-row">
-          <span>{{ 'todo.fields.description' | translate }}</span>
-          <quill-editor
-            class="rich-editor"
-            formControlName="Description"
-            [placeholder]="'todo.fields.descriptionPlaceholder' | translate"
-            [modules]="descriptionModules"
-            [format]="'html'"
-            theme="snow"
-            (onEditorCreated)="onEditorCreated($event)"
-          ></quill-editor>
         </label>
         <label class="field date-field">
           <span class="sr-only">{{ 'todo.fields.startDate' | translate }}</span>
@@ -152,24 +134,24 @@
         </label>
         <div class="field priority-field">
           <span>{{ 'todo.fields.priority' | translate }}</span>
-          <div class="priority-rating">
-            <div class="bolt-row" role="radiogroup" aria-label="Priority">
-              <button
-                type="button"
-                *ngFor="let level of priorityLevels"
-                [attr.aria-checked]="createForm.value.Priority === level"
-              role="radio"
-              (click)="setPriority(level)"
-              [class.is-active]="createForm.value.Priority === level"
-              [class.is-level-1]="level === 1"
-              [class.is-level-2]="level === 2"
-              [class.is-level-3]="level === 3"
-            >
-              <i class="fa-solid fa-bolt"></i>
-            </button>
-          </div>
+          <select class="priority-select" formControlName="Priority">
+            <option [ngValue]="3">{{ 'todo.priority.high' | translate }}</option>
+            <option [ngValue]="2">{{ 'todo.priority.medium' | translate }}</option>
+            <option [ngValue]="1">{{ 'todo.priority.low' | translate }}</option>
+          </select>
         </div>
-        </div>
+        <label class="field full-row">
+          <span>{{ 'todo.fields.description' | translate }}</span>
+          <quill-editor
+            class="rich-editor"
+            formControlName="Description"
+            [placeholder]="'todo.fields.descriptionPlaceholder' | translate"
+            [modules]="descriptionModules"
+            [format]="'html'"
+            theme="snow"
+            (onEditorCreated)="onEditorCreated($event)"
+          ></quill-editor>
+        </label>
       </div>
 
       <div class="form-actions modal-actions">
