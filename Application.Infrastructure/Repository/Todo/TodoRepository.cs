@@ -61,6 +61,16 @@ namespace Application.Infrastructure.Repository.Todo
             return await ravenQuery.ToListAsync();
         }
 
+        public async Task<IReadOnlyList<TodoTask>> SearchByRecurrenceGroupAsync(string recurrenceGroupId)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(recurrenceGroupId);
+
+            var ravenQuery = _serviceRavenDb.AsyncSession.Query<TodoTask, TodoTasks_ByContextAndStatus>()
+                .Where(t => t.RecurrenceGroupId == recurrenceGroupId);
+
+            return await ravenQuery.ToListAsync();
+        }
+
         public async Task UpdateAsync(TodoTask entity)
         {
             await _serviceRavenDb.AsyncSession.StoreAsync(entity);

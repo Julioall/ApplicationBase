@@ -1,0 +1,46 @@
+<section class="agenda-view">
+  <header class="agenda-header">
+    <div class="date-controls">
+      <button type="button" class="icon-btn" (click)="changeDay(-1)" aria-label="Previous day">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <div class="current-date">
+        <p class="eyebrow">{{ selectedDate | date: 'EEEE' }}</p>
+        <h3>{{ selectedDate | date: 'dd MMM yyyy' }}</h3>
+      </div>
+      <button type="button" class="icon-btn" (click)="changeDay(1)" aria-label="Next day">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+    <button class="btn ghost small" type="button" (click)="goToday()">{{ 'todo.agenda.today' | translate }}</button>
+  </header>
+
+  <div class="agenda-list" *ngIf="agendaEntries.length; else emptyAgenda">
+    <div class="agenda-item" *ngFor="let entry of agendaEntries" (click)="taskSelected.emit(entry.task)">
+      <div class="time-col" [class.all-day]="entry.isAllDay">
+        <span *ngIf="entry.isAllDay">{{ 'todo.schedule.allDay' | translate }}</span>
+        <span *ngIf="!entry.isAllDay">
+          {{ entry.start | date: 'HH:mm' }} - {{ entry.end | date: 'HH:mm' }}
+        </span>
+      </div>
+      <div class="agenda-card" [class.done]="entry.task.Status === TodoStatus.Done">
+        <div class="agenda-title">
+          <span class="title-text">{{ entry.task.Title }}</span>
+        </div>
+        <div class="agenda-meta">
+          <span class="pill ghost tiny" *ngIf="entry.task.Priority">{{ getPriorityLabel(entry.task.Priority) }}</span>
+          <span class="pill ghost tiny" *ngIf="entry.task.Recurrence">
+            <i class="fa-solid fa-rotate"></i>
+            {{ getRecurrenceLabel(entry.task.Recurrence) }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #emptyAgenda>
+    <div class="empty-state">
+      <p class="muted">{{ 'todo.agenda.empty' | translate }}</p>
+    </div>
+  </ng-template>
+</section>

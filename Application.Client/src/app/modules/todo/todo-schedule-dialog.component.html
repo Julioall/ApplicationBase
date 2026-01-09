@@ -1,0 +1,82 @@
+<div class="schedule-backdrop" *ngIf="isOpen" (click)="close()">
+  <form class="schedule-modal" (click)="$event.stopPropagation()" [formGroup]="form">
+    <header class="schedule-header">
+      <div>
+        <p class="eyebrow">{{ 'todo.fields.when' | translate }}</p>
+        <h3>{{ 'todo.schedule.title' | translate }}</h3>
+      </div>
+      <button class="icon-btn" type="button" (click)="close()" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </header>
+
+    <div class="schedule-grid">
+      <label class="field date-field">
+        <span>{{ 'todo.fields.startDateTime' | translate }}</span>
+        <div class="input-with-icon">
+          <i class="fa-regular fa-clock date-icon" aria-hidden="true"></i>
+          <input
+            [type]="form.get('IsAllDay')?.value ? 'date' : 'datetime-local'"
+            formControlName="StartDate"
+            [placeholder]="'todo.fields.startDateTime' | translate"
+          />
+        </div>
+      </label>
+      <label class="field date-field">
+        <span>{{ 'todo.fields.endDateTime' | translate }}</span>
+        <div class="input-with-icon">
+          <i class="fa-regular fa-clock date-icon" aria-hidden="true"></i>
+          <input
+            [type]="form.get('IsAllDay')?.value ? 'date' : 'datetime-local'"
+            formControlName="DueDate"
+            [placeholder]="'todo.fields.endDateTime' | translate"
+          />
+        </div>
+      </label>
+      <label class="field inline-toggle">
+        <span>{{ 'todo.fields.allDay' | translate }}</span>
+        <label class="switch">
+          <input type="checkbox" formControlName="IsAllDay" />
+          <span class="slider"></span>
+        </label>
+      </label>
+    </div>
+
+    <div class="field recurrence-field">
+      <span>{{ 'todo.fields.recurrence' | translate }}</span>
+      <div class="recurrence-row">
+        <select formControlName="RecurrenceType" (change)="onRecurrenceTypeChange()">
+          <option *ngFor="let option of recurrenceOptions" [ngValue]="option.value">{{ option.label | translate }}</option>
+        </select>
+        <div class="interval-row" *ngIf="form.get('RecurrenceType')?.value !== TodoRecurrenceType.None">
+          <label class="inline-field">
+            <span>{{ 'todo.fields.recurrenceInterval' | translate }}</span>
+            <input type="number" min="1" formControlName="RecurrenceInterval" />
+          </label>
+          <label class="inline-field">
+            <span>{{ 'todo.fields.recurrenceEndsOn' | translate }}</span>
+            <input type="date" formControlName="RecurrenceEndsOn" />
+          </label>
+        </div>
+        <div class="weekday-selector" *ngIf="form.get('RecurrenceType')?.value === TodoRecurrenceType.Weekly">
+          <span class="muted">{{ 'todo.fields.recurrenceDays' | translate }}</span>
+          <div class="day-chips">
+            <button
+              type="button"
+              class="day-chip"
+              *ngFor="let day of weekDays"
+              [class.active]="isDaySelected(day.value)"
+              (click)="toggleDaySelection(day.value)"
+            >
+              {{ day.short }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="schedule-actions">
+      <button class="btn ghost" type="button" (click)="close()">{{ 'todo.actions.close' | translate }}</button>
+    </footer>
+  </form>
+</div>

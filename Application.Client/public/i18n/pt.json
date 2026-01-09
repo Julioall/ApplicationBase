@@ -811,9 +811,19 @@
       "categoryPlaceholder": "Tag ou area",
       "priority": "Prioridade",
       "priorityNone": "Sem prioridade",
+      "status": "Status",
       "startDate": "Inicio",
+      "startDateTime": "Inicio",
+      "endDateTime": "Termino",
       "dueDate": "Prazo",
-      "context": "Contexto"
+      "when": "Quando",
+      "context": "Contexto",
+      "allDay": "Dia inteiro",
+      "recurrence": "Recorrencia",
+      "recurrenceInterval": "Repetir a cada",
+      "recurrenceEndsOn": "Termina em",
+      "recurrenceDays": "Dias",
+      "applyToSeries": "Aplicar para toda a serie"
     },
     "status": {
       "notStarted": "Nao iniciada",
@@ -825,7 +835,9 @@
       "cancel": "Cancelar",
       "close": "Fechar",
       "archive": "Arquivar",
-      "delete": "Excluir"
+      "delete": "Excluir",
+      "edit": "Editar",
+      "save": "Salvar"
     },
     "notifications": {
       "created": "Tarefa criada",
@@ -845,6 +857,29 @@
       "low": "Baixa",
       "medium": "Media",
       "high": "Alta"
+    },
+    "recurrence": {
+      "none": "Nao repete",
+      "daily": "Diariamente",
+      "weekdays": "Dias uteis",
+      "weekly": "Semanal",
+      "monthly": "Mensal",
+      "yearly": "Anual",
+      "everyNWeeks": "A cada {{count}} semana(s)",
+      "custom": "Personalizado"
+    },
+    "schedule": {
+      "allDay": "Dia inteiro",
+      "title": "Agendamento",
+      "unset": "Sem agendamento"
+    },
+    "view": {
+      "board": "Quadro",
+      "agenda": "Agenda"
+    },
+    "agenda": {
+      "today": "Hoje",
+      "empty": "Nenhuma tarefa para este dia."
     },
     "modal": {
       "eyebrow": "Criar",

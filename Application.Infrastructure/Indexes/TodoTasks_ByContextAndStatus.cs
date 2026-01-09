@@ -16,8 +16,11 @@ namespace Application.Infrastructure.Indexes
                                t.AssignedToUserId,
                                t.IsArchived,
                                t.Priority,
+                               t.StartDate,
                                t.DueDate,
-                               t.CreatedAt
+                               t.CreatedAt,
+                               t.RecurrenceGroupId,
+                               RecurrenceType = t.Recurrence != null ? t.Recurrence.Type : TodoRecurrenceType.None
                            };
         }
     }

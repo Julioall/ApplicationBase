@@ -4,6 +4,22 @@ export enum TodoStatus {
   Done = 2,
 }
 
+export enum TodoRecurrenceType {
+  None = 0,
+  Daily = 1,
+  Weekly = 2,
+  Monthly = 3,
+  Yearly = 4,
+  Weekdays = 5,
+}
+
+export interface TodoRecurrence {
+  Type: TodoRecurrenceType;
+  Interval?: number | null;
+  EndsOn?: string | null;
+  DaysOfWeek?: number[] | null;
+}
+
 export interface TodoStep {
   Id: string;
   Title: string;
@@ -29,6 +45,9 @@ export interface TodoTask {
   CreatedAt: string;
   AssignedToUserId?: string | null;
   IsArchived: boolean;
+  IsAllDay?: boolean;
+  RecurrenceGroupId?: string | null;
+  Recurrence?: TodoRecurrence | null;
   Steps: TodoStep[];
 }
 
@@ -64,6 +83,8 @@ export interface CreateTodoTask {
   ContextType?: string | null;
   ContextId?: string | null;
   AssignedToUserId?: string | null;
+  IsAllDay?: boolean;
+  Recurrence?: TodoRecurrence | null;
   Steps?: CreateTodoStep[];
 }
 
@@ -79,6 +100,9 @@ export interface UpdateTodoTask {
   ContextType?: string | null;
   ContextId?: string | null;
   AssignedToUserId?: string | null;
+  IsAllDay?: boolean | null;
+  Recurrence?: TodoRecurrence | null;
+  ApplyToSeries?: boolean;
 }
 
 export interface TodoImageUpload {

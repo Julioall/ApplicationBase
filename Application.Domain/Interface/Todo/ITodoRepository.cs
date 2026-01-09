@@ -6,6 +6,7 @@ namespace Application.Domain.Interface.Todo
     {
         Task<TodoTask?> GetByIdAsync(string id);
         Task<IReadOnlyList<TodoTask>> SearchAsync(TodoTaskSearchQuery query);
+        Task<IReadOnlyList<TodoTask>> SearchByRecurrenceGroupAsync(string recurrenceGroupId);
         Task AddAsync(TodoTask entity);
         Task UpdateAsync(TodoTask entity);
         Task DeleteAsync(string id);

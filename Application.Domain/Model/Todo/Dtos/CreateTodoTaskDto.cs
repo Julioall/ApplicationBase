@@ -13,6 +13,8 @@ namespace Application.Domain.Model.Todo.Dtos
         public string? ContextType { get; set; }
         public string? ContextId { get; set; }
         public string? AssignedToUserId { get; set; }
+        public bool IsAllDay { get; set; }
+        public TodoRecurrenceDto? Recurrence { get; set; }
         public List<CreateTodoStepDto> Steps { get; set; } = new();
     }
 }

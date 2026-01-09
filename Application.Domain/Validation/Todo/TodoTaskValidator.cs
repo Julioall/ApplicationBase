@@ -29,6 +29,10 @@ namespace Application.Domain.Validation.Todo
                 .Must(HaveValidDates)
                 .WithMessage("TodoDateRangeInvalid");
 
+            RuleFor(t => t.Recurrence)
+                .SetValidator(new TodoRecurrenceValidator())
+                .When(t => t.Recurrence != null);
+
             When(t => !string.IsNullOrWhiteSpace(t.ContextId), () =>
             {
                 RuleFor(t => t.ContextType)
@@ -51,7 +55,19 @@ namespace Application.Domain.Validation.Todo
         {
             if (task.StartDate.HasValue && task.DueDate.HasValue)
             {
-                return task.StartDate.Value.Date <= task.DueDate.Value.Date;
+                if (task.StartDate.Value > task.DueDate.Value)
+                {
+                    return false;
+                }
+            }
+
+            if (task.Recurrence?.EndsOn.HasValue == true)
+            {
+                var anchor = task.StartDate ?? task.DueDate;
+                if (anchor.HasValue && task.Recurrence.EndsOn.Value.Date < anchor.Value.Date)
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -101,6 +117,10 @@ namespace Application.Domain.Validation.Todo
                 .Must(HaveValidDates)
                 .WithMessage("TodoDateRangeInvalid");
 
+            RuleFor(t => t.Recurrence)
+                .SetValidator(new TodoRecurrenceDtoValidator())
+                .When(t => t.Recurrence != null);
+
             When(t => !string.IsNullOrWhiteSpace(t.ContextId), () =>
             {
                 RuleFor(t => t.ContextType)
@@ -123,7 +143,19 @@ namespace Application.Domain.Validation.Todo
         {
             if (task.StartDate.HasValue && task.DueDate.HasValue)
             {
-                return task.StartDate.Value.Date <= task.DueDate.Value.Date;
+                if (task.StartDate.Value > task.DueDate.Value)
+                {
+                    return false;
+                }
+            }
+
+            if (task.Recurrence?.EndsOn.HasValue == true)
+            {
+                var anchor = task.StartDate ?? task.DueDate;
+                if (anchor.HasValue && task.Recurrence.EndsOn.Value.Date < anchor.Value.Date)
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -156,6 +188,10 @@ namespace Application.Domain.Validation.Todo
                 .Must(HaveValidDates)
                 .WithMessage("TodoDateRangeInvalid");
 
+            RuleFor(t => t.Recurrence)
+                .SetValidator(new TodoRecurrenceDtoValidator())
+                .When(t => t.Recurrence != null);
+
             When(t => !string.IsNullOrWhiteSpace(t.ContextId), () =>
             {
                 RuleFor(t => t.ContextType)
@@ -175,7 +211,19 @@ namespace Application.Domain.Validation.Todo
         {
             if (task.StartDate.HasValue && task.DueDate.HasValue)
             {
-                return task.StartDate.Value.Date <= task.DueDate.Value.Date;
+                if (task.StartDate.Value > task.DueDate.Value)
+                {
+                    return false;
+                }
+            }
+
+            if (task.Recurrence?.EndsOn.HasValue == true)
+            {
+                var anchor = task.StartDate ?? task.DueDate;
+                if (anchor.HasValue && task.Recurrence.EndsOn.Value.Date < anchor.Value.Date)
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -199,6 +247,44 @@ namespace Application.Domain.Validation.Todo
             RuleFor(s => s.Title)
                 .Must(title => title == null || !string.IsNullOrWhiteSpace(title))
                 .WithMessage("TodoStepTitleRequired");
+        }
+    }
+
+    public class TodoRecurrenceValidator : AbstractValidator<TodoRecurrence>
+    {
+        public TodoRecurrenceValidator()
+        {
+            RuleFor(r => r.Type)
+                .IsInEnum()
+                .WithMessage("TodoRecurrenceInvalid");
+
+            RuleFor(r => r.Interval)
+                .GreaterThanOrEqualTo(1)
+                .WithMessage("TodoRecurrenceInvalid");
+
+            RuleFor(r => r.DaysOfWeek)
+                .NotEmpty()
+                .WithMessage("TodoRecurrenceInvalid")
+                .When(r => r.Type == TodoRecurrenceType.Weekly);
+        }
+    }
+
+    public class TodoRecurrenceDtoValidator : AbstractValidator<TodoRecurrenceDto>
+    {
+        public TodoRecurrenceDtoValidator()
+        {
+            RuleFor(r => r.Type)
+                .IsInEnum()
+                .WithMessage("TodoRecurrenceInvalid");
+
+            RuleFor(r => r.Interval)
+                .GreaterThanOrEqualTo(1)
+                .WithMessage("TodoRecurrenceInvalid");
+
+            RuleFor(r => r.DaysOfWeek)
+                .NotEmpty()
+                .WithMessage("TodoRecurrenceInvalid")
+                .When(r => r.Type == TodoRecurrenceType.Weekly);
         }
     }
 

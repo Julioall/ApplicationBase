@@ -11,74 +11,105 @@
 
     <div class="settings-body">
       <div class="board-toolbar">
+        <div class="view-switch">
+          <button type="button" class="pill ghost" [class.active]="viewMode === 'board'" (click)="setViewMode('board')">
+            <i class="fa-solid fa-table-columns"></i>
+            <span>{{ 'todo.view.board' | translate }}</span>
+          </button>
+          <button type="button" class="pill ghost" [class.active]="viewMode === 'agenda'" (click)="setViewMode('agenda')">
+            <i class="fa-regular fa-calendar"></i>
+            <span>{{ 'todo.view.agenda' | translate }}</span>
+          </button>
+        </div>
         <button class="btn primary" type="button" (click)="openCreate()" [disabled]="!canManage">
           <i class="fa-regular fa-square-plus"></i>
           <span>{{ 'todo.newTask' | translate }}</span>
         </button>
       </div>
 
-      <section class="board-grid" *ngIf="!isLoading; else loadingState">
-        <div class="board-column" *ngFor="let column of columns" [attr.data-status]="column.status">
-          <div class="column-head">
-            <div class="column-title" [ngClass]="getStatusClass(column.status)">
-              <span class="status-dot"></span>
-              <span class="title-label">{{ column.label | translate }}</span>
+      <section *ngIf="!isLoading; else loadingState">
+        <ng-container [ngSwitch]="viewMode">
+          <div class="board-grid" *ngSwitchCase="'board'">
+            <div class="board-column" *ngFor="let column of columns" [attr.data-status]="column.status">
+              <div class="column-head">
+                <div class="column-title" [ngClass]="getStatusClass(column.status)">
+                  <span class="status-dot"></span>
+                  <span class="title-label">{{ column.label | translate }}</span>
+                </div>
+                <span class="pill ghost count">{{ column.items.length }}</span>
+              </div>
+              <div
+                class="column-dropzone"
+                cdkDropList
+                [id]="column.id"
+                [cdkDropListData]="column.items"
+                [cdkDropListConnectedTo]="connectedDropListIds"
+                (cdkDropListDropped)="onDrop($event, column.status)"
+                [cdkDropListDisabled]="!canManage"
+              >
+                <p class="empty" *ngIf="column.items.length === 0">{{ 'todo.emptyColumn' | translate }}</p>
+                <article class="task-card" *ngFor="let task of column.items" cdkDrag [cdkDragDisabled]="!canManage" (click)="selectTask(task)">
+                  <div class="task-head">
+                    <div class="task-title">
+                      <span class="title-text">{{ task.Title }}</span>
+                    </div>
+                    <div class="priority-icons" *ngIf="task.Priority as pr" [ngSwitch]="pr">
+                      <ng-container *ngSwitchCase="1">
+                        <i class="fa-solid fa-bolt low"></i>
+                        <i class="fa-solid fa-bolt muted"></i>
+                        <i class="fa-solid fa-bolt muted"></i>
+                      </ng-container>
+                      <ng-container *ngSwitchCase="2">
+                        <i class="fa-solid fa-bolt medium"></i>
+                        <i class="fa-solid fa-bolt medium"></i>
+                        <i class="fa-solid fa-bolt muted"></i>
+                      </ng-container>
+                      <ng-container *ngSwitchCase="3">
+                        <i class="fa-solid fa-bolt high"></i>
+                        <i class="fa-solid fa-bolt high"></i>
+                        <i class="fa-solid fa-bolt high"></i>
+                      </ng-container>
+                    </div>
+                  </div>
+                  <div class="task-description preview" *ngIf="task.Description" [innerHTML]="task.Description"></div>
+                  <div class="chip-row" *ngIf="getTaskCategories(task).length">
+                    <span class="chip" *ngFor="let cat of getTaskCategories(task)">#{{ cat }}</span>
+                  </div>
+                  <div class="task-footer">
+                    <div class="task-dates" *ngIf="task.StartDate || task.DueDate">
+                      <span class="date-pill">
+                        <span class="date-label">{{ 'todo.fields.when' | translate }}</span>
+                        <span class="date-value" *ngIf="task.IsAllDay">
+                          {{ task.StartDate | date: 'dd/MM' }}
+                          <span class="pill ghost tiny">{{ 'todo.schedule.allDay' | translate }}</span>
+                        </span>
+                        <span class="date-value" *ngIf="!task.IsAllDay">
+                          <span *ngIf="task.StartDate">{{ task.StartDate | date: 'dd/MM HH:mm' }}</span>
+                          <span class="date-separator" *ngIf="task.StartDate && task.DueDate">-&gt;</span>
+                          <span *ngIf="task.DueDate">{{ task.DueDate | date: 'dd/MM HH:mm' }}</span>
+                        </span>
+                      </span>
+                    </div>
+                    <div class="task-meta" *ngIf="task.Recurrence">
+                      <span class="pill ghost tiny">
+                        <i class="fa-solid fa-rotate"></i>
+                        {{ getRecurrenceLabel(task.Recurrence) }}
+                      </span>
+                    </div>
+                  </div>
+                </article>
+              </div>
             </div>
-            <span class="pill ghost count">{{ column.items.length }}</span>
           </div>
-          <div
-            class="column-dropzone"
-            cdkDropList
-            [id]="column.id"
-            [cdkDropListData]="column.items"
-            [cdkDropListConnectedTo]="connectedDropListIds"
-            (cdkDropListDropped)="onDrop($event, column.status)"
-            [cdkDropListDisabled]="!canManage"
-          >
-            <p class="empty" *ngIf="column.items.length === 0">{{ 'todo.emptyColumn' | translate }}</p>
-            <article class="task-card" *ngFor="let task of column.items" cdkDrag [cdkDragDisabled]="!canManage" (click)="selectTask(task)">
-              <div class="task-head">
-                <div class="task-title">
-                  <span class="title-text">{{ task.Title }}</span>
-                </div>
-                <div class="priority-icons" *ngIf="task.Priority as pr" [ngSwitch]="pr">
-                  <ng-container *ngSwitchCase="1">
-                    <i class="fa-solid fa-bolt low"></i>
-                    <i class="fa-solid fa-bolt muted"></i>
-                    <i class="fa-solid fa-bolt muted"></i>
-                  </ng-container>
-                  <ng-container *ngSwitchCase="2">
-                    <i class="fa-solid fa-bolt medium"></i>
-                    <i class="fa-solid fa-bolt medium"></i>
-                    <i class="fa-solid fa-bolt muted"></i>
-                  </ng-container>
-                  <ng-container *ngSwitchCase="3">
-                    <i class="fa-solid fa-bolt high"></i>
-                    <i class="fa-solid fa-bolt high"></i>
-                    <i class="fa-solid fa-bolt high"></i>
-                  </ng-container>
-                </div>
-              </div>
-              <div class="task-description preview" *ngIf="task.Description" [innerHTML]="task.Description"></div>
-              <div class="chip-row" *ngIf="getTaskCategories(task).length">
-                <span class="chip" *ngFor="let cat of getTaskCategories(task)">#{{ cat }}</span>
-              </div>
-              <div class="task-footer">
-                <div class="task-dates" *ngIf="task.StartDate || task.DueDate">
-                  <span *ngIf="task.StartDate" class="date-pill">
-                    <span class="date-label">{{ 'todo.fields.startDate' | translate }}</span>
-                    <span class="date-value">{{ task.StartDate | date: 'dd/MM/yyyy' }}</span>
-                  </span>
-                  <span class="date-separator" *ngIf="task.StartDate && task.DueDate">-&gt;</span>
-                  <span *ngIf="task.DueDate" class="date-pill">
-                    <span class="date-label">{{ 'todo.fields.dueDate' | translate }}</span>
-                    <span class="date-value">{{ task.DueDate | date: 'dd/MM/yyyy' }}</span>
-                  </span>
-                </div>
-              </div>
-            </article>
-          </div>
-        </div>
+          <app-todo-agenda
+            *ngSwitchCase="'agenda'"
+            [tasks]="tasks"
+            [selectedDate]="agendaDate"
+            [canManage]="canManage"
+            (taskSelected)="selectTask($event)"
+            (dateChange)="onAgendaDateChange($event)"
+          ></app-todo-agenda>
+        </ng-container>
       </section>
     </div>
   </article>
@@ -99,16 +130,13 @@
           <span>{{ 'todo.fields.title' | translate }}</span>
           <input type="text" formControlName="Title" [placeholder]="'todo.fields.titlePlaceholder' | translate" />
         </label>
-        <label class="field date-field">
-          <span class="sr-only">{{ 'todo.fields.startDate' | translate }}</span>
-          <i class="fa-regular fa-calendar date-icon" aria-hidden="true"></i>
-          <input type="date" formControlName="StartDate" [placeholder]="'todo.fields.startDate' | translate" />
-        </label>
-        <label class="field date-field">
-          <span class="sr-only">{{ 'todo.fields.dueDate' | translate }}</span>
-          <i class="fa-regular fa-calendar date-icon" aria-hidden="true"></i>
-          <input type="date" formControlName="DueDate" [placeholder]="'todo.fields.dueDate' | translate" />
-        </label>
+        <div class="field full-row schedule-trigger">
+          <span>{{ 'todo.fields.when' | translate }}</span>
+          <button type="button" class="btn ghost" (click)="openScheduleDialog()">
+            <i class="fa-regular fa-calendar"></i>
+            <span>{{ getScheduleSummary(createForm) }}</span>
+          </button>
+        </div>
         <label class="field">
           <span>{{ 'todo.fields.category' | translate }}</span>
           <input
@@ -170,9 +198,18 @@
       (closed)="closeDetail()"
       (taskUpdated)="handleTaskUpdated($event)"
       (archived)="handleTaskArchived($event)"
+      (refreshRequested)="loadTasks()"
     ></app-todo-task-detail>
   </div>
 </div>
+
+<app-todo-schedule-dialog
+  [form]="createForm"
+  [isOpen]="isScheduleDialogOpen"
+  [weekDays]="weekDays"
+  [recurrenceOptions]="recurrenceOptions"
+  (closed)="closeScheduleDialog()"
+></app-todo-schedule-dialog>
 
 <ng-template #loadingState>
   <div class="loading-state">

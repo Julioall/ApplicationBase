@@ -787,9 +787,19 @@
       "categoryPlaceholder": "Tag or area",
       "priority": "Priority",
       "priorityNone": "No priority",
+      "status": "Status",
       "startDate": "Start date",
+      "startDateTime": "Start",
+      "endDateTime": "End",
       "dueDate": "Due date",
-      "context": "Context"
+      "when": "When",
+      "context": "Context",
+      "allDay": "All day",
+      "recurrence": "Recurrence",
+      "recurrenceInterval": "Repeat every",
+      "recurrenceEndsOn": "Ends on",
+      "recurrenceDays": "On days",
+      "applyToSeries": "Apply to all occurrences"
     },
     "status": {
       "notStarted": "Not started",
@@ -801,7 +811,9 @@
         "cancel": "Cancel",
         "close": "Close",
         "archive": "Archive",
-        "delete": "Delete"
+        "delete": "Delete",
+        "edit": "Edit",
+        "save": "Save"
       },
     "notifications": {
       "created": "Task created",
@@ -821,6 +833,29 @@
       "low": "Low",
       "medium": "Medium",
       "high": "High"
+    },
+    "recurrence": {
+      "none": "Does not repeat",
+      "daily": "Daily",
+      "weekdays": "Weekdays",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "everyNWeeks": "Every {{count}} week(s)",
+      "custom": "Custom"
+    },
+    "schedule": {
+      "allDay": "All day",
+      "title": "Schedule",
+      "unset": "No schedule yet"
+    },
+    "view": {
+      "board": "Board",
+      "agenda": "Agenda"
+    },
+    "agenda": {
+      "today": "Today",
+      "empty": "No tasks scheduled for this day."
     },
     "modal": {
       "eyebrow": "Create",

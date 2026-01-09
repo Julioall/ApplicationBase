@@ -76,6 +76,7 @@ namespace Application.Service.Service
 
             var sanitizedDescription = await ProcessDescriptionAsync(dto.Description, currentUserId);
             var categories = NormalizeCategories(dto.Categories, dto.Category);
+            var recurrence = NormalizeRecurrence(dto.Recurrence);
 
             var task = new TodoTask
             {
@@ -93,6 +94,11 @@ namespace Application.Service.Service
                 CreatedByUserId = Normalize(currentUserId),
                 AssignedToUserId = Normalize(dto.AssignedToUserId),
                 IsArchived = false,
+                IsAllDay = dto.IsAllDay,
+                Recurrence = recurrence,
+                RecurrenceGroupId = recurrence != null && recurrence.Type != TodoRecurrenceType.None
+                    ? Guid.NewGuid().ToString()
+                    : null,
                 Steps = new List<TodoStep>()
             };
 
@@ -137,47 +143,32 @@ namespace Application.Service.Service
                 throw new NotFoundException(_localizer["TodoTaskNotFound", id]);
             }
 
-            task.Steps ??= new List<TodoStep>();
-            if (task.CreatedAt == default)
-            {
-                task.CreatedAt = DateTime.UtcNow;
-            }
-
-            if (dto.Title != null)
-            {
-                task.Title = dto.Title.Trim();
-            }
-
-            task.Description = dto.Description != null ? await ProcessDescriptionAsync(dto.Description, task.CreatedByUserId) : task.Description;
+            var sanitizedDescription = dto.Description != null ? await ProcessDescriptionAsync(dto.Description, task.CreatedByUserId) : null;
+            IReadOnlyCollection<string>? categories = null;
             if (dto.Categories != null || dto.Category != null)
             {
-                var categories = NormalizeCategories(dto.Categories, dto.Category);
-                task.Categories = categories.ToList();
-                task.Category = categories.FirstOrDefault();
+                categories = NormalizeCategories(dto.Categories, dto.Category);
             }
-            task.Priority = dto.Priority ?? task.Priority;
-            task.StartDate = dto.StartDate ?? task.StartDate;
-            task.DueDate = dto.DueDate ?? task.DueDate;
-            task.ContextType = dto.ContextType != null ? Normalize(dto.ContextType) : task.ContextType;
-            task.ContextId = dto.ContextId != null ? Normalize(dto.ContextId) : task.ContextId;
-            task.AssignedToUserId = dto.AssignedToUserId != null ? Normalize(dto.AssignedToUserId) : task.AssignedToUserId;
 
-            if (dto.Status.HasValue)
+            var recurrence = dto.Recurrence != null ? NormalizeRecurrence(dto.Recurrence) : null;
+
+            var tasksToUpdate = new List<TodoTask> { task };
+            if (dto.ApplyToSeries && !string.IsNullOrWhiteSpace(task.RecurrenceGroupId))
             {
-                task.Status = dto.Status.Value;
-                if (task.Status == TodoStatus.Done)
+                var series = await _repository.SearchByRecurrenceGroupAsync(task.RecurrenceGroupId);
+                tasksToUpdate = series.ToList();
+                if (tasksToUpdate.All(t => t.Id != task.Id))
                 {
-                    CompleteAllSteps(task);
-                    task.CompletedAt ??= DateTime.UtcNow;
-                }
-                else
-                {
-                    task.CompletedAt = null;
+                    tasksToUpdate.Add(task);
                 }
             }
 
-            await _taskValidator.ValidateAndThrowAsync(task);
-            await _repository.UpdateAsync(task);
+            foreach (var target in tasksToUpdate)
+            {
+                ApplyTaskUpdates(target, dto, sanitizedDescription, categories, recurrence);
+                await _taskValidator.ValidateAndThrowAsync(target);
+                await _repository.UpdateAsync(target);
+            }
 
             return ToDto(task);
         }
@@ -397,6 +388,93 @@ namespace Application.Service.Service
             };
         }
 
+        private void ApplyTaskUpdates(
+            TodoTask task,
+            UpdateTodoTaskDto dto,
+            string? sanitizedDescription,
+            IReadOnlyCollection<string>? categories,
+            TodoRecurrence? recurrence)
+        {
+            task.Steps ??= new List<TodoStep>();
+            if (task.CreatedAt == default)
+            {
+                task.CreatedAt = DateTime.UtcNow;
+            }
+
+            if (dto.Title != null)
+            {
+                task.Title = dto.Title.Trim();
+            }
+
+            if (dto.Description != null)
+            {
+                task.Description = sanitizedDescription;
+            }
+
+            if (categories != null)
+            {
+                task.Categories = categories.ToList();
+                task.Category = categories.FirstOrDefault();
+            }
+
+            if (dto.Priority.HasValue)
+            {
+                task.Priority = dto.Priority.Value;
+            }
+
+            if (dto.StartDate.HasValue)
+            {
+                task.StartDate = dto.StartDate.Value;
+            }
+
+            if (dto.DueDate.HasValue)
+            {
+                task.DueDate = dto.DueDate.Value;
+            }
+
+            if (dto.ContextType != null)
+            {
+                task.ContextType = Normalize(dto.ContextType);
+            }
+
+            if (dto.ContextId != null)
+            {
+                task.ContextId = Normalize(dto.ContextId);
+            }
+
+            if (dto.AssignedToUserId != null)
+            {
+                task.AssignedToUserId = Normalize(dto.AssignedToUserId);
+            }
+
+            if (dto.IsAllDay.HasValue)
+            {
+                task.IsAllDay = dto.IsAllDay.Value;
+            }
+
+            if (dto.Recurrence != null)
+            {
+                task.Recurrence = recurrence;
+                task.RecurrenceGroupId = recurrence != null && recurrence.Type != TodoRecurrenceType.None
+                    ? task.RecurrenceGroupId ?? Guid.NewGuid().ToString()
+                    : null;
+            }
+
+            if (dto.Status.HasValue)
+            {
+                task.Status = dto.Status.Value;
+                if (task.Status == TodoStatus.Done)
+                {
+                    CompleteAllSteps(task);
+                    task.CompletedAt ??= DateTime.UtcNow;
+                }
+                else
+                {
+                    task.CompletedAt = null;
+                }
+            }
+        }
+
         private async Task<string?> ProcessDescriptionAsync(string? html, string? uploadedByUserId)
         {
             if (string.IsNullOrWhiteSpace(html))
@@ -468,6 +546,38 @@ namespace Application.Service.Service
                 "image/gif" => ".gif",
                 "image/webp" => ".webp",
                 _ => ".img"
+            };
+        }
+
+        private static TodoRecurrence? NormalizeRecurrence(TodoRecurrenceDto? dto)
+        {
+            if (dto == null || dto.Type == TodoRecurrenceType.None)
+            {
+                return null;
+            }
+
+            return new TodoRecurrence
+            {
+                Type = dto.Type,
+                Interval = dto.Interval <= 0 ? 1 : dto.Interval,
+                EndsOn = dto.EndsOn,
+                DaysOfWeek = dto.DaysOfWeek?.Distinct().ToList() ?? new List<DayOfWeek>()
+            };
+        }
+
+        private static TodoRecurrenceDto? ToRecurrenceDto(TodoRecurrence? recurrence)
+        {
+            if (recurrence == null || recurrence.Type == TodoRecurrenceType.None)
+            {
+                return null;
+            }
+
+            return new TodoRecurrenceDto
+            {
+                Type = recurrence.Type,
+                Interval = recurrence.Interval <= 0 ? 1 : recurrence.Interval,
+                EndsOn = recurrence.EndsOn,
+                DaysOfWeek = recurrence.DaysOfWeek?.ToList() ?? new List<DayOfWeek>()
             };
         }
 
@@ -627,6 +737,9 @@ namespace Application.Service.Service
                 CreatedAt = task.CreatedAt,
                 AssignedToUserId = task.AssignedToUserId,
                 IsArchived = task.IsArchived,
+                IsAllDay = task.IsAllDay,
+                RecurrenceGroupId = task.RecurrenceGroupId,
+                Recurrence = ToRecurrenceDto(task.Recurrence),
                 Steps = (task.Steps ?? new List<TodoStep>())
                     .OrderBy(s => s.Order)
                     .Select(s => new TodoStepDto

@@ -484,6 +484,9 @@
   <data name="TodoDateRangeInvalid" xml:space="preserve">
     <value>Data de inicio deve ser menor ou igual a data de vencimento.</value>
   </data>
+  <data name="TodoRecurrenceInvalid" xml:space="preserve">
+    <value>Configuracao de recorrencia invalida.</value>
+  </data>
   <data name="TodoContextTypeRequired" xml:space="preserve">
     <value>ContextType e obrigatorio quando ContextId for informado.</value>
   </data>
