@@ -29,6 +29,7 @@ export class TodoBoardComponent implements OnInit {
   tasks: TodoTask[] = [];
   selectedTask: TodoTask | null = null;
   createForm: FormGroup;
+  scheduleErrors: string[] = [];
   isCreateModalOpen = false;
   isScheduleDialogOpen = false;
   isLoading = false;
@@ -138,6 +139,7 @@ export class TodoBoardComponent implements OnInit {
     this.isScheduleDialogOpen = false;
     this.createForm.reset();
     this.selectedCategories = [];
+    this.scheduleErrors = [];
     this.createForm.patchValue({
       Priority: 1,
       IsAllDay: false,
@@ -145,6 +147,8 @@ export class TodoBoardComponent implements OnInit {
       RecurrenceInterval: 1,
       RecurrenceEndsOn: null,
       RecurrenceDaysOfWeek: [],
+      StartDate: null,
+      DueDate: null,
     });
   }
 
@@ -160,6 +164,11 @@ export class TodoBoardComponent implements OnInit {
     }
 
     const formValue = this.createForm.value;
+    this.scheduleErrors = this.getScheduleValidationErrors(formValue);
+    if (this.scheduleErrors.length > 0) {
+      this.notification.showError(this.scheduleErrors[0]);
+      return;
+    }
     const startDate = this.normalizeDateValue(formValue.StartDate);
     const dueDate = this.normalizeDateValue(formValue.DueDate);
     const recurrence = this.buildRecurrenceFromForm(formValue, startDate);
@@ -183,7 +192,10 @@ export class TodoBoardComponent implements OnInit {
         this.isCreateModalOpen = false;
         this.selectedTask = task;
       },
-      error: () => {},
+      error: (err) => {
+        const message = this.getCreateErrorMessage(err);
+        this.notification.showError(message);
+      },
     });
   }
 
@@ -359,6 +371,7 @@ export class TodoBoardComponent implements OnInit {
   }
 
   openScheduleDialog(): void {
+    this.scheduleErrors = [];
     this.isScheduleDialogOpen = true;
   }
 
@@ -387,11 +400,75 @@ export class TodoBoardComponent implements OnInit {
     return summary;
   }
 
+  private getScheduleValidationErrors(formValue: any): string[] {
+    const errors: string[] = [];
+    const start = formValue.StartDate ? new Date(formValue.StartDate) : null;
+    const due = formValue.DueDate ? new Date(formValue.DueDate) : null;
+    const recurrenceEnd = formValue.RecurrenceEndsOn ? new Date(formValue.RecurrenceEndsOn) : null;
+    const recurrenceType = formValue.RecurrenceType;
+
+    if (start && due && start.getTime() > due.getTime()) {
+      const msg = this.translate.instant('todo.errors.scheduleRange');
+      errors.push(msg !== 'todo.errors.scheduleRange' ? msg : 'O término deve ser após o início.');
+    }
+
+    const hasRecurrence = recurrenceType !== undefined && recurrenceType !== null && recurrenceType !== TodoRecurrenceType.None;
+    const anchor = start ?? due;
+
+    if (hasRecurrence && !anchor) {
+      const msg = this.translate.instant('todo.errors.recurrenceAnchor');
+      errors.push(msg !== 'todo.errors.recurrenceAnchor' ? msg : 'Defina uma data de início ou término para recorrência.');
+    }
+
+    if (hasRecurrence && recurrenceEnd && anchor && recurrenceEnd.getTime() < anchor.getTime()) {
+      const msg = this.translate.instant('todo.errors.recurrenceEndsOn');
+      errors.push(msg !== 'todo.errors.recurrenceEndsOn' ? msg : 'A data de término da recorrência deve ser depois do início.');
+    }
+
+    const weekly = recurrenceType === TodoRecurrenceType.Weekly;
+    const weeklyDays: number[] = Array.isArray(formValue.RecurrenceDaysOfWeek) ? formValue.RecurrenceDaysOfWeek : [];
+    if (weekly && weeklyDays.length === 0 && !start) {
+      const msg = this.translate.instant('todo.errors.recurrenceWeeklyDays');
+      errors.push(msg !== 'todo.errors.recurrenceWeeklyDays' ? msg : 'Selecione ao menos um dia para repetição semanal.');
+    }
+
+    return errors;
+  }
+
+  private getCreateErrorMessage(error: any): string {
+    const apiTitle = error?.error?.title || error?.error?.Title;
+    const apiDetail = error?.error?.detail || error?.error?.Detail;
+    if (apiTitle && apiDetail) {
+      return `${apiTitle}: ${apiDetail}`;
+    }
+    if (apiDetail) {
+      return apiDetail;
+    }
+    const fallback = this.translate.instant('todo.errors.createFailed');
+    return fallback !== 'todo.errors.createFailed'
+      ? fallback
+      : 'Não foi possível criar a tarefa. Verifique datas e recorrência.';
+  }
+
   private normalizeDateValue(value: any): string | null {
     if (value === undefined || value === null || value === '') {
       return null;
     }
     return value;
+  }
+
+  private formatDateInput(value?: string | null): string | null {
+    if (!value) {
+      return null;
+    }
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return null;
+    }
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const day = `${date.getDate()}`.padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   private buildRecurrenceFromForm(formValue: any, startDate: string | null): TodoRecurrence | null {

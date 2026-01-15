@@ -130,12 +130,33 @@
           <span>{{ 'todo.fields.title' | translate }}</span>
           <input type="text" formControlName="Title" [placeholder]="'todo.fields.titlePlaceholder' | translate" />
         </label>
-        <div class="field full-row schedule-trigger">
-          <span>{{ 'todo.fields.when' | translate }}</span>
-          <button type="button" class="btn ghost" (click)="openScheduleDialog()">
-            <i class="fa-regular fa-calendar"></i>
-            <span>{{ getScheduleSummary(createForm) }}</span>
-          </button>
+        <div class="field full-row when-block">
+          <span class="field-title">{{ 'todo.fields.when' | translate }}</span>
+          <div class="when-row">
+            <div class="input-pair">
+              <p class="sub-label">{{ 'todo.fields.startDateTime' | translate }}</p>
+              <div class="input-shell">
+                <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                <input type="datetime-local" formControlName="StartDate" [placeholder]="'todo.fields.startDateTime' | translate" />
+              </div>
+            </div>
+            <div class="input-pair">
+              <p class="sub-label">{{ 'todo.fields.endDateTime' | translate }}</p>
+              <div class="input-shell">
+                <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                <input type="datetime-local" formControlName="DueDate" [placeholder]="'todo.fields.endDateTime' | translate" />
+              </div>
+            </div>
+          </div>
+          <div class="recurrence-row">
+            <button type="button" class="tiny-link" (click)="openScheduleDialog()">
+              <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+              {{ 'todo.fields.recurrence' | translate }}
+            </button>
+          </div>
+          <div class="schedule-errors" *ngIf="scheduleErrors.length">
+            <p class="error-text" *ngFor="let err of scheduleErrors">{{ err }}</p>
+          </div>
         </div>
         <label class="field">
           <span>{{ 'todo.fields.category' | translate }}</span>

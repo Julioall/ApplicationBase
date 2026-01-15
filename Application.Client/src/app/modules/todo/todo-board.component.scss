@@ -523,10 +523,10 @@
 
 .create-modal {
   width: var(--todo-modal-width);
-  background: linear-gradient(180deg, var(--surface), var(--surface-alt));
+  background: #ffffff;
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-soft);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.12);
   padding: var(--space-5);
   display: flex;
   flex-direction: column;
@@ -569,7 +569,7 @@
 }
 
 .modal-grid .field {
-  background: var(--surface-alt);
+  background: #ffffff;
   border-radius: var(--radius-md);
   padding: var(--space-3);
   box-shadow: inset 0 1px 0 rgba(var(--shadow-rgb), 0.04);
@@ -588,7 +588,7 @@
   padding: 0.65rem 0.75rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
-  background: var(--surface);
+  background: #f8f9fb;
   color: var(--text-primary);
 }
 
@@ -777,6 +777,97 @@
   gap: var(--space-2);
   width: 100%;
   justify-content: flex-start;
+}
+
+.when-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.field-title {
+  margin: 0;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.when-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-3);
+}
+
+.input-pair {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sub-label {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.input-shell {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: #f8f9fb;
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.02);
+  color: var(--text-primary);
+}
+
+.input-shell input {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.input-shell input::placeholder {
+  color: var(--text-muted);
+}
+
+.input-shell i {
+  color: var(--text-muted);
+}
+
+.recurrence-row {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.tiny-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tiny-link:hover {
+  color: var(--text-primary);
+}
+
+.schedule-errors {
+  margin-top: var(--space-2);
+  color: #b3261e;
+
+  .error-text {
+    margin: 0;
+    font-weight: 600;
+  }
 }
 
 .inline-field {
