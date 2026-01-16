@@ -9,7 +9,6 @@ import { TodoBoardComponent } from './todo-board.component';
 import { TodoStepsChecklistComponent } from './todo-steps-checklist.component';
 import { TodoTaskDetailComponent } from './todo-task-detail.component';
 import { TodoAgendaComponent } from './todo-agenda.component';
-import { TodoScheduleDialogComponent } from './todo-schedule-dialog.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +16,6 @@ import { TodoScheduleDialogComponent } from './todo-schedule-dialog.component';
     TodoStepsChecklistComponent,
     TodoTaskDetailComponent,
     TodoAgendaComponent,
-    TodoScheduleDialogComponent,
   ],
   imports: [
     CommonModule,

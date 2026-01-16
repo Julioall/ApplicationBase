@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { TodoRecurrence, TodoRecurrenceType, TodoStatus, TodoTask } from '../../model/todo';
+import { TodoStatus, TodoTask } from '../../model/todo';
 import { TranslateService } from '@ngx-translate/core';
-import { occursOnDate } from './recurrence.util';
 
 type AgendaEntry = {
   task: TodoTask;
@@ -23,7 +22,6 @@ export class TodoAgendaComponent {
   @Output() dateChange = new EventEmitter<Date>();
 
   TodoStatus = TodoStatus;
-  TodoRecurrenceType = TodoRecurrenceType;
 
   constructor(private readonly translate: TranslateService) {}
 
@@ -63,34 +61,8 @@ export class TodoAgendaComponent {
     this.dateChange.emit(today);
   }
 
-  getRecurrenceLabel(recurrence?: TodoRecurrence | null): string {
-    if (!recurrence || recurrence.Type === undefined || recurrence.Type === TodoRecurrenceType.None) {
-      return this.translate.instant('todo.recurrence.none');
-    }
-
-    switch (recurrence.Type) {
-      case TodoRecurrenceType.Daily:
-        return this.translate.instant('todo.recurrence.daily');
-      case TodoRecurrenceType.Weekdays:
-        return this.translate.instant('todo.recurrence.weekdays');
-      case TodoRecurrenceType.Weekly: {
-        const interval = recurrence.Interval && recurrence.Interval > 1 ? recurrence.Interval : 1;
-        if (interval > 1) {
-          return this.translate.instant('todo.recurrence.everyNWeeks', { count: interval });
-        }
-        return this.translate.instant('todo.recurrence.weekly');
-      }
-      case TodoRecurrenceType.Monthly:
-        return this.translate.instant('todo.recurrence.monthly');
-      case TodoRecurrenceType.Yearly:
-        return this.translate.instant('todo.recurrence.yearly');
-      default:
-        return this.translate.instant('todo.recurrence.custom');
-    }
-  }
-
   private createEntryForDay(task: TodoTask, day: Date): AgendaEntry | null {
-    if (!occursOnDate(task, day)) {
+    if (!this.occursOnDate(task, day)) {
       return null;
     }
 
@@ -105,6 +77,21 @@ export class TodoAgendaComponent {
       end,
       isAllDay: !!task.IsAllDay || (!start && !end),
     };
+  }
+
+  private occursOnDate(task: TodoTask, target: Date): boolean {
+    const targetDay = this.startOfDay(target);
+    const start = task.StartDate ? this.startOfDay(new Date(task.StartDate)) : null;
+    const end = task.DueDate ? this.startOfDay(new Date(task.DueDate)) : null;
+
+    const anchor = start ?? end;
+    if (!anchor) {
+      return false;
+    }
+
+    const endDate = end ?? start ?? anchor;
+    const rangeStart = start ?? endDate;
+    return targetDay.getTime() >= rangeStart.getTime() && targetDay.getTime() <= endDate.getTime();
   }
 
   getPriorityLabel(priority?: number | null): string {
@@ -127,5 +114,9 @@ export class TodoAgendaComponent {
     const combined = new Date(day);
     combined.setHours(timeSource.getHours(), timeSource.getMinutes(), 0, 0);
     return combined;
+  }
+
+  private startOfDay(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
   }
 }

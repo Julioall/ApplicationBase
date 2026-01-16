@@ -17,7 +17,6 @@
             <span>{{ 'todo.view.board' | translate }}</span>
           </button>
           <button type="button" class="pill ghost" [class.active]="viewMode === 'agenda'" (click)="setViewMode('agenda')">
-            <i class="fa-regular fa-calendar"></i>
             <span>{{ 'todo.view.agenda' | translate }}</span>
           </button>
         </div>
@@ -49,54 +48,44 @@
               >
                 <p class="empty" *ngIf="column.items.length === 0">{{ 'todo.emptyColumn' | translate }}</p>
                 <article class="task-card" *ngFor="let task of column.items" cdkDrag [cdkDragDisabled]="!canManage" (click)="selectTask(task)">
-                  <div class="task-head">
-                    <div class="task-title">
-                      <span class="title-text">{{ task.Title }}</span>
-                    </div>
-                    <div class="priority-icons" *ngIf="task.Priority as pr" [ngSwitch]="pr">
-                      <ng-container *ngSwitchCase="1">
-                        <i class="fa-solid fa-bolt low"></i>
-                        <i class="fa-solid fa-bolt muted"></i>
-                        <i class="fa-solid fa-bolt muted"></i>
-                      </ng-container>
-                      <ng-container *ngSwitchCase="2">
-                        <i class="fa-solid fa-bolt medium"></i>
-                        <i class="fa-solid fa-bolt medium"></i>
-                        <i class="fa-solid fa-bolt muted"></i>
-                      </ng-container>
-                      <ng-container *ngSwitchCase="3">
-                        <i class="fa-solid fa-bolt high"></i>
-                        <i class="fa-solid fa-bolt high"></i>
-                        <i class="fa-solid fa-bolt high"></i>
-                      </ng-container>
-                    </div>
-                  </div>
-                  <div class="task-description preview" *ngIf="task.Description" [innerHTML]="task.Description"></div>
-                  <div class="chip-row" *ngIf="getTaskCategories(task).length">
-                    <span class="chip" *ngFor="let cat of getTaskCategories(task)">#{{ cat }}</span>
-                  </div>
-                  <div class="task-footer">
-                    <div class="task-dates" *ngIf="task.StartDate || task.DueDate">
-                      <span class="date-pill">
-                        <span class="date-label">{{ 'todo.fields.when' | translate }}</span>
-                        <span class="date-value" *ngIf="task.IsAllDay">
-                          {{ task.StartDate | date: 'dd/MM' }}
-                          <span class="pill ghost tiny">{{ 'todo.schedule.allDay' | translate }}</span>
-                        </span>
-                        <span class="date-value" *ngIf="!task.IsAllDay">
-                          <span *ngIf="task.StartDate">{{ task.StartDate | date: 'dd/MM HH:mm' }}</span>
-                          <span class="date-separator" *ngIf="task.StartDate && task.DueDate">-&gt;</span>
-                          <span *ngIf="task.DueDate">{{ task.DueDate | date: 'dd/MM HH:mm' }}</span>
-                        </span>
+                  <header class="task-card__header">
+                    <div class="task-card__tags" *ngIf="getTaskCategories(task).length; else defaultTag">
+                      <span
+                        class="task-tag"
+                        *ngFor="let cat of getTaskCategories(task); let i = index"
+                        [ngClass]="{ 'tag--blue': i === 0, 'tag--purple': i === 1, 'tag--green': i === 2 }"
+                      >
+                        {{ cat }}
                       </span>
                     </div>
-                    <div class="task-meta" *ngIf="task.Recurrence">
-                      <span class="pill ghost tiny">
-                        <i class="fa-solid fa-rotate"></i>
-                        {{ getRecurrenceLabel(task.Recurrence) }}
-                      </span>
-                    </div>
+                    <ng-template #defaultTag>
+                      <div class="task-card__tags">
+                        <span class="task-tag tag--blue">Task</span>
+                      </div>
+                    </ng-template>
+                    <span class="task-card__badge" *ngIf="task.Priority">
+                      {{ getPriorityLabel(task.Priority) }}
+                    </span>
+                  </header>
+
+                  <div class="task-card__content">
+                    <h3 class="task-card__title">{{ task.Title }}</h3>
+                    <p class="task-card__desc" *ngIf="task.Description" [innerHTML]="task.Description"></p>
                   </div>
+
+                  <footer class="task-card__footer" *ngIf="task.StartDate || task.DueDate">
+                    <div class="task-card__date">
+                      <i class="fa-regular fa-calendar-check"></i>
+                      <ng-container *ngIf="task.IsAllDay; else timedDate">
+                        <span>{{ task.StartDate | date: 'MMM d, y' }}</span>
+                      </ng-container>
+                      <ng-template #timedDate>
+                        <span *ngIf="task.StartDate">{{ task.StartDate | date: 'MMM d, y HH:mm' }}</span>
+                        <span *ngIf="task.StartDate && task.DueDate">&nbsp;–&nbsp;</span>
+                        <span *ngIf="task.DueDate">{{ task.DueDate | date: 'MMM d, y HH:mm' }}</span>
+                      </ng-template>
+                    </div>
+                  </footer>
                 </article>
               </div>
             </div>
@@ -117,80 +106,93 @@
 
 <div class="create-modal-backdrop" *ngIf="isCreateModalOpen" (click)="cancelCreate()">
   <div class="create-modal" (click)="$event.stopPropagation()">
-    <header class="modal-header">
+    <header class="create-modal__header">
       <div>
-        <p class="eyebrow">{{ 'todo.modal.eyebrow' | translate }}</p>
         <h2>{{ 'todo.modal.title' | translate }}</h2>
         <p class="subtitle">{{ 'todo.modal.subtitle' | translate }}</p>
       </div>
+      <button class="btn-icon-close" type="button" (click)="cancelCreate()" aria-label="Close create modal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </header>
-    <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="modal-form">
-      <div class="modal-grid">
-        <label class="field full-row rich-text-field">
-          <span>{{ 'todo.fields.title' | translate }}</span>
-          <input type="text" formControlName="Title" [placeholder]="'todo.fields.titlePlaceholder' | translate" />
-        </label>
-        <div class="field full-row when-block">
-          <span class="field-title">{{ 'todo.fields.when' | translate }}</span>
-          <div class="when-row">
-            <div class="input-pair">
-              <p class="sub-label">{{ 'todo.fields.startDateTime' | translate }}</p>
-              <div class="input-shell">
-                <i class="fa-regular fa-calendar" aria-hidden="true"></i>
-                <input type="datetime-local" formControlName="StartDate" [placeholder]="'todo.fields.startDateTime' | translate" />
-              </div>
-            </div>
-            <div class="input-pair">
-              <p class="sub-label">{{ 'todo.fields.endDateTime' | translate }}</p>
-              <div class="input-shell">
-                <i class="fa-regular fa-clock" aria-hidden="true"></i>
-                <input type="datetime-local" formControlName="DueDate" [placeholder]="'todo.fields.endDateTime' | translate" />
-              </div>
-            </div>
-          </div>
-          <div class="recurrence-row">
-            <button type="button" class="tiny-link" (click)="openScheduleDialog()">
-              <i class="fa-solid fa-rotate" aria-hidden="true"></i>
-              {{ 'todo.fields.recurrence' | translate }}
-            </button>
-          </div>
-          <div class="schedule-errors" *ngIf="scheduleErrors.length">
-            <p class="error-text" *ngFor="let err of scheduleErrors">{{ err }}</p>
-          </div>
-        </div>
-        <label class="field">
-          <span>{{ 'todo.fields.category' | translate }}</span>
+
+    <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="create-modal__body">
+      <div class="form-group">
+        <label>{{ 'todo.fields.title' | translate }}</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-pen-to-square input-icon"></i>
           <input
             type="text"
-            formControlName="Category"
-            [placeholder]="'todo.fields.categoryPlaceholder' | translate"
-            list="todo-category-options"
-            autocomplete="off"
-            #categoryInput
-            (keydown.enter)="onCategoryEnter($event, categoryInput)"
+            class="modern-input"
+            formControlName="Title"
+            [placeholder]="'todo.fields.titlePlaceholder' | translate"
           />
-          <datalist id="todo-category-options">
-            <option *ngFor="let option of categoryOptions" [value]="option"></option>
-          </datalist>
-          <div class="chip-row" *ngIf="selectedCategories.length">
-            <span class="chip" *ngFor="let cat of selectedCategories">
+        </div>
+      </div>
+
+      <div class="form-grid compact">
+        <div class="form-group">
+          <label>{{ 'todo.fields.startDateTime' | translate }}</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-calendar input-icon"></i>
+            <input type="datetime-local" class="modern-input" formControlName="StartDate" [placeholder]="'todo.fields.startDateTime' | translate" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>{{ 'todo.fields.endDateTime' | translate }}</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-calendar-check input-icon"></i>
+            <input type="datetime-local" class="modern-input" formControlName="DueDate" [placeholder]="'todo.fields.endDateTime' | translate" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-grid compact">
+        <div class="form-group">
+          <label>{{ 'todo.fields.category' | translate }}</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-tag input-icon"></i>
+            <input
+              type="text"
+              class="modern-input"
+              formControlName="Category"
+              [placeholder]="'todo.fields.categoryPlaceholder' | translate"
+              list="todo-category-options"
+              autocomplete="off"
+              #categoryInput
+              (keydown.enter)="onCategoryEnter($event, categoryInput)"
+            />
+            <datalist id="todo-category-options">
+              <option *ngFor="let option of categoryOptions" [value]="option"></option>
+            </datalist>
+          </div>
+          <div class="chip-container" *ngIf="selectedCategories.length">
+            <span class="modern-chip" *ngFor="let cat of selectedCategories">
               {{ cat }}
               <button type="button" (click)="removeCategory(cat)" aria-label="Remove category">
                 <i class="fa-solid fa-xmark"></i>
               </button>
             </span>
           </div>
-        </label>
-        <div class="field priority-field">
-          <span>{{ 'todo.fields.priority' | translate }}</span>
-          <select class="priority-select" formControlName="Priority">
-            <option [ngValue]="3">{{ 'todo.priority.high' | translate }}</option>
-            <option [ngValue]="2">{{ 'todo.priority.medium' | translate }}</option>
-            <option [ngValue]="1">{{ 'todo.priority.low' | translate }}</option>
-          </select>
         </div>
-        <label class="field full-row">
-          <span>{{ 'todo.fields.description' | translate }}</span>
+
+        <div class="form-group">
+          <label>{{ 'todo.fields.priority' | translate }}</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-layer-group input-icon"></i>
+            <select class="modern-input" formControlName="Priority">
+              <option [ngValue]="3">{{ 'todo.priority.high' | translate }}</option>
+              <option [ngValue]="2">{{ 'todo.priority.medium' | translate }}</option>
+              <option [ngValue]="1">{{ 'todo.priority.low' | translate }}</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>{{ 'todo.fields.description' | translate }}</label>
+        <div class="editor-wrapper">
           <quill-editor
             class="rich-editor"
             formControlName="Description"
@@ -200,14 +202,17 @@
             theme="snow"
             (onEditorCreated)="onEditorCreated($event)"
           ></quill-editor>
-        </label>
-      </div>
-
-      <div class="form-actions modal-actions">
-        <button class="btn ghost" type="button" (click)="cancelCreate()">{{ 'todo.actions.cancel' | translate }}</button>
-        <button class="btn primary" type="submit">{{ 'todo.actions.create' | translate }}</button>
+        </div>
       </div>
     </form>
+
+    <footer class="create-modal__footer">
+      <button class="btn btn-ghost" type="button" (click)="cancelCreate()">{{ 'todo.actions.cancel' | translate }}</button>
+      <button class="btn btn-primary" type="submit" (click)="submitCreate()">
+        <i class="fa-solid fa-plus"></i>
+        <span>{{ 'todo.actions.create' | translate }}</span>
+      </button>
+    </footer>
   </div>
 </div>
 
@@ -223,14 +228,6 @@
     ></app-todo-task-detail>
   </div>
 </div>
-
-<app-todo-schedule-dialog
-  [form]="createForm"
-  [isOpen]="isScheduleDialogOpen"
-  [weekDays]="weekDays"
-  [recurrenceOptions]="recurrenceOptions"
-  (closed)="closeScheduleDialog()"
-></app-todo-schedule-dialog>
 
 <ng-template #loadingState>
   <div class="loading-state">

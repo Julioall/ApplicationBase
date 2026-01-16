@@ -5,7 +5,7 @@ import { finalize } from 'rxjs/operators';
 import { AuthService } from '../../service/auth/auth.service';
 import { TodoService } from '../../service/todo/todo.service';
 import { MANAGE_TODO_PERMISSION, VIEW_TODO_PERMISSION } from '../../model/permissions';
-import { CreateTodoTask, TodoRecurrence, TodoRecurrenceType, TodoStatus, TodoTask, UpdateTodoTask } from '../../model/todo';
+import { CreateTodoTask, TodoStatus, TodoTask, UpdateTodoTask } from '../../model/todo';
 import { QuillModules } from 'ngx-quill';
 import { NotificationService } from '../../service/notification/notification.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -24,14 +24,11 @@ type TodoColumn = {
 })
 export class TodoBoardComponent implements OnInit {
   TodoStatus = TodoStatus;
-  TodoRecurrenceType = TodoRecurrenceType;
   columns: TodoColumn[] = [];
   tasks: TodoTask[] = [];
   selectedTask: TodoTask | null = null;
   createForm: FormGroup;
-  scheduleErrors: string[] = [];
   isCreateModalOpen = false;
-  isScheduleDialogOpen = false;
   isLoading = false;
   viewMode: 'board' | 'agenda' = 'board';
   agendaDate: Date = new Date();
@@ -40,23 +37,6 @@ export class TodoBoardComponent implements OnInit {
   selectedCategories: string[] = [];
   isUploadingImage = false;
   readonly priorityLevels = [1, 2, 3];
-  readonly recurrenceOptions = [
-    { value: TodoRecurrenceType.None, label: 'todo.recurrence.none' },
-    { value: TodoRecurrenceType.Daily, label: 'todo.recurrence.daily' },
-    { value: TodoRecurrenceType.Weekdays, label: 'todo.recurrence.weekdays' },
-    { value: TodoRecurrenceType.Weekly, label: 'todo.recurrence.weekly' },
-    { value: TodoRecurrenceType.Monthly, label: 'todo.recurrence.monthly' },
-    { value: TodoRecurrenceType.Yearly, label: 'todo.recurrence.yearly' },
-  ];
-  readonly weekDays = [
-    { value: 0, label: 'todo.weekdays.sun', short: 'S' },
-    { value: 1, label: 'todo.weekdays.mon', short: 'M' },
-    { value: 2, label: 'todo.weekdays.tue', short: 'T' },
-    { value: 3, label: 'todo.weekdays.wed', short: 'W' },
-    { value: 4, label: 'todo.weekdays.thu', short: 'T' },
-    { value: 5, label: 'todo.weekdays.fri', short: 'F' },
-    { value: 6, label: 'todo.weekdays.sat', short: 'S' },
-  ];
   private quillEditor: any;
   readonly descriptionModules: QuillModules = {
     toolbar: {
@@ -97,10 +77,6 @@ export class TodoBoardComponent implements OnInit {
       StartDate: [null],
       DueDate: [null],
       IsAllDay: [false],
-      RecurrenceType: [TodoRecurrenceType.None],
-      RecurrenceInterval: [1],
-      RecurrenceEndsOn: [null],
-      RecurrenceDaysOfWeek: [[]],
     });
   }
 
@@ -136,17 +112,11 @@ export class TodoBoardComponent implements OnInit {
       return;
     }
     this.isCreateModalOpen = true;
-    this.isScheduleDialogOpen = false;
     this.createForm.reset();
     this.selectedCategories = [];
-    this.scheduleErrors = [];
     this.createForm.patchValue({
       Priority: 1,
       IsAllDay: false,
-      RecurrenceType: TodoRecurrenceType.None,
-      RecurrenceInterval: 1,
-      RecurrenceEndsOn: null,
-      RecurrenceDaysOfWeek: [],
       StartDate: null,
       DueDate: null,
     });
@@ -154,7 +124,6 @@ export class TodoBoardComponent implements OnInit {
 
   cancelCreate(): void {
     this.isCreateModalOpen = false;
-    this.isScheduleDialogOpen = false;
   }
 
   submitCreate(): void {
@@ -164,14 +133,13 @@ export class TodoBoardComponent implements OnInit {
     }
 
     const formValue = this.createForm.value;
-    this.scheduleErrors = this.getScheduleValidationErrors(formValue);
-    if (this.scheduleErrors.length > 0) {
-      this.notification.showError(this.scheduleErrors[0]);
+    const scheduleErrors = this.getScheduleValidationErrors(formValue);
+    if (scheduleErrors.length > 0) {
+      this.notification.showError(scheduleErrors[0]);
       return;
     }
     const startDate = this.normalizeDateValue(formValue.StartDate);
     const dueDate = this.normalizeDateValue(formValue.DueDate);
-    const recurrence = this.buildRecurrenceFromForm(formValue, startDate);
     const payload: CreateTodoTask = {
       Title: formValue.Title,
       Description: formValue.Description,
@@ -181,7 +149,6 @@ export class TodoBoardComponent implements OnInit {
       StartDate: startDate,
       DueDate: dueDate,
       IsAllDay: !!formValue.IsAllDay,
-      Recurrence: recurrence,
     };
 
     this.todoService.createTask(payload).subscribe({
@@ -370,66 +337,14 @@ export class TodoBoardComponent implements OnInit {
     };
   }
 
-  openScheduleDialog(): void {
-    this.scheduleErrors = [];
-    this.isScheduleDialogOpen = true;
-  }
-
-  closeScheduleDialog(): void {
-    this.isScheduleDialogOpen = false;
-  }
-
-  getScheduleSummary(form: FormGroup): string {
-    const value = form.value;
-    const allDay = !!value.IsAllDay;
-    const start = this.formatScheduleDisplay(value.StartDate, allDay);
-    const end = this.formatScheduleDisplay(value.DueDate, allDay);
-
-    let summary = start;
-    if (end) {
-      summary = summary ? `${summary} -> ${end}` : end;
-    }
-    if (!summary) {
-      summary = this.translate.instant('todo.schedule.unset');
-    }
-
-    const recurrence = this.buildRecurrencePreview(value);
-    if (recurrence) {
-      summary = `${summary} | ${this.getRecurrenceLabel(recurrence)}`;
-    }
-    return summary;
-  }
-
   private getScheduleValidationErrors(formValue: any): string[] {
     const errors: string[] = [];
     const start = formValue.StartDate ? new Date(formValue.StartDate) : null;
     const due = formValue.DueDate ? new Date(formValue.DueDate) : null;
-    const recurrenceEnd = formValue.RecurrenceEndsOn ? new Date(formValue.RecurrenceEndsOn) : null;
-    const recurrenceType = formValue.RecurrenceType;
 
     if (start && due && start.getTime() > due.getTime()) {
       const msg = this.translate.instant('todo.errors.scheduleRange');
-      errors.push(msg !== 'todo.errors.scheduleRange' ? msg : 'O término deve ser após o início.');
-    }
-
-    const hasRecurrence = recurrenceType !== undefined && recurrenceType !== null && recurrenceType !== TodoRecurrenceType.None;
-    const anchor = start ?? due;
-
-    if (hasRecurrence && !anchor) {
-      const msg = this.translate.instant('todo.errors.recurrenceAnchor');
-      errors.push(msg !== 'todo.errors.recurrenceAnchor' ? msg : 'Defina uma data de início ou término para recorrência.');
-    }
-
-    if (hasRecurrence && recurrenceEnd && anchor && recurrenceEnd.getTime() < anchor.getTime()) {
-      const msg = this.translate.instant('todo.errors.recurrenceEndsOn');
-      errors.push(msg !== 'todo.errors.recurrenceEndsOn' ? msg : 'A data de término da recorrência deve ser depois do início.');
-    }
-
-    const weekly = recurrenceType === TodoRecurrenceType.Weekly;
-    const weeklyDays: number[] = Array.isArray(formValue.RecurrenceDaysOfWeek) ? formValue.RecurrenceDaysOfWeek : [];
-    if (weekly && weeklyDays.length === 0 && !start) {
-      const msg = this.translate.instant('todo.errors.recurrenceWeeklyDays');
-      errors.push(msg !== 'todo.errors.recurrenceWeeklyDays' ? msg : 'Selecione ao menos um dia para repetição semanal.');
+      errors.push(msg !== 'todo.errors.scheduleRange' ? msg : 'O termino deve ser apos o inicio.');
     }
 
     return errors;
@@ -447,7 +362,7 @@ export class TodoBoardComponent implements OnInit {
     const fallback = this.translate.instant('todo.errors.createFailed');
     return fallback !== 'todo.errors.createFailed'
       ? fallback
-      : 'Não foi possível criar a tarefa. Verifique datas e recorrência.';
+      : 'Nao foi possivel criar a tarefa. Verifique as datas.';
   }
 
   private normalizeDateValue(value: any): string | null {
@@ -457,79 +372,6 @@ export class TodoBoardComponent implements OnInit {
     return value;
   }
 
-  private formatDateInput(value?: string | null): string | null {
-    if (!value) {
-      return null;
-    }
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-      return null;
-    }
-    const year = date.getFullYear();
-    const month = `${date.getMonth() + 1}`.padStart(2, '0');
-    const day = `${date.getDate()}`.padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  private buildRecurrenceFromForm(formValue: any, startDate: string | null): TodoRecurrence | null {
-    const type = formValue.RecurrenceType;
-    if (type === undefined || type === null || type === TodoRecurrenceType.None) {
-      return null;
-    }
-
-    const interval = formValue.RecurrenceInterval && Number(formValue.RecurrenceInterval) > 0 ? Number(formValue.RecurrenceInterval) : 1;
-    let days: number[] | null = null;
-
-    if (type === TodoRecurrenceType.Weekly) {
-      const selected = (formValue.RecurrenceDaysOfWeek as number[] | null) ?? [];
-      if (selected.length > 0) {
-        days = selected;
-      } else if (startDate) {
-        days = [new Date(startDate).getDay()];
-      }
-    }
-
-    if (type === TodoRecurrenceType.Weekdays) {
-      days = [1, 2, 3, 4, 5];
-    }
-
-    return {
-      Type: type,
-      Interval: interval,
-      EndsOn: this.normalizeDateValue(formValue.RecurrenceEndsOn),
-      DaysOfWeek: days,
-    };
-  }
-
-  private buildRecurrencePreview(formValue: any): TodoRecurrence | null {
-    if (!formValue) {
-      return null;
-    }
-    const type = formValue.RecurrenceType;
-    if (type === undefined || type === null || type === TodoRecurrenceType.None) {
-      return null;
-    }
-    return {
-      Type: type,
-      Interval: formValue.RecurrenceInterval,
-      EndsOn: formValue.RecurrenceEndsOn,
-      DaysOfWeek: formValue.RecurrenceDaysOfWeek,
-    };
-  }
-
-  private formatScheduleDisplay(value: string | null, allDay: boolean): string {
-    if (!value) {
-      return '';
-    }
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-      return '';
-    }
-    const options: Intl.DateTimeFormatOptions = allDay
-      ? { day: '2-digit', month: '2-digit', year: 'numeric' }
-      : { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-    return date.toLocaleString(undefined, options);
-  }
 
   loadTasks(): void {
     if (!this.canView) {
@@ -640,32 +482,6 @@ export class TodoBoardComponent implements OnInit {
     if (priority === 2) return 'medium';
     if (priority === 3) return 'high';
     return '';
-  }
-
-  getRecurrenceLabel(recurrence?: TodoRecurrence | null): string {
-    if (!recurrence || recurrence.Type === undefined || recurrence.Type === TodoRecurrenceType.None) {
-      return this.translate.instant('todo.recurrence.none');
-    }
-
-    switch (recurrence.Type) {
-      case TodoRecurrenceType.Daily:
-        return this.translate.instant('todo.recurrence.daily');
-      case TodoRecurrenceType.Weekdays:
-        return this.translate.instant('todo.recurrence.weekdays');
-      case TodoRecurrenceType.Weekly: {
-        const interval = recurrence.Interval && recurrence.Interval > 1 ? recurrence.Interval : 1;
-        if (interval > 1) {
-          return this.translate.instant('todo.recurrence.everyNWeeks', { count: interval });
-        }
-        return this.translate.instant('todo.recurrence.weekly');
-      }
-      case TodoRecurrenceType.Monthly:
-        return this.translate.instant('todo.recurrence.monthly');
-      case TodoRecurrenceType.Yearly:
-        return this.translate.instant('todo.recurrence.yearly');
-      default:
-        return this.translate.instant('todo.recurrence.custom');
-    }
   }
 
   getCompletionPercent(task: TodoTask): number {

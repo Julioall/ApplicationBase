@@ -29,10 +29,6 @@
         </div>
         <div class="agenda-meta">
           <span class="pill ghost tiny" *ngIf="entry.task.Priority">{{ getPriorityLabel(entry.task.Priority) }}</span>
-          <span class="pill ghost tiny" *ngIf="entry.task.Recurrence">
-            <i class="fa-solid fa-rotate"></i>
-            {{ getRecurrenceLabel(entry.task.Recurrence) }}
-          </span>
         </div>
       </div>
     </div>

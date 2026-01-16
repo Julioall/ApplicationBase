@@ -1,186 +1,113 @@
 <section class="task-detail" *ngIf="task">
   <form class="detail-form" [formGroup]="editForm" (ngSubmit)="submitEdit()">
-    <div class="detail-header">
-      <div class="head-top">
-        <div class="title-block" *ngIf="!isEditing">
-          <h2>{{ task.Title }}</h2>
-          <span class="priority-inline" *ngIf="task.Priority as pr">
-            <ng-container [ngSwitch]="pr">
-              <ng-container *ngSwitchCase="1">
-                <i class="fa-solid fa-bolt low"></i>
-                <i class="fa-solid fa-bolt muted"></i>
-                <i class="fa-solid fa-bolt muted"></i>
-              </ng-container>
-              <ng-container *ngSwitchCase="2">
-                <i class="fa-solid fa-bolt medium"></i>
-                <i class="fa-solid fa-bolt medium"></i>
-                <i class="fa-solid fa-bolt muted"></i>
-              </ng-container>
-              <ng-container *ngSwitchCase="3">
-                <i class="fa-solid fa-bolt high"></i>
-                <i class="fa-solid fa-bolt high"></i>
-                <i class="fa-solid fa-bolt high"></i>
-              </ng-container>
-            </ng-container>
-          </span>
-        </div>
-        <div class="title-block" *ngIf="isEditing">
-          <label class="field full-row">
-            <span>{{ 'todo.fields.title' | translate }}</span>
-            <input type="text" formControlName="Title" />
-          </label>
-        </div>
-        <div class="head-actions" *ngIf="canManage">
-          <button class="btn ghost" type="button" (click)="isEditing ? cancelEdit() : startEdit()">
-            <i class="fa-regular fa-pen-to-square"></i>
-            <span>{{ isEditing ? ('todo.actions.cancel' | translate) : ('todo.actions.edit' | translate) }}</span>
-          </button>
-          <button class="btn primary" type="submit" *ngIf="isEditing">
-            <i class="fa-solid fa-check"></i>
-            <span>{{ 'todo.actions.save' | translate }}</span>
-          </button>
-          <button class="btn ghost" type="button" (click)="close()">{{ 'todo.actions.close' | translate }}</button>
-        </div>
+    <header class="panel-header">
+      <div class="status-pill">
+        <i class="fa-regular fa-circle-play"></i>
+        <span>{{ getStatusLabel(task.Status) }}</span>
       </div>
-      <div class="muted description-html" *ngIf="task.Description && !isEditing" [innerHTML]="task.Description"></div>
-      <div class="chip-row" *ngIf="getTaskCategories().length && !isEditing">
-        <span class="chip" *ngFor="let cat of getTaskCategories()">#{{ cat }}</span>
+      <div class="header-actions" *ngIf="canManage">
+        <button
+          class="action-btn"
+          type="button"
+          (click)="isEditing ? cancelEdit() : startEdit()"
+          [attr.aria-label]="isEditing ? ('todo.actions.cancel' | translate) : ('todo.actions.edit' | translate)"
+        >
+          <i class="fa-regular fa-pen-to-square"></i>
+        </button>
+        <button class="action-btn" type="button" (click)="archive()" aria-label="Archive task">
+          <i class="fa-solid fa-box-archive"></i>
+        </button>
+        <button class="action-btn danger" type="button" (click)="deleteTask()" aria-label="Delete task">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+        <button class="action-btn" type="button" (click)="close()" aria-label="Close detail">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
+    </header>
 
-      <ng-container *ngIf="!isEditing">
-        <div class="date-row" *ngIf="task.StartDate || task.DueDate">
-          <span class="eyebrow date-label">
+    <div class="panel-body">
+      <textarea class="editable-title" formControlName="Title" [readonly]="!isEditing"></textarea>
+
+      <div class="properties-grid">
+        <div class="prop-row" *ngIf="task.StartDate || task.DueDate">
+          <span class="prop-label"><i class="fa-regular fa-calendar"></i> {{ 'todo.fields.when' | translate }}</span>
+          <span class="prop-value">
             <ng-container *ngIf="task.IsAllDay; else timedRange">
-              <span>{{ task.StartDate | date: 'dd/MM/yyyy' }}</span>
-              <span class="pill ghost tiny">{{ 'todo.schedule.allDay' | translate }}</span>
+              {{ task.StartDate | date: 'MMM d, y' }}
             </ng-container>
             <ng-template #timedRange>
-              <span *ngIf="task.StartDate">{{ task.StartDate | date: 'dd/MM/yyyy HH:mm' }}</span>
-              <span class="date-separator" *ngIf="task.StartDate && task.DueDate">-&gt;</span>
-              <span *ngIf="task.DueDate">{{ task.DueDate | date: 'dd/MM/yyyy HH:mm' }}</span>
+              <span *ngIf="task.StartDate">{{ task.StartDate | date: 'MMM d, y HH:mm' }}</span>
+              <span *ngIf="task.StartDate && task.DueDate"> – </span>
+              <span *ngIf="task.DueDate">{{ task.DueDate | date: 'MMM d, y HH:mm' }}</span>
             </ng-template>
           </span>
         </div>
-        <div class="recurrence-row" *ngIf="task.Recurrence">
-          <span class="pill ghost">
-            <i class="fa-solid fa-rotate"></i>
-            {{ getRecurrenceLabel(task.Recurrence) }}
+        <div class="prop-row">
+          <span class="prop-label"><i class="fa-solid fa-layer-group"></i> {{ 'todo.fields.priority' | translate }}</span>
+          <span class="prop-value prop-value--stacked">
+            <span class="priority-badge" *ngIf="task.Priority">{{ getPriorityLabel(task.Priority) }}</span>
+            <select *ngIf="isEditing" formControlName="Priority" class="prop-select">
+              <option [ngValue]="null">{{ 'todo.fields.priorityNone' | translate }}</option>
+              <option [ngValue]="1">{{ 'todo.priority.low' | translate }}</option>
+              <option [ngValue]="2">{{ 'todo.priority.medium' | translate }}</option>
+              <option [ngValue]="3">{{ 'todo.priority.high' | translate }}</option>
+            </select>
           </span>
         </div>
-      </ng-container>
-    </div>
+        <div class="prop-row" *ngIf="getTaskCategories().length">
+          <span class="prop-label"><i class="fa-solid fa-tag"></i> {{ 'todo.fields.category' | translate }}</span>
+          <span class="prop-value">
+            <span class="tag-pill" *ngFor="let cat of getTaskCategories()">{{ cat }}</span>
+          </span>
+        </div>
+        <div class="prop-row">
+          <span class="prop-label"><i class="fa-regular fa-circle-check"></i> {{ 'todo.fields.status' | translate }}</span>
+          <span class="prop-value prop-value--stacked">
+            <select *ngIf="isEditing" formControlName="Status" class="prop-select">
+              <option *ngFor="let status of statuses" [ngValue]="status.value">{{ status.label | translate }}</option>
+            </select>
+            <span *ngIf="!isEditing" class="status-chip" [ngClass]="getStatusClass(task.Status)">{{ getStatusLabel(task.Status) }}</span>
+          </span>
+        </div>
+      </div>
 
-    <ng-container *ngIf="isEditing; else viewDetails">
-      <div class="edit-grid">
-        <label class="field">
-          <span>{{ 'todo.fields.status' | translate }}</span>
-          <select formControlName="Status">
-            <option *ngFor="let status of statuses" [ngValue]="status.value">{{ status.label | translate }}</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>{{ 'todo.fields.priority' | translate }}</span>
-          <select formControlName="Priority">
-            <option [ngValue]="null">{{ 'todo.fields.priorityNone' | translate }}</option>
-            <option [ngValue]="1">{{ 'todo.priority.low' | translate }}</option>
-            <option [ngValue]="2">{{ 'todo.priority.medium' | translate }}</option>
-            <option [ngValue]="3">{{ 'todo.priority.high' | translate }}</option>
-          </select>
-        </label>
-        <div class="field full-row schedule-trigger">
-          <span>{{ 'todo.fields.when' | translate }}</span>
-          <div class="schedule-trigger-row">
-            <button type="button" class="btn ghost" (click)="openScheduleDialog()">
-              <i class="fa-regular fa-calendar"></i>
-              <span>{{ getScheduleSummary() }}</span>
-            </button>
-            <label class="apply-series" *ngIf="task?.RecurrenceGroupId">
-              <input type="checkbox" formControlName="ApplyToSeries" />
-              <span>{{ 'todo.fields.applyToSeries' | translate }}</span>
-            </label>
+      <div class="description-area">
+        <label>{{ 'todo.fields.description' | translate }}</label>
+        <ng-container *ngIf="isEditing; else viewDescription">
+          <textarea rows="5" formControlName="Description" class="description-input" [placeholder]="'todo.fields.descriptionPlaceholder' | translate"></textarea>
+        </ng-container>
+        <ng-template #viewDescription>
+          <div class="rich-viewer" *ngIf="task.Description" [innerHTML]="task.Description"></div>
+          <div class="rich-viewer muted" *ngIf="!task.Description">{{ 'todo.fields.descriptionPlaceholder' | translate }}</div>
+        </ng-template>
+      </div>
+
+      <section class="steps-section">
+        <div class="steps-head">
+          <div>
+            <p class="label">{{ 'todo.steps.title' | translate }}</p>
+          </div>
+          <div class="pill ghost">
+            {{ getCompletedSteps() }}/{{ task.Steps.length || 0 }}
           </div>
         </div>
-        <label class="field full-row">
-          <span>{{ 'todo.fields.description' | translate }}</span>
-          <textarea rows="4" formControlName="Description" [placeholder]="'todo.fields.descriptionPlaceholder' | translate"></textarea>
-        </label>
-      </div>
-    </ng-container>
 
-    <ng-template #viewDetails>
-      <div class="meta-grid">
-        <div class="meta-card">
-          <p class="label">{{ 'todo.fields.status' | translate }}</p>
-          <p class="value">
-            <span class="status-value" [ngClass]="getStatusClass(task.Status)">{{ getStatusLabel(task.Status) }}</span>
-          </p>
-        </div>
-        <div class="meta-card">
-          <p class="label">{{ 'todo.fields.priority' | translate }}</p>
-          <p class="value priority-value">
-            <span class="priority-inline" *ngIf="task.Priority as pr">
-              <ng-container [ngSwitch]="pr">
-                <ng-container *ngSwitchCase="1">
-                  <i class="fa-solid fa-bolt low"></i>
-                  <i class="fa-solid fa-bolt muted"></i>
-                  <i class="fa-solid fa-bolt muted"></i>
-                </ng-container>
-                <ng-container *ngSwitchCase="2">
-                  <i class="fa-solid fa-bolt medium"></i>
-                  <i class="fa-solid fa-bolt medium"></i>
-                  <i class="fa-solid fa-bolt muted"></i>
-                </ng-container>
-                <ng-container *ngSwitchCase="3">
-                  <i class="fa-solid fa-bolt high"></i>
-                  <i class="fa-solid fa-bolt high"></i>
-                  <i class="fa-solid fa-bolt high"></i>
-                </ng-container>
-              </ng-container>
-            </span>
-            <span>{{ getPriorityLabel(task.Priority) }}</span>
-          </p>
-        </div>
-      </div>
-    </ng-template>
+        <app-todo-steps-checklist
+          [steps]="task.Steps || []"
+          [canEdit]="canManage"
+          (reorder)="onReorderSteps($event)"
+          (toggle)="onToggleStep($event)"
+          (titleChange)="onTitleChange($event)"
+          (addStep)="onAddStep($event)"
+          (deleteStep)="onDeleteStep($event)"
+        ></app-todo-steps-checklist>
+      </section>
+    </div>
 
-    <section class="steps-section">
-      <div class="steps-head">
-        <div>
-          <p class="label">{{ 'todo.steps.title' | translate }}</p>
-        </div>
-        <div class="pill ghost">
-          {{ getCompletedSteps() }}/{{ task.Steps.length || 0 }}
-        </div>
-      </div>
-
-      <app-todo-steps-checklist
-        [steps]="task.Steps || []"
-        [canEdit]="canManage"
-        (reorder)="onReorderSteps($event)"
-        (toggle)="onToggleStep($event)"
-        (titleChange)="onTitleChange($event)"
-        (addStep)="onAddStep($event)"
-        (deleteStep)="onDeleteStep($event)"
-      ></app-todo-steps-checklist>
-    </section>
-
-    <footer class="detail-footer" *ngIf="canManage && !isEditing">
-      <button class="btn ghost" type="button" (click)="archive()">
-        <i class="fa-solid fa-box-archive"></i>
-        <span>{{ 'todo.actions.archive' | translate }}</span>
-      </button>
-      <button class="btn danger ghost" type="button" (click)="deleteTask()">
-        <i class="fa-regular fa-trash-can"></i>
-        <span>{{ 'todo.actions.delete' | translate }}</span>
-      </button>
+    <footer class="panel-footer" *ngIf="canManage && isEditing">
+      <button class="btn btn--ghost" type="button" (click)="cancelEdit()">{{ 'todo.actions.cancel' | translate }}</button>
+      <button class="btn btn--primary" type="submit">{{ 'todo.actions.save' | translate }}</button>
     </footer>
   </form>
-
-  <app-todo-schedule-dialog
-    [form]="editForm"
-    [isOpen]="isScheduleDialogOpen"
-    [weekDays]="weekDays"
-    [recurrenceOptions]="recurrenceOptions"
-    (closed)="closeScheduleDialog()"
-  ></app-todo-schedule-dialog>
 </section>
