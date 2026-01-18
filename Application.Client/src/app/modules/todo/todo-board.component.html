@@ -193,15 +193,12 @@
       <div class="form-group">
         <label>{{ 'todo.fields.description' | translate }}</label>
         <div class="editor-wrapper">
-          <quill-editor
-            class="rich-editor"
+          <ckeditor
+            class="description-editor"
+            [editor]="Editor"
             formControlName="Description"
-            [placeholder]="'todo.fields.descriptionPlaceholder' | translate"
-            [modules]="descriptionModules"
-            [format]="'html'"
-            theme="snow"
-            (onEditorCreated)="onEditorCreated($event)"
-          ></quill-editor>
+            [config]="editorConfig"
+          ></ckeditor>
         </div>
       </div>
     </form>

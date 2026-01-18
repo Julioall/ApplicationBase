@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { TodoService } from '../../service/todo/todo.service';
 import { TodoStatus, TodoStep, TodoTask, UpdateTodoTask } from '../../model/todo';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 @Component({
   selector: 'app-todo-task-detail',
@@ -21,6 +22,27 @@ export class TodoTaskDetailComponent implements OnChanges {
 
   editForm: FormGroup;
   isEditing = false;
+  Editor = ClassicEditor;
+  editorConfig = {
+    toolbar: [
+      'heading',
+      '|',
+      'bold',
+      'italic',
+      'underline',
+      'link',
+      'bulletedList',
+      'numberedList',
+      '|',
+      'blockQuote',
+      'code',
+      'insertTable',
+      '|',
+      'undo',
+      'redo',
+    ],
+    placeholder: '',
+  };
 
   readonly statuses = [
     { value: TodoStatus.NotStarted, label: 'todo.status.notStarted' },
@@ -63,6 +85,10 @@ export class TodoTaskDetailComponent implements OnChanges {
     }
     this.isEditing = true;
     this.patchFormFromTask(this.task);
+    this.editorConfig = {
+      ...this.editorConfig,
+      placeholder: this.translate.instant('todo.fields.descriptionPlaceholder'),
+    };
   }
 
   cancelEdit(): void {

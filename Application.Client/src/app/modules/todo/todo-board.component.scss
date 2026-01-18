@@ -156,6 +156,7 @@
   flex-direction: column;
   gap: 0.5rem;
   min-height: calc(75vh - var(--space-7) * 2);
+  min-width: 0;
 }
 
 .column-head {
@@ -212,7 +213,6 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   padding: 20px;
   width: 100%;
-  max-width: 420px;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   display: flex;
@@ -306,7 +306,7 @@
   line-height: 1.6;
   color: #64748b;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -684,19 +684,26 @@
 }
 
 .editor-wrapper {
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  overflow: visible;
-  position: relative;
-}
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--elevation-1);
 
-.editor-wrapper .ql-toolbar {
-  position: relative;
-  z-index: 2;
-}
+  .ck-toolbar {
+    background: var(--surface-alt);
+    border: none;
+    border-bottom: 1px solid var(--border-soft);
+    border-radius: 0;
+  }
 
-.editor-wrapper .ql-picker-options {
-  z-index: 1300;
+  .ck-content {
+    min-height: 180px;
+    padding: 16px;
+    background: var(--surface);
+    color: var(--text-primary);
+    border: none;
+  }
 }
 
 .create-modal__footer {
@@ -782,54 +789,6 @@
 
 .input-shell input::placeholder {
   color: var(--text-muted);
-}
-
-.rich-text-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.rich-text-field .rich-editor {
-  width: 100%;
-}
-
-.rich-text-field .ql-toolbar,
-.rich-text-field .ql-container {
-  border-color: var(--border-subtle);
-}
-
-.rich-text-field .ql-toolbar {
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
-  background: var(--surface);
-}
-
-.rich-text-field .ql-container {
-  border-radius: 0 0 var(--radius-md) var(--radius-md);
-  min-height: 180px;
-  background: var(--surface);
-}
-
-.rich-text-field .ql-editor {
-  min-height: 140px;
-  color: var(--text-primary);
-}
-
-.rich-text-field .ql-picker {
-  color: var(--text-primary);
-}
-
-.rich-text-field .ql-picker-options {
-  background: var(--surface);
-  border-color: var(--border-subtle);
-}
-
-.rich-text-field .ql-stroke {
-  stroke: var(--text-primary);
-}
-
-.rich-text-field .ql-fill {
-  fill: var(--text-primary);
 }
 
 .modal-grid .full-row {
@@ -934,10 +893,84 @@
   .lead-row {
     flex-direction: column;
   }
+
+  .board-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .board-column {
+    min-height: 60vh;
+  }
 }
 
-@media (max-width: 640px) {
-  .when-row {
-    grid-template-columns: 1fr;
+@media (max-width: 720px) {
+  .todo-board {
+    padding: var(--space-5) var(--space-3);
+  }
+
+  .card-lead {
+    padding: var(--space-3);
+  }
+
+  .board-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+
+  .view-switch {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .board-grid {
+    display: flex;
+    gap: var(--space-3);
+    overflow-x: auto;
+    padding-bottom: var(--space-2);
+    scroll-snap-type: x mandatory;
+  }
+
+  .board-column {
+    flex: 0 0 88%;
+    min-width: 280px;
+    scroll-snap-align: start;
+    min-height: auto;
+    border-radius: var(--radius-lg);
+    border-color: var(--border-soft);
+    background: linear-gradient(180deg, var(--surface), var(--surface-alt));
+  }
+
+  .column-head {
+    position: sticky;
+    top: 0;
+    background: inherit;
+    z-index: 1;
+    padding: var(--space-2) var(--space-1);
+  }
+
+  .column-dropzone {
+    min-height: 160px;
+    padding: var(--space-2);
+    border-radius: var(--radius-lg);
+  }
+
+  .task-card {
+    padding: var(--space-4);
+    gap: var(--space-3);
+    box-shadow: var(--elevation-1);
+    border-color: var(--border-soft);
+  }
+
+  .task-card__title {
+    font-size: 1rem;
+  }
+
+  .task-card__desc {
+    -webkit-line-clamp: 1;
+  }
+
+  .create-modal__body {
+    padding: 24px;
   }
 }

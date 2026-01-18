@@ -40,6 +40,7 @@ export class StudentsListComponent implements OnInit, OnDestroy {
   statusFilter: StatusFilter = 'all';
   searchControl = new FormControl('');
   showColumnMenu = false;
+  selectedStudent: Student | null = null;
   columns: ColumnConfig[] = [
     { id: 'name', labelKey: 'students.list.columns.name', width: '1fr', visible: true },
     { id: 'email', labelKey: 'students.list.columns.email', width: '1fr', visible: true },
@@ -92,6 +93,9 @@ export class StudentsListComponent implements OnInit, OnDestroy {
         this.total = (this.statusFilter === 'suspended' || this.statusFilter === 'not_currently')
           ? this.students.length
           : result.Total;
+        if (this.selectedStudent) {
+          this.selectedStudent = this.students.find(student => student.Id === this.selectedStudent?.Id) || null;
+        }
         this.pageNumber = result.PageNumber || this.pageNumber;
         this.pageSize = result.PageSize || this.pageSize;
         this.loading = false;
@@ -140,6 +144,9 @@ export class StudentsListComponent implements OnInit, OnDestroy {
     this.studentsService.deleteStudent(student.Id).subscribe({
       next: () => {
         this.notificationService.showSuccess(this.translate.instant('students.list.deleteSuccess'));
+        if (this.selectedStudent?.Id === student.Id) {
+          this.closeSidePanel();
+        }
         this.loadStudents();
       },
       error: (err) => {
@@ -210,11 +217,6 @@ export class StudentsListComponent implements OnInit, OnDestroy {
     return this.columns.filter(column => column.visible);
   }
 
-  get gridTemplateColumns(): string {
-    const count = this.visibleColumns.length || 1;
-    return `repeat(${count}, 1fr) auto`;
-  }
-
   toggleColumnMenu(event: Event): void {
     event.stopPropagation();
     this.showColumnMenu = !this.showColumnMenu;
@@ -243,6 +245,24 @@ export class StudentsListComponent implements OnInit, OnDestroy {
 
   get canManageStudents(): boolean {
     return this.authService.hasPermission(MANAGE_STUDENTS_PERMISSION);
+  }
+
+  setStatusFilter(filter: StatusFilter): void {
+    this.statusFilter = filter;
+    this.pageNumber = 1;
+    this.loadStudents();
+  }
+
+  openSidePanel(student: Student): void {
+    this.selectedStudent = student;
+  }
+
+  closeSidePanel(): void {
+    this.selectedStudent = null;
+  }
+
+  isColumnVisible(columnId: ColumnKey): boolean {
+    return this.visibleColumns.some(column => column.id === columnId);
   }
 
   getStatusLabel(student: Student): string {

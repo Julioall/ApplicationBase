@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { TranslateModule } from '@ngx-translate/core';
-import { QuillModule } from 'ngx-quill';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { TodoRoutingModule } from './todo-routing.module';
 import { TodoBoardComponent } from './todo-board.component';
 import { TodoStepsChecklistComponent } from './todo-steps-checklist.component';
@@ -23,7 +23,7 @@ import { TodoAgendaComponent } from './todo-agenda.component';
     ReactiveFormsModule,
     DragDropModule,
     TranslateModule,
-    QuillModule.forRoot(),
+    CKEditorModule,
     TodoRoutingModule,
   ],
 })

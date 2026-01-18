@@ -1,14 +1,13 @@
-import { CdkDragDrop, transferArrayItem } from '@angular/cdk/drag-drop';
+﻿import { CdkDragDrop, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { finalize } from 'rxjs/operators';
 import { AuthService } from '../../service/auth/auth.service';
 import { TodoService } from '../../service/todo/todo.service';
 import { MANAGE_TODO_PERMISSION, VIEW_TODO_PERMISSION } from '../../model/permissions';
 import { CreateTodoTask, TodoStatus, TodoTask, UpdateTodoTask } from '../../model/todo';
-import { QuillModules } from 'ngx-quill';
 import { NotificationService } from '../../service/notification/notification.service';
 import { TranslateService } from '@ngx-translate/core';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 type TodoColumn = {
   status: TodoStatus;
@@ -35,26 +34,27 @@ export class TodoBoardComponent implements OnInit {
   connectedDropListIds: string[] = [];
   categoryOptions: string[] = [];
   selectedCategories: string[] = [];
-  isUploadingImage = false;
   readonly priorityLevels = [1, 2, 3];
-  private quillEditor: any;
-  readonly descriptionModules: QuillModules = {
-    toolbar: {
-      container: [
-        [{ header: [1, 2, 3, false] }],
-        ['bold', 'italic', 'underline', 'strike'],
-        [{ color: [] }, { background: [] }],
-        [{ list: 'ordered' }, { list: 'bullet' }],
-        [{ indent: '-1' }, { indent: '+1' }],
-        [{ align: [] }],
-        [{ size: [] }],
-        ['link', 'image'],
-        ['clean'],
-      ],
-      handlers: {
-        image: () => this.handleImageUpload(),
-      },
-    },
+  Editor = ClassicEditor;
+  editorConfig = {
+    toolbar: [
+      'heading',
+      '|',
+      'bold',
+      'italic',
+      'underline',
+      'link',
+      'bulletedList',
+      'numberedList',
+      '|',
+      'blockQuote',
+      'code',
+      'insertTable',
+      '|',
+      'undo',
+      'redo',
+    ],
+    placeholder: '',
   };
   readonly statusIcons: Record<TodoStatus, string> = {
     [TodoStatus.NotStarted]: 'fa-regular fa-circle',
@@ -89,10 +89,6 @@ export class TodoBoardComponent implements OnInit {
       return false;
     }
     return current >= level;
-  }
-
-  onEditorCreated(quill: any): void {
-    this.quillEditor = quill;
   }
 
   ngOnInit(): void {
@@ -181,50 +177,6 @@ export class TodoBoardComponent implements OnInit {
   onAgendaDateChange(date: Date): void {
     this.agendaDate = date;
   }
-
-  handleImageUpload(): void {
-    if (!this.canManage) {
-      return;
-    }
-
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.style.display = 'none';
-    document.body.appendChild(input);
-
-    input.onchange = () => {
-      const file = input.files?.[0];
-      document.body.removeChild(input);
-
-      if (!file) {
-        return;
-      }
-
-      this.isUploadingImage = true;
-      this.todoService
-        .uploadImage(file)
-        .pipe(finalize(() => (this.isUploadingImage = false)))
-        .subscribe({
-          next: ({ url }) => {
-            const editor = this.quillEditor;
-            if (!editor) {
-              return;
-            }
-            const range = editor.getSelection(true) || { index: editor.getLength(), length: 0 };
-            editor.insertEmbed(range.index, 'image', url, 'user');
-            editor.setSelection(range.index + 1);
-          },
-          error: () => {
-            const message = this.translate.instant('todo.notifications.imageUploadFailed');
-            this.notification.showError(message !== 'todo.notifications.imageUploadFailed' ? message : 'Não foi possível enviar a imagem.');
-          },
-        });
-    };
-
-    input.click();
-  }
-
   onCategoryEnter(event: Event, input: HTMLInputElement): void {
     event.preventDefault();
     this.addCategory(input.value);
@@ -493,3 +445,4 @@ export class TodoBoardComponent implements OnInit {
     return Math.round((done / total) * 100);
   }
 }
+

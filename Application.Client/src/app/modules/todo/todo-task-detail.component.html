@@ -75,7 +75,12 @@
       <div class="description-area">
         <label>{{ 'todo.fields.description' | translate }}</label>
         <ng-container *ngIf="isEditing; else viewDescription">
-          <textarea rows="5" formControlName="Description" class="description-input" [placeholder]="'todo.fields.descriptionPlaceholder' | translate"></textarea>
+          <ckeditor
+            class="description-editor"
+            [editor]="Editor"
+            formControlName="Description"
+            [config]="editorConfig"
+          ></ckeditor>
         </ng-container>
         <ng-template #viewDescription>
           <div class="rich-viewer" *ngIf="task.Description" [innerHTML]="task.Description"></div>

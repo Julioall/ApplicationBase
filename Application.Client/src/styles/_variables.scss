@@ -5,7 +5,7 @@
   --font-size-md: 16px;
   --font-size-lg: 18px;
   --font-size-xl: 22px;
-  --font-size-display: 28px;
+  --font-size-display: 26px;
   --line-height-tight: 1.25;
   --line-height-base: 1.5;
   --line-height-relaxed: 1.65;
@@ -26,21 +26,21 @@
   --space-9: 48px;
   --space-10: 56px;
 
-  --radius-xs: 6px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
   --radius-lg: 16px;
-  --radius-xl: 20px;
+  --radius-xl: 24px;
   --radius-full: 999px;
   --control-height: 48px;
 
-  --elevation-1: 0 2px 10px rgba(var(--shadow-rgb), 0.08);
-  --elevation-2: 0 8px 24px rgba(var(--shadow-rgb), 0.12);
-  --elevation-3: 0 14px 36px rgba(var(--shadow-rgb), 0.16);
+  --elevation-1: 0 4px 12px rgba(var(--shadow-rgb), 0.08);
+  --elevation-2: 0 12px 30px rgba(var(--shadow-rgb), 0.12);
+  --elevation-3: 0 20px 55px rgba(var(--shadow-rgb), 0.16);
   --elevation-focus: 0 0 0 3px rgba(var(--focus-rgb), 0.35);
 
-  --transition-fast: 120ms ease;
-  --transition-base: 180ms ease;
+  --transition-fast: 140ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
 
   --bp-sm: 480px;
   --bp-md: 720px;

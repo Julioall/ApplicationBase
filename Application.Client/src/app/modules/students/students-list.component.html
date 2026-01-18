@@ -3,8 +3,15 @@
     <div class="card-lead">
       <div class="lead-row">
         <div>
+          <p class="eyebrow">{{ 'students.list.eyebrow' | translate }}</p>
           <h1>{{ 'students.list.title' | translate }}</h1>
           <p class="subtitle">{{ 'students.list.subtitle' | translate }}</p>
+        </div>
+        <div class="lead-actions" *ngIf="canManageStudents">
+          <button type="button" class="btn primary" (click)="onAdd()">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            <span>{{ 'students.list.add' | translate }}</span>
+          </button>
         </div>
       </div>
     </div>
@@ -23,6 +30,26 @@
             />
           </div>
         </div>
+
+        <div class="status-filters" [attr.aria-label]="translate.instant('students.list.statusFilter')">
+          <button type="button" class="pill ghost" [class.active]="statusFilter === 'all'" (click)="setStatusFilter('all')">
+            <span class="dot"></span>
+            <span>{{ 'students.list.statusAll' | translate }}</span>
+          </button>
+          <button type="button" class="pill ghost" [class.active]="statusFilter === 'active'" (click)="setStatusFilter('active')">
+            <span class="dot"></span>
+            <span>{{ 'students.list.statusActive' | translate }}</span>
+          </button>
+          <button type="button" class="pill ghost" [class.active]="statusFilter === 'not_currently'" (click)="setStatusFilter('not_currently')">
+            <span class="dot"></span>
+            <span>{{ 'students.list.statusInactive' | translate }}</span>
+          </button>
+          <button type="button" class="pill ghost" [class.active]="statusFilter === 'suspended'" (click)="setStatusFilter('suspended')">
+            <span class="dot suspended"></span>
+            <span>{{ 'students.status.suspended' | translate }}</span>
+          </button>
+        </div>
+
         <div class="actions-inline">
           <div class="column-filter" (click)="$event.stopPropagation()">
             <button type="button" class="btn ghost" (click)="toggleColumnMenu($event)">
@@ -41,6 +68,7 @@
               </label>
             </div>
           </div>
+
           <ng-container *ngIf="canManageStudents">
             <input #importInput type="file" accept=".xlsx,.json" hidden (change)="onImport($event)" />
             <button type="button" class="btn ghost" (click)="importInput.click()" [disabled]="loading || importing">
@@ -51,10 +79,6 @@
               <i class="fa-solid fa-file-export" aria-hidden="true"></i>
               <span>{{ 'students.list.export' | translate }}</span>
             </button>
-            <button type="button" class="btn primary" (click)="onAdd()">
-              <i class="fa-solid fa-plus" aria-hidden="true"></i>
-              <span>{{ 'students.list.add' | translate }}</span>
-            </button>
           </ng-container>
         </div>
       </div>
@@ -63,72 +87,152 @@
         {{ 'students.list.importHint' | translate }}
       </p>
 
-      <div class="list-panel">
-        <div class="list-header" [style.gridTemplateColumns]="gridTemplateColumns">
-          <ng-container *ngFor="let column of visibleColumns">
-            <span>{{ column.labelKey | translate }}</span>
-          </ng-container>
-          <span class="actions-col">{{ 'students.list.columns.actions' | translate }}</span>
-        </div>
+      <div class="state-row" *ngIf="loading">
+        {{ 'students.list.loading' | translate }}
+      </div>
+      <div class="state-row" *ngIf="!loading && students.length === 0">
+        {{ 'students.list.empty' | translate }}
+      </div>
 
-        <div class="list-body">
-          <div *ngIf="loading" class="state-row">
-            {{ 'students.list.loading' | translate }}
-          </div>
-          <div *ngIf="!loading && students.length === 0" class="state-row">
-            {{ 'students.list.empty' | translate }}
-          </div>
-          <div *ngFor="let student of students; trackBy: trackByStudent" class="list-row" [style.gridTemplateColumns]="gridTemplateColumns">
-            <ng-container *ngFor="let column of visibleColumns">
-              <div class="cell" [ngSwitch]="column.id" [attr.data-label]="column.labelKey | translate">
-                <div *ngSwitchCase="'name'" class="name">
-                  <div class="main">{{ student.FirstName }} {{ student.LastName }}</div>
-                  <div class="meta">{{ student.Institution || ('students.list.noInstitution' | translate) }}</div>
-                </div>
-                <ng-container *ngSwitchCase="'email'">
-                  {{ student.Email || '-' }}
-                </ng-container>
-                <ng-container *ngSwitchCase="'idNumber'">
-                  {{ student.IdNumber || '-' }}
-                </ng-container>
-                <ng-container *ngSwitchCase="'phone'">
-                  {{ student.Phone || '-' }}
-                </ng-container>
-                <ng-container *ngSwitchCase="'lastAccess'">
-                  {{ student.LastAccessAt ? (student.LastAccessAt | date:'short') : '-' }}
-                </ng-container>
-                <ng-container *ngSwitchCase="'status'">
-                  <span class="status" [ngClass]="getStatusClass(student)">
-                    {{ getStatusLabel(student) }}
-                  </span>
-                </ng-container>
-              </div>
-            </ng-container>
-            <div class="cell actions" [attr.data-label]="'students.list.columns.actions' | translate">
-              <button type="button" class="btn secondary" (click)="onEdit(student)">
-                <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
-                <span>{{ 'students.list.edit' | translate }}</span>
+      <div class="cards-grid" *ngIf="!loading && students.length">
+        <article class="task-card student-card" *ngFor="let student of students; trackBy: trackByStudent" (click)="openSidePanel(student)">
+          <header class="task-card__header">
+            <div class="status-pill" [ngClass]="getStatusClass(student)">
+              <span class="dot"></span>
+              <span>{{ getStatusLabel(student) }}</span>
+            </div>
+            <div class="card-actions" *ngIf="canManageStudents">
+              <button type="button" class="card-icon" (click)="onEdit(student); $event.stopPropagation()">
+                <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
               </button>
-              <button type="button" class="btn danger" (click)="onDelete(student)">
+              <button type="button" class="card-icon danger" (click)="onDelete(student); $event.stopPropagation()">
                 <i class="fa-solid fa-trash" aria-hidden="true"></i>
-                <span>{{ 'students.list.delete' | translate }}</span>
               </button>
             </div>
-          </div>
-        </div>
+          </header>
 
-        <footer class="card-footer pagination">
-          <button type="button" class="btn ghost" [disabled]="pageNumber === 1 || loading" (click)="changePage(-1)">
-            {{ 'students.list.prev' | translate }}
-          </button>
-          <span class="page-indicator">
-            {{ 'students.list.pageXofY' | translate:{ page: pageNumber, total: totalPages } }}
-          </span>
-          <button type="button" class="btn ghost" [disabled]="pageNumber >= totalPages || loading" (click)="changePage(1)">
-            {{ 'students.list.next' | translate }}
-          </button>
-        </footer>
+          <div class="task-card__content">
+            <div class="title-row">
+              <h3 class="task-card__title">{{ student.FirstName }} {{ student.LastName }}</h3>
+              <span class="tag-pill" *ngIf="student.IdNumber">
+                <span class="dot"></span>
+                <span>{{ student.IdNumber }}</span>
+              </span>
+            </div>
+            <p class="task-card__desc">
+              {{ student.Institution || ('students.list.noInstitution' | translate) }}
+            </p>
+            <div class="meta-row">
+              <span class="meta-chip" *ngIf="isColumnVisible('email')">
+                <i class="fa-regular fa-envelope"></i>
+                {{ student.Email || '-' }}
+              </span>
+              <span class="meta-chip" *ngIf="isColumnVisible('phone')">
+                <i class="fa-solid fa-phone"></i>
+                {{ student.Phone || '-' }}
+              </span>
+              <span class="meta-chip" *ngIf="isColumnVisible('lastAccess')">
+                <i class="fa-regular fa-clock"></i>
+                {{ student.LastAccessAt ? (student.LastAccessAt | date:'short') : '-' }}
+              </span>
+            </div>
+          </div>
+
+          <footer class="task-card__footer">
+            <div class="footer-left" *ngIf="isColumnVisible('status')">
+              <span class="status-chip" [ngClass]="getStatusClass(student)">
+                <span class="dot"></span>
+                {{ getStatusLabel(student) }}
+              </span>
+            </div>
+            <button type="button" class="ghost-link" (click)="openSidePanel(student); $event.stopPropagation()">
+              {{ 'students.list.edit' | translate }}
+              <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i>
+            </button>
+          </footer>
+        </article>
       </div>
+
+      <footer class="pagination" *ngIf="!loading && students.length">
+        <button type="button" class="btn ghost" [disabled]="pageNumber === 1 || loading" (click)="changePage(-1)">
+          {{ 'students.list.prev' | translate }}
+        </button>
+        <span class="page-indicator">
+          {{ 'students.list.pageXofY' | translate:{ page: pageNumber, total: totalPages } }}
+        </span>
+        <button type="button" class="btn ghost" [disabled]="pageNumber >= totalPages || loading" (click)="changePage(1)">
+          {{ 'students.list.next' | translate }}
+        </button>
+      </footer>
     </div>
   </article>
 </section>
+
+<div class="side-panel-backdrop" *ngIf="selectedStudent as student" (click)="closeSidePanel()">
+  <aside class="side-panel" (click)="$event.stopPropagation()">
+    <header class="side-panel__header">
+      <div>
+        <p class="eyebrow">{{ 'students.list.eyebrow' | translate }}</p>
+        <h2>{{ student.FirstName }} {{ student.LastName }}</h2>
+        <p class="subtitle">
+          {{ student.Institution || ('students.list.noInstitution' | translate) }}
+        </p>
+      </div>
+      <button type="button" class="panel-close" [attr.aria-label]="'modal.cancel' | translate" (click)="closeSidePanel()">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <div class="side-panel__body">
+      <div class="detail-row" *ngIf="isColumnVisible('email')">
+        <span class="label">
+          <i class="fa-regular fa-envelope" aria-hidden="true"></i>
+          {{ 'students.list.columns.email' | translate }}
+        </span>
+        <span class="value">{{ student.Email || '-' }}</span>
+      </div>
+      <div class="detail-row" *ngIf="isColumnVisible('phone')">
+        <span class="label">
+          <i class="fa-solid fa-phone" aria-hidden="true"></i>
+          {{ 'students.list.columns.phone' | translate }}
+        </span>
+        <span class="value">{{ student.Phone || '-' }}</span>
+      </div>
+      <div class="detail-row" *ngIf="isColumnVisible('idNumber')">
+        <span class="label">
+          <i class="fa-regular fa-id-badge" aria-hidden="true"></i>
+          {{ 'students.list.columns.idNumber' | translate }}
+        </span>
+        <span class="value">{{ student.IdNumber || '-' }}</span>
+      </div>
+      <div class="detail-row" *ngIf="isColumnVisible('lastAccess')">
+        <span class="label">
+          <i class="fa-regular fa-clock" aria-hidden="true"></i>
+          {{ 'students.list.columns.lastAccess' | translate }}
+        </span>
+        <span class="value">{{ student.LastAccessAt ? (student.LastAccessAt | date:'short') : '-' }}</span>
+      </div>
+      <div class="detail-row" *ngIf="isColumnVisible('status')">
+        <span class="label">
+          <i class="fa-regular fa-circle-check" aria-hidden="true"></i>
+          {{ 'students.list.columns.status' | translate }}
+        </span>
+        <span class="value status-chip" [ngClass]="getStatusClass(student)">
+          <span class="dot"></span>
+          {{ getStatusLabel(student) }}
+        </span>
+      </div>
+    </div>
+
+    <footer class="side-panel__footer">
+      <button class="btn ghost" type="button" (click)="onDelete(student); $event.stopPropagation()">
+        <i class="fa-solid fa-trash" aria-hidden="true"></i>
+        <span>{{ 'students.list.delete' | translate }}</span>
+      </button>
+      <button class="btn primary" type="button" (click)="onEdit(student); $event.stopPropagation()">
+        <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+        <span>{{ 'students.list.edit' | translate }}</span>
+      </button>
+    </footer>
+  </aside>
+</div>
