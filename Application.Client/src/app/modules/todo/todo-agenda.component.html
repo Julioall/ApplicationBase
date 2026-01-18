@@ -28,7 +28,13 @@
           <span class="title-text">{{ entry.task.Title }}</span>
         </div>
         <div class="agenda-meta">
-          <span class="pill ghost tiny" *ngIf="entry.task.Priority">{{ getPriorityLabel(entry.task.Priority) }}</span>
+          <span
+            class="pill tiny priority"
+            *ngIf="entry.task.Priority"
+            [ngClass]="getPriorityClass(entry.task.Priority)"
+          >
+            {{ getPriorityLabel(entry.task.Priority) }}
+          </span>
         </div>
       </div>
     </div>

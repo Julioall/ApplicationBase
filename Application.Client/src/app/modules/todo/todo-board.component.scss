@@ -276,14 +276,32 @@
 }
 
 .task-card__badge {
-  background: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
+  background: var(--surface-alt);
+  color: var(--text-primary);
+  border: 1px solid var(--border-soft);
   padding: 4px 10px;
   border-radius: 8px;
   font-size: 12px;
   font-weight: 700;
   flex-shrink: 0;
+}
+
+.task-card__badge.low {
+  background: var(--success-soft);
+  color: var(--success);
+  border-color: color-mix(in srgb, var(--success) 45%, transparent);
+}
+
+.task-card__badge.medium {
+  background: var(--warning-soft);
+  color: #b45309;
+  border-color: color-mix(in srgb, var(--warning) 50%, transparent);
+}
+
+.task-card__badge.high {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 45%, transparent);
 }
 
 .task-card__content {
@@ -380,8 +398,8 @@
 }
 
 .pill.priority {
-  background: rgba(253, 160, 59, 0.2);
-  color: #f48c06;
+  background: var(--surface-strong);
+  color: var(--text-primary);
 }
 
 .pill.due {
@@ -876,13 +894,25 @@
 
 .pill.priority {
   gap: 0.35rem;
+  border: 1px solid var(--border-soft);
 }
 
-.pill.priority.low,
-.pill.priority.medium,
+.pill.priority.low {
+  background: var(--success-soft);
+  color: var(--success);
+  border-color: color-mix(in srgb, var(--success) 45%, transparent);
+}
+
+.pill.priority.medium {
+  background: var(--warning-soft);
+  color: #b45309;
+  border-color: color-mix(in srgb, var(--warning) 50%, transparent);
+}
+
 .pill.priority.high {
-  background: var(--surface-strong);
-  color: var(--text-primary);
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 45%, transparent);
 }
 
 .priority-text {

@@ -63,7 +63,7 @@
                         <span class="task-tag tag--blue">Task</span>
                       </div>
                     </ng-template>
-                    <span class="task-card__badge" *ngIf="task.Priority">
+                    <span class="task-card__badge" *ngIf="task.Priority" [ngClass]="getPriorityClass(task.Priority)">
                       {{ getPriorityLabel(task.Priority) }}
                     </span>
                   </header>

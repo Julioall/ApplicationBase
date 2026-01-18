@@ -93,6 +93,28 @@
   gap: 0.35rem;
 }
 
+.pill.priority {
+  border: 1px solid var(--border-soft);
+}
+
+.pill.priority.low {
+  background: var(--success-soft);
+  color: var(--success);
+  border-color: color-mix(in srgb, var(--success) 45%, transparent);
+}
+
+.pill.priority.medium {
+  background: var(--warning-soft);
+  color: #b45309;
+  border-color: color-mix(in srgb, var(--warning) 50%, transparent);
+}
+
+.pill.priority.high {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 45%, transparent);
+}
+
 .empty-state {
   text-align: center;
   color: var(--text-muted);

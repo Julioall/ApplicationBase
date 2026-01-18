@@ -49,6 +49,16 @@ export class TodoTaskDetailComponent implements OnChanges {
     { value: TodoStatus.InProgress, label: 'todo.status.inProgress' },
     { value: TodoStatus.Done, label: 'todo.status.done' },
   ];
+  private readonly statusLabelKeys: Record<TodoStatus, string> = {
+    [TodoStatus.NotStarted]: 'todo.status.notStarted',
+    [TodoStatus.InProgress]: 'todo.status.inProgress',
+    [TodoStatus.Done]: 'todo.status.done',
+  };
+  private readonly statusValues = new Set<TodoStatus>([
+    TodoStatus.NotStarted,
+    TodoStatus.InProgress,
+    TodoStatus.Done,
+  ]);
   readonly priorityLevels = [1, 2, 3];
 
   constructor(
@@ -224,15 +234,28 @@ export class TodoTaskDetailComponent implements OnChanges {
     return this.task.Steps.filter((s) => s.IsCompleted).length;
   }
 
-  getStatusLabel(status: TodoStatus): string {
-    const translation = this.translate.instant(this.statuses.find((s) => s.value === status)?.label ?? '');
-    return translation || TodoStatus[status];
+  getStatusLabel(status: TodoStatus | string | null | undefined): string {
+    const normalized = this.normalizeStatus(status);
+    if (normalized !== null) {
+      const key = this.statusLabelKeys[normalized];
+      const translation = this.translate.instant(key);
+      if (translation && translation !== key) {
+        return translation;
+      }
+      const fallback = TodoStatus[normalized];
+      if (fallback) {
+        return fallback.replace(/([A-Z])/g, ' $1').trim();
+      }
+    }
+    return typeof status === 'string' ? status : '';
   }
 
-  getStatusClass(status: TodoStatus): string {
-    if (status === TodoStatus.NotStarted) return 'NotStarted';
-    if (status === TodoStatus.InProgress) return 'InProgress';
-    return 'Done';
+  getStatusClass(status: TodoStatus | string | null | undefined): string {
+    const normalized = this.normalizeStatus(status);
+    if (normalized === TodoStatus.NotStarted) return 'NotStarted';
+    if (normalized === TodoStatus.InProgress) return 'InProgress';
+    if (normalized === TodoStatus.Done) return 'Done';
+    return '';
   }
 
   isPriorityActive(current?: number | null, level?: number): boolean {
@@ -243,15 +266,16 @@ export class TodoTaskDetailComponent implements OnChanges {
   }
 
   getPriorityLabel(priority?: number | null): string {
-    if (priority === 1) {
+    const value = priority === null || priority === undefined ? null : Number(priority);
+    if (value === 1) {
       const text = this.translate.instant('todo.priority.low');
       return text !== 'todo.priority.low' ? text : 'Baixa';
     }
-    if (priority === 2) {
+    if (value === 2) {
       const text = this.translate.instant('todo.priority.medium');
       return text !== 'todo.priority.medium' ? text : 'Media';
     }
-    if (priority === 3) {
+    if (value === 3) {
       const text = this.translate.instant('todo.priority.high');
       return text !== 'todo.priority.high' ? text : 'Alta';
     }
@@ -259,9 +283,10 @@ export class TodoTaskDetailComponent implements OnChanges {
   }
 
   getPriorityClass(priority?: number | null): string {
-    if (priority === 1) return 'low';
-    if (priority === 2) return 'medium';
-    if (priority === 3) return 'high';
+    const value = priority === null || priority === undefined ? null : Number(priority);
+    if (value === 1) return 'low';
+    if (value === 2) return 'medium';
+    if (value === 3) return 'high';
     return '';
   }
 
@@ -273,6 +298,33 @@ export class TodoTaskDetailComponent implements OnChanges {
       return [this.task.Category];
     }
     return [];
+  }
+
+  private normalizeStatus(status: TodoStatus | string | null | undefined): TodoStatus | null {
+    if (status === null || status === undefined) {
+      return null;
+    }
+
+    if (typeof status === 'number' && this.statusValues.has(status)) {
+      return status;
+    }
+
+    const numeric = Number(status);
+    if (!Number.isNaN(numeric) && this.statusValues.has(numeric as TodoStatus)) {
+      return numeric as TodoStatus;
+    }
+
+    const key = status.toString().toLowerCase().replace(/[\s_-]/g, '');
+    if (key === 'notstarted') {
+      return TodoStatus.NotStarted;
+    }
+    if (key === 'inprogress') {
+      return TodoStatus.InProgress;
+    }
+    if (key === 'done' || key === 'completed' || key === 'concluida') {
+      return TodoStatus.Done;
+    }
+    return null;
   }
 
   private patchFormFromTask(task: TodoTask): void {

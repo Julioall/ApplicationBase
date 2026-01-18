@@ -46,7 +46,9 @@
         <div class="prop-row">
           <span class="prop-label"><i class="fa-solid fa-layer-group"></i> {{ 'todo.fields.priority' | translate }}</span>
           <span class="prop-value prop-value--stacked">
-            <span class="priority-badge" *ngIf="task.Priority">{{ getPriorityLabel(task.Priority) }}</span>
+            <span class="priority-badge" *ngIf="task.Priority" [ngClass]="getPriorityClass(task.Priority)">
+              {{ getPriorityLabel(task.Priority) }}
+            </span>
             <select *ngIf="isEditing" formControlName="Priority" class="prop-select">
               <option [ngValue]="null">{{ 'todo.fields.priorityNone' | translate }}</option>
               <option [ngValue]="1">{{ 'todo.priority.low' | translate }}</option>

@@ -95,18 +95,27 @@ export class TodoAgendaComponent {
   }
 
   getPriorityLabel(priority?: number | null): string {
-    if (priority === 1) {
+    const value = priority === null || priority === undefined ? null : Number(priority);
+    if (value === 1) {
       const text = this.translate.instant('todo.priority.low');
       return text !== 'todo.priority.low' ? text : 'Baixa';
     }
-    if (priority === 2) {
+    if (value === 2) {
       const text = this.translate.instant('todo.priority.medium');
       return text !== 'todo.priority.medium' ? text : 'Media';
     }
-    if (priority === 3) {
+    if (value === 3) {
       const text = this.translate.instant('todo.priority.high');
       return text !== 'todo.priority.high' ? text : 'Alta';
     }
+    return '';
+  }
+
+  getPriorityClass(priority?: number | null): string {
+    const value = priority === null || priority === undefined ? null : Number(priority);
+    if (value === 1) return 'low';
+    if (value === 2) return 'medium';
+    if (value === 3) return 'high';
     return '';
   }
 
