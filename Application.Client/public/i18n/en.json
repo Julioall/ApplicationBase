@@ -766,11 +766,19 @@
     "eyebrow": "Workflow",
     "title": "Todo board",
     "subtitle": "Organize tasks, contexts and checklists.",
+    "meta": {
+      "sprint": "Sprint 02"
+    },
+    "filters": {
+      "searchPlaceholder": "Filter cards...",
+      "searchAria": "Filter tasks"
+    },
     "detail": "Task details",
     "newTask": "New task",
     "loading": "Loading tasks...",
-    "emptyColumn": "Nothing here yet.",
-    "completedAt": "Completed",
+  "emptyColumn": "Nothing here yet.",
+  "defaultTag": "Task",
+  "completedAt": "Completed",
     "steps": {
       "title": "Steps",
       "subtitle": "Drag to reorder or click to edit.",
@@ -810,11 +818,13 @@
         "create": "Create task",
         "cancel": "Cancel",
         "close": "Close",
-        "archive": "Archive",
-        "delete": "Delete",
-        "edit": "Edit",
-        "save": "Save"
-      },
+    "archive": "Archive",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "removeCategory": "Remove category",
+    "addCard": "Add card"
+  },
     "notifications": {
       "created": "Task created",
       "updated": "Task updated",

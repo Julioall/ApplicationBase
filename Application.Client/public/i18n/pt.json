@@ -790,11 +790,19 @@
     "eyebrow": "Fluxo",
     "title": "Quadro de tarefas",
     "subtitle": "Organize tarefas, contextos e checklists.",
+    "meta": {
+      "sprint": "Sprint 02"
+    },
+    "filters": {
+      "searchPlaceholder": "Filtrar cards...",
+      "searchAria": "Filtrar tarefas"
+    },
     "detail": "Detalhes da tarefa",
     "newTask": "Nova tarefa",
     "loading": "Carregando tarefas...",
-    "emptyColumn": "Nada aqui ainda.",
-    "completedAt": "Concluida",
+  "emptyColumn": "Nada aqui ainda.",
+  "defaultTag": "Tarefa",
+  "completedAt": "Concluida",
     "steps": {
       "title": "Etapas",
       "subtitle": "Arraste para reordenar ou clique para editar.",
@@ -834,11 +842,13 @@
       "create": "Criar tarefa",
       "cancel": "Cancelar",
       "close": "Fechar",
-      "archive": "Arquivar",
-      "delete": "Excluir",
-      "edit": "Editar",
-      "save": "Salvar"
-    },
+    "archive": "Arquivar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "save": "Salvar",
+    "removeCategory": "Remover categoria",
+    "addCard": "Adicionar card"
+  },
     "notifications": {
       "created": "Tarefa criada",
       "updated": "Tarefa atualizada",

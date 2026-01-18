@@ -131,3 +131,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+@include respond-down(sm) {
+  .student-form-page {
+    padding: var(--space-5) var(--space-3);
+  }
+
+  .form-actions {
+    justify-content: flex-start;
+  }
+}

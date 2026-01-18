@@ -258,37 +258,6 @@ export class TodoBoardComponent implements OnInit {
     return task.Steps?.filter(step => step.IsCompleted).length ?? 0;
   }
 
-  getDueBadge(task: TodoTask): { key: string; params?: Record<string, any>; variant: 'success' | 'warning' | 'danger' } | null {
-    if (!task.DueDate) {
-      return null;
-    }
-
-    const now = new Date();
-    const due = new Date(task.DueDate);
-    const startOfToday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-    const startOfDue = new Date(Date.UTC(due.getUTCFullYear(), due.getUTCMonth(), due.getUTCDate()));
-    const diffMs = startOfDue.getTime() - startOfToday.getTime();
-    const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) {
-      return { key: 'todo.badge.dueToday', variant: 'warning' };
-    }
-
-    if (diffDays > 0) {
-      return {
-        key: 'todo.badge.dueIn',
-        params: { count: diffDays },
-        variant: 'success',
-      };
-    }
-
-    return {
-      key: 'todo.badge.dueAgo',
-      params: { count: Math.abs(diffDays) },
-      variant: 'danger',
-    };
-  }
-
   private getScheduleValidationErrors(formValue: any): string[] {
     const errors: string[] = [];
     const start = formValue.StartDate ? new Date(formValue.StartDate) : null;

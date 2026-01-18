@@ -1,106 +1,125 @@
 <section class="todo-page">
-  <article class="card settings-shell todo-board">
-    <div class="card-lead">
-      <div class="lead-row">
-        <div class="header-copy">
+  <article class="card settings-shell todo-board kanban-shell">
+    <header class="board-header">
+      <div class="board-header__copy">
+        <div class="title-row">
           <h1>{{ 'todo.title' | translate }}</h1>
-          <p class="subtitle">{{ 'todo.subtitle' | translate }}</p>
         </div>
+        <p class="subtitle">{{ 'todo.subtitle' | translate }}</p>
       </div>
-    </div>
+      <div class="board-header__actions">
+        <button
+          class="btn btn-primary"
+          type="button"
+          (click)="openCreate()"
+          [disabled]="!canManage"
+          [attr.aria-label]="'todo.newTask' | translate"
+        >
+          <i class="fa-solid fa-plus"></i>
+          <span>{{ 'todo.newTask' | translate }}</span>
+        </button>
+      </div>
+    </header>
 
-    <div class="settings-body">
-      <div class="board-toolbar">
+    <div class="board-toolbar">
+      <div class="toolbar-actions">
         <div class="view-switch">
           <button type="button" class="pill ghost" [class.active]="viewMode === 'board'" (click)="setViewMode('board')">
             <i class="fa-solid fa-table-columns"></i>
             <span>{{ 'todo.view.board' | translate }}</span>
           </button>
           <button type="button" class="pill ghost" [class.active]="viewMode === 'agenda'" (click)="setViewMode('agenda')">
+            <i class="fa-solid fa-list"></i>
             <span>{{ 'todo.view.agenda' | translate }}</span>
           </button>
         </div>
-        <button class="btn primary" type="button" (click)="openCreate()" [disabled]="!canManage">
-          <i class="fa-regular fa-square-plus"></i>
-          <span>{{ 'todo.newTask' | translate }}</span>
-        </button>
       </div>
-
-      <section *ngIf="!isLoading; else loadingState">
-        <ng-container [ngSwitch]="viewMode">
-          <div class="board-grid" *ngSwitchCase="'board'">
-            <div class="board-column" *ngFor="let column of columns" [attr.data-status]="column.status">
-              <div class="column-head">
-                <div class="column-title" [ngClass]="getStatusClass(column.status)">
-                  <span class="status-dot"></span>
-                  <span class="title-label">{{ column.label | translate }}</span>
-                </div>
-                <span class="pill ghost count">{{ column.items.length }}</span>
-              </div>
-              <div
-                class="column-dropzone"
-                cdkDropList
-                [id]="column.id"
-                [cdkDropListData]="column.items"
-                [cdkDropListConnectedTo]="connectedDropListIds"
-                (cdkDropListDropped)="onDrop($event, column.status)"
-                [cdkDropListDisabled]="!canManage"
-              >
-                <p class="empty" *ngIf="column.items.length === 0">{{ 'todo.emptyColumn' | translate }}</p>
-                <article class="task-card" *ngFor="let task of column.items" cdkDrag [cdkDragDisabled]="!canManage" (click)="selectTask(task)">
-                  <header class="task-card__header">
-                    <div class="task-card__tags" *ngIf="getTaskCategories(task).length; else defaultTag">
-                      <span
-                        class="task-tag"
-                        *ngFor="let cat of getTaskCategories(task); let i = index"
-                        [ngClass]="{ 'tag--blue': i === 0, 'tag--purple': i === 1, 'tag--green': i === 2 }"
-                      >
-                        {{ cat }}
-                      </span>
-                    </div>
-                    <ng-template #defaultTag>
-                      <div class="task-card__tags">
-                        <span class="task-tag tag--blue">Task</span>
-                      </div>
-                    </ng-template>
-                    <span class="task-card__badge" *ngIf="task.Priority" [ngClass]="getPriorityClass(task.Priority)">
-                      {{ getPriorityLabel(task.Priority) }}
-                    </span>
-                  </header>
-
-                  <div class="task-card__content">
-                    <h3 class="task-card__title">{{ task.Title }}</h3>
-                    <p class="task-card__desc" *ngIf="task.Description" [innerHTML]="task.Description"></p>
-                  </div>
-
-                  <footer class="task-card__footer" *ngIf="task.StartDate || task.DueDate">
-                    <div class="task-card__date">
-                      <i class="fa-regular fa-calendar-check"></i>
-                      <ng-container *ngIf="task.IsAllDay; else timedDate">
-                        <span>{{ task.StartDate | date: 'MMM d, y' }}</span>
-                      </ng-container>
-                      <ng-template #timedDate>
-                        <span *ngIf="task.StartDate">{{ task.StartDate | date: 'MMM d, y HH:mm' }}</span>
-                        <span *ngIf="task.StartDate && task.DueDate">&nbsp;–&nbsp;</span>
-                        <span *ngIf="task.DueDate">{{ task.DueDate | date: 'MMM d, y HH:mm' }}</span>
-                      </ng-template>
-                    </div>
-                  </footer>
-                </article>
-              </div>
-            </div>
-          </div>
-          <app-todo-agenda
-            *ngSwitchCase="'agenda'"
-            [tasks]="tasks"
-            [selectedDate]="agendaDate"
-            [canManage]="canManage"
-            (taskSelected)="selectTask($event)"
-            (dateChange)="onAgendaDateChange($event)"
-          ></app-todo-agenda>
-        </ng-container>
-      </section>
     </div>
+
+    <section class="board-body" *ngIf="!isLoading; else loadingState">
+      <ng-container [ngSwitch]="viewMode">
+        <div class="board-canvas" *ngSwitchCase="'board'">
+          <div class="board-column" *ngFor="let column of columns" [attr.data-status]="column.status">
+            <div class="column-header" [ngClass]="getStatusClass(column.status)">
+              <div class="column-title">
+                <span class="status-dot"></span>
+                <span class="title-label">{{ column.label | translate }}</span>
+              </div>
+              <span class="count-pill">{{ column.items.length }}</span>
+            </div>
+
+            <div
+              class="column-dropzone"
+              cdkDropList
+              [id]="column.id"
+              [cdkDropListData]="column.items"
+              [cdkDropListConnectedTo]="connectedDropListIds"
+              (cdkDropListDropped)="onDrop($event, column.status)"
+              [cdkDropListDisabled]="!canManage"
+            >
+              <p class="empty" *ngIf="column.items.length === 0">{{ 'todo.emptyColumn' | translate }}</p>
+              <article
+                class="task-card"
+                *ngFor="let task of column.items"
+                cdkDrag
+                [cdkDragDisabled]="!canManage"
+                (click)="selectTask(task)"
+              >
+                <header class="task-card__header">
+                  <div class="task-card__tags" *ngIf="getTaskCategories(task).length; else defaultTag">
+                    <span
+                      class="task-tag"
+                      *ngFor="let cat of getTaskCategories(task); let i = index"
+                      [ngClass]="{ 'tag--blue': i === 0, 'tag--purple': i === 1, 'tag--green': i === 2 }"
+                    >
+                      {{ cat }}
+                    </span>
+                  </div>
+                  <ng-template #defaultTag>
+                    <div class="task-card__tags">
+                      <span class="task-tag tag--blue">{{ 'todo.defaultTag' | translate }}</span>
+                    </div>
+                  </ng-template>
+                  <span class="task-card__badge" *ngIf="task.Priority" [ngClass]="getPriorityClass(task.Priority)">
+                    {{ getPriorityLabel(task.Priority) }}
+                  </span>
+                </header>
+
+                <div class="task-card__content">
+                  <h3 class="task-card__title">{{ task.Title }}</h3>
+                  <p class="task-card__desc" *ngIf="task.Description" [innerHTML]="task.Description"></p>
+                </div>
+
+                <footer class="task-card__footer">
+                  <div class="task-card__date" *ngIf="task.DueDate">
+                    <i class="fa-regular fa-calendar"></i>
+                    <span>{{ task.DueDate | date: 'MMM d' }}</span>
+                  </div>
+                </footer>
+              </article>
+            </div>
+
+            <button
+              type="button"
+              class="add-task-btn"
+              (click)="openCreate()"
+              [disabled]="!canManage"
+              [attr.aria-label]="'todo.actions.addCard' | translate"
+            >
+              <i class="fa fa-plus me-2"></i>{{ 'todo.actions.addCard' | translate }}
+            </button>
+          </div>
+        </div>
+        <app-todo-agenda
+          *ngSwitchCase="'agenda'"
+          [tasks]="tasks"
+          [selectedDate]="agendaDate"
+          [canManage]="canManage"
+          (taskSelected)="selectTask($event)"
+          (dateChange)="onAgendaDateChange($event)"
+        ></app-todo-agenda>
+      </ng-container>
+    </section>
   </article>
 </section>
 
@@ -111,7 +130,12 @@
         <h2>{{ 'todo.modal.title' | translate }}</h2>
         <p class="subtitle">{{ 'todo.modal.subtitle' | translate }}</p>
       </div>
-      <button class="btn-icon-close" type="button" (click)="cancelCreate()" aria-label="Close create modal">
+      <button
+        class="btn-icon-close"
+        type="button"
+        (click)="cancelCreate()"
+        [attr.aria-label]="'todo.actions.close' | translate"
+      >
         <i class="fa-solid fa-xmark"></i>
       </button>
     </header>
@@ -169,7 +193,11 @@
           <div class="chip-container" *ngIf="selectedCategories.length">
             <span class="modern-chip" *ngFor="let cat of selectedCategories">
               {{ cat }}
-              <button type="button" (click)="removeCategory(cat)" aria-label="Remove category">
+              <button
+                type="button"
+                (click)="removeCategory(cat)"
+                [attr.aria-label]="'todo.actions.removeCategory' | translate"
+              >
                 <i class="fa-solid fa-xmark"></i>
               </button>
             </span>

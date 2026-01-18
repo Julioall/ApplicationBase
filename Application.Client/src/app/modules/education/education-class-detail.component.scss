@@ -1,3 +1,5 @@
+@use '../../../styles/variables' as *;
+
 .education-page {
   width: 100%;
   margin: 0;
@@ -115,7 +117,7 @@
 
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 420px));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1rem;
   grid-auto-rows: auto;
   justify-content: flex-start;
@@ -269,6 +271,7 @@
   .students-table {
     display: grid;
     gap: 0.5rem;
+    overflow-x: auto;
 
     .table-row {
       display: grid;
@@ -292,7 +295,7 @@
 
 @media (max-width: 1200px) {
   .cards {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   }
 }
 
@@ -318,5 +321,19 @@
   .muted {
     color: var(--text-muted);
     margin: 0;
+  }
+}
+
+@include respond-down(md) {
+  .card.settings-shell {
+    padding: var(--space-4);
+  }
+
+  .card-lead {
+    padding: var(--space-4);
+  }
+
+  .uc-students {
+    padding: var(--space-4);
   }
 }
