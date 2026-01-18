@@ -246,6 +246,18 @@
   transform: translateY(-2px);
 }
 
+.cdk-drag-preview.task-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--border-muted);
+  box-shadow: 0 16px 32px rgba(var(--shadow-rgb), 0.16);
+  backdrop-filter: blur(2px);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.2;
+  border: 1px dashed var(--border-soft);
+}
+
 .task-card__header {
   display: flex;
   justify-content: space-between;
