@@ -6,7 +6,7 @@ namespace Application.Service.Interface
 {
     public interface ITodoService
     {
-        Task<IReadOnlyList<TodoTaskDto>> GetTasksAsync(TodoTaskSearchQuery query);
+        Task<IReadOnlyList<TodoTaskDto>> GetTasksAsync(TodoTaskSearchQuery query, string currentUserId);
         Task<TodoTaskDto> GetByIdAsync(string id);
         Task<TodoTaskDto> CreateAsync(string currentUserId, CreateTodoTaskDto dto);
         Task<TodoTaskDto> UpdateAsync(string id, UpdateTodoTaskDto dto);

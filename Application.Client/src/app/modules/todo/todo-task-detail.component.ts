@@ -78,9 +78,10 @@ export class TodoTaskDetailComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    const keepEditing = this.isEditing;
     if (changes['task'] && this.task) {
       this.patchFormFromTask(this.task);
-      this.isEditing = false;
+      this.isEditing = keepEditing;
     }
   }
 

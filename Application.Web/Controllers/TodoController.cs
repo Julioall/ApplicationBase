@@ -36,7 +36,8 @@ namespace Application.Api.Controllers
         public async Task<IActionResult> GetTasks([FromQuery] TodoTaskSearchQuery? query)
         {
             var criteria = query ?? new TodoTaskSearchQuery();
-            var tasks = await _todoService.GetTasksAsync(criteria);
+            var userId = await RequireCurrentUserIdAsync();
+            var tasks = await _todoService.GetTasksAsync(criteria, userId);
             return Ok(tasks);
         }
 

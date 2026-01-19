@@ -47,11 +47,19 @@ namespace Application.Service.Service
             _htmlSanitizer = BuildSanitizer();
         }
 
-        public async Task<IReadOnlyList<TodoTaskDto>> GetTasksAsync(TodoTaskSearchQuery query)
+        public async Task<IReadOnlyList<TodoTaskDto>> GetTasksAsync(TodoTaskSearchQuery query, string currentUserId)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(currentUserId);
+
+            var normalizedUser = Normalize(currentUserId)!;
             var normalized = NormalizeQuery(query ?? new TodoTaskSearchQuery());
             var tasks = await _repository.SearchAsync(normalized);
-            return tasks.Select(ToDto).ToList();
+            var filtered = tasks.Where(t =>
+                string.Equals(t.CreatedByUserId, normalizedUser, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.AssignedToUserId, normalizedUser, StringComparison.OrdinalIgnoreCase) ||
+                (t.Assignees?.Any(a => string.Equals(a.Id, normalizedUser, StringComparison.OrdinalIgnoreCase)) ?? false)
+            );
+            return filtered.Select(ToDto).ToList();
         }
 
         public async Task<TodoTaskDto> GetByIdAsync(string id)
