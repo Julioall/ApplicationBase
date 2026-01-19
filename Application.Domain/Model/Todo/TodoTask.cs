@@ -17,6 +17,7 @@ namespace Application.Domain.Model.Todo
         public string? CreatedByUserId { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? AssignedToUserId { get; set; }
+        public List<TodoAssignee> Assignees { get; set; } = new();
         public bool IsArchived { get; set; }
         public bool IsAllDay { get; set; }
         public string? RecurrenceGroupId { get; set; }

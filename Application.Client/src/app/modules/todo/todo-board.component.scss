@@ -287,23 +287,25 @@
 }
 
 .task-tag::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #94a3b8;
+  content: '#';
+  margin-right: 6px;
+  color: currentColor;
+  font-weight: 800;
 }
 
-.tag--blue::before {
-  background: var(--accent);
+.tag--blue {
+  color: var(--accent-strong);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
-.tag--purple::before {
-  background: #a855f7;
+.tag--purple {
+  color: #a855f7;
+  border-color: color-mix(in srgb, #a855f7 30%, transparent);
 }
 
-.tag--green::before {
-  background: #10b981;
+.tag--green {
+  color: #10b981;
+  border-color: color-mix(in srgb, #10b981 30%, transparent);
 }
 
 .task-card__content {
@@ -389,6 +391,108 @@
   padding: 0 4px;
 }
 
+.task-card__assignees {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.assignee-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+  background: var(--surface-alt);
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.assignee-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.assignee-avatar__more {
+  background: var(--surface-muted);
+  color: var(--text-primary);
+  border-color: var(--surface);
+}
+
+.assignee-avatar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(var(--shadow-rgb), 0.15);
+}
+
+.assignee-input {
+  position: relative;
+}
+
+.assignee-suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  box-shadow: var(--shadow-soft);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.assignee-suggestion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.assignee-suggestion:hover {
+  background: var(--surface-alt);
+}
+
+.assignee-suggestion .avatar-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--surface-alt);
+  border: 1px solid var(--border-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: var(--text-primary);
+}
+
+.assignee-suggestion .avatar-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.assignee-suggestion .name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .add-task-btn {
   padding: 0.85rem 1rem;
   width: 100%;
@@ -432,7 +536,7 @@
 
 .detail-modal {
   width: 100%;
-  max-width: 560px;
+  max-width: 800px;
   height: 100vh;
   background: var(--surface);
   border-left: 1px solid var(--border-soft);
@@ -670,6 +774,9 @@
 }
 
 :host ::ng-deep .ck.ck-editor__main > .ck-editor__editable {
+  min-height: 3.6em;
+  max-height: 15vh;
+  overflow: auto;
   background: var(--surface);
   color: var(--text-primary);
   border-color: var(--border-soft);

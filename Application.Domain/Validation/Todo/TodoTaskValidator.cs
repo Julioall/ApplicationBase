@@ -25,6 +25,9 @@ namespace Application.Domain.Validation.Todo
                 .Must(cat => !string.IsNullOrWhiteSpace(cat))
                 .WithMessage("TodoCategoryInvalid");
 
+            RuleForEach(t => t.Assignees)
+                .SetValidator(new TodoAssigneeValidator());
+
             RuleFor(t => t)
                 .Must(HaveValidDates)
                 .WithMessage("TodoDateRangeInvalid");
@@ -113,6 +116,9 @@ namespace Application.Domain.Validation.Todo
                 .Must(cat => string.IsNullOrWhiteSpace(cat) == false)
                 .WithMessage("TodoCategoryInvalid");
 
+            RuleForEach(t => t.Assignees)
+                .SetValidator(new TodoAssigneeDtoValidator());
+
             RuleFor(t => t)
                 .Must(HaveValidDates)
                 .WithMessage("TodoDateRangeInvalid");
@@ -184,6 +190,9 @@ namespace Application.Domain.Validation.Todo
                 .Must(cat => string.IsNullOrWhiteSpace(cat) == false)
                 .WithMessage("TodoCategoryInvalid");
 
+            RuleForEach(t => t.Assignees)
+                .SetValidator(new TodoAssigneeDtoValidator());
+
             RuleFor(t => t)
                 .Must(HaveValidDates)
                 .WithMessage("TodoDateRangeInvalid");
@@ -247,6 +256,26 @@ namespace Application.Domain.Validation.Todo
             RuleFor(s => s.Title)
                 .Must(title => title == null || !string.IsNullOrWhiteSpace(title))
                 .WithMessage("TodoStepTitleRequired");
+        }
+    }
+
+    public class TodoAssigneeValidator : AbstractValidator<TodoAssignee>
+    {
+        public TodoAssigneeValidator()
+        {
+            RuleFor(a => a.Name)
+                .NotEmpty()
+                .WithMessage("TodoAssigneeNameRequired");
+        }
+    }
+
+    public class TodoAssigneeDtoValidator : AbstractValidator<TodoAssigneeDto>
+    {
+        public TodoAssigneeDtoValidator()
+        {
+            RuleFor(a => a.Name)
+                .NotEmpty()
+                .WithMessage("TodoAssigneeNameRequired");
         }
     }
 

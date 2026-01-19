@@ -10,6 +10,7 @@ import { TodoStep } from '../../model/todo';
 export class TodoStepsChecklistComponent {
   @Input() steps: TodoStep[] = [];
   @Input() canEdit = true;
+  @Input() canToggle = true;
 
   @Output() reorder = new EventEmitter<TodoStep[]>();
   @Output() toggle = new EventEmitter<{ stepId: string; isCompleted: boolean }>();
@@ -32,7 +33,7 @@ export class TodoStepsChecklistComponent {
   }
 
   onToggle(step: TodoStep, checked: boolean): void {
-    if (!this.canEdit) {
+    if (!this.canToggle) {
       return;
     }
     this.toggle.emit({ stepId: step.Id, isCompleted: checked });

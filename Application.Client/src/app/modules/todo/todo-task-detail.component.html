@@ -102,7 +102,8 @@
 
         <app-todo-steps-checklist
           [steps]="task.Steps || []"
-          [canEdit]="canManage"
+          [canEdit]="canManage && isEditing"
+          [canToggle]="canManage"
           (reorder)="onReorderSteps($event)"
           (toggle)="onToggleStep($event)"
           (titleChange)="onTitleChange($event)"

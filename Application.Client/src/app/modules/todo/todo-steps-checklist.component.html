@@ -27,7 +27,7 @@
         type="checkbox"
         [checked]="step.IsCompleted"
         (change)="onToggle(step, $any($event.target).checked)"
-        [disabled]="!canEdit"
+        [disabled]="!canToggle"
       />
       <span class="fakebox"></span>
     </label>
@@ -43,7 +43,7 @@
       />
       <small *ngIf="step.CompletedAt" class="timestamp">{{ step.CompletedAt | date: 'short' }}</small>
     </div>
-    <button class="icon-btn ghost sm success" type="button" *ngIf="canEdit && !step.IsCompleted" (click)="onToggle(step, true)">
+    <button class="icon-btn ghost sm success" type="button" *ngIf="canToggle && !step.IsCompleted" (click)="onToggle(step, true)">
       <i class="fa-regular fa-circle-check"></i>
     </button>
     <button class="icon-btn ghost sm danger" type="button" *ngIf="canEdit" (click)="deleteStep.emit(step.Id)">

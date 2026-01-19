@@ -826,6 +826,8 @@
       "dueDate": "Prazo",
       "when": "Quando",
       "context": "Contexto",
+      "assignees": "Responsáveis",
+      "assigneesPlaceholder": "Adicione um responsável",
       "allDay": "Dia inteiro",
       "recurrence": "Recorrencia",
       "recurrenceInterval": "Repetir a cada",
@@ -847,6 +849,7 @@
     "edit": "Editar",
     "save": "Salvar",
     "removeCategory": "Remover categoria",
+    "removeAssignee": "Remover responsável",
     "addCard": "Adicionar card"
   },
     "notifications": {

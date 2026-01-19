@@ -802,6 +802,8 @@
       "dueDate": "Due date",
       "when": "When",
       "context": "Context",
+      "assignees": "Assignees",
+      "assigneesPlaceholder": "Add a person",
       "allDay": "All day",
       "recurrence": "Recurrence",
       "recurrenceInterval": "Repeat every",
@@ -823,6 +825,7 @@
     "edit": "Edit",
     "save": "Save",
     "removeCategory": "Remove category",
+    "removeAssignee": "Remove assignee",
     "addCard": "Add card"
   },
     "notifications": {

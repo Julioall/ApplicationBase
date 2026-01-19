@@ -17,6 +17,7 @@ namespace Application.Domain.Model.Todo.Dtos
         public string? CreatedByUserId { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? AssignedToUserId { get; set; }
+        public IReadOnlyCollection<TodoAssigneeDto>? Assignees { get; set; }
         public bool IsArchived { get; set; }
         public bool IsAllDay { get; set; }
         public string? RecurrenceGroupId { get; set; }

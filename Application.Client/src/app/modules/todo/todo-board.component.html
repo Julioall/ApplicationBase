@@ -95,6 +95,28 @@
                     <i class="fa-regular fa-calendar"></i>
                     <span>{{ task.DueDate | date: 'MMM d' }}</span>
                   </div>
+                  <div class="task-card__assignees" *ngIf="getAssignees(task).length">
+                    <ng-container *ngFor="let assignee of getAssignees(task) | slice:0:3; let idx = index">
+                      <div
+                        class="assignee-avatar"
+                        [style.zIndex]="10 - idx"
+                        [style.marginLeft.px]="idx === 0 ? 0 : -10"
+                        [attr.title]="assignee.Name"
+                      >
+                        <img *ngIf="assignee.AvatarUrl; else initials" [src]="assignee.AvatarUrl" [alt]="assignee.Name" />
+                        <ng-template #initials>
+                          <span>{{ getAssigneeInitials(assignee.Name) }}</span>
+                        </ng-template>
+                      </div>
+                    </ng-container>
+                    <div
+                      class="assignee-avatar assignee-avatar__more"
+                      *ngIf="getAssignees(task).length > 3"
+                      [attr.title]="getAssignees(task).length - 3"
+                    >
+                      +{{ getAssignees(task).length - 3 }}
+                    </div>
+                  </div>
                 </footer>
               </article>
             </div>
@@ -123,8 +145,8 @@
   </article>
 </section>
 
-<div class="create-modal-backdrop" *ngIf="isCreateModalOpen" (click)="cancelCreate()">
-  <div class="create-modal" (click)="$event.stopPropagation()">
+<div class="create-modal-backdrop" *ngIf="isCreateModalOpen">
+  <div class="create-modal">
     <header class="create-modal__header">
       <div>
         <h2>{{ 'todo.modal.title' | translate }}</h2>
@@ -172,11 +194,11 @@
       </div>
 
       <div class="form-grid compact">
-        <div class="form-group">
-          <label>{{ 'todo.fields.category' | translate }}</label>
-          <div class="input-wrapper">
-            <i class="fa-solid fa-tag input-icon"></i>
-            <input
+      <div class="form-group">
+        <label>{{ 'todo.fields.category' | translate }}</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-tag input-icon"></i>
+          <input
               type="text"
               class="modern-input"
               formControlName="Category"
@@ -219,16 +241,47 @@
       </div>
 
       <div class="form-group">
-        <label>{{ 'todo.fields.description' | translate }}</label>
-        <div class="editor-wrapper">
-          <ckeditor
-            class="description-editor"
-            [editor]="Editor"
-            formControlName="Description"
-            [config]="editorConfig"
-          ></ckeditor>
+        <label>{{ 'todo.fields.assignees' | translate }}</label>
+        <div class="input-wrapper assignee-input">
+          <i class="fa-solid fa-user-plus input-icon"></i>
+          <input
+            type="text"
+            class="modern-input"
+            [placeholder]="'todo.fields.assigneesPlaceholder' | translate"
+            autocomplete="off"
+            #assigneeInput
+            (keydown.enter)="onAssigneeEnter($event, assigneeInput)"
+            (input)="onAssigneeInputChange(assigneeInput.value)"
+          />
+          <div class="assignee-suggestions" *ngIf="assigneeSuggestions.length">
+            <button
+              type="button"
+              class="assignee-suggestion"
+              *ngFor="let option of assigneeSuggestions"
+              (click)="selectAssigneeSuggestion(option)"
+            >
+              <span class="avatar-thumb">
+                <img *ngIf="option.AvatarUrl" [src]="option.AvatarUrl" [alt]="option.Name" />
+                <span *ngIf="!option.AvatarUrl">{{ getAssigneeInitials(option.Name) }}</span>
+              </span>
+              <span class="name">{{ option.Name }}</span>
+            </button>
+          </div>
+        </div>
+        <div class="chip-container" *ngIf="selectedAssignees.length">
+          <span class="modern-chip" *ngFor="let person of selectedAssignees">
+            {{ person.Name }}
+            <button
+              type="button"
+              (click)="removeAssignee(person.Name)"
+              [attr.aria-label]="'todo.actions.removeAssignee' | translate"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </span>
         </div>
       </div>
+
     </form>
 
     <footer class="create-modal__footer">

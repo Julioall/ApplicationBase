@@ -77,6 +77,7 @@ namespace Application.Service.Service
             var sanitizedDescription = await ProcessDescriptionAsync(dto.Description, currentUserId);
             var categories = NormalizeCategories(dto.Categories, dto.Category);
             var recurrence = NormalizeRecurrence(dto.Recurrence);
+            var assignees = NormalizeAssignees(dto.Assignees);
 
             var task = new TodoTask
             {
@@ -93,6 +94,7 @@ namespace Application.Service.Service
                 CreatedAt = DateTime.UtcNow,
                 CreatedByUserId = Normalize(currentUserId),
                 AssignedToUserId = Normalize(dto.AssignedToUserId),
+                Assignees = assignees.ToList(),
                 IsArchived = false,
                 IsAllDay = dto.IsAllDay,
                 Recurrence = recurrence,
@@ -388,6 +390,23 @@ namespace Application.Service.Service
             };
         }
 
+        private IEnumerable<TodoAssignee> NormalizeAssignees(IEnumerable<TodoAssigneeDto>? assignees)
+        {
+            if (assignees == null)
+            {
+                return Array.Empty<TodoAssignee>();
+            }
+
+            return assignees
+                .Where(a => a != null && !string.IsNullOrWhiteSpace(a.Name))
+                .Select(a => new TodoAssignee
+                {
+                    Id = Normalize(a.Id),
+                    Name = a.Name.Trim(),
+                    AvatarUrl = a.AvatarUrl
+                });
+        }
+
         private void ApplyTaskUpdates(
             TodoTask task,
             UpdateTodoTaskDto dto,
@@ -445,6 +464,11 @@ namespace Application.Service.Service
             if (dto.AssignedToUserId != null)
             {
                 task.AssignedToUserId = Normalize(dto.AssignedToUserId);
+            }
+
+            if (dto.Assignees != null)
+            {
+                task.Assignees = NormalizeAssignees(dto.Assignees).ToList();
             }
 
             if (dto.IsAllDay.HasValue)
@@ -740,6 +764,12 @@ namespace Application.Service.Service
                 IsAllDay = task.IsAllDay,
                 RecurrenceGroupId = task.RecurrenceGroupId,
                 Recurrence = ToRecurrenceDto(task.Recurrence),
+                Assignees = task.Assignees?.Select(a => new TodoAssigneeDto
+                {
+                    Id = a.Id,
+                    Name = a.Name,
+                    AvatarUrl = a.AvatarUrl
+                }).ToList(),
                 Steps = (task.Steps ?? new List<TodoStep>())
                     .OrderBy(s => s.Order)
                     .Select(s => new TodoStepDto

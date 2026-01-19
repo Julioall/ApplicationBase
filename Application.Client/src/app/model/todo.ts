@@ -28,6 +28,12 @@ export interface TodoStep {
   CompletedAt?: string | null;
 }
 
+export interface TodoAssignee {
+  Id?: string | null;
+  Name: string;
+  AvatarUrl?: string | null;
+}
+
 export interface TodoTask {
   Id: string;
   Title: string;
@@ -44,6 +50,7 @@ export interface TodoTask {
   CreatedByUserId?: string | null;
   CreatedAt: string;
   AssignedToUserId?: string | null;
+  Assignees?: TodoAssignee[] | null;
   IsArchived: boolean;
   IsAllDay?: boolean;
   RecurrenceGroupId?: string | null;
@@ -83,6 +90,7 @@ export interface CreateTodoTask {
   ContextType?: string | null;
   ContextId?: string | null;
   AssignedToUserId?: string | null;
+  Assignees?: TodoAssignee[] | null;
   IsAllDay?: boolean;
   Recurrence?: TodoRecurrence | null;
   Steps?: CreateTodoStep[];
@@ -100,6 +108,7 @@ export interface UpdateTodoTask {
   ContextType?: string | null;
   ContextId?: string | null;
   AssignedToUserId?: string | null;
+  Assignees?: TodoAssignee[] | null;
   IsAllDay?: boolean | null;
   Recurrence?: TodoRecurrence | null;
   ApplyToSeries?: boolean;

@@ -3,8 +3,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../service/auth/auth.service';
 import { TodoService } from '../../service/todo/todo.service';
+import { UserService } from '../../service/user/user.service';
 import { MANAGE_TODO_PERMISSION, VIEW_TODO_PERMISSION } from '../../model/permissions';
-import { CreateTodoTask, TodoStatus, TodoTask, UpdateTodoTask } from '../../model/todo';
+import { CreateTodoTask, TodoStatus, TodoTask, UpdateTodoTask, TodoAssignee } from '../../model/todo';
 import { NotificationService } from '../../service/notification/notification.service';
 import { TranslateService } from '@ngx-translate/core';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
@@ -34,6 +35,12 @@ export class TodoBoardComponent implements OnInit {
   connectedDropListIds: string[] = [];
   categoryOptions: string[] = [];
   selectedCategories: string[] = [];
+  selectedAssignees: TodoAssignee[] = [];
+  assigneeOptions: TodoAssignee[] = [];
+  assigneeSuggestions: TodoAssignee[] = [];
+  assigneeQuery = '';
+  isLoadingAssignees = false;
+  private assigneeMap: Record<string, TodoAssignee> = {};
   readonly priorityLevels = [1, 2, 3];
   Editor = ClassicEditor;
   editorConfig = {
@@ -67,7 +74,8 @@ export class TodoBoardComponent implements OnInit {
     private readonly fb: FormBuilder,
     private readonly authService: AuthService,
     private readonly notification: NotificationService,
-    private readonly translate: TranslateService
+    private readonly translate: TranslateService,
+    private readonly userService: UserService
   ) {
     this.createForm = this.fb.group({
       Title: ['', Validators.required],
@@ -110,6 +118,10 @@ export class TodoBoardComponent implements OnInit {
     this.isCreateModalOpen = true;
     this.createForm.reset();
     this.selectedCategories = [];
+    this.selectedAssignees = [];
+    this.assigneeQuery = '';
+    this.assigneeSuggestions = [];
+    this.loadAssigneeOptions();
     this.createForm.patchValue({
       Priority: 1,
       IsAllDay: false,
@@ -145,6 +157,7 @@ export class TodoBoardComponent implements OnInit {
       StartDate: startDate,
       DueDate: dueDate,
       IsAllDay: !!formValue.IsAllDay,
+      Assignees: this.selectedAssignees.length ? this.selectedAssignees : null,
     };
 
     this.todoService.createTask(payload).subscribe({
@@ -199,6 +212,32 @@ export class TodoBoardComponent implements OnInit {
 
   removeCategory(category: string): void {
     this.selectedCategories = this.selectedCategories.filter((c) => c !== category);
+  }
+
+  onAssigneeEnter(event: Event, input: HTMLInputElement): void {
+    event.preventDefault();
+    this.addAssignee(input.value);
+    input.value = '';
+  }
+
+  addAssignee(value: string | TodoAssignee): void {
+    const name = typeof value === 'string' ? value?.trim() : value?.Name?.trim();
+    if (!name) {
+      return;
+    }
+    const exists = this.selectedAssignees.some((a) => a.Name.localeCompare(name, undefined, { sensitivity: 'accent' }) === 0);
+    if (exists) {
+      return;
+    }
+    const avatarUrl = typeof value === 'string' ? null : value?.AvatarUrl ?? null;
+    const id = typeof value === 'string' ? null : value?.Id ?? null;
+    this.selectedAssignees = [...this.selectedAssignees, { Name: name, AvatarUrl: avatarUrl, Id: id }];
+    this.assigneeQuery = '';
+    this.assigneeSuggestions = [];
+  }
+
+  removeAssignee(name: string): void {
+    this.selectedAssignees = this.selectedAssignees.filter((a) => a.Name !== name);
   }
 
   getTaskCategories(task: TodoTask): string[] {
@@ -305,6 +344,8 @@ export class TodoBoardComponent implements OnInit {
             this.refreshColumns();
             this.syncSelectedTask();
             this.refreshCategories();
+            this.updateAssigneeMapFromTasks(this.tasks);
+            this.loadAssigneeOptions(true);
             this.isLoading = false;
           },
       error: () => {
@@ -414,6 +455,112 @@ export class TodoBoardComponent implements OnInit {
     const total = task.Steps.length;
     const done = this.getCompletedSteps(task);
     return Math.round((done / total) * 100);
+  }
+
+  getAssignees(task: TodoTask): TodoAssignee[] {
+    const direct = (task.Assignees || [])
+      .map(a => this.enrichAssignee(a))
+      .filter((a): a is TodoAssignee => !!a && !!a.Name);
+    if (direct.length) {
+      return direct;
+    }
+    const fallbackId = task.AssignedToUserId || task.CreatedByUserId;
+    if (fallbackId && this.assigneeMap[fallbackId]) {
+      return [this.assigneeMap[fallbackId]];
+    }
+    return [];
+  }
+
+  getAssigneeInitials(name: string | null | undefined): string {
+    if (!name) {
+      return '';
+    }
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) {
+      return parts[0].substring(0, 2).toUpperCase();
+    }
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  onAssigneeInputChange(value: string): void {
+    this.assigneeQuery = value;
+    this.updateAssigneeSuggestions();
+  }
+
+  selectAssigneeSuggestion(option: TodoAssignee): void {
+    this.addAssignee(option);
+  }
+
+  private updateAssigneeSuggestions(): void {
+    const term = this.assigneeQuery.trim().toLowerCase();
+    if (!term) {
+      this.assigneeSuggestions = [];
+      return;
+    }
+    const alreadySelected = new Set(this.selectedAssignees.map(a => a.Name.toLowerCase()));
+    this.assigneeSuggestions = this.assigneeOptions
+      .filter(opt => !alreadySelected.has(opt.Name.toLowerCase()))
+      .filter(opt => opt.Name.toLowerCase().includes(term))
+      .slice(0, 5);
+  }
+
+  private loadAssigneeOptions(force = false): void {
+    if ((!force && this.assigneeOptions.length > 0) || this.isLoadingAssignees) {
+      return;
+    }
+    this.isLoadingAssignees = true;
+    this.userService.getAllUsers().subscribe({
+      next: (users) => {
+        this.assigneeOptions = (users || []).map((u) => ({
+          Id: u.Id ?? null,
+          Name: u.Profile?.Name || u.Account?.Email || 'User',
+          AvatarUrl: u.Profile?.ProfilePictureUrl ?? null,
+        }));
+        this.rebuildAssigneeMap();
+        this.isLoadingAssignees = false;
+        this.updateAssigneeSuggestions();
+      },
+      error: () => {
+        this.isLoadingAssignees = false;
+      },
+    });
+  }
+
+  private rebuildAssigneeMap(): void {
+    this.assigneeMap = {};
+    this.assigneeOptions.forEach(opt => {
+      if (opt.Id) {
+        this.assigneeMap[opt.Id] = opt;
+      }
+    });
+  }
+
+  private updateAssigneeMapFromTasks(tasks: TodoTask[]): void {
+    tasks.forEach(task => {
+      (task.Assignees || []).forEach(a => {
+        if (a?.Id) {
+          this.assigneeMap[a.Id] = {
+            Id: a.Id,
+            Name: a.Name,
+            AvatarUrl: a.AvatarUrl ?? this.assigneeMap[a.Id]?.AvatarUrl ?? null,
+          };
+        }
+      });
+    });
+  }
+
+  private enrichAssignee(assignee: TodoAssignee | null | undefined): TodoAssignee | null {
+    if (!assignee) {
+      return null;
+    }
+    const id = assignee.Id;
+    if (assignee.Name) {
+      return assignee;
+    }
+    if (id && this.assigneeMap[id]) {
+      return this.assigneeMap[id];
+    }
+    return null;
   }
 }
 
