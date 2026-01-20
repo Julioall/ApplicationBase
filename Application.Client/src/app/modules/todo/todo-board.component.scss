@@ -775,8 +775,7 @@
 }
 
 :host ::ng-deep .ck.ck-editor__main > .ck-editor__editable {
-  min-height: 3.6em;
-  max-height: 15vh;
+  height: 15vh;
   overflow: auto;
   background: var(--surface);
   color: var(--text-primary);
