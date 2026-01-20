@@ -34,6 +34,7 @@ export class AuthComponent implements OnInit {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
+      rememberMe: [true],
     });
   }
 
@@ -64,13 +65,12 @@ export class AuthComponent implements OnInit {
       this.notificationService.showError(this.translateService.instant('auth.formError'));
       return;
     }
-    const { email, password } = this.loginForm?.value;
-    this.authService.login(email, password).subscribe({
+    const { email, password, rememberMe } = this.loginForm?.value;
+    this.authService.login(email, password, rememberMe).subscribe({
       next: (response: { token: any }) => {
         if (response && response.token) {
-          this.authService.saveToken(response.token);
           this.notificationService.showSuccess(this.translateService.instant('auth.loginSuccess'));
-          this.loginForm?.reset();
+          this.loginForm?.reset({ rememberMe: true });
           this.showPassword = false;
           this.router.navigate(['/home']);
         }

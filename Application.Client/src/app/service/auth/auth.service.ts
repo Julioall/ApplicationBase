@@ -15,7 +15,7 @@ export class AuthService {
 
   constructor(private http: HttpClient, private readonly translate: TranslateService) {}
 
-  login(email: string, password: string): Observable<any> {
+  login(email: string, password: string, remember: boolean = true): Observable<any> {
     const url = `${environment.apiUrl}/Authentication/login`;
     const body = {
       Email: email,
@@ -24,9 +24,9 @@ export class AuthService {
     return this.http.post<any>(url, body).pipe(
       map((response) => {
         if (response && response.token) {
-          this.saveToken(response.token);
+          this.saveToken(response.token, remember);
           if (response.refreshToken) {
-            this.saveRefreshToken(response.refreshToken);
+            this.saveRefreshToken(response.refreshToken, remember);
           }
         }
         return response;
@@ -52,20 +52,36 @@ export class AuthService {
     this.removeToken();
   }
 
-  saveToken(token: string): void {
-    localStorage.setItem('token', token);
+  saveToken(token: string, remember: boolean = true): void {
+    if (remember) {
+      localStorage.setItem('token', token);
+      sessionStorage.removeItem('token');
+    } else {
+      sessionStorage.setItem('token', token);
+      localStorage.removeItem('token');
+    }
   }
 
-  saveRefreshToken(token: string): void {
-    localStorage.setItem('refreshToken', token);
+  saveRefreshToken(token: string, remember: boolean = true): void {
+    if (remember) {
+      localStorage.setItem('refreshToken', token);
+      sessionStorage.removeItem('refreshToken');
+    } else {
+      sessionStorage.setItem('refreshToken', token);
+      localStorage.removeItem('refreshToken');
+    }
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return localStorage.getItem('token') || sessionStorage.getItem('token');
   }
 
   getRefreshToken(): string | null {
-    return localStorage.getItem('refreshToken');
+    return localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
+  }
+
+  isRemembered(): boolean {
+    return localStorage.getItem('token') !== null;
   }
 
   refreshToken(): Observable<any> {
@@ -90,6 +106,8 @@ export class AuthService {
   removeToken(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('refreshToken');
   }
 
   isTokenExpired(token: string): boolean {
