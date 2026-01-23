@@ -34,7 +34,6 @@ type NavItem = {
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss'],
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   isNavOpen = false;
@@ -45,7 +44,18 @@ export class NavbarComponent implements OnInit, OnDestroy {
   primaryNav: NavItem[] = [
     { icon: 'fa-solid fa-compass', label: 'home.primaryNav.panel', path: '/home' },
     { icon: 'fa-solid fa-school', label: 'navbar.education', path: '/education' },
-    { icon: 'fa-solid fa-signal', label: 'home.primaryNav.metrics' },
+    {
+      icon: 'fa-solid fa-user-graduate',
+      label: 'navbar.students',
+      path: '/students',
+      permissions: [VIEW_STUDENTS_PERMISSION, MANAGE_STUDENTS_PERMISSION],
+    },
+    {
+      icon: 'fa-solid fa-user-shield',
+      label: 'home.adminNav.users',
+      path: '/admin/users',
+      permissions: [ADMIN_PERMISSION],
+    },
     {
       icon: 'fa-solid fa-clipboard-check',
       label: 'home.primaryNav.todo',
@@ -53,11 +63,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
       permissions: [VIEW_TODO_PERMISSION, MANAGE_TODO_PERMISSION],
     },
   ];
-  favoriteNav: NavItem[] = [{ icon: 'fa-regular fa-file-lines', label: 'home.favoriteNav.reports' }];
   adminShortcuts: NavItem[] = [
-    { icon: 'fa-solid fa-user-shield', label: 'home.adminNav.users', path: '/admin/users' },
     { icon: 'fa-solid fa-gears', label: 'home.adminNav.services', path: '/admin/services' },
-    { icon: 'fa-solid fa-user-graduate', label: 'navbar.students', path: '/students' },
     { icon: 'fa-solid fa-life-ring', label: 'home.adminNav.support', path: '/support' },
   ];
   notifications: AppNotification[] = [];
