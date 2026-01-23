@@ -1,22 +1,193 @@
 <div class="min-h-screen bg-page text-text-primary">
-  <div class="grid lg:grid-cols-[280px_1fr] min-h-screen">
-    <aside
-      [ngClass]="[
-        'fixed lg:sticky lg:top-0 left-0 z-30 h-screen lg:h-[calc(100vh)] w-[88vw] max-w-[260px] lg:w-auto bg-gradient-to-b from-surface to-surface-alt border-r border-border-soft shadow-soft backdrop-blur-md flex flex-col gap-4 px-4 py-5 transition-transform duration-200',
-        isNavOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-      ]"
-    >
-      <div class="flex items-center gap-3 px-2">
-        <div class="h-11 w-11 rounded-xl bg-accent text-text-inverse grid place-items-center shadow-soft">
+  <!-- Topbar -->
+  <header class="fixed top-0 inset-x-0 z-40 flex items-center justify-between gap-4 px-4 lg:px-8 h-16 border-b border-border-soft bg-surface/95 backdrop-blur">
+    <div class="flex items-center gap-3">
+      <button
+        class="inline-flex lg:hidden items-center justify-center h-10 w-10 rounded-lg border border-border-soft bg-surface-alt text-text-subtle hover:text-accent-strong hover:bg-accent-soft transition"
+        type="button"
+        [attr.aria-label]="'home.openMenu' | translate"
+        (click)="toggleNav()"
+      >
+        <i class="fa-solid" [ngClass]="isNavOpen ? 'fa-xmark' : 'fa-bars'"></i>
+      </button>
+      <div class="flex items-center gap-2">
+        <div class="h-10 w-10 rounded-lg bg-accent text-text-inverse grid place-items-center shadow-soft">
           <i class="fa fa-cubes"></i>
         </div>
-        <div class="flex flex-col">
-          <span class="text-base font-bold leading-none">{{ 'home.brandTitle' | translate }}</span>
-          <span class="text-xs text-text-subtle">{{ 'home.brandSubtitle' | translate }}</span>
+        <div class="flex flex-col leading-none">
+          <span class="text-sm font-bold">{{ 'home.brandTitle' | translate }}</span>
+          <span class="text-xs text-text-subtle">Portal Acadêmico</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <div class="relative">
+        <button
+          #notificationsTrigger
+          class="inline-flex items-center justify-center h-10 w-10 rounded-lg border border-border-soft bg-surface-alt text-text-subtle hover:text-accent-strong hover:bg-accent-soft transition relative"
+          type="button"
+          [attr.aria-label]="'home.viewNotifications' | translate"
+          [attr.aria-expanded]="isNotificationsOpen"
+          (click)="toggleNotifications($event)"
+        >
+          <span class="absolute top-2 right-2 h-2 w-2 rounded-full bg-danger" *ngIf="unreadNotifications > 0"></span>
+          <i class="fa-regular fa-bell"></i>
+        </button>
+        <div
+          #notificationsMenu
+          class="absolute right-0 mt-2 w-[min(380px,92vw)] bg-surface border border-border-soft rounded-2xl shadow-soft p-4 space-y-3 z-50"
+          *ngIf="isNotificationsOpen"
+        >
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="font-semibold text-sm m-0">{{ 'notifications.title' | translate }}</p>
+              <p class="text-text-subtle text-sm m-0" *ngIf="unreadNotifications > 0">
+                {{ 'notifications.unread' | translate:{ count: unreadNotifications } }}
+              </p>
+              <p class="text-text-muted text-sm m-0" *ngIf="unreadNotifications === 0">
+                {{ 'notifications.allRead' | translate }}
+              </p>
+            </div>
+            <button
+              class="text-sm font-semibold text-accent hover:text-accent-strong disabled:text-text-muted"
+              type="button"
+              [disabled]="unreadNotifications === 0 || isMarkingNotifications"
+              (click)="markAllNotificationsAsRead()"
+            >
+              {{ 'notifications.markAllAsRead' | translate }}
+            </button>
+          </div>
+          <div *ngIf="isLoadingNotifications" class="text-center text-text-subtle py-3 text-sm">
+            {{ 'notifications.loading' | translate }}
+          </div>
+          <div class="space-y-2 max-h-[420px] overflow-y-auto" *ngIf="!isLoadingNotifications">
+            <p class="text-center text-text-subtle py-3 text-sm" *ngIf="notifications.length === 0">
+              {{ 'notifications.empty' | translate }}
+            </p>
+            <article
+              class="grid grid-cols-[auto_1fr_auto] items-start gap-3 p-3 rounded-xl border border-border-soft bg-surface-alt hover:border-accent-soft hover:-translate-y-0.5 transition cursor-pointer"
+              *ngFor="let notification of notifications; trackBy: trackByNotification"
+              [class.border-accent-soft]="!notification.IsRead"
+              [class.bg-accent-soft]="!notification.IsRead"
+              (click)="handleNotificationClick(notification)"
+            >
+              <div
+                class="h-2.5 w-2.5 rounded-full mt-1"
+                [ngClass]="{
+                  'bg-success': notification.Type === 'success',
+                  'bg-danger': notification.Type === 'error',
+                  'bg-warning': notification.Type === 'warning',
+                  'bg-info': notification.Type === 'info',
+                  'bg-text-subtle': !notification.Type
+                }"
+              ></div>
+              <div class="space-y-1">
+                <div class="font-semibold text-sm">{{ notification.Title }}</div>
+                <p class="text-sm text-text-primary m-0">{{ notification.Message }}</p>
+                <div class="flex items-center gap-2 text-xs text-text-subtle">
+                  <span class="px-2 py-1 rounded-full border border-border-soft" *ngIf="notification.Type === 'success'">
+                    {{ 'notifications.importCompleted' | translate }}
+                  </span>
+                  <span class="px-2 py-1 rounded-full border border-border-soft" *ngIf="notification.Type === 'error'">
+                    {{ 'notifications.importFailed' | translate }}
+                  </span>
+                  <span class="text-text-muted">{{ notification.CreatedAt | date: 'short' }}</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <button
+                  class="h-8 w-8 inline-flex items-center justify-center rounded-md text-text-subtle hover:text-accent-strong hover:bg-accent-soft transition"
+                  type="button"
+                  [attr.aria-label]="'notifications.markAsRead' | translate"
+                  (click)="markNotificationAsRead(notification, $event)"
+                  *ngIf="!notification.IsRead"
+                >
+                  <i class="fa-regular fa-circle-check"></i>
+                </button>
+                <button
+                  class="h-8 w-8 inline-flex items-center justify-center rounded-md text-danger hover:bg-danger-soft transition"
+                  type="button"
+                  [attr.aria-label]="'notifications.delete' | translate"
+                  (click)="deleteNotification(notification, $event)"
+                >
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              </div>
+            </article>
+          </div>
         </div>
       </div>
 
-      <div class="flex-1 min-h-0 overflow-y-auto pr-2 pb-6 space-y-6 border-t border-border-soft pt-4 ">
+      <div class="relative">
+        <button
+          #profileMenu
+          class="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-border-soft bg-surface text-text-primary font-semibold hover:border-accent-strong shadow-sm transition"
+          type="button"
+          (click)="toggleProfileMenu($event)"
+          [attr.aria-expanded]="isProfileMenuOpen"
+          [attr.aria-label]="(isProfileMenuOpen ? 'home.profileMenu.closeLabel' : 'home.profileMenu.openLabel') | translate"
+        >
+          <div class="h-8 w-8 rounded-full bg-accent text-text-inverse grid place-items-center font-bold text-xs overflow-hidden">
+            <img *ngIf="userAvatarUrl; else fallbackInitials" [src]="userAvatarUrl" alt="User avatar" class="h-full w-full object-cover" />
+            <ng-template #fallbackInitials>{{ userInitials }}</ng-template>
+          </div>
+          <i class="fa-solid" [ngClass]="isProfileMenuOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+        </button>
+
+        <div
+          class="absolute right-0 mt-3 w-64 rounded-2xl border border-border-soft bg-surface shadow-soft p-2 flex flex-col gap-1 z-50"
+          *ngIf="isProfileMenuOpen"
+        >
+          <button
+            class="flex items-center gap-3 px-3 py-3 rounded-lg text-left text-text-primary hover:bg-accent-soft transition"
+            type="button"
+            (click)="navigateToProfile()"
+          >
+            <i class="fa-regular fa-user text-text-subtle"></i>
+            <div class="flex flex-col">
+              <span class="font-semibold text-sm">{{ 'home.profileMenu.profile' | translate }}</span>
+              <span class="text-xs text-text-subtle">{{ 'home.profileMenu.profileSubtitle' | translate }}</span>
+            </div>
+          </button>
+
+          <button
+            class="flex items-center gap-3 px-3 py-3 rounded-lg text-left text-text-primary hover:bg-accent-soft transition"
+            type="button"
+            (click)="navigateToProfile()"
+          >
+            <i class="fa-solid fa-sliders text-text-subtle"></i>
+            <div class="flex flex-col">
+              <span class="font-semibold text-sm">{{ 'home.profileMenu.settings' | translate }}</span>
+              <span class="text-xs text-text-subtle">{{ 'home.profileMenu.settingsSubtitle' | translate }}</span>
+            </div>
+          </button>
+
+          <button
+            class="flex items-center gap-3 px-3 py-3 rounded-lg text-left text-danger hover:bg-danger-soft transition"
+            type="button"
+            (click)="logout()"
+          >
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <div class="flex flex-col">
+              <span class="font-semibold text-sm">{{ 'home.profileMenu.logout' | translate }}</span>
+              <span class="text-xs text-text-subtle">{{ 'home.profileMenu.logoutSubtitle' | translate }}</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="pt-16 pb-14 min-h-screen">
+    <!-- Sidebar -->
+    <aside
+      [ngClass]="[
+        'fixed top-16 bottom-14 left-0 z-30 w-64 bg-gradient-to-b from-surface to-surface-alt border-r border-border-soft shadow-soft backdrop-blur-md flex flex-col gap-4 px-4 py-5 transition-transform duration-200 overflow-hidden',
+        isNavOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      ]"
+    >
+      <div class="flex-1 min-h-0 overflow-y-auto pr-2 pb-6 space-y-6">
         <div class="space-y-2">
           <ng-container *ngFor="let link of primaryNav">
             <a
@@ -62,238 +233,71 @@
       </div>
     </aside>
 
-    <div class="lg:col-start-2 flex flex-col min-h-screen bg-page">
-      <div
-        *ngIf="isNavOpen"
-        class="fixed inset-0 bg-overlay-strong backdrop-blur-sm z-20 lg:hidden"
-        (click)="closeNav()"
-      ></div>
+    <!-- Scrim for mobile -->
+    <div
+      *ngIf="isNavOpen"
+      class="fixed inset-0 bg-overlay-strong backdrop-blur-sm z-20 lg:hidden"
+      (click)="closeNav()"
+    ></div>
 
-      <header class="sticky top-0 z-10 flex items-center gap-3 justify-end px-4 lg:px-8 py-4 border-b border-border-soft bg-surface/95 backdrop-blur">
-        <button
-          class="inline-flex lg:hidden items-center justify-center h-10 w-10 rounded-lg border border-border-soft bg-surface-alt text-text-subtle hover:text-accent-strong hover:bg-accent-soft transition"
-          type="button"
-          [attr.aria-label]="'home.openMenu' | translate"
-          (click)="toggleNav()"
-        >
-          <i class="fa-solid" [ngClass]="isNavOpen ? 'fa-xmark' : 'fa-bars'"></i>
-        </button>
-
-        <div class="flex items-center gap-3">
-          <div class="relative">
-            <button
-              #notificationsTrigger
-              class="inline-flex items-center justify-center h-10 w-10 rounded-lg border border-border-soft bg-surface-alt text-text-subtle hover:text-accent-strong hover:bg-accent-soft transition relative"
-              type="button"
-              [attr.aria-label]="'home.viewNotifications' | translate"
-              [attr.aria-expanded]="isNotificationsOpen"
-              (click)="toggleNotifications($event)"
-            >
-              <span class="absolute top-2 right-2 h-2 w-2 rounded-full bg-danger" *ngIf="unreadNotifications > 0"></span>
-              <i class="fa-regular fa-bell"></i>
-            </button>
-            <div
-              #notificationsMenu
-              class="absolute right-0 mt-2 w-[min(380px,92vw)] bg-surface border border-border-soft rounded-2xl shadow-soft p-4 space-y-3 z-30"
-              *ngIf="isNotificationsOpen"
-            >
-              <div class="flex items-start justify-between gap-3">
-                <div>
-                  <p class="font-semibold text-sm m-0">{{ 'notifications.title' | translate }}</p>
-                  <p class="text-text-subtle text-sm m-0" *ngIf="unreadNotifications > 0">
-                    {{ 'notifications.unread' | translate:{ count: unreadNotifications } }}
-                  </p>
-                  <p class="text-text-muted text-sm m-0" *ngIf="unreadNotifications === 0">
-                    {{ 'notifications.allRead' | translate }}
-                  </p>
-                </div>
-                <button
-                  class="text-sm font-semibold text-accent hover:text-accent-strong disabled:text-text-muted"
-                  type="button"
-                  [disabled]="unreadNotifications === 0 || isMarkingNotifications"
-                  (click)="markAllNotificationsAsRead()"
-                >
-                  {{ 'notifications.markAllAsRead' | translate }}
-                </button>
-              </div>
-              <div *ngIf="isLoadingNotifications" class="text-center text-text-subtle py-3 text-sm">
-                {{ 'notifications.loading' | translate }}
-              </div>
-              <div class="space-y-2 max-h-[420px] overflow-y-auto" *ngIf="!isLoadingNotifications">
-                <p class="text-center text-text-subtle py-3 text-sm" *ngIf="notifications.length === 0">
-                  {{ 'notifications.empty' | translate }}
-                </p>
-                <article
-                  class="grid grid-cols-[auto_1fr_auto] items-start gap-3 p-3 rounded-xl border border-border-soft bg-surface-alt hover:border-accent-soft hover:-translate-y-0.5 transition cursor-pointer"
-                  *ngFor="let notification of notifications; trackBy: trackByNotification"
-                  [class.border-accent-soft]="!notification.IsRead"
-                  [class.bg-accent-soft]="!notification.IsRead"
-                  (click)="handleNotificationClick(notification)"
-                >
-                  <div
-                    class="h-2.5 w-2.5 rounded-full mt-1"
-                    [ngClass]="{
-                      'bg-success': notification.Type === 'success',
-                      'bg-danger': notification.Type === 'error',
-                      'bg-warning': notification.Type === 'warning',
-                      'bg-info': notification.Type === 'info',
-                      'bg-text-subtle': !notification.Type
-                    }"
-                  ></div>
-                  <div class="space-y-1">
-                    <div class="font-semibold text-sm">{{ notification.Title }}</div>
-                    <p class="text-sm text-text-primary m-0">{{ notification.Message }}</p>
-                    <div class="flex items-center gap-2 text-xs text-text-subtle">
-                      <span class="px-2 py-1 rounded-full border border-border-soft" *ngIf="notification.Type === 'success'">
-                        {{ 'notifications.importCompleted' | translate }}
-                      </span>
-                      <span class="px-2 py-1 rounded-full border border-border-soft" *ngIf="notification.Type === 'error'">
-                        {{ 'notifications.importFailed' | translate }}
-                      </span>
-                      <span class="text-text-muted">{{ notification.CreatedAt | date: 'short' }}</span>
-                    </div>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <button
-                      class="h-8 w-8 inline-flex items-center justify-center rounded-md text-text-subtle hover:text-accent-strong hover:bg-accent-soft transition"
-                      type="button"
-                      [attr.aria-label]="'notifications.markAsRead' | translate"
-                      (click)="markNotificationAsRead(notification, $event)"
-                      *ngIf="!notification.IsRead"
-                    >
-                      <i class="fa-regular fa-circle-check"></i>
-                    </button>
-                    <button
-                      class="h-8 w-8 inline-flex items-center justify-center rounded-md text-danger hover:bg-danger-soft transition"
-                      type="button"
-                      [attr.aria-label]="'notifications.delete' | translate"
-                      (click)="deleteNotification(notification, $event)"
-                    >
-                      <i class="fa-regular fa-trash-can"></i>
-                    </button>
-                  </div>
-                </article>
-              </div>
-            </div>
-          </div>
-
-          <div class="relative">
-            <button
-              #profileMenu
-              class="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-border-soft bg-surface text-text-primary font-semibold hover:border-accent-strong shadow-sm transition"
-              type="button"
-              (click)="toggleProfileMenu($event)"
-              [attr.aria-expanded]="isProfileMenuOpen"
-              [attr.aria-label]="(isProfileMenuOpen ? 'home.profileMenu.closeLabel' : 'home.profileMenu.openLabel') | translate"
-            >
-              <div class="h-8 w-8 rounded-full bg-accent text-text-inverse grid place-items-center font-bold text-xs overflow-hidden">
-                <img *ngIf="userAvatarUrl; else fallbackInitials" [src]="userAvatarUrl" alt="User avatar" class="h-full w-full object-cover" />
-                <ng-template #fallbackInitials>{{ userInitials }}</ng-template>
-              </div>
-              <i class="fa-solid" [ngClass]="isProfileMenuOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-            </button>
-
-            <div
-              class="absolute right-0 mt-3 w-64 rounded-2xl border border-border-soft bg-surface shadow-soft p-2 flex flex-col gap-1 z-30"
-              *ngIf="isProfileMenuOpen"
-            >
-              <button
-                class="flex items-center gap-3 px-3 py-3 rounded-lg text-left text-text-primary hover:bg-accent-soft transition"
-                type="button"
-                (click)="navigateToProfile()"
-              >
-                <i class="fa-regular fa-user text-text-subtle"></i>
-                <div class="flex flex-col">
-                  <span class="font-semibold text-sm">{{ 'home.profileMenu.profile' | translate }}</span>
-                  <span class="text-xs text-text-subtle">{{ 'home.profileMenu.profileSubtitle' | translate }}</span>
-                </div>
-              </button>
-
-              <button
-                class="flex items-center gap-3 px-3 py-3 rounded-lg text-left text-text-primary hover:bg-accent-soft transition"
-                type="button"
-                (click)="navigateToProfile()"
-              >
-                <i class="fa-solid fa-sliders text-text-subtle"></i>
-                <div class="flex flex-col">
-                  <span class="font-semibold text-sm">{{ 'home.profileMenu.settings' | translate }}</span>
-                  <span class="text-xs text-text-subtle">{{ 'home.profileMenu.settingsSubtitle' | translate }}</span>
-                </div>
-              </button>
-
-              <button
-                class="flex items-center gap-3 px-3 py-3 rounded-lg text-left text-danger hover:bg-danger-soft transition"
-                type="button"
-                (click)="logout()"
-              >
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                <div class="flex flex-col">
-                  <span class="font-semibold text-sm">{{ 'home.profileMenu.logout' | translate }}</span>
-                  <span class="text-xs text-text-subtle">{{ 'home.profileMenu.logoutSubtitle' | translate }}</span>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <section class="flex-1 px-4 lg:px-8 py-6">
-        <router-outlet></router-outlet>
-      </section>
-
-      <footer class="mt-auto px-4 lg:px-8 py-4 border-t border-border-soft bg-page text-center space-y-2 text-xs text-text-subtle">
-        <div class="flex flex-wrap items-center justify-center gap-3">
-          <a
-            href="mailto:julio.all&#64;outlook.com"
-            class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
-            aria-label="E-mail de Julio Alves"
-          >
-            <i class="fa-solid fa-envelope"></i>
-            <span>Email</span>
-          </a>
-          <a
-            href="https://instagram.com/julioall"
-            target="_blank"
-            rel="noreferrer noopener"
-            class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
-            aria-label="Instagram de Julio Alves"
-          >
-            <i class="fa-brands fa-instagram"></i>
-            <span>Instagram</span>
-          </a>
-          <a
-            href="https://discord.gg/julioall"
-            target="_blank"
-            rel="noreferrer noopener"
-            class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
-            aria-label="Discord de Julio Alves"
-          >
-            <i class="fa-brands fa-discord"></i>
-            <span>Discord</span>
-          </a>
-          <a
-            href="https://www.linkedin.com/in/julioall/"
-            target="_blank"
-            rel="noreferrer noopener"
-            class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
-            aria-label="LinkedIn de Julio Alves"
-          >
-            <i class="fa-brands fa-linkedin"></i>
-            <span>LinkedIn</span>
-          </a>
-          <a
-            href="https://wa.me/qr/R2JWZR5YSPS4D1"
-            target="_blank"
-            rel="noreferrer noopener"
-            class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
-            aria-label="WhatsApp de Julio Alves"
-          >
-            <i class="fa-brands fa-whatsapp"></i>
-            <span>WhatsApp</span>
-          </a>
-        </div>
-        <div class="text-text-muted">&copy; 2020-2025 Julio Alves. All rights reserved.</div>
-      </footer>
-    </div>
+    <!-- Main -->
+    <main class="ml-0 lg:ml-64 h-[calc(100vh-4rem-3.5rem)] overflow-auto px-4 lg:px-8 py-6">
+      <router-outlet></router-outlet>
+    </main>
   </div>
+
+  <!-- Footer -->
+  <footer class="fixed bottom-0 inset-x-0 z-40 px-4 lg:px-8 py-3 h-14 border-t border-border-soft bg-page text-center text-xs text-text-subtle">
+    <div class="flex flex-wrap items-center justify-center gap-3">
+      <a
+        href="mailto:julio.all&#64;outlook.com"
+        class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
+        aria-label="E-mail de Julio Alves"
+      >
+        <i class="fa-solid fa-envelope"></i>
+        <span>Email</span>
+      </a>
+      <a
+        href="https://instagram.com/julioall"
+        target="_blank"
+        rel="noreferrer noopener"
+        class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
+        aria-label="Instagram de Julio Alves"
+      >
+        <i class="fa-brands fa-instagram"></i>
+        <span>Instagram</span>
+      </a>
+      <a
+        href="https://discord.gg/julioall"
+        target="_blank"
+        rel="noreferrer noopener"
+        class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
+        aria-label="Discord de Julio Alves"
+      >
+        <i class="fa-brands fa-discord"></i>
+        <span>Discord</span>
+      </a>
+      <a
+        href="https://www.linkedin.com/in/julioall/"
+        target="_blank"
+        rel="noreferrer noopener"
+        class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
+        aria-label="LinkedIn de Julio Alves"
+      >
+        <i class="fa-brands fa-linkedin"></i>
+        <span>LinkedIn</span>
+      </a>
+      <a
+        href="https://wa.me/qr/R2JWZR5YSPS4D1"
+        target="_blank"
+        rel="noreferrer noopener"
+        class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
+        aria-label="WhatsApp de Julio Alves"
+      >
+        <i class="fa-brands fa-whatsapp"></i>
+        <span>WhatsApp</span>
+      </a>
+    </div>
+    <div class="text-text-muted">&copy; 2020-2025 Julio Alves. All rights reserved.</div>
+  </footer>
 </div>
