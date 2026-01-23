@@ -1,20 +1,29 @@
-<div class="auth-wrapper">
-  <div class="card">
-    <header class="card-head">
-      <h1>{{ 'auth.register.title' | translate }}</h1>
-      <p>{{ 'auth.register.subtitle' | translate }}</p>
+<div
+  class="min-h-screen bg-page text-text-primary flex flex-col items-center justify-center px-4 py-6 sm:py-10 gap-8 transition-colors duration-300"
+>
+  <div
+    class="w-full max-w-lg sm:max-w-xl bg-surface border border-border-soft rounded-2xl shadow-soft backdrop-blur-sm p-6 sm:p-8 md:p-10 space-y-6 transition-colors"
+  >
+    <header class="space-y-2">
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">
+        {{ 'auth.register.title' | translate }}
+      </h1>
+      <p class="text-text-subtle text-sm sm:text-base md:text-lg">
+        {{ 'auth.register.subtitle' | translate }}
+      </p>
     </header>
 
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-      <label class="field">
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4 sm:space-y-5">
+      <label class="flex flex-col gap-2 text-sm font-semibold text-text-primary">
         <span>{{ 'auth.register.fullNameLabel' | translate }}</span>
         <input
           type="text"
           [placeholder]="'auth.register.fullNamePlaceholder' | translate"
           formControlName="fullName"
+          class="w-full rounded-xl border border-border-soft bg-surface-alt px-4 py-3 text-base font-medium text-text-primary placeholder:text-text-muted shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.08)] focus:outline-none focus:ring-2 focus:ring-focus focus:border-transparent transition"
         />
         <small
-          class="error"
+          class="text-xs text-danger font-medium"
           *ngIf="registerForm.get('fullName')?.invalid && (registerForm.get('fullName')?.touched || submitted)"
         >
           {{
@@ -25,15 +34,16 @@
         </small>
       </label>
 
-      <label class="field">
+      <label class="flex flex-col gap-2 text-sm font-semibold text-text-primary">
         <span>{{ 'auth.register.emailLabel' | translate }}</span>
         <input
           type="email"
           [placeholder]="'auth.register.emailPlaceholder' | translate"
           formControlName="email"
+          class="w-full rounded-xl border border-border-soft bg-surface-alt px-4 py-3 text-base font-medium text-text-primary placeholder:text-text-muted shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.08)] focus:outline-none focus:ring-2 focus:ring-focus focus:border-transparent transition"
         />
         <small
-          class="error"
+          class="text-xs text-danger font-medium"
           *ngIf="registerForm.get('email')?.invalid && (registerForm.get('email')?.touched || submitted)"
         >
           {{
@@ -44,19 +54,20 @@
         </small>
       </label>
 
-      <div class="inline">
-        <label class="field">
+      <div class="grid gap-4 sm:gap-5 sm:grid-cols-2">
+        <label class="flex flex-col gap-2 text-sm font-semibold text-text-primary">
           <span>{{ 'auth.register.passwordLabel' | translate }}</span>
-          <div class="password-input">
+          <div class="relative flex items-center rounded-xl">
             <input
               [type]="passwordVisibility.password ? 'text' : 'password'"
               [placeholder]="'auth.register.passwordPlaceholder' | translate"
               formControlName="password"
               autocomplete="new-password"
+              class="w-full rounded-xl border border-border-soft bg-transparent px-4 py-3 pr-12 text-base font-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-focus focus:border-transparent"
             />
             <button
               type="button"
-              class="visibility-toggle"
+              class="absolute inset-y-0 right-3 inline-flex items-center justify-center text-text-muted hover:text-text-primary transition"
               (click)="togglePasswordVisibility('password')"
               [attr.aria-label]="
                 passwordVisibility.password
@@ -68,7 +79,7 @@
             </button>
           </div>
           <small
-            class="error"
+            class="text-xs text-danger font-medium"
             *ngIf="registerForm.get('password')?.invalid && (registerForm.get('password')?.touched || submitted)"
           >
             {{
@@ -80,18 +91,20 @@
             }}
           </small>
         </label>
-        <label class="field">
+
+        <label class="flex flex-col gap-2 text-sm font-semibold text-text-primary">
           <span>{{ 'auth.register.confirmPasswordLabel' | translate }}</span>
-          <div class="password-input">
+          <div class="relative flex items-center rounded-xl">
             <input
               [type]="passwordVisibility.confirmPassword ? 'text' : 'password'"
               [placeholder]="'auth.register.confirmPasswordPlaceholder' | translate"
               formControlName="confirmPassword"
               autocomplete="new-password"
+              class="w-full rounded-xl border border-border-soft bg-transparent px-4 py-3 pr-12 text-base font-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-focus focus:border-transparent"
             />
             <button
               type="button"
-              class="visibility-toggle"
+              class="absolute inset-y-0 right-3 inline-flex items-center justify-center text-text-muted hover:text-text-primary transition"
               (click)="togglePasswordVisibility('confirmPassword')"
               [attr.aria-label]="
                 passwordVisibility.confirmPassword
@@ -103,7 +116,7 @@
             </button>
           </div>
           <small
-            class="error"
+            class="text-xs text-danger font-medium"
             *ngIf="(registerForm.get('confirmPassword')?.touched || submitted) && registerForm.hasError('passwordsMismatch')"
           >
             {{ 'auth.register.confirmPasswordMismatch' | translate }}
@@ -111,27 +124,42 @@
         </label>
       </div>
 
-      <label class="checkbox">
-        <input type="checkbox" formControlName="updates" />
+      <label class="inline-flex items-start gap-3 text-sm text-text-subtle">
+        <input
+          type="checkbox"
+          formControlName="updates"
+          class="mt-1 h-4 w-4 rounded border-border-soft bg-surface-alt text-accent focus:ring-2 focus:ring-focus"
+        />
         <span>{{ 'auth.register.updatesLabel' | translate }}</span>
       </label>
 
-      <button class="btn primary w-100" type="submit" [disabled]="registerForm.invalid">
+      <button
+        class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent via-accent-strong to-accent px-4 py-3 text-text-inverse font-semibold shadow-soft hover:-translate-y-0.5 hover:shadow-[0_14px_44px_rgba(var(--shadow-rgb),0.16)] transition focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-2 focus:ring-offset-surface disabled:opacity-70 disabled:cursor-not-allowed"
+        type="submit"
+        [disabled]="registerForm.invalid"
+      >
         {{ 'auth.register.submit' | translate }}
       </button>
     </form>
 
-    <footer class="card-footer">
+    <footer class="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-text-subtle">
       <span>{{ 'auth.register.footerText' | translate }}</span>
-      <button type="button" class="link-btn" (click)="goToLogin()">
+      <button
+        type="button"
+        class="font-semibold text-accent hover:text-accent-strong transition underline-offset-4 hover:underline"
+        (click)="goToLogin()"
+      >
         {{ 'auth.register.footerLink' | translate }}
       </button>
     </footer>
   </div>
 
-  <button type="button" class="theme-fab" (click)="toggleTheme()">
-    <span class="toggle-icon" [class.dark]="activeTheme === 'dark'">
-      {{ activeTheme === 'dark' ? '🌙' : '☀️' }}
-    </span>
+  <button
+    type="button"
+    class="fixed right-4 bottom-4 sm:right-6 sm:bottom-6 h-12 w-12 rounded-full border border-border-soft bg-surface text-text-primary shadow-soft flex items-center justify-center hover:-translate-y-0.5 transition"
+    (click)="toggleTheme()"
+    [attr.aria-label]="activeTheme === 'dark' ? ('auth.login.switchToLight' | translate) : ('auth.login.switchToDark' | translate)"
+  >
+    <i class="fa-solid" [ngClass]="activeTheme === 'dark' ? 'fa-moon' : 'fa-sun'" aria-hidden="true"></i>
   </button>
 </div>

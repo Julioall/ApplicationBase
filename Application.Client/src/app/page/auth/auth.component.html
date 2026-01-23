@@ -1,20 +1,29 @@
-<div class="auth-wrapper">
-  <div class="card">
-    <header class="card-head">
-      <h1>{{ 'auth.login.title' | translate }}</h1>
-      <p>{{ 'auth.login.subtitle' | translate }}</p>
+<div
+  class="min-h-screen bg-page text-text-primary flex flex-col items-center justify-center px-4 py-6 sm:py-10 gap-8 transition-colors duration-300"
+>
+  <div
+    class="w-full max-w-lg sm:max-w-xl bg-surface border border-border-soft rounded-2xl shadow-soft backdrop-blur-sm p-6 sm:p-8 md:p-10 space-y-6 transition-colors"
+  >
+    <header class="space-y-2">
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">
+        {{ 'auth.login.title' | translate }}
+      </h1>
+      <p class="text-text-subtle text-sm sm:text-base md:text-lg">
+        {{ 'auth.login.subtitle' | translate }}
+      </p>
     </header>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-      <label class="field">
+    <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-4 sm:space-y-5">
+      <label class="flex flex-col gap-2 text-sm font-semibold text-text-primary">
         <span>{{ 'auth.login.emailLabel' | translate }}</span>
         <input
           type="email"
           [placeholder]="'auth.login.emailPlaceholder' | translate"
           formControlName="email"
+          class="w-full rounded-xl border border-border-soft bg-surface-alt px-4 py-3 text-base font-medium text-text-primary placeholder:text-text-muted shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.08)] focus:outline-none focus:ring-2 focus:ring-focus focus:border-transparent transition"
         />
         <small
-          class="error"
+          class="text-xs text-danger font-medium"
           *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.touched || loginSubmitted)"
         >
           {{
@@ -25,18 +34,19 @@
         </small>
       </label>
 
-      <label class="field">
+      <label class="flex flex-col gap-2 text-sm font-semibold text-text-primary">
         <span>{{ 'auth.login.passwordLabel' | translate }}</span>
-        <div class="password-input">
+        <div class="relative flex items-center rounded-xl">
           <input
             [type]="showPassword ? 'text' : 'password'"
             [placeholder]="'auth.login.passwordPlaceholder' | translate"
             formControlName="password"
             autocomplete="current-password"
+            class="w-full rounded-xl border border-border-soft bg-transparent px-4 py-3 pr-12 text-base font-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-focus focus:border-transparent"
           />
           <button
             type="button"
-            class="visibility-toggle"
+            class="absolute inset-y-0 right-3 inline-flex items-center justify-center text-text-muted hover:text-text-primary transition"
             (click)="togglePasswordVisibility()"
             [attr.aria-label]="
               showPassword ? ('auth.login.hidePassword' | translate) : ('auth.login.showPassword' | translate)
@@ -46,7 +56,7 @@
           </button>
         </div>
         <small
-          class="error"
+          class="text-xs text-danger font-medium"
           *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.touched || loginSubmitted)"
         >
           {{
@@ -57,30 +67,50 @@
         </small>
       </label>
 
-      <div class="support">
-        <label class="remember">
-          <input type="checkbox" formControlName="rememberMe" />
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-sm">
+        <label class="inline-flex items-center gap-2 text-text-subtle">
+          <input
+            type="checkbox"
+            formControlName="rememberMe"
+            class="h-4 w-4 rounded border-border-soft bg-surface-alt text-accent focus:ring-2 focus:ring-focus"
+          />
           <span>{{ 'auth.login.remember' | translate }}</span>
         </label>
-        <button class="link-btn" type="button" (click)="onForgotPassword($event)">
+        <button
+          class="font-semibold text-accent hover:text-accent-strong transition self-start sm:self-auto"
+          type="button"
+          (click)="onForgotPassword($event)"
+        >
           {{ 'auth.login.forgot' | translate }}
         </button>
       </div>
 
-      <button class="btn primary w-100" type="submit">{{ 'auth.login.submit' | translate }}</button>
+      <button
+        class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent via-accent-strong to-accent px-4 py-3 text-text-inverse font-semibold shadow-soft hover:-translate-y-0.5 hover:shadow-[0_14px_44px_rgba(var(--shadow-rgb),0.16)] transition focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-2 focus:ring-offset-surface"
+        type="submit"
+      >
+        {{ 'auth.login.submit' | translate }}
+      </button>
     </form>
 
-    <footer class="card-footer">
+    <footer class="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-text-subtle">
       <span>{{ 'auth.login.noAccount' | translate }}</span>
-      <button type="button" class="link-btn" (click)="goToRegister()">
+      <button
+        type="button"
+        class="font-semibold text-accent hover:text-accent-strong transition underline-offset-4 hover:underline"
+        (click)="goToRegister()"
+      >
         {{ 'auth.login.create' | translate }}
       </button>
     </footer>
   </div>
 
-  <button type="button" class="theme-fab" (click)="toggleTheme()">
-    <span class="toggle-icon" [class.dark]="activeTheme === 'dark'">
-      {{ activeTheme === 'dark' ? '🌙' : '☀️' }}
-    </span>
+  <button
+    type="button"
+    class="fixed right-4 bottom-4 sm:right-6 sm:bottom-6 h-12 w-12 rounded-full border border-border-soft bg-surface text-text-primary shadow-soft flex items-center justify-center hover:-translate-y-0.5 transition"
+    (click)="toggleTheme()"
+    [attr.aria-label]="activeTheme === 'dark' ? ('auth.login.switchToLight' | translate) : ('auth.login.switchToDark' | translate)"
+  >
+    <i class="fa-solid" [ngClass]="activeTheme === 'dark' ? 'fa-moon' : 'fa-sun'" aria-hidden="true"></i>
   </button>
 </div>

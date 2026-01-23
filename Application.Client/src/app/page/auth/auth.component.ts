@@ -13,7 +13,6 @@ import { ThemeService } from '../../service/theme/theme.service';
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.component.html',
-  styleUrls: ['./auth.component.scss'],
 })
 export class AuthComponent implements OnInit {
   loginForm!: FormGroup;
