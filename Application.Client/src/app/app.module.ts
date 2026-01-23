@@ -18,6 +18,7 @@ import { ToastContainerComponent } from './shared/notification/toast-container.c
 import { ForgotPasswordComponent } from './page/auth/forgot-password.component';
 import { ResetPasswordComponent } from './page/auth/reset-password.component';
 import { ModalContainerComponent } from './shared/modal/modal-container.component';
+import { NavbarComponent } from './shared/navbar/navbar.component';
 
 export class AppTranslateLoader implements TranslateLoader {
   constructor(private http: HttpClient) {}
@@ -35,6 +36,7 @@ export class AppTranslateLoader implements TranslateLoader {
     ForgotPasswordComponent,
     ResetPasswordComponent,
     ModalContainerComponent,
+    NavbarComponent,
   ],
   imports: [
     BrowserModule,

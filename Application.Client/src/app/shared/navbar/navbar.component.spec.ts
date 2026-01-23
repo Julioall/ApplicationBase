@@ -4,6 +4,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ThemeService } from '../../service/theme/theme.service';
 import { AuthService } from '../../service/auth/auth.service';
+import { UserService } from '../../service/user/user.service';
+import { NotificationApiService } from '../../service/notification/notification-api.service';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { of } from 'rxjs';
 
@@ -12,6 +14,30 @@ class FakeLoader implements TranslateLoader {
     return of({});
   }
 }
+
+const authStub: Partial<AuthService> = {
+  isLoggedIn: () => false,
+  logout: () => {},
+  hasPermission: () => false,
+  hasAnyPermission: () => false,
+};
+
+const userServiceStub: Partial<UserService> = {
+  getCurrentUser: () => of({}),
+};
+
+const notificationApiStub: Partial<NotificationApiService> = {
+  getLatest: () => of({ Items: [], UnreadCount: 0 }),
+  markAsRead: () => of(null),
+  markManyAsRead: () => of(null),
+  delete: () => of(null),
+};
+
+const themeStub: Partial<ThemeService> = {
+  setTheme: () => {},
+  getActiveTheme: () => 'light' as any,
+  toggleTheme: () => 'light' as any,
+};
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
@@ -27,7 +53,12 @@ describe('NavbarComponent', () => {
           loader: { provide: TranslateLoader, useClass: FakeLoader }
         })
       ],
-      providers: [ThemeService, AuthService]
+      providers: [
+        { provide: ThemeService, useValue: themeStub },
+        { provide: AuthService, useValue: authStub },
+        { provide: UserService, useValue: userServiceStub },
+        { provide: NotificationApiService, useValue: notificationApiStub },
+      ]
     }).compileComponents();
   }));
 
