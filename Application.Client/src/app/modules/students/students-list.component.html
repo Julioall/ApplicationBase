@@ -21,114 +21,156 @@
     </div>
 
     <div class="space-y-4">
-      <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-        <div class="flex flex-1 flex-col gap-3">
-          <div class="relative w-full">
-            <i class="fa-solid fa-magnifying-glass pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle" aria-hidden="true"></i>
-            <input
-              id="searchStudents"
-              type="search"
-              class="w-full rounded-lg border-2 border-border-soft bg-gradient-to-br from-surface-alt to-surface px-4 py-3 pl-10 text-base text-text-primary shadow-[inset_0_1px_2px_rgba(var(--shadow-rgb),0.06)] transition placeholder:text-text-muted hover:border-border-strong focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-2 focus:ring-offset-surface"
-              [placeholder]="translate.instant('students.list.searchPlaceholder')"
-              [formControl]="searchControl"
-              [attr.aria-label]="translate.instant('students.list.searchAria')"
-            />
-          </div>
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="relative">
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded-lg border border-border-soft bg-surface px-4 py-2.5 text-sm font-semibold text-text-primary shadow-[0_6px_18px_rgba(var(--shadow-rgb),0.06)] transition hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            (click)="toggleFilterDropdown($event)"
+            [attr.aria-expanded]="showFilterDropdown"
+          >
+            <i class="fa-solid fa-filter" aria-hidden="true"></i>
+            <span>Filtros</span>
+          </button>
 
-          <div class="flex flex-wrap items-center gap-2" [attr.aria-label]="translate.instant('students.list.statusFilter')">
-            <button
-              type="button"
-              class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-2 text-sm font-semibold text-text-primary transition hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-              [ngClass]="{ 'border-primary-strong bg-primary-soft text-primary-strong shadow-md': statusFilter === 'all' }"
-              (click)="setStatusFilter('all')"
-            >
-              <span class="h-2.5 w-2.5 rounded-full bg-primary shadow-[0_0_0_4px_color-mix(in_srgb,_var(--primary)_18%,_transparent)]"></span>
-              <span>{{ 'students.list.statusAll' | translate }}</span>
-            </button>
-            <button
-              type="button"
-              class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-2 text-sm font-semibold text-text-primary transition hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-              [ngClass]="{ 'border-success bg-success/15 text-success shadow-md': statusFilter === 'active' }"
-              (click)="setStatusFilter('active')"
-            >
-              <span class="h-2.5 w-2.5 rounded-full bg-success shadow-[0_0_0_4px_color-mix(in_srgb,_var(--success)_20%,_transparent)]"></span>
-              <span>{{ 'students.list.statusActive' | translate }}</span>
-            </button>
-            <button
-              type="button"
-              class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-2 text-sm font-semibold text-text-primary transition hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-              [ngClass]="{ 'border-warning bg-warning/15 text-warning shadow-md': statusFilter === 'not_currently' }"
-              (click)="setStatusFilter('not_currently')"
-            >
-              <span class="h-2.5 w-2.5 rounded-full bg-warning shadow-[0_0_0_4px_color-mix(in_srgb,_var(--warning)_20%,_transparent)]"></span>
-              <span>{{ 'students.list.statusInactive' | translate }}</span>
-            </button>
-            <button
-              type="button"
-              class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-2 text-sm font-semibold text-text-primary transition hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-              [ngClass]="{ 'border-danger bg-danger/15 text-danger shadow-md': statusFilter === 'suspended' }"
-              (click)="setStatusFilter('suspended')"
-            >
-              <span class="h-2.5 w-2.5 rounded-full bg-danger shadow-[0_0_0_4px_color-mix(in_srgb,_var(--danger)_18%,_transparent)]"></span>
-              <span>{{ 'students.status.suspended' | translate }}</span>
-            </button>
-          </div>
-        </div>
+          <div
+            class="absolute z-20 mt-2 w-[320px] max-w-[90vw] rounded-2xl border border-border-soft bg-surface p-4 shadow-[0_14px_40px_rgba(var(--shadow-rgb),0.16)]"
+            *ngIf="showFilterDropdown"
+            (click)="$event.stopPropagation()"
+          >
+              <div class="space-y-4">
+                <div>
+                <label class="mb-1 block text-sm font-semibold text-text-primary" for="filterSearch">{{ 'students.list.searchPlaceholder' | translate }}</label>
+                <div class="w-full max-w-sm min-w-[200px]">
+                  <div class="relative flex items-center">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-text-subtle" aria-hidden="true"></i>
+                    <input
+                      id="filterSearch"
+                      type="search"
+                      class="w-full bg-transparent text-sm text-text-primary placeholder:text-text-muted border border-border-soft rounded-md pl-10 pr-3 py-2 transition focus:outline-none focus:border-border-strong hover:border-border-strong shadow-sm focus:shadow"
+                      [placeholder]="translate.instant('students.list.searchPlaceholder')"
+                      [formControl]="searchControl"
+                      [attr.aria-label]="translate.instant('students.list.searchAria')"
+                    />
+                  </div>
+                </div>
+              </div>
 
-        <div class="flex flex-wrap items-center justify-end gap-3">
-          <div class="relative" (click)="$event.stopPropagation()">
-            <button
-              type="button"
-              class="inline-flex items-center gap-2 rounded-lg border border-border-soft bg-surface px-4 py-2.5 text-sm font-semibold text-text-primary shadow-[0_6px_18px_rgba(var(--shadow-rgb),0.06)] transition hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-              (click)="toggleColumnMenu($event)"
-            >
-              <i class="fa-solid fa-sliders" aria-hidden="true"></i>
-              <span>{{ 'students.list.columnsFilter' | translate }}</span>
-            </button>
-            <div
-              class="absolute right-0 z-10 mt-2 min-w-56 rounded-xl border border-border-soft bg-surface p-4 shadow-[0_14px_40px_rgba(var(--shadow-rgb),0.16)]"
-              *ngIf="showColumnMenu"
-            >
-              <p class="mb-3 text-sm font-semibold text-text-primary">{{ 'students.list.columnsFilterTitle' | translate }}</p>
-              <label class="flex items-center gap-2 text-sm text-text-primary" *ngFor="let column of columns">
-                <input
-                  type="checkbox"
-                  class="h-4 w-4 rounded border-border-soft text-accent focus:ring-accent"
-                  [checked]="column.visible"
-                  (change)="toggleColumn(column.id, $event)"
-                />
-                <span>{{ column.labelKey | translate }}</span>
-              </label>
+              <div>
+                <p class="mb-2 text-sm font-semibold text-text-primary">{{ 'students.list.statusFilter' | translate }}</p>
+                <div class="relative">
+                  <button
+                    type="button"
+                    class="flex w-full items-center justify-between rounded-lg border border-border-soft bg-surface px-4 py-3 text-sm font-semibold text-text-primary shadow-[0_6px_18px_rgba(var(--shadow-rgb),0.06)] transition hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+                    (click)="toggleStatusDropdown($event)"
+                    [attr.aria-expanded]="statusDropdownOpen"
+                  >
+                    <span class="inline-flex items-center gap-2">
+                      <span class="h-2.5 w-2.5 rounded-full" [ngClass]="getStatusFilterDotClass(statusFilter)"></span>
+                      <span>{{ getStatusFilterLabel(statusFilter) }}</span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down text-text-muted" aria-hidden="true"></i>
+                  </button>
+                  <div
+                    class="absolute left-0 right-0 z-10 mt-2 rounded-xl border border-border-soft bg-surface p-2 shadow-[0_14px_40px_rgba(var(--shadow-rgb),0.16)]"
+                    *ngIf="statusDropdownOpen"
+                  >
+                    <button
+                      type="button"
+                      class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-semibold text-text-primary hover:bg-surface-alt"
+                      *ngFor="let option of statusFilters"
+                      (click)="selectStatus(option.id)"
+                    >
+                      <span class="inline-flex items-center gap-2">
+                        <span class="h-2.5 w-2.5 rounded-full" [ngClass]="option.dotClass"></span>
+                        <span>{{ option.labelKey | translate }}</span>
+                      </span>
+                      <i class="fa-solid fa-check text-accent" *ngIf="statusFilter === option.id" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p class="mb-2 text-sm font-semibold text-text-primary">Último acesso</p>
+                <div class="flex flex-col gap-1">
+                  <button
+                    type="button"
+                    class="flex w-full items-center justify-between rounded-md px-2 py-1 text-sm font-semibold text-text-primary transition hover:bg-surface-alt"
+                    [ngClass]="{ 'text-accent': sortOption === 'lastAccessDesc' }"
+                    (click)="setSort('lastAccessDesc')"
+                  >
+                    <span>Mais recente</span>
+                    <i class="fa-solid fa-check" *ngIf="sortOption === 'lastAccessDesc'" aria-hidden="true"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="flex w-full items-center justify-between rounded-md px-2 py-1 text-sm font-semibold text-text-primary transition hover:bg-surface-alt"
+                    [ngClass]="{ 'text-accent': sortOption === 'lastAccessAsc' }"
+                    (click)="setSort('lastAccessAsc')"
+                  >
+                    <span>Mais antigo</span>
+                    <i class="fa-solid fa-check" *ngIf="sortOption === 'lastAccessAsc'" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <p class="mb-2 text-sm font-semibold text-text-primary">Nome</p>
+                <div class="flex flex-col gap-1">
+                  <button
+                    type="button"
+                    class="flex w-full items-center justify-between rounded-md px-2 py-1 text-sm font-semibold text-text-primary transition hover:bg-surface-alt"
+                    [ngClass]="{ 'text-accent': sortOption === 'nameAsc' }"
+                    (click)="setSort('nameAsc')"
+                  >
+                    <span>Ordem crescente</span>
+                    <i class="fa-solid fa-check" *ngIf="sortOption === 'nameAsc'" aria-hidden="true"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="flex w-full items-center justify-between rounded-md px-2 py-1 text-sm font-semibold text-text-primary transition hover:bg-surface-alt"
+                    [ngClass]="{ 'text-accent': sortOption === 'nameDesc' }"
+                    (click)="setSort('nameDesc')"
+                  >
+                    <span>Ordem decrescente</span>
+                    <i class="fa-solid fa-check" *ngIf="sortOption === 'nameDesc'" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <p class="mb-2 text-sm font-semibold text-text-primary">Colunas</p>
+                <div class="grid gap-1">
+                  <label
+                    class="flex items-center gap-2 rounded-md px-2 py-1 text-sm font-semibold text-text-primary hover:bg-surface-alt"
+                    *ngFor="let column of columns"
+                  >
+                    <input
+                      type="checkbox"
+                      class="h-4 w-4 rounded border-border-soft text-accent focus:ring-accent"
+                      [checked]="column.visible"
+                      (change)="toggleColumn(column.id, $event)"
+                    />
+                    <span>{{ column.labelKey }}</span>
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
-
-          <ng-container *ngIf="canManageStudents">
-            <input #importInput type="file" accept=".xlsx,.json" hidden (change)="onImport($event)" />
-            <button
-              type="button"
-              class="inline-flex items-center gap-2 rounded-lg border border-border-soft bg-surface px-4 py-2.5 text-sm font-semibold text-text-primary shadow-[0_6px_18px_rgba(var(--shadow-rgb),0.06)] transition hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60"
-              (click)="importInput.click()"
-              [disabled]="loading || importing"
-            >
-              <i class="fa-solid fa-file-import" aria-hidden="true"></i>
-              <span>{{ 'students.list.import' | translate }}</span>
-            </button>
-            <button
-              type="button"
-              class="inline-flex items-center gap-2 rounded-lg border border-border-soft bg-surface px-4 py-2.5 text-sm font-semibold text-text-primary shadow-[0_6px_18px_rgba(var(--shadow-rgb),0.06)] transition hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60"
-              (click)="onExport()"
-              [disabled]="loading || exporting"
-            >
-              <i class="fa-solid fa-file-export" aria-hidden="true"></i>
-              <span>{{ 'students.list.export' | translate }}</span>
-            </button>
-          </ng-container>
         </div>
-      </div>
 
-      <p class="text-sm text-text-subtle" *ngIf="canManageStudents">
-        {{ 'students.list.importHint' | translate }}
-      </p>
+        <button
+          *ngIf="canManageStudents"
+          type="button"
+          class="inline-flex items-center gap-2 rounded-lg border border-border-soft bg-surface px-4 py-2.5 text-sm font-semibold text-text-primary shadow-[0_6px_18px_rgba(var(--shadow-rgb),0.06)] transition hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60"
+          (click)="onExport()"
+          [disabled]="loading || exporting"
+        >
+          <i class="fa-solid fa-file-export" aria-hidden="true"></i>
+          <span>Exportar</span>
+        </button>
+      </div>
 
       <div
         class="rounded-lg border border-dashed border-border-soft bg-surface-alt/70 px-4 py-4 text-center text-sm text-text-subtle"
@@ -143,120 +185,89 @@
         {{ 'students.list.empty' | translate }}
       </div>
 
-      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" *ngIf="!loading && students.length">
-        <article
-          class="group relative flex cursor-pointer flex-col gap-3 rounded-xl border border-border-soft bg-surface p-5 shadow-soft transition hover:-translate-y-0.5 hover:border-accent-strong hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-          *ngFor="let student of students; trackBy: trackByStudent"
-          (click)="openSidePanel(student)"
-        >
-          <header class="flex items-center justify-between gap-3">
-            <div
-              class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-1.5 text-xs font-semibold text-text-primary"
-              [ngClass]="{
-                'border-success/60 bg-success/15 text-success': getStatusClass(student).includes('active'),
-                'border-warning/60 bg-warning/15 text-warning': getStatusClass(student).includes('inactive'),
-                'border-danger/60 bg-danger/15 text-danger': getStatusClass(student).includes('suspended')
-              }"
+      <div class="overflow-auto rounded-xl border border-border-soft bg-surface-alt/40 shadow-soft" *ngIf="!loading && students.length">
+        <table class="min-w-full text-sm text-text-primary">
+          <thead class="bg-surface text-left text-xs font-semibold uppercase tracking-[0.08em] text-text-subtle">
+            <tr>
+              <th class="px-4 py-3" *ngIf="isColumnVisible('name')">Nome</th>
+              <th class="px-4 py-3" *ngIf="isColumnVisible('email')">Email</th>
+              <th class="px-4 py-3" *ngIf="isColumnVisible('idNumber')">CPF</th>
+              <th class="px-4 py-3" *ngIf="isColumnVisible('phone')">Telefone</th>
+              <th class="px-4 py-3">Último acesso</th>
+              <th class="px-4 py-3">Status</th>
+              <th class="px-4 py-3 text-right" *ngIf="canManageStudents">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              class="border-t border-border-soft bg-surface transition hover:bg-surface-alt/60 cursor-pointer"
+              *ngFor="let student of students; trackBy: trackByStudent"
+              (click)="openSidePanel(student)"
             >
-              <span
-                class="h-2.5 w-2.5 rounded-full"
-                [ngClass]="{
-                  'bg-success shadow-[0_0_0_4px_color-mix(in_srgb,_var(--success)_18%,_transparent)]': getStatusClass(student).includes('active'),
-                  'bg-warning shadow-[0_0_0_4px_color-mix(in_srgb,_var(--warning)_18%,_transparent)]': getStatusClass(student).includes('inactive'),
-                  'bg-danger shadow-[0_0_0_4px_color-mix(in_srgb,_var(--danger)_16%,_transparent)]': getStatusClass(student).includes('suspended'),
-                  'bg-primary shadow-[0_0_0_4px_color-mix(in_srgb,_var(--primary)_18%,_transparent)]': true
-                }"
-              ></span>
-              <span>{{ getStatusLabel(student) }}</span>
-            </div>
-            <div class="flex items-center gap-2" *ngIf="canManageStudents">
-              <button
-                type="button"
-                class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border-soft bg-surface-alt text-text-muted transition hover:-translate-y-0.5 hover:border-border-strong hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-                (click)="onEdit(student); $event.stopPropagation()"
-              >
-                <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
-              </button>
-              <button
-                type="button"
-                class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border-soft bg-surface-alt text-text-muted transition hover:-translate-y-0.5 hover:border-danger hover:text-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-                (click)="onDelete(student); $event.stopPropagation()"
-              >
-                <i class="fa-solid fa-trash" aria-hidden="true"></i>
-              </button>
-            </div>
-          </header>
-
-          <div class="flex flex-col gap-2">
-            <div class="flex flex-wrap items-center justify-between gap-3">
-              <h3 class="text-lg font-semibold text-text-primary">{{ student.FirstName }} {{ student.LastName }}</h3>
-              <span
-                class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-1 text-xs font-semibold text-text-primary"
-                *ngIf="student.IdNumber"
-              >
-                <span class="h-2 w-2 rounded-full bg-primary"></span>
-                <span>{{ student.IdNumber }}</span>
-              </span>
-            </div>
-            <p class="text-sm text-text-subtle">
-              {{ student.Institution || ('students.list.noInstitution' | translate) }}
-            </p>
-            <div class="flex flex-wrap gap-2 text-sm">
-              <span
-                class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-1 text-text-primary"
-                *ngIf="isColumnVisible('email')"
-              >
-                <i class="fa-regular fa-envelope text-text-muted"></i>
-                {{ student.Email || '-' }}
-              </span>
-              <span
-                class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-1 text-text-primary"
-                *ngIf="isColumnVisible('phone')"
-              >
-                <i class="fa-solid fa-phone text-text-muted"></i>
-                {{ student.Phone || '-' }}
-              </span>
-              <span
-                class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-1 text-text-primary"
-                *ngIf="isColumnVisible('lastAccess')"
-              >
-                <i class="fa-regular fa-clock text-text-muted"></i>
-                {{ student.LastAccessAt ? (student.LastAccessAt | date:'short') : '-' }}
-              </span>
-            </div>
-          </div>
-
-          <footer class="mt-auto flex items-center justify-between gap-3">
-            <div
-              class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-1.5 text-xs font-semibold text-text-primary"
-              *ngIf="isColumnVisible('status')"
-              [ngClass]="{
-                'border-success/60 bg-success/15 text-success': getStatusClass(student).includes('active'),
-                'border-warning/60 bg-warning/15 text-warning': getStatusClass(student).includes('inactive'),
-                'border-danger/60 bg-danger/15 text-danger': getStatusClass(student).includes('suspended')
-              }"
-            >
-              <span
-                class="h-2.5 w-2.5 rounded-full"
-                [ngClass]="{
-                  'bg-success shadow-[0_0_0_4px_color-mix(in_srgb,_var(--success)_18%,_transparent)]': getStatusClass(student).includes('active'),
-                  'bg-warning shadow-[0_0_0_4px_color-mix(in_srgb,_var(--warning)_18%,_transparent)]': getStatusClass(student).includes('inactive'),
-                  'bg-danger shadow-[0_0_0_4px_color-mix(in_srgb,_var(--danger)_16%,_transparent)]': getStatusClass(student).includes('suspended'),
-                  'bg-primary shadow-[0_0_0_4px_color-mix(in_srgb,_var(--primary)_18%,_transparent)]': true
-                }"
-              ></span>
-              <span>{{ getStatusLabel(student) }}</span>
-            </div>
-            <button
-              type="button"
-              class="inline-flex items-center gap-2 text-sm font-semibold text-accent transition hover:text-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-              (click)="openSidePanel(student); $event.stopPropagation()"
-            >
-              {{ 'students.list.edit' | translate }}
-              <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i>
-            </button>
-          </footer>
-        </article>
+              <td class="px-4 py-3 align-top" *ngIf="isColumnVisible('name')">
+                <div class="flex flex-col gap-1">
+                  <span class="text-base font-semibold text-text-primary">{{ student.FirstName }} {{ student.LastName }}</span>
+                  <span class="text-sm text-text-subtle">{{ student.Institution || ('students.list.noInstitution' | translate) }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-3 align-top" *ngIf="isColumnVisible('email')">
+                <span class="text-text-primary">{{ student.Email || '-' }}</span>
+              </td>
+              <td class="px-4 py-3 align-top" *ngIf="isColumnVisible('idNumber')">
+                <span class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-1 text-xs font-semibold text-text-primary" *ngIf="student.IdNumber">
+                  <span class="h-2 w-2 rounded-full bg-primary"></span>
+                  <span>{{ student.IdNumber }}</span>
+                </span>
+                <span *ngIf="!student.IdNumber" class="text-text-subtle">-</span>
+              </td>
+              <td class="px-4 py-3 align-top" *ngIf="isColumnVisible('phone')">
+                <span class="text-text-primary">{{ student.Phone || '-' }}</span>
+              </td>
+              <td class="px-4 py-3 align-top">
+                <span class="text-text-primary">{{ student.LastAccessAt ? (student.LastAccessAt | date:'short') : '-' }}</span>
+              </td>
+              <td class="px-4 py-3 align-top">
+                <span
+                  class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-1 text-xs font-semibold text-text-primary"
+                  [ngClass]="{
+                    'border-success/60 bg-success/15 text-success': getStatusClass(student).includes('active'),
+                    'border-warning/60 bg-warning/15 text-warning': getStatusClass(student).includes('inactive'),
+                    'border-danger/60 bg-danger/15 text-danger': getStatusClass(student).includes('suspended')
+                  }"
+                >
+                  <span
+                    class="h-2.5 w-2.5 rounded-full"
+                    [ngClass]="{
+                      'bg-success shadow-[0_0_0_4px_color-mix(in_srgb,_var(--success)_18%,_transparent)]': getStatusClass(student).includes('active'),
+                      'bg-warning shadow-[0_0_0_4px_color-mix(in_srgb,_var(--warning)_18%,_transparent)]': getStatusClass(student).includes('inactive'),
+                      'bg-danger shadow-[0_0_0_4px_color-mix(in_srgb,_var(--danger)_16%,_transparent)]': getStatusClass(student).includes('suspended'),
+                      'bg-primary shadow-[0_0_0_4px_color-mix(in_srgb,_var(--primary)_18%,_transparent)]': true
+                    }"
+                  ></span>
+                  <span>{{ getStatusLabel(student) }}</span>
+                </span>
+              </td>
+              <td class="px-4 py-3 text-right align-top" *ngIf="canManageStudents">
+                <div class="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border-soft bg-surface-alt text-text-muted transition hover:-translate-y-0.5 hover:border-border-strong hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+                    (click)="onEdit(student); $event.stopPropagation()"
+                  >
+                    <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border-soft bg-surface-alt text-text-muted transition hover:-translate-y-0.5 hover:border-danger hover:text-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+                    (click)="onDelete(student); $event.stopPropagation()"
+                  >
+                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <footer class="flex items-center justify-end gap-3" *ngIf="!loading && students.length">

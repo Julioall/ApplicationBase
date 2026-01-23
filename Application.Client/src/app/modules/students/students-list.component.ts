@@ -9,12 +9,12 @@ import { StudentsService } from '../../service/students/students.service';
 import { NotificationService } from '../../service/notification/notification.service';
 import { AuthService } from '../../service/auth/auth.service';
 import { MANAGE_STUDENTS_PERMISSION } from '../../model/permissions';
-import { StudentImportResult } from '../../model/student-import-result';
 import { ModalService } from '../../shared/modal/modal.service';
 import { LocalStorageService } from '../../shared/storage/local-storage.service';
 
 type StatusFilter = 'all' | 'active' | 'suspended' | 'not_currently';
 type ColumnKey = 'name' | 'email' | 'idNumber' | 'phone' | 'lastAccess' | 'status';
+type SortOption = 'lastAccessDesc' | 'lastAccessAsc' | 'nameAsc' | 'nameDesc';
 
 interface ColumnConfig {
   id: ColumnKey;
@@ -34,19 +34,24 @@ export class StudentsListComponent implements OnInit, OnDestroy {
   pageNumber = 1;
   pageSize = 10;
   loading = false;
-  importing = false;
   exporting = false;
   statusFilter: StatusFilter = 'all';
   searchControl = new FormControl('');
-  showColumnMenu = false;
+  showFilterDropdown = false;
+  statusDropdownOpen = false;
+  sortOption: SortOption = 'lastAccessDesc';
   selectedStudent: Student | null = null;
+  statusFilters: { id: StatusFilter; labelKey: string; dotClass: string }[] = [
+    { id: 'all', labelKey: 'students.list.statusAll', dotClass: 'bg-primary shadow-[0_0_0_4px_color-mix(in_srgb,_var(--primary)_18%,_transparent)]' },
+    { id: 'active', labelKey: 'students.list.statusActive', dotClass: 'bg-success shadow-[0_0_0_4px_color-mix(in_srgb,_var(--success)_18%,_transparent)]' },
+    { id: 'not_currently', labelKey: 'students.list.statusInactive', dotClass: 'bg-warning shadow-[0_0_0_4px_color-mix(in_srgb,_var(--warning)_18%,_transparent)]' },
+    { id: 'suspended', labelKey: 'students.status.suspended', dotClass: 'bg-danger shadow-[0_0_0_4px_color-mix(in_srgb,_var(--danger)_16%,_transparent)]' },
+  ];
   columns: ColumnConfig[] = [
-    { id: 'name', labelKey: 'students.list.columns.name', width: '1fr', visible: true },
-    { id: 'email', labelKey: 'students.list.columns.email', width: '1fr', visible: true },
-    { id: 'idNumber', labelKey: 'students.list.columns.idNumber', width: '1fr', visible: true },
-    { id: 'phone', labelKey: 'students.list.columns.phone', width: '1fr', visible: true },
-    { id: 'lastAccess', labelKey: 'students.list.columns.lastAccess', width: '1fr', visible: true },
-    { id: 'status', labelKey: 'students.list.columns.status', width: '1fr', visible: true },
+    { id: 'name', labelKey: 'Nome', width: '1fr', visible: true },
+    { id: 'email', labelKey: 'Email', width: '1fr', visible: false },
+    { id: 'idNumber', labelKey: 'CPF', width: '1fr', visible: false },
+    { id: 'phone', labelKey: 'Telefone', width: '1fr', visible: false },
   ];
   private searchSub?: Subscription;
 
@@ -88,7 +93,7 @@ export class StudentsListComponent implements OnInit, OnDestroy {
     }).subscribe({
       next: (result) => {
         const items = result.Items || [];
-        this.students = this.filterByStatus(items);
+        this.students = this.applySort(this.filterByStatus(items));
         this.total = (this.statusFilter === 'suspended' || this.statusFilter === 'not_currently')
           ? this.students.length
           : result.Total;
@@ -162,31 +167,6 @@ export class StudentsListComponent implements OnInit, OnDestroy {
     this.loadStudents();
   }
 
-  onImport(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) {
-      return;
-    }
-
-    this.importing = true;
-    this.studentsService.importStudents(file)
-      .pipe(finalize(() => {
-        this.importing = false;
-        input.value = '';
-      }))
-      .subscribe({
-        next: (result) => {
-          this.handleImportResult(result);
-          this.loadStudents();
-        },
-        error: (err) => {
-          const detail = this.resolveErrorDetail(err, 'students.list.importError');
-          this.notificationService.showError(detail, this.translate.instant('students.common.error'));
-        }
-      });
-  }
-
   onExport(): void {
     this.exporting = true;
     this.studentsService.exportStudents()
@@ -216,9 +196,31 @@ export class StudentsListComponent implements OnInit, OnDestroy {
     return this.columns.filter(column => column.visible);
   }
 
-  toggleColumnMenu(event: Event): void {
+  getStatusFilterLabel(filter: StatusFilter): string {
+    const key = this.statusFilters.find(f => f.id === filter)?.labelKey;
+    return key ? this.translate.instant(key) : filter;
+  }
+
+  getStatusFilterDotClass(filter: StatusFilter): string {
+    return this.statusFilters.find(f => f.id === filter)?.dotClass || 'bg-primary';
+  }
+
+  toggleFilterDropdown(event?: Event): void {
+    event?.stopPropagation();
+    this.showFilterDropdown = !this.showFilterDropdown;
+    if (!this.showFilterDropdown) {
+      this.statusDropdownOpen = false;
+    }
+  }
+
+  toggleStatusDropdown(event: Event): void {
     event.stopPropagation();
-    this.showColumnMenu = !this.showColumnMenu;
+    this.statusDropdownOpen = !this.statusDropdownOpen;
+  }
+
+  selectStatus(filter: StatusFilter): void {
+    this.setStatusFilter(filter);
+    this.statusDropdownOpen = false;
   }
 
   toggleColumn(columnId: ColumnKey, event?: Event): void {
@@ -252,6 +254,11 @@ export class StudentsListComponent implements OnInit, OnDestroy {
     this.loadStudents();
   }
 
+  setSort(option: SortOption): void {
+    this.sortOption = option;
+    this.students = this.applySort([...this.students]);
+  }
+
   openSidePanel(student: Student): void {
     this.selectedStudent = student;
   }
@@ -261,6 +268,9 @@ export class StudentsListComponent implements OnInit, OnDestroy {
   }
 
   isColumnVisible(columnId: ColumnKey): boolean {
+    if (columnId === 'lastAccess' || columnId === 'status') {
+      return true;
+    }
     return this.visibleColumns.some(column => column.id === columnId);
   }
 
@@ -285,27 +295,6 @@ export class StudentsListComponent implements OnInit, OnDestroy {
       return 'inactive';
     }
     return 'active';
-  }
-
-  private handleImportResult(result: StudentImportResult): void {
-    const created = result?.Created ?? 0;
-    const updated = result?.Updated ?? 0;
-    this.notificationService.showSuccess(
-      this.translate.instant('students.list.importSuccess', { created, updated }),
-      this.translate.instant('students.list.importTitle')
-    );
-
-    const errors = result?.Errors || [];
-    if (errors.length > 0) {
-      const preview = errors.slice(0, 3)
-        .map(error => this.translate.instant('students.list.importErrorRow', { row: error.Row, message: error.Message }))
-        .join(' | ');
-
-      this.notificationService.showWarning(
-        preview,
-        this.translate.instant('students.list.importWarning', { count: errors.length })
-      );
-    }
   }
 
   private resolveErrorDetail(err: any, fallbackKey: string): string {
@@ -334,7 +323,31 @@ export class StudentsListComponent implements OnInit, OnDestroy {
 
   @HostListener('document:click')
   onDocumentClick(): void {
-    this.showColumnMenu = false;
+    this.showFilterDropdown = false;
+    this.statusDropdownOpen = false;
+  }
+
+  private applySort(items: Student[]): Student[] {
+    if (this.sortOption === 'nameAsc' || this.sortOption === 'nameDesc') {
+      return [...items].sort((a, b) => {
+        const nameA = `${a.FirstName || ''} ${a.LastName || ''}`.trim().toLocaleLowerCase();
+        const nameB = `${b.FirstName || ''} ${b.LastName || ''}`.trim().toLocaleLowerCase();
+        const result = nameA.localeCompare(nameB);
+        return this.sortOption === 'nameAsc' ? result : -result;
+      });
+    }
+
+    // default: order by last access desc/asc, fallback to name asc
+    return [...items].sort((a, b) => {
+      const aDate = a.LastAccessAt ? new Date(a.LastAccessAt).getTime() : 0;
+      const bDate = b.LastAccessAt ? new Date(b.LastAccessAt).getTime() : 0;
+      if (aDate !== bDate) {
+        return this.sortOption === 'lastAccessAsc' ? aDate - bDate : bDate - aDate;
+      }
+      const nameA = `${a.FirstName || ''} ${a.LastName || ''}`.trim().toLocaleLowerCase();
+      const nameB = `${b.FirstName || ''} ${b.LastName || ''}`.trim().toLocaleLowerCase();
+      return nameA.localeCompare(nameB);
+    });
   }
 
   private loadColumnPreferences(): void {
