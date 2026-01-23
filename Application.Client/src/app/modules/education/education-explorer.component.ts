@@ -14,8 +14,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-education-explorer',
-  templateUrl: './education-explorer.component.html',
-  styleUrls: ['./education-explorer.component.scss']
+  templateUrl: './education-explorer.component.html'
 })
 export class EducationExplorerComponent implements OnInit, OnDestroy {
   form: FormGroup;

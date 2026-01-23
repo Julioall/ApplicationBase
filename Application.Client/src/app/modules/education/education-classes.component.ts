@@ -10,8 +10,7 @@ import { NotificationService } from '../../service/notification/notification.ser
 
 @Component({
   selector: 'app-education-classes',
-  templateUrl: './education-classes.component.html',
-  styleUrls: ['./education-classes.component.scss']
+  templateUrl: './education-classes.component.html'
 })
 export class EducationClassesComponent implements OnInit, OnDestroy {
   ucs: EducationUc[] = [];

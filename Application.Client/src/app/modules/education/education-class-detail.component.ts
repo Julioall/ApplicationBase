@@ -12,8 +12,7 @@ import { StudentsService } from '../../service/students/students.service';
 
 @Component({
   selector: 'app-education-class-detail',
-  templateUrl: './education-class-detail.component.html',
-  styleUrls: ['./education-class-detail.component.scss']
+  templateUrl: './education-class-detail.component.html'
 })
 export class EducationClassDetailComponent implements OnInit, OnDestroy {
   classId = '';

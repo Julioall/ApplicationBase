@@ -1,21 +1,21 @@
-<section class="education-page user-settings">
-  <article class="card settings-shell">
-    <div class="card-lead">
-      <div class="header-copy">
-        <p class="eyebrow">{{ 'education.header.eyebrow' | translate }}</p>
-        <h1>{{ 'education.header.title' | translate }}</h1>
-        <p class="subtitle">{{ 'education.header.subtitle' | translate }}</p>
+<section class="w-full px-2 sm:px-4">
+  <article class="mx-auto max-w-6xl space-y-6 rounded-2xl border border-border-soft bg-surface p-6 shadow-soft lg:p-8">
+    <div class="flex flex-col gap-4 rounded-xl bg-gradient-to-br from-surface-alt to-surface px-6 py-5 shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.05)]">
+      <p class="text-xs font-semibold uppercase tracking-[0.28em] text-text-subtle">{{ 'education.header.eyebrow' | translate }}</p>
+      <div class="space-y-2">
+        <h1 class="text-3xl font-semibold text-text-primary">{{ 'education.header.title' | translate }}</h1>
+        <p class="text-base text-text-subtle">{{ 'education.header.subtitle' | translate }}</p>
       </div>
     </div>
 
-    <div class="settings-body">
-      <div class="filters-row">
-        <div class="filters inline">
-          <div class="filter">
-            <label for="schoolSelect">{{ 'education.filters.school' | translate }}</label>
+    <div class="flex flex-col gap-5">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div class="grid w-full gap-4 md:grid-cols-2 lg:max-w-4xl">
+          <label class="flex flex-col gap-2 text-sm font-semibold text-text-primary">
+            <span>{{ 'education.filters.school' | translate }}</span>
             <select
               id="schoolSelect"
-              class="w-full min-h-control appearance-none rounded-md border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--primary)_22%,_transparent)]"
+              class="w-full min-h-[var(--control-height)] appearance-none rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition hover:border-border-strong focus:border-primary focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--primary)_22%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60"
               [formControl]="schoolControl"
               (change)="onSchoolChange()"
               [disabled]="loadingSchools || loadingPrograms"
@@ -24,13 +24,13 @@
               <option [ngValue]="''">{{ 'education.filters.selectPlaceholder' | translate }}</option>
               <option *ngFor="let school of schools" [ngValue]="school.Id">{{ school.Name }}</option>
             </select>
-          </div>
+          </label>
 
-          <div class="filter">
-            <label for="programSelect">{{ 'education.filters.program' | translate }}</label>
+          <label class="flex flex-col gap-2 text-sm font-semibold text-text-primary">
+            <span>{{ 'education.filters.program' | translate }}</span>
             <select
               id="programSelect"
-              class="w-full min-h-control appearance-none rounded-md border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--primary)_22%,_transparent)]"
+              class="w-full min-h-[var(--control-height)] appearance-none rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition hover:border-border-strong focus:border-primary focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--primary)_22%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60"
               [formControl]="programControl"
               (change)="onProgramChange()"
               [disabled]="!form.get('schoolId')?.value || loadingPrograms || loadingClasses"
@@ -39,58 +39,59 @@
               <option [ngValue]="''">{{ 'education.filters.selectPlaceholder' | translate }}</option>
               <option *ngFor="let program of programs" [ngValue]="program.Id">{{ program.Name }}</option>
             </select>
-          </div>
+          </label>
         </div>
 
-        <div class="filters-right">
-          <div class="field search-field no-label">
-            <div class="input-icon">
-              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-              <input
-                id="ucSearch"
-                type="search"
-                [formControl]="searchControl"
-                [placeholder]="'education.filters.searchPlaceholder' | translate"
-                [attr.aria-label]="('education.filters.search' | translate)"
-              />
-            </div>
+        <div class="flex w-full flex-col gap-3 sm:flex-row sm:items-end sm:justify-end lg:w-auto">
+          <div class="relative w-full sm:w-72">
+            <i class="fa-solid fa-magnifying-glass pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle" aria-hidden="true"></i>
+            <input
+              id="ucSearch"
+              type="search"
+              class="w-full rounded-lg border-2 border-border-soft bg-gradient-to-br from-surface-alt to-surface px-4 py-3 pl-10 text-base text-text-primary shadow-[inset_0_1px_2px_rgba(var(--shadow-rgb),0.06)] transition placeholder:text-text-muted hover:border-border-strong focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-2 focus:ring-offset-surface"
+              [formControl]="searchControl"
+              [placeholder]="'education.filters.searchPlaceholder' | translate"
+              [attr.aria-label]="('education.filters.search' | translate)"
+            />
           </div>
 
-          <div class="header-actions">
-            <label class="btn primary" *ngIf="canImport">
-              <i class="fa-solid fa-file-import"></i>
-              <span>{{ 'education.actions.import' | translate }}</span>
-              <input
-                type="file"
-                accept=".json,application/json"
-                (change)="onImportCourses($event)"
-                [disabled]="importing"
-                [attr.aria-label]="('education.actions.import' | translate)"
-              />
-            </label>
-          </div>
+          <label
+            class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-accent-strong to-accent px-4 py-3 text-sm font-semibold text-text-inverse shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent sm:w-auto"
+            *ngIf="canImport"
+          >
+            <i class="fa-solid fa-file-import"></i>
+            <span>{{ 'education.actions.import' | translate }}</span>
+            <input
+              class="sr-only"
+              type="file"
+              accept=".json,application/json"
+              (change)="onImportCourses($event)"
+              [disabled]="importing"
+              [attr.aria-label]="('education.actions.import' | translate)"
+            />
+          </label>
         </div>
       </div>
 
-      <div class="summary" *ngIf="hasResults">
-        <div class="chip" *ngIf="selectedSchoolName !== '-'">
-          <i class="fa-solid fa-building-columns"></i>
-          <span>{{ 'education.labels.school' | translate }}:</span>
-          <strong>{{ selectedSchoolName }}</strong>
+      <div class="flex flex-wrap items-center gap-2" *ngIf="hasResults">
+        <div class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-raised px-3 py-1 text-sm text-text-primary" *ngIf="selectedSchoolName !== '-'">
+          <i class="fa-solid fa-building-columns text-accent" aria-hidden="true"></i>
+          <span class="font-semibold">{{ 'education.labels.school' | translate }}:</span>
+          <span>{{ selectedSchoolName }}</span>
         </div>
-        <div class="chip" *ngIf="selectedProgramName !== '-'">
-          <i class="fa-solid fa-layer-group"></i>
-          <span>{{ 'education.labels.program' | translate }}:</span>
-          <strong>{{ selectedProgramName }}</strong>
+        <div class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-raised px-3 py-1 text-sm text-text-primary" *ngIf="selectedProgramName !== '-'">
+          <i class="fa-solid fa-layer-group text-accent" aria-hidden="true"></i>
+          <span class="font-semibold">{{ 'education.labels.program' | translate }}:</span>
+          <span>{{ selectedProgramName }}</span>
         </div>
       </div>
 
-      <section class="class-cards" *ngIf="hasResults; else emptyState">
-        <p class="muted no-results" *ngIf="filteredClasses.length === 0">
+      <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" *ngIf="hasResults; else emptyState">
+        <p class="col-span-full rounded-lg border border-dashed border-border-soft bg-surface-alt px-3 py-2 text-sm text-text-muted" *ngIf="filteredClasses.length === 0">
           {{ 'education.empty.title' | translate }}
         </p>
         <article
-          class="class-card"
+          class="group relative isolate flex cursor-pointer flex-col gap-4 overflow-hidden rounded-xl border border-accent-soft bg-gradient-to-br from-surface-alt via-surface to-accent-soft/20 p-4 shadow-soft transition hover:-translate-y-0.5 hover:border-accent-strong hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           *ngFor="let classItem of filteredClasses"
           (click)="openClass(classItem)"
           (keydown.enter)="openClass(classItem)"
@@ -99,25 +100,28 @@
           role="button"
           [attr.aria-label]="('education.classes.open' | translate) + ' ' + classItem.Name"
         >
-          <div class="class-meta">
-            <h3 class="class-title">{{ classItem.Name }}</h3>
-            <p class="class-school">{{ selectedSchoolName }}</p>
+          <div class="pointer-events-none absolute -right-8 top-2 h-28 w-28 rounded-full bg-accent/15 blur-3xl" aria-hidden="true"></div>
+
+          <div class="space-y-1">
+            <h3 class="text-lg font-semibold text-text-primary">{{ classItem.Name }}</h3>
+            <p class="text-sm text-text-subtle">{{ selectedSchoolName }}</p>
           </div>
 
-          <div class="class-footer">
-            <div class="class-period">
-              <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
-              <span>{{ formatClassPeriod(classItem) }}</span>
-            </div>
+          <div class="flex items-center gap-2 text-sm font-semibold text-text-primary">
+            <i class="fa-regular fa-calendar-days text-accent" aria-hidden="true"></i>
+            <span>{{ formatClassPeriod(classItem) }}</span>
           </div>
         </article>
       </section>
 
       <ng-template #emptyState>
-        <div class="empty" *ngIf="!loadingClasses">
-          <i class="fa-regular fa-folder-open"></i>
-          <p>{{ 'education.empty.title' | translate }}</p>
-          <p class="muted">{{ 'education.empty.subtitle' | translate }}</p>
+        <div
+          class="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border-soft bg-surface-alt/70 px-6 py-12 text-center text-text-subtle"
+          *ngIf="!loadingClasses"
+        >
+          <i class="fa-regular fa-folder-open text-3xl" aria-hidden="true"></i>
+          <p class="text-base font-semibold text-text-primary">{{ 'education.empty.title' | translate }}</p>
+          <p class="text-sm text-text-muted">{{ 'education.empty.subtitle' | translate }}</p>
         </div>
       </ng-template>
     </div>

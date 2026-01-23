@@ -1,101 +1,113 @@
-<section class="education-page class-detail">
-  <div class="top-actions">
-    <button type="button" class="back-link" (click)="goBack()">
-      <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
-      <span>{{ 'education.classDetail.back' | translate }}</span>
-    </button>
-  </div>
-
-  <article class="card settings-shell">
-    <div class="card-lead">
-      <div class="header-copy">
-        <h1>
-          {{ isUcDetail ? (selectedUc?.Fullname || ('education.ucDetail.title' | translate)) : (className || ('education.classDetail.title' | translate)) }}
-        </h1>
-        <p class="subtitle">
-          {{ isUcDetail ? ('education.ucDetail.subtitle' | translate) : ('education.classDetail.subtitle' | translate) }}
-        </p>
-      </div>
-      <div class="header-actions" *ngIf="isUcDetail">
-        <label class="btn primary">
-          <i class="fa-solid fa-file-import"></i>
-          <span>{{ 'education.ucDetail.import' | translate }}</span>
-          <input
-            type="file"
-            accept=".json,application/json"
-            (change)="onImportParticipants($event)"
-            [disabled]="importingParticipants"
-            [attr.aria-label]="('education.ucDetail.import' | translate)"
-          />
-        </label>
-      </div>
+<section class="w-full px-2 sm:px-4">
+  <div class="mx-auto max-w-6xl space-y-4">
+    <div class="flex items-center justify-start">
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 text-sm font-semibold text-text-subtle transition hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+        (click)="goBack()"
+      >
+        <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+        <span>{{ 'education.classDetail.back' | translate }}</span>
+      </button>
     </div>
 
-    <div class="settings-body">
-      <div class="summary">
-        <div class="chip" *ngIf="displaySchoolName">
-          <i class="fa-solid fa-building-columns"></i>
-          <span>{{ 'education.labels.school' | translate }}:</span>
-          <strong>{{ displaySchoolName }}</strong>
+    <article class="space-y-6 rounded-2xl border border-border-soft bg-surface p-6 shadow-soft lg:p-8">
+      <div class="flex flex-col gap-4 rounded-xl bg-gradient-to-br from-surface-alt to-surface px-6 py-5 shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.05)] lg:flex-row lg:items-center lg:justify-between">
+        <div class="space-y-2">
+          <h1 class="text-3xl font-semibold text-text-primary">
+            {{ isUcDetail ? (selectedUc?.Fullname || ('education.ucDetail.title' | translate)) : (className || ('education.classDetail.title' | translate)) }}
+          </h1>
+          <p class="text-base text-text-subtle">
+            {{ isUcDetail ? ('education.ucDetail.subtitle' | translate) : ('education.classDetail.subtitle' | translate) }}
+          </p>
         </div>
-        <div class="chip" *ngIf="displayProgramName">
-          <i class="fa-solid fa-layer-group"></i>
-          <span>{{ 'education.labels.program' | translate }}:</span>
-          <strong>{{ displayProgramName }}</strong>
+        <div *ngIf="isUcDetail" class="flex justify-end">
+          <label
+            class="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-accent-strong to-accent px-4 py-3 text-sm font-semibold text-text-inverse shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent"
+          >
+            <i class="fa-solid fa-file-import"></i>
+            <span>{{ 'education.ucDetail.import' | translate }}</span>
+            <input
+              class="sr-only"
+              type="file"
+              accept=".json,application/json"
+              (change)="onImportParticipants($event)"
+              [disabled]="importingParticipants"
+              [attr.aria-label]="('education.ucDetail.import' | translate)"
+            />
+          </label>
         </div>
-        <div class="chip" *ngIf="className">
-          <i class="fa-solid fa-chalkboard-user"></i>
-          <span>{{ 'education.labels.class' | translate }}:</span>
-          <strong>{{ className }}</strong>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-raised px-3 py-1 text-sm text-text-primary" *ngIf="displaySchoolName">
+          <i class="fa-solid fa-building-columns text-accent" aria-hidden="true"></i>
+          <span class="font-semibold">{{ 'education.labels.school' | translate }}:</span>
+          <span>{{ displaySchoolName }}</span>
         </div>
-        <div class="chip" *ngIf="displayPeriodText">
-          <i class="fa-regular fa-calendar"></i>
-          <span>{{ 'education.labels.period' | translate }}:</span>
-          <strong>{{ displayPeriodText }}</strong>
+        <div class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-raised px-3 py-1 text-sm text-text-primary" *ngIf="displayProgramName">
+          <i class="fa-solid fa-layer-group text-accent" aria-hidden="true"></i>
+          <span class="font-semibold">{{ 'education.labels.program' | translate }}:</span>
+          <span>{{ displayProgramName }}</span>
         </div>
-        <div class="chip" *ngIf="isUcDetail && selectedUc?.ViewUrl">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i>
-          <a [href]="selectedUc?.ViewUrl" target="_blank" rel="noreferrer">
+        <div class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-raised px-3 py-1 text-sm text-text-primary" *ngIf="className">
+          <i class="fa-solid fa-chalkboard-user text-accent" aria-hidden="true"></i>
+          <span class="font-semibold">{{ 'education.labels.class' | translate }}:</span>
+          <span>{{ className }}</span>
+        </div>
+        <div class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-raised px-3 py-1 text-sm text-text-primary" *ngIf="displayPeriodText">
+          <i class="fa-regular fa-calendar text-accent" aria-hidden="true"></i>
+          <span class="font-semibold">{{ 'education.labels.period' | translate }}:</span>
+          <span>{{ displayPeriodText }}</span>
+        </div>
+        <div class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-raised px-3 py-1 text-sm text-text-primary" *ngIf="isUcDetail && selectedUc?.ViewUrl">
+          <i class="fa-solid fa-arrow-up-right-from-square text-accent" aria-hidden="true"></i>
+          <a class="font-semibold text-accent hover:text-accent-strong" [href]="selectedUc?.ViewUrl" target="_blank" rel="noreferrer">
             {{ 'education.labels.viewCourse' | translate }}
           </a>
         </div>
       </div>
 
-      <section class="uc-students" *ngIf="isUcDetail && selectedUc; else classList">
-        <div class="section-header">
-          <div>
-            <h2>{{ 'education.ucDetail.studentsTitle' | translate }}</h2>
-            <p class="muted">{{ 'education.ucDetail.studentsSubtitle' | translate }}</p>
+      <section class="rounded-xl border border-border-soft bg-surface-alt/70 p-4 shadow-soft lg:p-5" *ngIf="isUcDetail && selectedUc; else classList">
+        <div class="flex items-start justify-between gap-3 border-b border-border-soft pb-4">
+          <div class="space-y-1">
+            <h2 class="text-xl font-semibold text-text-primary">{{ 'education.ucDetail.studentsTitle' | translate }}</h2>
+            <p class="text-sm text-text-muted">{{ 'education.ucDetail.studentsSubtitle' | translate }}</p>
           </div>
-          <span class="pill" *ngIf="students.length">{{ students.length }}</span>
+          <span class="inline-flex min-w-10 justify-center rounded-full border border-border-soft bg-surface px-3 py-1 text-sm font-semibold text-text-primary" *ngIf="students.length">
+            {{ students.length }}
+          </span>
         </div>
 
-        <div class="panel-body" *ngIf="loadingStudents">
-          <p class="state">{{ 'education.ucDetail.studentsLoading' | translate }}</p>
+        <div class="py-4 text-sm text-text-muted" *ngIf="loadingStudents">
+          {{ 'education.ucDetail.studentsLoading' | translate }}
         </div>
 
-        <div class="panel-body" *ngIf="!loadingStudents && students.length === 0">
-          <p class="state">{{ 'education.ucDetail.studentsEmpty' | translate }}</p>
+        <div class="py-4 text-sm text-text-muted" *ngIf="!loadingStudents && students.length === 0">
+          {{ 'education.ucDetail.studentsEmpty' | translate }}
         </div>
 
-        <div class="students-table" *ngIf="!loadingStudents && students.length > 0">
-          <div class="table-row table-head">
-            <span>{{ 'education.ucDetail.studentsName' | translate }}</span>
-            <span>{{ 'education.ucDetail.studentsEmail' | translate }}</span>
-            <span>{{ 'education.ucDetail.studentsPhone' | translate }}</span>
+        <div class="flex flex-col gap-2" *ngIf="!loadingStudents && students.length > 0">
+          <div class="grid grid-cols-1 gap-3 rounded-lg border border-border-soft bg-surface p-3 shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.05)] sm:grid-cols-3">
+            <span class="text-sm font-semibold text-text-primary">{{ 'education.ucDetail.studentsName' | translate }}</span>
+            <span class="text-sm font-semibold text-text-primary">{{ 'education.ucDetail.studentsEmail' | translate }}</span>
+            <span class="text-sm font-semibold text-text-primary">{{ 'education.ucDetail.studentsPhone' | translate }}</span>
           </div>
-          <div class="table-row" *ngFor="let student of students; trackBy: trackByStudent">
-            <span>{{ getStudentName(student) }}</span>
-            <span>{{ student.Email || '-' }}</span>
-            <span>{{ student.Phone || '-' }}</span>
+          <div
+            class="grid grid-cols-1 gap-3 rounded-lg border border-border-soft bg-surface-alt px-3 py-3 text-sm text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.03)] sm:grid-cols-3"
+            *ngFor="let student of students; trackBy: trackByStudent"
+          >
+            <span class="font-medium">{{ getStudentName(student) }}</span>
+            <span class="text-text-subtle">{{ student.Email || '-' }}</span>
+            <span class="text-text-subtle">{{ student.Phone || '-' }}</span>
           </div>
         </div>
       </section>
 
       <ng-template #classList>
-        <section class="cards" *ngIf="units.length; else emptyState">
+        <section *ngIf="units.length; else emptyState" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           <article
-            class="uc-card"
+            class="group relative isolate flex cursor-pointer flex-col gap-4 overflow-hidden rounded-xl border border-accent-soft bg-gradient-to-br from-surface-alt via-surface to-accent-soft/20 p-4 shadow-soft transition hover:-translate-y-0.5 hover:border-accent-strong hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
             *ngFor="let uc of units; trackBy: trackByUc"
             role="button"
             tabindex="0"
@@ -103,47 +115,55 @@
             (keydown.enter)="openUc(uc)"
             (keydown.space)="openUc(uc); $event.preventDefault()"
           >
-          <a
-            *ngIf="uc.ViewUrl"
-            class="btn ghost open-course"
-            [href]="uc.ViewUrl"
-            target="_blank"
-            rel="noreferrer"
-            [attr.aria-label]="'education.labels.viewCourse' | translate"
-            (click)="$event.stopPropagation()"
-          >
-            <i class="fa-solid fa-arrow-up-right-from-square"></i>
-          </a>
-          <div class="uc-meta">
-            <p class="uc-program">{{ programName || uc.ProgramNameDerived }}</p>
-            <div class="uc-cover" *ngIf="uc.CourseImage; else coverPlaceholder">
-              <img [src]="uc.CourseImage" [alt]="uc.Fullname" />
-            </div>
-            <ng-template #coverPlaceholder>
-              <div class="uc-cover placeholder">
-                <i class="fa-regular fa-image"></i>
+            <div class="pointer-events-none absolute -right-8 top-2 h-24 w-24 rounded-full bg-accent/15 blur-3xl" aria-hidden="true"></div>
+            <a
+              *ngIf="uc.ViewUrl"
+              class="absolute right-3 top-3 inline-flex items-center justify-center rounded-md border border-border-soft bg-surface/90 px-2 py-1 text-sm font-semibold text-text-primary transition hover:-translate-y-0.5 hover:border-accent-strong hover:text-accent-strong focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-2 focus:ring-offset-surface"
+              [href]="uc.ViewUrl"
+              target="_blank"
+              rel="noreferrer"
+              [attr.aria-label]="'education.labels.viewCourse' | translate"
+              (click)="$event.stopPropagation()"
+            >
+              <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+            </a>
+
+            <div class="space-y-3">
+              <p class="text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-text-muted">
+                {{ programName || uc.ProgramNameDerived }}
+              </p>
+              <div class="overflow-hidden rounded-lg border border-border-soft bg-surface-alt">
+                <ng-container *ngIf="uc.CourseImage; else coverPlaceholder">
+                  <img class="h-40 w-full object-cover" [src]="uc.CourseImage" [alt]="uc.Fullname" />
+                </ng-container>
+                <ng-template #coverPlaceholder>
+                  <div class="flex h-40 items-center justify-center text-2xl text-text-muted">
+                    <i class="fa-regular fa-image" aria-hidden="true"></i>
+                  </div>
+                </ng-template>
               </div>
-            </ng-template>
-            <h3 class="uc-title">{{ uc.Fullname }}</h3>
-            <p class="uc-school">{{ uc.SchoolNameDerived || schoolName }}</p>
-          </div>
-          <div class="uc-footer">
-            <div class="uc-period">
-              <i class="fa-regular fa-calendar-days"></i>
+              <h3 class="text-lg font-semibold text-text-primary">{{ uc.Fullname }}</h3>
+              <p class="text-sm text-text-subtle">{{ uc.SchoolNameDerived || schoolName }}</p>
+            </div>
+
+            <div class="mt-auto flex items-center gap-2 text-sm font-semibold text-text-primary">
+              <i class="fa-regular fa-calendar-days text-accent" aria-hidden="true"></i>
               <span>{{ formatPeriod(uc.StartDate, uc.EndDate, uc.PeriodTextDerived || null) }}</span>
             </div>
-          </div>
           </article>
         </section>
       </ng-template>
 
       <ng-template #emptyState>
-        <div class="empty" *ngIf="!loadingUnits">
-          <i class="fa-regular fa-folder-open"></i>
-          <p>{{ 'education.empty.title' | translate }}</p>
-          <p class="muted">{{ 'education.empty.subtitle' | translate }}</p>
+        <div
+          class="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border-soft bg-surface-alt/70 px-6 py-12 text-center text-text-subtle"
+          *ngIf="!loadingUnits"
+        >
+          <i class="fa-regular fa-folder-open text-3xl" aria-hidden="true"></i>
+          <p class="text-base font-semibold text-text-primary">{{ 'education.empty.title' | translate }}</p>
+          <p class="text-sm text-text-muted">{{ 'education.empty.subtitle' | translate }}</p>
         </div>
       </ng-template>
-    </div>
-  </article>
+    </article>
+  </div>
 </section>
