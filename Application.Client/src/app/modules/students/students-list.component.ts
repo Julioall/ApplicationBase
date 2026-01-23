@@ -25,8 +25,7 @@ interface ColumnConfig {
 
 @Component({
   selector: 'app-students-list',
-  templateUrl: './students-list.component.html',
-  styleUrls: ['./students-list.component.scss']
+  templateUrl: './students-list.component.html'
 })
 export class StudentsListComponent implements OnInit, OnDestroy {
   private readonly columnsStorageKey = 'students.columns.preferences';

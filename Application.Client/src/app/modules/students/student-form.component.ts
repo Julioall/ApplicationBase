@@ -9,8 +9,7 @@ import { CepService, CepResult } from '../../service/cep/cep.service';
 
 @Component({
   selector: 'app-student-form',
-  templateUrl: './student-form.component.html',
-  styleUrls: ['./student-form.component.scss']
+  templateUrl: './student-form.component.html'
 })
 export class StudentFormComponent implements OnInit {
   form: FormGroup;

@@ -1,91 +1,154 @@
-<section class="student-form-page">
-  <div class="top-actions">
-    <button type="button" class="back-link" (click)="onCancel()">
-      <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
-      <span>{{ 'students.form.back' | translate }}</span>
-    </button>
-  </div>
-
-  <article class="card settings-shell">
-    <div class="card-lead">
-      <h1>{{ (isEdit ? 'students.form.titleEdit' : 'students.form.titleCreate') | translate }}</h1>
-      <p class="subtitle">{{ 'students.form.subtitle' | translate }}</p>
+<section class="w-full px-2 sm:px-4">
+  <div class="mx-auto max-w-5xl space-y-4">
+    <div class="flex items-center justify-start">
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 text-sm font-semibold text-text-subtle transition hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+        (click)="onCancel()"
+      >
+        <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+        <span>{{ 'students.form.back' | translate }}</span>
+      </button>
     </div>
 
-    <div class="settings-body">
-      <form class="form-card" [class.loading]="loading" [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="form-actions">
-          <button type="submit" class="btn primary" [disabled]="loading">
+    <article class="space-y-6 rounded-2xl border border-border-soft bg-surface p-6 shadow-soft lg:p-8">
+      <div class="flex flex-col gap-3 rounded-xl bg-gradient-to-br from-surface-alt to-surface px-6 py-5 shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.05)]">
+        <h1 class="text-3xl font-semibold text-text-primary">{{ (isEdit ? 'students.form.titleEdit' : 'students.form.titleCreate') | translate }}</h1>
+        <p class="text-base text-text-subtle">{{ 'students.form.subtitle' | translate }}</p>
+      </div>
+
+      <form class="space-y-5" [class.opacity-70]="loading" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="flex justify-end">
+          <button
+            type="submit"
+            class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent-strong to-accent px-5 py-3 text-sm font-semibold text-text-inverse shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
+            [disabled]="loading"
+          >
             {{ (loading ? 'students.form.saving' : 'students.form.save') | translate }}
           </button>
         </div>
 
-        <div class="grid two-cols">
-          <div class="field" [class.invalid]="showError('FirstName','required') || showError('FirstName','minlength') || showError('FirstName','maxlength')">
-            <label for="firstName">{{ 'students.form.firstName' | translate }}</label>
-            <input id="firstName" type="text" formControlName="FirstName" />
-            <small *ngIf="showError('FirstName','required')">{{ 'students.form.errors.firstNameRequired' | translate }}</small>
-            <small *ngIf="showError('FirstName','minlength') || showError('FirstName','maxlength')">{{ 'students.form.errors.firstNameLength' | translate }}</small>
+        <div class="grid gap-4 md:grid-cols-2">
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold text-text-primary" for="firstName">{{ 'students.form.firstName' | translate }}</label>
+            <input
+              id="firstName"
+              type="text"
+              formControlName="FirstName"
+              class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition placeholder:text-text-muted focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+              [ngClass]="{ 'border-danger ring-1 ring-danger/40 focus:border-danger focus:ring-danger/60': showError('FirstName','required') || showError('FirstName','minlength') || showError('FirstName','maxlength') }"
+            />
+            <small class="text-xs text-danger" *ngIf="showError('FirstName','required')">{{ 'students.form.errors.firstNameRequired' | translate }}</small>
+            <small class="text-xs text-danger" *ngIf="showError('FirstName','minlength') || showError('FirstName','maxlength')">{{ 'students.form.errors.firstNameLength' | translate }}</small>
           </div>
 
-          <div class="field" [class.invalid]="showError('LastName','required') || showError('LastName','minlength') || showError('LastName','maxlength')">
-            <label for="lastName">{{ 'students.form.lastName' | translate }}</label>
-            <input id="lastName" type="text" formControlName="LastName" />
-            <small *ngIf="showError('LastName','required')">{{ 'students.form.errors.lastNameRequired' | translate }}</small>
-            <small *ngIf="showError('LastName','minlength') || showError('LastName','maxlength')">{{ 'students.form.errors.lastNameLength' | translate }}</small>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold text-text-primary" for="lastName">{{ 'students.form.lastName' | translate }}</label>
+            <input
+              id="lastName"
+              type="text"
+              formControlName="LastName"
+              class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition placeholder:text-text-muted focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+              [ngClass]="{ 'border-danger ring-1 ring-danger/40 focus:border-danger focus:ring-danger/60': showError('LastName','required') || showError('LastName','minlength') || showError('LastName','maxlength') }"
+            />
+            <small class="text-xs text-danger" *ngIf="showError('LastName','required')">{{ 'students.form.errors.lastNameRequired' | translate }}</small>
+            <small class="text-xs text-danger" *ngIf="showError('LastName','minlength') || showError('LastName','maxlength')">{{ 'students.form.errors.lastNameLength' | translate }}</small>
           </div>
         </div>
 
-        <div class="grid two-cols">
-          <div class="field" [class.invalid]="showError('Email','email')">
-            <label for="email">{{ 'students.form.email' | translate }}</label>
-            <input id="email" type="email" formControlName="Email" />
-            <small *ngIf="showError('Email','email')">{{ 'students.form.errors.email' | translate }}</small>
+        <div class="grid gap-4 md:grid-cols-2">
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold text-text-primary" for="email">{{ 'students.form.email' | translate }}</label>
+            <input
+              id="email"
+              type="email"
+              formControlName="Email"
+              class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition placeholder:text-text-muted focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+              [ngClass]="{ 'border-danger ring-1 ring-danger/40 focus:border-danger focus:ring-danger/60': showError('Email','email') }"
+            />
+            <small class="text-xs text-danger" *ngIf="showError('Email','email')">{{ 'students.form.errors.email' | translate }}</small>
           </div>
-          <div class="field" [class.invalid]="showError('IdNumber','maxlength')">
-            <label for="idNumber">{{ 'students.form.idNumber' | translate }}</label>
-            <input id="idNumber" type="text" formControlName="IdNumber" maxlength="20" />
-            <small *ngIf="showError('IdNumber','maxlength')">{{ 'students.form.errors.idNumber' | translate }}</small>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold text-text-primary" for="idNumber">{{ 'students.form.idNumber' | translate }}</label>
+            <input
+              id="idNumber"
+              type="text"
+              maxlength="20"
+              formControlName="IdNumber"
+              class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition placeholder:text-text-muted focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+              [ngClass]="{ 'border-danger ring-1 ring-danger/40 focus:border-danger focus:ring-danger/60': showError('IdNumber','maxlength') }"
+            />
+            <small class="text-xs text-danger" *ngIf="showError('IdNumber','maxlength')">{{ 'students.form.errors.idNumber' | translate }}</small>
           </div>
         </div>
 
-        <div class="grid two-cols">
-          <div class="field">
-            <label for="phone">{{ 'students.form.phone' | translate }}</label>
-            <input id="phone" type="tel" formControlName="Phone" />
+        <div class="grid gap-4 md:grid-cols-2">
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold text-text-primary" for="phone">{{ 'students.form.phone' | translate }}</label>
+            <input
+              id="phone"
+              type="tel"
+              formControlName="Phone"
+              class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition placeholder:text-text-muted focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+            />
           </div>
-          <div class="field">
-            <label for="dob">{{ 'students.form.dateOfBirth' | translate }}</label>
-            <input id="dob" type="date" formControlName="DateOfBirth" />
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold text-text-primary" for="dob">{{ 'students.form.dateOfBirth' | translate }}</label>
+            <input
+              id="dob"
+              type="date"
+              formControlName="DateOfBirth"
+              class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition placeholder:text-text-muted focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+            />
           </div>
         </div>
 
-        <div class="grid two-cols">
-      <div class="field">
-        <label for="institution">{{ 'students.form.institution' | translate }}</label>
-        <input id="institution" type="text" formControlName="Institution" />
-      </div>
-      <div class="field">
-        <label for="lang">{{ 'students.form.lang' | translate }}</label>
-        <select id="lang" formControlName="Lang">
-          <option value="">{{ 'students.form.langSelectPlaceholder' | translate }}</option>
-          <option *ngFor="let lang of languages" [value]="lang.value">{{ lang.labelKey | translate }}</option>
-        </select>
-        <small *ngIf="showError('Lang','pattern')">{{ 'students.form.errors.lang' | translate }}</small>
-      </div>
-    </div>
+        <div class="grid gap-4 md:grid-cols-2">
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold text-text-primary" for="institution">{{ 'students.form.institution' | translate }}</label>
+            <input
+              id="institution"
+              type="text"
+              formControlName="Institution"
+              class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition placeholder:text-text-muted focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+            />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold text-text-primary" for="lang">{{ 'students.form.lang' | translate }}</label>
+            <select
+              id="lang"
+              formControlName="Lang"
+              class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+              [ngClass]="{ 'border-danger ring-1 ring-danger/40 focus:border-danger focus:ring-danger/60': showError('Lang','pattern') }"
+            >
+              <option value="">{{ 'students.form.langSelectPlaceholder' | translate }}</option>
+              <option *ngFor="let lang of languages" [value]="lang.value">{{ lang.labelKey | translate }}</option>
+            </select>
+            <small class="text-xs text-danger" *ngIf="showError('Lang','pattern')">{{ 'students.form.errors.lang' | translate }}</small>
+          </div>
+        </div>
 
-        <div class="grid two-cols">
-          <div class="field">
-            <label for="timeZone">{{ 'students.form.timeZone' | translate }}</label>
-            <input id="timeZone" type="text" formControlName="TimeZone" list="tz-options" />
+        <div class="grid gap-4 md:grid-cols-2">
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold text-text-primary" for="timeZone">{{ 'students.form.timeZone' | translate }}</label>
+            <input
+              id="timeZone"
+              type="text"
+              formControlName="TimeZone"
+              list="tz-options"
+              class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition placeholder:text-text-muted focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+            />
             <datalist id="tz-options">
               <option *ngFor="let tz of timeZones" [value]="tz"></option>
             </datalist>
           </div>
-          <div class="field">
-            <label for="status">{{ 'students.form.status' | translate }}</label>
-            <select id="status" formControlName="Status">
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold text-text-primary" for="status">{{ 'students.form.status' | translate }}</label>
+            <select
+              id="status"
+              formControlName="Status"
+              class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+            >
               <option *ngFor="let option of statusOptions" [value]="option.value">
                 {{ option.label | translate }}
               </option>
@@ -93,49 +156,86 @@
           </div>
         </div>
 
-        <div class="field">
-          <label for="lastAccess">{{ 'students.form.lastAccess' | translate }}</label>
-          <input id="lastAccess" type="datetime-local" formControlName="LastAccessAt" />
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-semibold text-text-primary" for="lastAccess">{{ 'students.form.lastAccess' | translate }}</label>
+          <input
+            id="lastAccess"
+            type="datetime-local"
+            formControlName="LastAccessAt"
+            class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition placeholder:text-text-muted focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+          />
         </div>
 
-        <div formGroupName="Address" class="address-grid">
-          <div class="field">
-        <label for="postalCode">{{ 'students.form.address.postalCode' | translate }}</label>
-        <input
-          id="postalCode"
-          type="text"
-          maxlength="9"
-          formControlName="PostalCode"
-          (blur)="onCepBlur()"
-        />
-        <small *ngIf="showAddressError('PostalCode','pattern')">{{ 'students.form.errors.cepInvalid' | translate }}</small>
-      </div>
-      <div class="field">
-        <label for="street">{{ 'students.form.address.street' | translate }}</label>
-        <input id="street" type="text" formControlName="Street" />
-      </div>
-      <div class="field">
-        <label for="number">{{ 'students.form.address.number' | translate }}</label>
-        <input id="number" type="text" formControlName="Number" />
-      </div>
-      <div class="field">
-        <label for="district">{{ 'students.form.address.district' | translate }}</label>
-        <input id="district" type="text" formControlName="District" />
-      </div>
-      <div class="field">
-        <label for="city">{{ 'students.form.address.city' | translate }}</label>
-        <input id="city" type="text" formControlName="City" />
-      </div>
-      <div class="field">
-        <label for="state">{{ 'students.form.address.state' | translate }}</label>
-        <input id="state" type="text" formControlName="State" />
-      </div>
-      <div class="field">
-        <label for="country">{{ 'students.form.address.country' | translate }}</label>
-        <input id="country" type="text" formControlName="Country" />
-      </div>
-    </div>
-  </form>
-</div>
-  </article>
+        <div formGroupName="Address" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold text-text-primary" for="postalCode">{{ 'students.form.address.postalCode' | translate }}</label>
+            <input
+              id="postalCode"
+              type="text"
+              maxlength="9"
+              formControlName="PostalCode"
+              (blur)="onCepBlur()"
+              class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition placeholder:text-text-muted focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+              [ngClass]="{ 'border-danger ring-1 ring-danger/40 focus:border-danger focus:ring-danger/60': showAddressError('PostalCode','pattern') }"
+            />
+            <small class="text-xs text-danger" *ngIf="showAddressError('PostalCode','pattern')">{{ 'students.form.errors.cepInvalid' | translate }}</small>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold text-text-primary" for="street">{{ 'students.form.address.street' | translate }}</label>
+            <input
+              id="street"
+              type="text"
+              formControlName="Street"
+              class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition placeholder:text-text-muted focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+            />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold text-text-primary" for="number">{{ 'students.form.address.number' | translate }}</label>
+            <input
+              id="number"
+              type="text"
+              formControlName="Number"
+              class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition placeholder:text-text-muted focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+            />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold text-text-primary" for="district">{{ 'students.form.address.district' | translate }}</label>
+            <input
+              id="district"
+              type="text"
+              formControlName="District"
+              class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition placeholder:text-text-muted focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+            />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold text-text-primary" for="city">{{ 'students.form.address.city' | translate }}</label>
+            <input
+              id="city"
+              type="text"
+              formControlName="City"
+              class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition placeholder:text-text-muted focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+            />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold text-text-primary" for="state">{{ 'students.form.address.state' | translate }}</label>
+            <input
+              id="state"
+              type="text"
+              formControlName="State"
+              class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition placeholder:text-text-muted focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+            />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold text-text-primary" for="country">{{ 'students.form.address.country' | translate }}</label>
+            <input
+              id="country"
+              type="text"
+              formControlName="Country"
+              class="w-full rounded-lg border border-border-soft bg-surface-alt px-4 py-3 text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.04)] transition placeholder:text-text-muted focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-1 focus:ring-offset-surface"
+            />
+          </div>
+        </div>
+      </form>
+    </article>
+  </div>
 </section>

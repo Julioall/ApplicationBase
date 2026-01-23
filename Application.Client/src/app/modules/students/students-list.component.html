@@ -1,14 +1,18 @@
-<section class="students-page email-settings">
-  <article class="card settings-shell">
-    <div class="card-lead">
-      <div class="lead-row">
-        <div>
-          <p class="eyebrow">{{ 'students.list.eyebrow' | translate }}</p>
-          <h1>{{ 'students.list.title' | translate }}</h1>
-          <p class="subtitle">{{ 'students.list.subtitle' | translate }}</p>
+<section class="w-full px-2 sm:px-4">
+  <article class="mx-auto max-w-6xl space-y-6 rounded-2xl border border-border-soft bg-surface p-6 shadow-soft lg:p-8">
+    <div class="flex flex-col gap-4 rounded-xl bg-gradient-to-br from-surface to-surface-alt px-6 py-5 shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.05)]">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div class="space-y-2">
+          <p class="text-xs font-semibold uppercase tracking-[0.28em] text-text-subtle">{{ 'students.list.eyebrow' | translate }}</p>
+          <h1 class="text-3xl font-semibold text-text-primary">{{ 'students.list.title' | translate }}</h1>
+          <p class="text-base text-text-subtle">{{ 'students.list.subtitle' | translate }}</p>
         </div>
-        <div class="lead-actions" *ngIf="canManageStudents">
-          <button type="button" class="btn primary" (click)="onAdd()">
+        <div *ngIf="canManageStudents">
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent-strong to-accent px-4 py-3 text-sm font-semibold text-text-inverse shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            (click)="onAdd()"
+          >
             <i class="fa-solid fa-plus" aria-hidden="true"></i>
             <span>{{ 'students.list.add' | translate }}</span>
           </button>
@@ -16,51 +20,80 @@
       </div>
     </div>
 
-    <div class="settings-body">
-      <div class="list-toolbar">
-        <div class="field search-field no-label">
-          <div class="input-icon">
-            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+    <div class="space-y-4">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div class="flex flex-1 flex-col gap-3">
+          <div class="relative w-full">
+            <i class="fa-solid fa-magnifying-glass pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-subtle" aria-hidden="true"></i>
             <input
               id="searchStudents"
               type="search"
+              class="w-full rounded-lg border-2 border-border-soft bg-gradient-to-br from-surface-alt to-surface px-4 py-3 pl-10 text-base text-text-primary shadow-[inset_0_1px_2px_rgba(var(--shadow-rgb),0.06)] transition placeholder:text-text-muted hover:border-border-strong focus:border-accent-strong focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,_var(--accent-strong)_35%,_transparent)] focus:ring-offset-2 focus:ring-offset-surface"
               [placeholder]="translate.instant('students.list.searchPlaceholder')"
               [formControl]="searchControl"
               [attr.aria-label]="translate.instant('students.list.searchAria')"
             />
           </div>
+
+          <div class="flex flex-wrap items-center gap-2" [attr.aria-label]="translate.instant('students.list.statusFilter')">
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-2 text-sm font-semibold text-text-primary transition hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+              [ngClass]="{ 'border-primary-strong bg-primary-soft text-primary-strong shadow-md': statusFilter === 'all' }"
+              (click)="setStatusFilter('all')"
+            >
+              <span class="h-2.5 w-2.5 rounded-full bg-primary shadow-[0_0_0_4px_color-mix(in_srgb,_var(--primary)_18%,_transparent)]"></span>
+              <span>{{ 'students.list.statusAll' | translate }}</span>
+            </button>
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-2 text-sm font-semibold text-text-primary transition hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+              [ngClass]="{ 'border-success bg-success/15 text-success shadow-md': statusFilter === 'active' }"
+              (click)="setStatusFilter('active')"
+            >
+              <span class="h-2.5 w-2.5 rounded-full bg-success shadow-[0_0_0_4px_color-mix(in_srgb,_var(--success)_20%,_transparent)]"></span>
+              <span>{{ 'students.list.statusActive' | translate }}</span>
+            </button>
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-2 text-sm font-semibold text-text-primary transition hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+              [ngClass]="{ 'border-warning bg-warning/15 text-warning shadow-md': statusFilter === 'not_currently' }"
+              (click)="setStatusFilter('not_currently')"
+            >
+              <span class="h-2.5 w-2.5 rounded-full bg-warning shadow-[0_0_0_4px_color-mix(in_srgb,_var(--warning)_20%,_transparent)]"></span>
+              <span>{{ 'students.list.statusInactive' | translate }}</span>
+            </button>
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-2 text-sm font-semibold text-text-primary transition hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+              [ngClass]="{ 'border-danger bg-danger/15 text-danger shadow-md': statusFilter === 'suspended' }"
+              (click)="setStatusFilter('suspended')"
+            >
+              <span class="h-2.5 w-2.5 rounded-full bg-danger shadow-[0_0_0_4px_color-mix(in_srgb,_var(--danger)_18%,_transparent)]"></span>
+              <span>{{ 'students.status.suspended' | translate }}</span>
+            </button>
+          </div>
         </div>
 
-        <div class="status-filters" [attr.aria-label]="translate.instant('students.list.statusFilter')">
-          <button type="button" class="pill ghost" [class.active]="statusFilter === 'all'" (click)="setStatusFilter('all')">
-            <span class="dot"></span>
-            <span>{{ 'students.list.statusAll' | translate }}</span>
-          </button>
-          <button type="button" class="pill ghost" [class.active]="statusFilter === 'active'" (click)="setStatusFilter('active')">
-            <span class="dot"></span>
-            <span>{{ 'students.list.statusActive' | translate }}</span>
-          </button>
-          <button type="button" class="pill ghost" [class.active]="statusFilter === 'not_currently'" (click)="setStatusFilter('not_currently')">
-            <span class="dot"></span>
-            <span>{{ 'students.list.statusInactive' | translate }}</span>
-          </button>
-          <button type="button" class="pill ghost" [class.active]="statusFilter === 'suspended'" (click)="setStatusFilter('suspended')">
-            <span class="dot suspended"></span>
-            <span>{{ 'students.status.suspended' | translate }}</span>
-          </button>
-        </div>
-
-        <div class="actions-inline">
-          <div class="column-filter" (click)="$event.stopPropagation()">
-            <button type="button" class="btn ghost" (click)="toggleColumnMenu($event)">
+        <div class="flex flex-wrap items-center justify-end gap-3">
+          <div class="relative" (click)="$event.stopPropagation()">
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 rounded-lg border border-border-soft bg-surface px-4 py-2.5 text-sm font-semibold text-text-primary shadow-[0_6px_18px_rgba(var(--shadow-rgb),0.06)] transition hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+              (click)="toggleColumnMenu($event)"
+            >
               <i class="fa-solid fa-sliders" aria-hidden="true"></i>
               <span>{{ 'students.list.columnsFilter' | translate }}</span>
             </button>
-            <div class="column-menu" *ngIf="showColumnMenu">
-              <p class="menu-title">{{ 'students.list.columnsFilterTitle' | translate }}</p>
-              <label class="menu-option" *ngFor="let column of columns">
+            <div
+              class="absolute right-0 z-10 mt-2 min-w-56 rounded-xl border border-border-soft bg-surface p-4 shadow-[0_14px_40px_rgba(var(--shadow-rgb),0.16)]"
+              *ngIf="showColumnMenu"
+            >
+              <p class="mb-3 text-sm font-semibold text-text-primary">{{ 'students.list.columnsFilterTitle' | translate }}</p>
+              <label class="flex items-center gap-2 text-sm text-text-primary" *ngFor="let column of columns">
                 <input
                   type="checkbox"
+                  class="h-4 w-4 rounded border-border-soft text-accent focus:ring-accent"
                   [checked]="column.visible"
                   (change)="toggleColumn(column.id, $event)"
                 />
@@ -71,11 +104,21 @@
 
           <ng-container *ngIf="canManageStudents">
             <input #importInput type="file" accept=".xlsx,.json" hidden (change)="onImport($event)" />
-            <button type="button" class="btn ghost" (click)="importInput.click()" [disabled]="loading || importing">
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 rounded-lg border border-border-soft bg-surface px-4 py-2.5 text-sm font-semibold text-text-primary shadow-[0_6px_18px_rgba(var(--shadow-rgb),0.06)] transition hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60"
+              (click)="importInput.click()"
+              [disabled]="loading || importing"
+            >
               <i class="fa-solid fa-file-import" aria-hidden="true"></i>
               <span>{{ 'students.list.import' | translate }}</span>
             </button>
-            <button type="button" class="btn ghost" (click)="onExport()" [disabled]="loading || exporting">
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 rounded-lg border border-border-soft bg-surface px-4 py-2.5 text-sm font-semibold text-text-primary shadow-[0_6px_18px_rgba(var(--shadow-rgb),0.06)] transition hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60"
+              (click)="onExport()"
+              [disabled]="loading || exporting"
+            >
               <i class="fa-solid fa-file-export" aria-hidden="true"></i>
               <span>{{ 'students.list.export' | translate }}</span>
             </button>
@@ -83,69 +126,132 @@
         </div>
       </div>
 
-      <p class="import-hint" *ngIf="canManageStudents">
+      <p class="text-sm text-text-subtle" *ngIf="canManageStudents">
         {{ 'students.list.importHint' | translate }}
       </p>
 
-      <div class="state-row" *ngIf="loading">
+      <div
+        class="rounded-lg border border-dashed border-border-soft bg-surface-alt/70 px-4 py-4 text-center text-sm text-text-subtle"
+        *ngIf="loading"
+      >
         {{ 'students.list.loading' | translate }}
       </div>
-      <div class="state-row" *ngIf="!loading && students.length === 0">
+      <div
+        class="rounded-lg border border-dashed border-border-soft bg-surface-alt/70 px-4 py-4 text-center text-sm text-text-subtle"
+        *ngIf="!loading && students.length === 0"
+      >
         {{ 'students.list.empty' | translate }}
       </div>
 
-      <div class="cards-grid" *ngIf="!loading && students.length">
-        <article class="task-card student-card" *ngFor="let student of students; trackBy: trackByStudent" (click)="openSidePanel(student)">
-          <header class="task-card__header">
-            <div class="status-pill" [ngClass]="getStatusClass(student)">
-              <span class="dot"></span>
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" *ngIf="!loading && students.length">
+        <article
+          class="group relative flex cursor-pointer flex-col gap-3 rounded-xl border border-border-soft bg-surface p-5 shadow-soft transition hover:-translate-y-0.5 hover:border-accent-strong hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+          *ngFor="let student of students; trackBy: trackByStudent"
+          (click)="openSidePanel(student)"
+        >
+          <header class="flex items-center justify-between gap-3">
+            <div
+              class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-1.5 text-xs font-semibold text-text-primary"
+              [ngClass]="{
+                'border-success/60 bg-success/15 text-success': getStatusClass(student).includes('active'),
+                'border-warning/60 bg-warning/15 text-warning': getStatusClass(student).includes('inactive'),
+                'border-danger/60 bg-danger/15 text-danger': getStatusClass(student).includes('suspended')
+              }"
+            >
+              <span
+                class="h-2.5 w-2.5 rounded-full"
+                [ngClass]="{
+                  'bg-success shadow-[0_0_0_4px_color-mix(in_srgb,_var(--success)_18%,_transparent)]': getStatusClass(student).includes('active'),
+                  'bg-warning shadow-[0_0_0_4px_color-mix(in_srgb,_var(--warning)_18%,_transparent)]': getStatusClass(student).includes('inactive'),
+                  'bg-danger shadow-[0_0_0_4px_color-mix(in_srgb,_var(--danger)_16%,_transparent)]': getStatusClass(student).includes('suspended'),
+                  'bg-primary shadow-[0_0_0_4px_color-mix(in_srgb,_var(--primary)_18%,_transparent)]': true
+                }"
+              ></span>
               <span>{{ getStatusLabel(student) }}</span>
             </div>
-            <div class="card-actions" *ngIf="canManageStudents">
-              <button type="button" class="card-icon" (click)="onEdit(student); $event.stopPropagation()">
+            <div class="flex items-center gap-2" *ngIf="canManageStudents">
+              <button
+                type="button"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border-soft bg-surface-alt text-text-muted transition hover:-translate-y-0.5 hover:border-border-strong hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+                (click)="onEdit(student); $event.stopPropagation()"
+              >
                 <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
               </button>
-              <button type="button" class="card-icon danger" (click)="onDelete(student); $event.stopPropagation()">
+              <button
+                type="button"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border-soft bg-surface-alt text-text-muted transition hover:-translate-y-0.5 hover:border-danger hover:text-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+                (click)="onDelete(student); $event.stopPropagation()"
+              >
                 <i class="fa-solid fa-trash" aria-hidden="true"></i>
               </button>
             </div>
           </header>
 
-          <div class="task-card__content">
-            <div class="title-row">
-              <h3 class="task-card__title">{{ student.FirstName }} {{ student.LastName }}</h3>
-              <span class="tag-pill" *ngIf="student.IdNumber">
-                <span class="dot"></span>
+          <div class="flex flex-col gap-2">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <h3 class="text-lg font-semibold text-text-primary">{{ student.FirstName }} {{ student.LastName }}</h3>
+              <span
+                class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-1 text-xs font-semibold text-text-primary"
+                *ngIf="student.IdNumber"
+              >
+                <span class="h-2 w-2 rounded-full bg-primary"></span>
                 <span>{{ student.IdNumber }}</span>
               </span>
             </div>
-            <p class="task-card__desc">
+            <p class="text-sm text-text-subtle">
               {{ student.Institution || ('students.list.noInstitution' | translate) }}
             </p>
-            <div class="meta-row">
-              <span class="meta-chip" *ngIf="isColumnVisible('email')">
-                <i class="fa-regular fa-envelope"></i>
+            <div class="flex flex-wrap gap-2 text-sm">
+              <span
+                class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-1 text-text-primary"
+                *ngIf="isColumnVisible('email')"
+              >
+                <i class="fa-regular fa-envelope text-text-muted"></i>
                 {{ student.Email || '-' }}
               </span>
-              <span class="meta-chip" *ngIf="isColumnVisible('phone')">
-                <i class="fa-solid fa-phone"></i>
+              <span
+                class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-1 text-text-primary"
+                *ngIf="isColumnVisible('phone')"
+              >
+                <i class="fa-solid fa-phone text-text-muted"></i>
                 {{ student.Phone || '-' }}
               </span>
-              <span class="meta-chip" *ngIf="isColumnVisible('lastAccess')">
-                <i class="fa-regular fa-clock"></i>
+              <span
+                class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-1 text-text-primary"
+                *ngIf="isColumnVisible('lastAccess')"
+              >
+                <i class="fa-regular fa-clock text-text-muted"></i>
                 {{ student.LastAccessAt ? (student.LastAccessAt | date:'short') : '-' }}
               </span>
             </div>
           </div>
 
-          <footer class="task-card__footer">
-            <div class="footer-left" *ngIf="isColumnVisible('status')">
-              <span class="status-chip" [ngClass]="getStatusClass(student)">
-                <span class="dot"></span>
-                {{ getStatusLabel(student) }}
-              </span>
+          <footer class="mt-auto flex items-center justify-between gap-3">
+            <div
+              class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-alt px-3 py-1.5 text-xs font-semibold text-text-primary"
+              *ngIf="isColumnVisible('status')"
+              [ngClass]="{
+                'border-success/60 bg-success/15 text-success': getStatusClass(student).includes('active'),
+                'border-warning/60 bg-warning/15 text-warning': getStatusClass(student).includes('inactive'),
+                'border-danger/60 bg-danger/15 text-danger': getStatusClass(student).includes('suspended')
+              }"
+            >
+              <span
+                class="h-2.5 w-2.5 rounded-full"
+                [ngClass]="{
+                  'bg-success shadow-[0_0_0_4px_color-mix(in_srgb,_var(--success)_18%,_transparent)]': getStatusClass(student).includes('active'),
+                  'bg-warning shadow-[0_0_0_4px_color-mix(in_srgb,_var(--warning)_18%,_transparent)]': getStatusClass(student).includes('inactive'),
+                  'bg-danger shadow-[0_0_0_4px_color-mix(in_srgb,_var(--danger)_16%,_transparent)]': getStatusClass(student).includes('suspended'),
+                  'bg-primary shadow-[0_0_0_4px_color-mix(in_srgb,_var(--primary)_18%,_transparent)]': true
+                }"
+              ></span>
+              <span>{{ getStatusLabel(student) }}</span>
             </div>
-            <button type="button" class="ghost-link" (click)="openSidePanel(student); $event.stopPropagation()">
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 text-sm font-semibold text-accent transition hover:text-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+              (click)="openSidePanel(student); $event.stopPropagation()"
+            >
               {{ 'students.list.edit' | translate }}
               <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i>
             </button>
@@ -153,14 +259,24 @@
         </article>
       </div>
 
-      <footer class="pagination" *ngIf="!loading && students.length">
-        <button type="button" class="btn ghost" [disabled]="pageNumber === 1 || loading" (click)="changePage(-1)">
+      <footer class="flex items-center justify-end gap-3" *ngIf="!loading && students.length">
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 rounded-lg border border-border-soft bg-surface px-4 py-2.5 text-sm font-semibold text-text-primary shadow-[0_6px_18px_rgba(var(--shadow-rgb),0.06)] transition hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="pageNumber === 1 || loading"
+          (click)="changePage(-1)"
+        >
           {{ 'students.list.prev' | translate }}
         </button>
-        <span class="page-indicator">
+        <span class="text-sm text-text-subtle">
           {{ 'students.list.pageXofY' | translate:{ page: pageNumber, total: totalPages } }}
         </span>
-        <button type="button" class="btn ghost" [disabled]="pageNumber >= totalPages || loading" (click)="changePage(1)">
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 rounded-lg border border-border-soft bg-surface px-4 py-2.5 text-sm font-semibold text-text-primary shadow-[0_6px_18px_rgba(var(--shadow-rgb),0.06)] transition hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="pageNumber >= totalPages || loading"
+          (click)="changePage(1)"
+        >
           {{ 'students.list.next' | translate }}
         </button>
       </footer>
@@ -168,68 +284,99 @@
   </article>
 </section>
 
-<div class="side-panel-backdrop" *ngIf="selectedStudent as student" (click)="closeSidePanel()">
-  <aside class="side-panel" (click)="$event.stopPropagation()">
-    <header class="side-panel__header">
-      <div>
-        <p class="eyebrow">{{ 'students.list.eyebrow' | translate }}</p>
-        <h2>{{ student.FirstName }} {{ student.LastName }}</h2>
-        <p class="subtitle">
+<div class="fixed inset-0 z-50 flex items-stretch justify-end bg-overlay-strong" *ngIf="selectedStudent as student" (click)="closeSidePanel()">
+  <aside
+    class="flex h-screen w-full max-w-lg flex-col border-l border-border-soft bg-surface shadow-[ -24px_0_60px_rgba(var(--shadow-rgb),0.2)]"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="sticky top-0 flex items-start justify-between gap-3 border-b border-border-soft bg-surface px-6 py-5">
+      <div class="space-y-1">
+        <p class="text-xs font-semibold uppercase tracking-[0.28em] text-text-subtle">{{ 'students.list.eyebrow' | translate }}</p>
+        <h2 class="text-xl font-semibold text-text-primary">{{ student.FirstName }} {{ student.LastName }}</h2>
+        <p class="text-sm text-text-subtle">
           {{ student.Institution || ('students.list.noInstitution' | translate) }}
         </p>
       </div>
-      <button type="button" class="panel-close" [attr.aria-label]="'modal.cancel' | translate" (click)="closeSidePanel()">
+      <button
+        type="button"
+        class="inline-flex h-11 w-11 items-center justify-center rounded-md border border-border-soft bg-surface-alt text-text-muted transition hover:-translate-y-0.5 hover:border-border-strong hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+        [attr.aria-label]="'modal.cancel' | translate"
+        (click)="closeSidePanel()"
+      >
         <i class="fa-solid fa-xmark" aria-hidden="true"></i>
       </button>
     </header>
 
-    <div class="side-panel__body">
-      <div class="detail-row" *ngIf="isColumnVisible('email')">
-        <span class="label">
+    <div class="flex flex-1 flex-col gap-3 overflow-y-auto px-6 py-4">
+      <div class="flex flex-col gap-1 rounded-lg border border-border-soft bg-surface-alt px-4 py-3" *ngIf="isColumnVisible('email')">
+        <span class="inline-flex items-center gap-2 text-sm text-text-subtle">
           <i class="fa-regular fa-envelope" aria-hidden="true"></i>
           {{ 'students.list.columns.email' | translate }}
         </span>
-        <span class="value">{{ student.Email || '-' }}</span>
+        <span class="text-sm font-semibold text-text-primary">{{ student.Email || '-' }}</span>
       </div>
-      <div class="detail-row" *ngIf="isColumnVisible('phone')">
-        <span class="label">
+      <div class="flex flex-col gap-1 rounded-lg border border-border-soft bg-surface-alt px-4 py-3" *ngIf="isColumnVisible('phone')">
+        <span class="inline-flex items-center gap-2 text-sm text-text-subtle">
           <i class="fa-solid fa-phone" aria-hidden="true"></i>
           {{ 'students.list.columns.phone' | translate }}
         </span>
-        <span class="value">{{ student.Phone || '-' }}</span>
+        <span class="text-sm font-semibold text-text-primary">{{ student.Phone || '-' }}</span>
       </div>
-      <div class="detail-row" *ngIf="isColumnVisible('idNumber')">
-        <span class="label">
+      <div class="flex flex-col gap-1 rounded-lg border border-border-soft bg-surface-alt px-4 py-3" *ngIf="isColumnVisible('idNumber')">
+        <span class="inline-flex items-center gap-2 text-sm text-text-subtle">
           <i class="fa-regular fa-id-badge" aria-hidden="true"></i>
           {{ 'students.list.columns.idNumber' | translate }}
         </span>
-        <span class="value">{{ student.IdNumber || '-' }}</span>
+        <span class="text-sm font-semibold text-text-primary">{{ student.IdNumber || '-' }}</span>
       </div>
-      <div class="detail-row" *ngIf="isColumnVisible('lastAccess')">
-        <span class="label">
+      <div class="flex flex-col gap-1 rounded-lg border border-border-soft bg-surface-alt px-4 py-3" *ngIf="isColumnVisible('lastAccess')">
+        <span class="inline-flex items-center gap-2 text-sm text-text-subtle">
           <i class="fa-regular fa-clock" aria-hidden="true"></i>
           {{ 'students.list.columns.lastAccess' | translate }}
         </span>
-        <span class="value">{{ student.LastAccessAt ? (student.LastAccessAt | date:'short') : '-' }}</span>
+        <span class="text-sm font-semibold text-text-primary">{{ student.LastAccessAt ? (student.LastAccessAt | date:'short') : '-' }}</span>
       </div>
-      <div class="detail-row" *ngIf="isColumnVisible('status')">
-        <span class="label">
+      <div class="flex flex-col gap-1 rounded-lg border border-border-soft bg-surface-alt px-4 py-3" *ngIf="isColumnVisible('status')">
+        <span class="inline-flex items-center gap-2 text-sm text-text-subtle">
           <i class="fa-regular fa-circle-check" aria-hidden="true"></i>
           {{ 'students.list.columns.status' | translate }}
         </span>
-        <span class="value status-chip" [ngClass]="getStatusClass(student)">
-          <span class="dot"></span>
+        <span
+          class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface px-3 py-1 text-sm font-semibold text-text-primary"
+          [ngClass]="{
+            'border-success/60 bg-success/15 text-success': getStatusClass(student).includes('active'),
+            'border-warning/60 bg-warning/15 text-warning': getStatusClass(student).includes('inactive'),
+            'border-danger/60 bg-danger/15 text-danger': getStatusClass(student).includes('suspended')
+          }"
+        >
+          <span
+            class="h-2.5 w-2.5 rounded-full"
+            [ngClass]="{
+              'bg-success shadow-[0_0_0_4px_color-mix(in_srgb,_var(--success)_18%,_transparent)]': getStatusClass(student).includes('active'),
+              'bg-warning shadow-[0_0_0_4px_color-mix(in_srgb,_var(--warning)_18%,_transparent)]': getStatusClass(student).includes('inactive'),
+              'bg-danger shadow-[0_0_0_4px_color-mix(in_srgb,_var(--danger)_16%,_transparent)]': getStatusClass(student).includes('suspended'),
+              'bg-primary shadow-[0_0_0_4px_color-mix(in_srgb,_var(--primary)_18%,_transparent)]': true
+            }"
+          ></span>
           {{ getStatusLabel(student) }}
         </span>
       </div>
     </div>
 
-    <footer class="side-panel__footer">
-      <button class="btn ghost" type="button" (click)="onDelete(student); $event.stopPropagation()">
+    <footer class="sticky bottom-0 flex flex-wrap justify-end gap-2 border-t border-border-soft bg-surface px-6 py-4">
+      <button
+        class="inline-flex items-center gap-2 rounded-lg border border-border-soft bg-surface px-4 py-2.5 text-sm font-semibold text-text-primary shadow-[0_6px_18px_rgba(var(--shadow-rgb),0.06)] transition hover:-translate-y-0.5 hover:border-danger hover:text-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+        type="button"
+        (click)="onDelete(student); $event.stopPropagation()"
+      >
         <i class="fa-solid fa-trash" aria-hidden="true"></i>
         <span>{{ 'students.list.delete' | translate }}</span>
       </button>
-      <button class="btn primary" type="button" (click)="onEdit(student); $event.stopPropagation()">
+      <button
+        class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent-strong to-accent px-4 py-2.5 text-sm font-semibold text-text-inverse shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        type="button"
+        (click)="onEdit(student); $event.stopPropagation()"
+      >
         <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
         <span>{{ 'students.list.edit' | translate }}</span>
       </button>
