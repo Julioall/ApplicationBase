@@ -3,14 +3,14 @@
   <header class="fixed top-0 inset-x-0 z-40 flex items-center justify-between gap-4 px-4 lg:px-8 h-16 border-b border-border-soft bg-surface/95 backdrop-blur">
     <div class="flex items-center gap-3">
       <button
-        class="inline-flex lg:hidden items-center justify-center h-10 w-10 rounded-lg border border-border-soft bg-surface-alt text-text-subtle hover:text-accent-strong hover:bg-accent-soft transition"
+        class="inline-flex lg:hidden items-center justify-center h-10 w-10 rounded-lg border border-border-soft bg-surface-alt text-text-primary hover:text-accent-strong hover:bg-accent-soft transition focus:outline-none focus:ring-0"
         type="button"
         [attr.aria-label]="'home.openMenu' | translate"
         (click)="toggleNav()"
       >
         <i class="fa-solid" [ngClass]="isNavOpen ? 'fa-xmark' : 'fa-bars'"></i>
       </button>
-      <div class="flex items-center gap-2">
+      <div class="hidden lg:flex items-center gap-2">
         <div class="h-10 w-10 rounded-lg bg-accent text-text-inverse grid place-items-center shadow-soft">
           <i class="fa fa-cubes"></i>
         </div>
@@ -19,26 +19,26 @@
           <span class="text-xs text-text-subtle">Portal Acadêmico</span>
         </div>
       </div>
-    </div>
+      </div>
 
-    <div class="flex items-center gap-3">
-      <div class="relative">
-        <button
-          #notificationsTrigger
-          class="inline-flex items-center justify-center h-10 w-10 rounded-lg border border-border-soft bg-surface-alt text-text-subtle hover:text-accent-strong hover:bg-accent-soft transition relative"
-          type="button"
-          [attr.aria-label]="'home.viewNotifications' | translate"
-          [attr.aria-expanded]="isNotificationsOpen"
-          (click)="toggleNotifications($event)"
-        >
+      <div class="flex items-center gap-3">
+        <div class="relative">
+          <button
+            #notificationsTrigger
+            class="inline-flex items-center justify-center h-10 w-10 rounded-lg border border-border-soft bg-surface-alt text-text-primary hover:text-accent-strong hover:bg-accent-soft transition focus:outline-none focus:ring-0"
+            type="button"
+            [attr.aria-label]="'home.viewNotifications' | translate"
+            [attr.aria-expanded]="isNotificationsOpen"
+            (click)="toggleNotifications($event)"
+          >
+            <i class="fa-regular fa-bell"></i>
+          </button>
           <span class="absolute top-2 right-2 h-2 w-2 rounded-full bg-danger" *ngIf="unreadNotifications > 0"></span>
-          <i class="fa-regular fa-bell"></i>
-        </button>
-        <div
-          #notificationsMenu
-          class="absolute right-0 mt-2 w-[min(380px,92vw)] bg-surface border border-border-soft rounded-2xl shadow-soft p-4 space-y-3 z-50"
-          *ngIf="isNotificationsOpen"
-        >
+          <div
+            #notificationsMenu
+            class="absolute right-0 mt-2 w-[min(380px,92vw)] bg-surface border border-border-soft rounded-2xl shadow-soft p-4 space-y-3 z-50"
+            *ngIf="isNotificationsOpen"
+          >
           <div class="flex items-start justify-between gap-3">
             <div>
               <p class="font-semibold text-sm m-0">{{ 'notifications.title' | translate }}</p>
@@ -122,17 +122,21 @@
       <div class="relative">
         <button
           #profileMenu
-          class="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-border-soft bg-surface text-text-primary font-semibold hover:border-accent-strong shadow-sm transition"
+          class="inline-flex items-center justify-center h-10 w-10 rounded-lg border border-border-soft bg-surface text-text-primary hover:border-accent-strong shadow-sm transition p-0 overflow-hidden focus:outline-none focus:ring-0"
           type="button"
           (click)="toggleProfileMenu($event)"
           [attr.aria-expanded]="isProfileMenuOpen"
           [attr.aria-label]="(isProfileMenuOpen ? 'home.profileMenu.closeLabel' : 'home.profileMenu.openLabel') | translate"
         >
-          <div class="h-8 w-8 rounded-full bg-accent text-text-inverse grid place-items-center font-bold text-xs overflow-hidden">
-            <img *ngIf="userAvatarUrl; else fallbackInitials" [src]="userAvatarUrl" alt="User avatar" class="h-full w-full object-cover" />
-            <ng-template #fallbackInitials>{{ userInitials }}</ng-template>
-          </div>
-          <i class="fa-solid" [ngClass]="isProfileMenuOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+          <img
+            *ngIf="userAvatarUrl; else fallbackInitials"
+            [src]="userAvatarUrl"
+            alt="User avatar"
+            class="h-full w-full object-cover"
+          />
+          <ng-template #fallbackInitials>
+            <span class="h-full w-full grid place-items-center bg-accent text-text-inverse font-bold text-xs">{{ userInitials }}</span>
+          </ng-template>
         </button>
 
         <div
@@ -179,11 +183,11 @@
     </div>
   </header>
 
-  <div class="pt-16 pb-14 min-h-screen">
+  <div class="pt-16 pb-0 min-h-screen">
     <!-- Sidebar -->
     <aside
       [ngClass]="[
-        'fixed top-16 bottom-14 left-0 z-30 w-64 bg-gradient-to-b from-surface to-surface-alt border-r border-border-soft shadow-soft backdrop-blur-md flex flex-col gap-4 px-4 py-5 transition-transform duration-200 overflow-hidden',
+        'fixed top-16 bottom-0 left-0 z-30 w-64 bg-gradient-to-b from-surface to-surface-alt border-r border-border-soft shadow-soft backdrop-blur-md flex flex-col gap-4 px-4 py-5 transition-transform duration-200 overflow-hidden',
         isNavOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       ]"
     >
@@ -236,68 +240,68 @@
     <!-- Scrim for mobile -->
     <div
       *ngIf="isNavOpen"
-      class="fixed inset-0 bg-overlay-strong backdrop-blur-sm z-20 lg:hidden"
+      class="fixed top-16 bottom-0 inset-x-0 bg-overlay-strong backdrop-blur-sm z-20 lg:hidden"
       (click)="closeNav()"
     ></div>
 
     <!-- Main -->
-    <main class="ml-0 lg:ml-64 h-[calc(100vh-4rem-3.5rem)] overflow-auto px-4 lg:px-8 py-6">
+    <main class="ml-0 lg:ml-64 min-h-[calc(100vh-4rem)] overflow-auto px-4 lg:px-8 py-6 flex-1">
       <router-outlet></router-outlet>
     </main>
-  </div>
 
-  <!-- Footer -->
-  <footer class="fixed bottom-0 inset-x-0 z-40 px-4 lg:px-8 py-3 h-14 border-t border-border-soft bg-page text-center text-xs text-text-subtle">
-    <div class="flex flex-wrap items-center justify-center gap-3">
-      <a
-        href="mailto:julio.all&#64;outlook.com"
-        class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
-        aria-label="E-mail de Julio Alves"
-      >
-        <i class="fa-solid fa-envelope"></i>
-        <span>Email</span>
-      </a>
-      <a
-        href="https://instagram.com/julioall"
-        target="_blank"
-        rel="noreferrer noopener"
-        class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
-        aria-label="Instagram de Julio Alves"
-      >
-        <i class="fa-brands fa-instagram"></i>
-        <span>Instagram</span>
-      </a>
-      <a
-        href="https://discord.gg/julioall"
-        target="_blank"
-        rel="noreferrer noopener"
-        class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
-        aria-label="Discord de Julio Alves"
-      >
-        <i class="fa-brands fa-discord"></i>
-        <span>Discord</span>
-      </a>
-      <a
-        href="https://www.linkedin.com/in/julioall/"
-        target="_blank"
-        rel="noreferrer noopener"
-        class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
-        aria-label="LinkedIn de Julio Alves"
-      >
-        <i class="fa-brands fa-linkedin"></i>
-        <span>LinkedIn</span>
-      </a>
-      <a
-        href="https://wa.me/qr/R2JWZR5YSPS4D1"
-        target="_blank"
-        rel="noreferrer noopener"
-        class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
-        aria-label="WhatsApp de Julio Alves"
-      >
-        <i class="fa-brands fa-whatsapp"></i>
-        <span>WhatsApp</span>
-      </a>
-    </div>
-    <div class="text-text-muted">&copy; 2020-2025 Julio Alves. All rights reserved.</div>
-  </footer>
+    <!-- Footer -->
+    <footer class="ml-0 lg:ml-64 px-4 lg:px-8 py-3 h-14 border-t border-border-soft bg-transparent text-[11px] text-text-subtle flex items-center justify-between gap-4 flex-wrap">
+      <div class="flex items-center gap-3 flex-wrap">
+        <a
+          href="mailto:julio.all&#64;outlook.com"
+          class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
+          aria-label="E-mail de Julio Alves"
+        >
+          <i class="fa-solid fa-envelope"></i>
+          <span>Email</span>
+        </a>
+        <a
+          href="https://instagram.com/julioall"
+          target="_blank"
+          rel="noreferrer noopener"
+          class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
+          aria-label="Instagram de Julio Alves"
+        >
+          <i class="fa-brands fa-instagram"></i>
+          <span>Instagram</span>
+        </a>
+        <a
+          href="https://discord.gg/julioall"
+          target="_blank"
+          rel="noreferrer noopener"
+          class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
+          aria-label="Discord de Julio Alves"
+        >
+          <i class="fa-brands fa-discord"></i>
+          <span>Discord</span>
+        </a>
+        <a
+          href="https://www.linkedin.com/in/julioall/"
+          target="_blank"
+          rel="noreferrer noopener"
+          class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
+          aria-label="LinkedIn de Julio Alves"
+        >
+          <i class="fa-brands fa-linkedin"></i>
+          <span>LinkedIn</span>
+        </a>
+        <a
+          href="https://wa.me/qr/R2JWZR5YSPS4D1"
+          target="_blank"
+          rel="noreferrer noopener"
+          class="inline-flex items-center gap-1 text-text-subtle hover:text-accent-strong transition"
+          aria-label="WhatsApp de Julio Alves"
+        >
+          <i class="fa-brands fa-whatsapp"></i>
+          <span>WhatsApp</span>
+        </a>
+      </div>
+      <div class="text-text-muted whitespace-nowrap">&copy; 2020-2025 Julio Alves. All rights reserved.</div>
+    </footer>
+  </div>
 </div>
