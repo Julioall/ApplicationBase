@@ -5,7 +5,6 @@ import { TodoStep } from '../../model/todo';
 @Component({
   selector: 'app-todo-steps-checklist',
   templateUrl: './todo-steps-checklist.component.html',
-  styleUrls: ['./todo-steps-checklist.component.scss'],
 })
 export class TodoStepsChecklistComponent {
   @Input() steps: TodoStep[] = [];

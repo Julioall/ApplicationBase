@@ -1,38 +1,39 @@
-<div class="add-inline mb-3" *ngIf="canEdit">
+<div class="flex gap-2 items-center mb-3" *ngIf="canEdit">
   <input
     type="text"
-    class="new-step"
+    class="flex-1 rounded-[10px] border border-dashed border-border-subtle bg-surface px-2.5 py-2.5 text-text-primary placeholder:text-text-muted"
     [(ngModel)]="newStepTitle"
     [placeholder]="'todo.steps.placeholder' | translate"
     (keydown.enter)="submitNewStep()"
   />
-  <button class="btn ghost sm" type="button" (click)="submitNewStep()">
+  <button class="inline-flex items-center gap-2 rounded-lg border border-transparent bg-transparent px-3 py-2.5 text-sm font-semibold text-text-subtle transition hover:bg-surface-alt hover:text-text-primary" type="button" (click)="submitNewStep()">
     <i class="fa-regular fa-plus"></i>
   </button>
 </div>
 
 <div
-  class="steps-list"
+  class="flex flex-col gap-1.5 max-h-[10vh] overflow-y-auto pr-1"
   cdkDropList
   [cdkDropListData]="steps"
   (cdkDropListDropped)="onDrop($event)"
   [cdkDropListDisabled]="!canEdit"
 >
-  <div class="step-row" *ngFor="let step of steps; trackBy: trackById" cdkDrag [cdkDragDisabled]="!canEdit">
-    <button class="drag-handle" type="button" cdkDragHandle [disabled]="!canEdit" aria-label="Reorder">
+  <div class="grid grid-cols-[auto_auto_1fr_auto_auto] items-center gap-2 rounded-[10px] border border-border-subtle bg-surface p-2 " *ngFor="let step of steps; trackBy: trackById" cdkDrag [cdkDragDisabled]="!canEdit">
+    <button class="border-none bg-transparent text-text-muted cursor-grab disabled:cursor-default" type="button" cdkDragHandle [disabled]="!canEdit" aria-label="Reorder">
       <span>⋮⋮</span>
     </button>
-    <label class="checkbox">
+    <label class="relative inline-flex items-center cursor-pointer">
       <input
         type="checkbox"
         [checked]="step.IsCompleted"
         (change)="onToggle(step, $any($event.target).checked)"
         [disabled]="!canToggle"
+        class="opacity-0 w-4 h-4 m-0"
       />
-      <span class="fakebox"></span>
+      <span class="absolute w-4 h-4 border border-border-subtle rounded pointer-events-none" [class.bg-[#63c28a]="step.IsCompleted" [class.border-[#63c28a]]="step.IsCompleted"></span>
     </label>
-    <div class="step-body" [class.completed]="step.IsCompleted">
-      <span *ngIf="editingStepId !== step.Id" (click)="startEditing(step)">{{ step.Title }}</span>
+    <div class="flex flex-col gap-0.5">
+      <span *ngIf="editingStepId !== step.Id" (click)="startEditing(step)" class="cursor-text" [class.line-through]="step.IsCompleted" [class.text-text-muted]="step.IsCompleted">{{ step.Title }}</span>
       <input
         *ngIf="editingStepId === step.Id"
         type="text"
@@ -40,13 +41,14 @@
         (blur)="commitEdit(step)"
         (keydown.enter)="commitEdit(step); $event.preventDefault()"
         [disabled]="!canEdit"
+        class="rounded-lg border border-border-subtle bg-surface-elevated px-2 py-1.5 text-text-primary"
       />
-      <small *ngIf="step.CompletedAt" class="timestamp">{{ step.CompletedAt | date: 'short' }}</small>
+      <small *ngIf="step.CompletedAt" class="text-text-muted text-xs">{{ step.CompletedAt | date: 'short' }}</small>
     </div>
-    <button class="icon-btn ghost sm success" type="button" *ngIf="canToggle && !step.IsCompleted" (click)="onToggle(step, true)">
+    <button class="inline-flex h-6 w-6 items-center justify-center rounded border-none bg-transparent text-success transition hover:bg-transparent" type="button" *ngIf="canToggle && !step.IsCompleted" (click)="onToggle(step, true)">
       <i class="fa-regular fa-circle-check"></i>
     </button>
-    <button class="icon-btn ghost sm danger" type="button" *ngIf="canEdit" (click)="deleteStep.emit(step.Id)">
+    <button class="inline-flex h-6 w-6 items-center justify-center rounded border-none bg-transparent text-danger transition hover:bg-transparent" type="button" *ngIf="canEdit" (click)="deleteStep.emit(step.Id)">
       <i class="fa-regular fa-trash-can"></i>
     </button>
   </div>

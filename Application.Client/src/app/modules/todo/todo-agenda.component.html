@@ -1,37 +1,41 @@
-<section class="agenda-view">
-  <header class="agenda-header">
-    <div class="date-controls">
-      <button type="button" class="icon-btn" (click)="changeDay(-1)" aria-label="Previous day">
+<section class="flex flex-col gap-3">
+  <header class="flex items-center justify-between gap-3">
+    <div class="inline-flex items-center gap-2">
+      <button type="button" class="inline-flex h-11 w-11 items-center justify-center rounded-[10px] border border-border-subtle bg-surface text-text-primary transition hover:bg-surface-alt" (click)="changeDay(-1)" aria-label="Previous day">
         <i class="fa-solid fa-chevron-left"></i>
       </button>
-      <div class="current-date">
-        <p class="eyebrow">{{ selectedDate | date: 'EEEE' }}</p>
-        <h3>{{ selectedDate | date: 'dd MMM yyyy' }}</h3>
+      <div>
+        <p class="text-xs font-bold uppercase tracking-widest text-text-subtle">{{ selectedDate | date: 'EEEE' }}</p>
+        <h3 class="m-0">{{ selectedDate | date: 'dd MMM yyyy' }}</h3>
       </div>
-      <button type="button" class="icon-btn" (click)="changeDay(1)" aria-label="Next day">
+      <button type="button" class="inline-flex h-11 w-11 items-center justify-center rounded-[10px] border border-border-subtle bg-surface text-text-primary transition hover:bg-surface-alt" (click)="changeDay(1)" aria-label="Next day">
         <i class="fa-solid fa-chevron-right"></i>
       </button>
     </div>
-    <button class="btn ghost small" type="button" (click)="goToday()">{{ 'todo.agenda.today' | translate }}</button>
+    <button class="inline-flex items-center gap-2 rounded-lg border border-border-subtle bg-transparent px-4 py-2.5 text-sm font-semibold text-text-subtle transition hover:bg-surface-alt hover:text-text-primary" type="button" (click)="goToday()">{{ 'todo.agenda.today' | translate }}</button>
   </header>
 
-  <div class="agenda-list" *ngIf="agendaEntries.length; else emptyAgenda">
-    <div class="agenda-item" *ngFor="let entry of agendaEntries" (click)="taskSelected.emit(entry.task)">
-      <div class="time-col" [class.all-day]="entry.isAllDay">
+  <div class="flex flex-col gap-2" *ngIf="agendaEntries.length; else emptyAgenda">
+    <div class="grid grid-cols-[120px_1fr] gap-3 rounded-lg border border-border-subtle bg-surface p-3 shadow-soft transition hover:bg-surface-alt" *ngFor="let entry of agendaEntries" (click)="taskSelected.emit(entry.task)">
+      <div class="flex items-center justify-end text-sm font-semibold text-text-muted" [class.text-accent-strong]="entry.isAllDay">
         <span *ngIf="entry.isAllDay">{{ 'todo.schedule.allDay' | translate }}</span>
         <span *ngIf="!entry.isAllDay">
           {{ entry.start | date: 'HH:mm' }} - {{ entry.end | date: 'HH:mm' }}
         </span>
       </div>
-      <div class="agenda-card" [class.done]="entry.task.Status === TodoStatus.Done">
-        <div class="agenda-title">
-          <span class="title-text">{{ entry.task.Title }}</span>
+      <div class="rounded-md border border-border-subtle bg-gradient-to-br from-surface to-surface-alt p-3 flex flex-col gap-2" [class.opacity-72]="entry.task.Status === TodoStatus.Done">
+        <div class="flex items-center justify-between gap-2">
+          <span class="font-bold">{{ entry.task.Title }}</span>
         </div>
-        <div class="agenda-meta">
+        <div class="flex flex-wrap items-center gap-1.5">
           <span
-            class="pill tiny priority"
+            class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold"
             *ngIf="entry.task.Priority"
-            [ngClass]="getPriorityClass(entry.task.Priority)"
+            [ngClass]="{
+              'border-[color-mix(in_srgb,var(--success)_45%,transparent)] bg-success-soft text-success': getPriorityClass(entry.task.Priority) === 'low',
+              'border-[color-mix(in_srgb,var(--warning)_50%,transparent)] bg-warning-soft text-[#b45309]': getPriorityClass(entry.task.Priority) === 'medium',
+              'border-[color-mix(in_srgb,var(--danger)_45%,transparent)] bg-danger-soft text-danger': getPriorityClass(entry.task.Priority) === 'high'
+            }"
           >
             {{ getPriorityLabel(entry.task.Priority) }}
           </span>
@@ -41,8 +45,8 @@
   </div>
 
   <ng-template #emptyAgenda>
-    <div class="empty-state">
-      <p class="muted">{{ 'todo.agenda.empty' | translate }}</p>
+    <div class="text-center p-4 text-text-muted">
+      <p>{{ 'todo.agenda.empty' | translate }}</p>
     </div>
   </ng-template>
 </section>

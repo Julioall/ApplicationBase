@@ -1,16 +1,16 @@
-<section class="todo-page">
-  <article class="card settings-shell todo-board kanban-shell">
-    <header class="board-header">
-      <div class="board-header__copy">
-        <div class="title-row">
-          <h1>{{ 'todo.title' | translate }}</h1>
+<section class="w-full px-2 sm:px-4">
+  <article class="mx-auto max-w-7xl space-y-6 rounded-2xl border border-border-soft bg-surface p-6 shadow-soft lg:p-8 min-h-screen">
+    <header class="flex flex-col gap-4 border-b border-border-soft pb-4 sm:flex-row sm:items-center sm:justify-between">
+      <div class="space-y-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <h1 class="text-3xl font-semibold text-text-primary lg:text-4xl">{{ 'todo.title' | translate }}</h1>
         </div>
-        <p class="subtitle">{{ 'todo.subtitle' | translate }}</p>
+        <p class="max-w-3xl text-base text-text-subtle">{{ 'todo.subtitle' | translate }}</p>
       </div>
-      <div class="board-header__actions">
+      <div class="flex items-center gap-3">
         <button
-          class="btn btn-primary"
           type="button"
+          class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-accent-strong to-accent px-5 py-3 text-sm font-semibold text-text-inverse shadow-[0_10px_30px_rgba(var(--shadow-rgb),0.15)] transition hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50"
           (click)="openCreate()"
           [disabled]="!canManage"
           [attr.aria-label]="'todo.newTask' | translate"
@@ -21,35 +21,69 @@
       </div>
     </header>
 
-    <div class="board-toolbar">
-      <div class="toolbar-actions">
-        <div class="view-switch">
-          <button type="button" class="pill ghost" [class.active]="viewMode === 'board'" (click)="setViewMode('board')">
-            <i class="fa-solid fa-table-columns"></i>
-            <span>{{ 'todo.view.board' | translate }}</span>
-          </button>
-          <button type="button" class="pill ghost" [class.active]="viewMode === 'agenda'" (click)="setViewMode('agenda')">
-            <i class="fa-solid fa-list"></i>
-            <span>{{ 'todo.view.agenda' | translate }}</span>
-          </button>
-        </div>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="inline-flex items-center gap-2 flex-wrap">
+        <button
+          type="button"
+          class="inline-flex items-center gap-2.5 rounded-lg border border-border-subtle bg-surface px-4 py-2.5 text-sm font-semibold shadow-soft transition hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+          [class.bg-accent-soft]="viewMode === 'board'"
+          [class.border-accent-soft]="viewMode === 'board'"
+          [class.text-accent-strong]="viewMode === 'board'"
+          [class.shadow-[0_8px_22px_rgba(var(--accent-rgb),0.18)]="viewMode === 'board'"
+          [class.text-text-primary]="viewMode !== 'board'"
+          (click)="setViewMode('board')"
+        >
+          <i class="fa-solid fa-table-columns"></i>
+          <span>{{ 'todo.view.board' | translate }}</span>
+        </button>
+        <button
+          type="button"
+          class="inline-flex items-center gap-2.5 rounded-lg border border-border-subtle bg-surface px-4 py-2.5 text-sm font-semibold shadow-soft transition hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+          [class.bg-accent-soft]="viewMode === 'agenda'"
+          [class.border-accent-soft]="viewMode === 'agenda'"
+          [class.text-accent-strong]="viewMode === 'agenda'"
+          [class.shadow-[0_8px_22px_rgba(var(--accent-rgb),0.18)]="viewMode === 'agenda'"
+          [class.text-text-primary]="viewMode !== 'agenda'"
+          (click)="setViewMode('agenda')"
+        >
+          <i class="fa-solid fa-list"></i>
+          <span>{{ 'todo.view.agenda' | translate }}</span>
+        </button>
       </div>
     </div>
 
-    <section class="board-body" *ngIf="!isLoading; else loadingState">
+    <section class="flex-1" *ngIf="!isLoading; else loadingState">
       <ng-container [ngSwitch]="viewMode">
-        <div class="board-canvas" *ngSwitchCase="'board'">
-          <div class="board-column" *ngFor="let column of columns" [attr.data-status]="column.status">
-            <div class="column-header" [ngClass]="getStatusClass(column.status)">
-              <div class="column-title">
-                <span class="status-dot"></span>
-                <span class="title-label">{{ column.label | translate }}</span>
+        <div class="flex gap-4 overflow-x-auto pb-4 scroll-smooth snap-x snap-mandatory" *ngSwitchCase="'board'">
+          <div
+            class="flex min-w-[280px] flex-1 flex-col rounded-xl border border-border-muted bg-column-bg shadow-[0_12px_32px_rgba(var(--shadow-rgb),0.12)] snap-center"
+            *ngFor="let column of columns"
+            [attr.data-status]="column.status"
+          >
+            <div
+              class="sticky top-0 z-10 flex items-center justify-between rounded-t-xl bg-surface-blur px-4 py-4 backdrop-blur-sm"
+              [ngClass]="{
+                'border-b border-border-soft': true
+              }"
+            >
+              <div class="flex items-center gap-2.5">
+                <span
+                  class="h-2.5 w-2.5 rounded-full shadow-[0_0_0_3px_var(--surface)]"
+                  [ngClass]="{
+                    'bg-[#94a3b8]': column.status === TodoStatus.NotStarted,
+                    'bg-[#3b82f6]': column.status === TodoStatus.InProgress,
+                    'bg-[#10b981]': column.status === TodoStatus.Done
+                  }"
+                ></span>
+                <span class="text-sm font-bold uppercase tracking-wide text-text-primary">{{ column.label | translate }}</span>
               </div>
-              <span class="count-pill">{{ column.items.length }}</span>
+              <span class="inline-flex min-w-9 items-center justify-center rounded-full border border-border-muted bg-surface px-2.5 py-1 text-sm font-bold text-text-primary">
+                {{ column.items.length }}
+              </span>
             </div>
 
             <div
-              class="column-dropzone"
+              class="flex-1 overflow-y-auto px-3 pt-3 scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-slate-300 max-h-[70vh]"
               cdkDropList
               [id]="column.id"
               [cdkDropListData]="column.items"
@@ -57,62 +91,81 @@
               (cdkDropListDropped)="onDrop($event, column.status)"
               [cdkDropListDisabled]="!canManage"
             >
-              <p class="empty" *ngIf="column.items.length === 0">{{ 'todo.emptyColumn' | translate }}</p>
+              <p class="my-5 text-center text-text-muted" *ngIf="column.items.length === 0">{{ 'todo.emptyColumn' | translate }}</p>
               <article
-                class="task-card"
+                class="mb-3 flex cursor-pointer flex-col gap-3 rounded-lg border border-border-muted bg-card-bg p-4 shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-[#3b82f6] hover:shadow-[0_12px_24px_rgba(var(--shadow-rgb),0.14)]"
                 *ngFor="let task of column.items"
                 cdkDrag
                 [cdkDragDisabled]="!canManage"
                 (click)="selectTask(task)"
               >
-                <header class="task-card__header">
-                  <div class="task-card__tags" *ngIf="getTaskCategories(task).length; else defaultTag">
+                <header class="flex items-start justify-between gap-3">
+                  <div class="flex flex-wrap gap-1.5" *ngIf="getTaskCategories(task).length; else defaultTag">
                     <span
-                      class="task-tag"
+                      class="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold uppercase tracking-wide"
                       *ngFor="let cat of getTaskCategories(task); let i = index"
-                      [ngClass]="{ 'tag--blue': i === 0, 'tag--purple': i === 1, 'tag--green': i === 2 }"
+                      [ngClass]="{
+                        'border-[color-mix(in_srgb,var(--accent)_30%,transparent)] bg-accent-soft text-accent-strong': i === 0,
+                        'border-[color-mix(in_srgb,#a855f7_30%,transparent)] bg-[color-mix(in_srgb,#a855f7_10%,transparent)] text-[#a855f7]': i === 1,
+                        'border-[color-mix(in_srgb,#10b981_30%,transparent)] bg-[color-mix(in_srgb,#10b981_10%,transparent)] text-[#10b981]': i === 2
+                      }"
                     >
-                      {{ cat }}
+                      <span class="font-extrabold">#</span>{{ cat }}
                     </span>
                   </div>
                   <ng-template #defaultTag>
-                    <div class="task-card__tags">
-                      <span class="task-tag tag--blue">{{ 'todo.defaultTag' | translate }}</span>
+                    <div class="flex flex-wrap gap-1.5">
+                      <span class="inline-flex items-center gap-1.5 rounded-lg border border-[color-mix(in_srgb,var(--accent)_30%,transparent)] bg-accent-soft px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-accent-strong">
+                        <span class="font-extrabold">#</span>{{ 'todo.defaultTag' | translate }}
+                      </span>
                     </div>
                   </ng-template>
-                  <span class="task-card__badge" *ngIf="task.Priority" [ngClass]="getPriorityClass(task.Priority)">
+                  <span
+                    class="flex-shrink-0 rounded-lg border px-2.5 py-1 text-xs font-bold"
+                    *ngIf="task.Priority"
+                    [ngClass]="{
+                      'border-[color-mix(in_srgb,var(--success)_45%,transparent)] bg-success-soft text-success': getPriorityClass(task.Priority) === 'low',
+                      'border-[color-mix(in_srgb,var(--warning)_50%,transparent)] bg-warning-soft text-[#b45309]': getPriorityClass(task.Priority) === 'medium',
+                      'border-[color-mix(in_srgb,var(--danger)_45%,transparent)] bg-danger-soft text-danger': getPriorityClass(task.Priority) === 'high'
+                    }"
+                  >
                     {{ getPriorityLabel(task.Priority) }}
                   </span>
                 </header>
 
-                <div class="task-card__content">
-                  <h3 class="task-card__title">{{ task.Title }}</h3>
-                  <p class="task-card__desc" *ngIf="task.Description" [innerHTML]="task.Description"></p>
+                <div class="flex flex-col gap-1.5">
+                  <h3 class="text-lg font-bold leading-snug text-text-primary">{{ task.Title }}</h3>
+                  <p
+                    class="line-clamp-2 min-h-[1.4em] overflow-hidden text-sm leading-relaxed text-[#64748b]"
+                    *ngIf="task.Description"
+                    [innerHTML]="task.Description"
+                  ></p>
                 </div>
 
-                <footer class="task-card__footer">
-                  <div class="task-card__date" *ngIf="task.DueDate">
-                    <i class="fa-regular fa-calendar"></i>
+                <footer class="flex items-center justify-between gap-2.5 border-t border-dashed border-border-soft pt-3">
+                  <div class="flex items-center gap-2 text-sm font-semibold text-[#64748b]" *ngIf="task.DueDate">
+                    <i class="fa-regular fa-calendar text-sm text-text-muted"></i>
                     <span>{{ task.DueDate | date: 'MMM d' }}</span>
                   </div>
-                  <div class="task-card__assignees" *ngIf="getAssignees(task).length">
+                  <div class="ml-auto inline-flex items-center" *ngIf="getAssignees(task).length">
                     <ng-container *ngFor="let assignee of getAssignees(task) | slice:0:3; let idx = index">
                       <div
-                        class="assignee-avatar"
+                        class="inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border-2 border-surface bg-surface-alt text-xs font-bold text-text-primary transition hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(var(--shadow-rgb),0.15)]"
                         [style.zIndex]="10 - idx"
                         [style.marginLeft.px]="idx === 0 ? 0 : -10"
                         [attr.title]="assignee.Name"
                       >
-                        <img *ngIf="assignee.AvatarUrl; else initials" [src]="assignee.AvatarUrl" [alt]="assignee.Name" />
+                        <img *ngIf="assignee.AvatarUrl; else initials" [src]="assignee.AvatarUrl" [alt]="assignee.Name" class="h-full w-full object-cover" />
                         <ng-template #initials>
                           <span>{{ getAssigneeInitials(assignee.Name) }}</span>
                         </ng-template>
                       </div>
                     </ng-container>
                     <div
-                      class="assignee-avatar assignee-avatar__more"
+                      class="inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-surface bg-surface-muted text-xs font-bold text-text-primary"
                       *ngIf="getAssignees(task).length > 3"
                       [attr.title]="getAssignees(task).length - 3"
+                      [style.marginLeft.px]="-10"
                     >
                       +{{ getAssignees(task).length - 3 }}
                     </div>
@@ -123,12 +176,12 @@
 
             <button
               type="button"
-              class="add-task-btn"
+              class="w-full rounded-b-xl border-none bg-transparent px-4 py-3.5 text-left text-sm font-semibold text-text-muted transition hover:bg-surface-alt hover:text-accent-strong focus-visible:bg-surface-alt focus-visible:text-accent-strong"
               (click)="openCreate()"
               [disabled]="!canManage"
               [attr.aria-label]="'todo.actions.addCard' | translate"
             >
-              <i class="fa fa-plus me-2"></i>{{ 'todo.actions.addCard' | translate }}
+              <i class="fa fa-plus mr-2"></i>{{ 'todo.actions.addCard' | translate }}
             </button>
           </div>
         </div>
@@ -145,15 +198,15 @@
   </article>
 </section>
 
-<div class="create-modal-backdrop" *ngIf="isCreateModalOpen">
-  <div class="create-modal">
-    <header class="create-modal__header">
+<div class="fixed inset-0 z-[1000] flex items-center justify-center bg-overlay-strong p-5 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]" *ngIf="isCreateModalOpen">
+  <div class="flex w-full max-w-[600px] max-h-[90vh] flex-col overflow-visible rounded-2xl border border-[color-mix(in_srgb,var(--surface)_55%,transparent)] bg-surface shadow-soft animate-[slideUp_0.3s_cubic-bezier(0.16,1,0.3,1)]">
+    <header class="flex items-start justify-between rounded-t-2xl border-b border-border-subtle bg-surface px-8 py-6">
       <div>
-        <h2>{{ 'todo.modal.title' | translate }}</h2>
-        <p class="subtitle">{{ 'todo.modal.subtitle' | translate }}</p>
+        <h2 class="text-xl font-bold text-text-primary">{{ 'todo.modal.title' | translate }}</h2>
+        <p class="mt-1 text-sm text-text-subtle">{{ 'todo.modal.subtitle' | translate }}</p>
       </div>
       <button
-        class="btn-icon-close"
+        class="rounded border-none bg-transparent p-1 text-xl text-text-subtle transition hover:bg-surface-alt hover:text-[#ef4444]"
         type="button"
         (click)="cancelCreate()"
         [attr.aria-label]="'todo.actions.close' | translate"
@@ -162,45 +215,55 @@
       </button>
     </header>
 
-    <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="create-modal__body">
-      <div class="form-group">
-        <label>{{ 'todo.fields.title' | translate }}</label>
-        <div class="input-wrapper">
-          <i class="fa-solid fa-pen-to-square input-icon"></i>
+    <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="flex flex-col gap-6 overflow-visible px-8 py-8">
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-bold text-text-primary">{{ 'todo.fields.title' | translate }}</label>
+        <div class="relative flex items-center text-text-subtle">
+          <i class="fa-solid fa-pen-to-square pointer-events-none absolute left-3.5 z-10 text-sm"></i>
           <input
             type="text"
-            class="modern-input"
+            class="w-full appearance-none rounded-lg border border-border-subtle bg-surface-alt px-4 py-2.5 pl-10 font-inherit text-[0.95rem] text-text-primary transition-all focus:border-accent focus:bg-surface focus:shadow-[0_0_0_3px_rgba(var(--accent-rgb),0.14)] focus:outline-none placeholder:text-text-muted"
             formControlName="Title"
             [placeholder]="'todo.fields.titlePlaceholder' | translate"
           />
         </div>
       </div>
 
-      <div class="form-grid compact">
-        <div class="form-group">
-          <label>{{ 'todo.fields.startDateTime' | translate }}</label>
-          <div class="input-wrapper">
-            <i class="fa-regular fa-calendar input-icon"></i>
-            <input type="datetime-local" class="modern-input" formControlName="StartDate" [placeholder]="'todo.fields.startDateTime' | translate" />
+      <div class="grid grid-cols-2 gap-5">
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-bold text-text-primary">{{ 'todo.fields.startDateTime' | translate }}</label>
+          <div class="relative flex items-center text-text-subtle">
+            <i class="fa-regular fa-calendar pointer-events-none absolute left-3.5 z-10 text-sm"></i>
+            <input
+              type="datetime-local"
+              class="w-full appearance-none rounded-lg border border-border-subtle bg-surface-alt px-4 py-2.5 pl-10 font-inherit text-[0.95rem] text-text-primary transition-all focus:border-accent focus:bg-surface focus:shadow-[0_0_0_3px_rgba(var(--accent-rgb),0.14)] focus:outline-none placeholder:text-text-muted"
+              formControlName="StartDate"
+              [placeholder]="'todo.fields.startDateTime' | translate"
+            />
           </div>
         </div>
-        <div class="form-group">
-          <label>{{ 'todo.fields.endDateTime' | translate }}</label>
-          <div class="input-wrapper">
-            <i class="fa-regular fa-calendar-check input-icon"></i>
-            <input type="datetime-local" class="modern-input" formControlName="DueDate" [placeholder]="'todo.fields.endDateTime' | translate" />
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-bold text-text-primary">{{ 'todo.fields.endDateTime' | translate }}</label>
+          <div class="relative flex items-center text-text-subtle">
+            <i class="fa-regular fa-calendar-check pointer-events-none absolute left-3.5 z-10 text-sm"></i>
+            <input
+              type="datetime-local"
+              class="w-full appearance-none rounded-lg border border-border-subtle bg-surface-alt px-4 py-2.5 pl-10 font-inherit text-[0.95rem] text-text-primary transition-all focus:border-accent focus:bg-surface focus:shadow-[0_0_0_3px_rgba(var(--accent-rgb),0.14)] focus:outline-none placeholder:text-text-muted"
+              formControlName="DueDate"
+              [placeholder]="'todo.fields.endDateTime' | translate"
+            />
           </div>
         </div>
       </div>
 
-      <div class="form-grid compact">
-      <div class="form-group">
-        <label>{{ 'todo.fields.category' | translate }}</label>
-        <div class="input-wrapper">
-          <i class="fa-solid fa-tag input-icon"></i>
-          <input
+      <div class="grid grid-cols-2 gap-5">
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-bold text-text-primary">{{ 'todo.fields.category' | translate }}</label>
+          <div class="relative flex items-center text-text-subtle">
+            <i class="fa-solid fa-tag pointer-events-none absolute left-3.5 z-10 text-sm"></i>
+            <input
               type="text"
-              class="modern-input"
+              class="w-full appearance-none rounded-lg border border-border-subtle bg-surface-alt px-4 py-2.5 pl-10 font-inherit text-[0.95rem] text-text-primary transition-all focus:border-accent focus:bg-surface focus:shadow-[0_0_0_3px_rgba(var(--accent-rgb),0.14)] focus:outline-none placeholder:text-text-muted"
               formControlName="Category"
               [placeholder]="'todo.fields.categoryPlaceholder' | translate"
               list="todo-category-options"
@@ -212,11 +275,12 @@
               <option *ngFor="let option of categoryOptions" [value]="option"></option>
             </datalist>
           </div>
-          <div class="chip-container" *ngIf="selectedCategories.length">
-            <span class="modern-chip" *ngFor="let cat of selectedCategories">
+          <div class="mt-2 flex flex-wrap gap-2" *ngIf="selectedCategories.length">
+            <span class="inline-flex items-center gap-1.5 rounded-full border border-border-subtle bg-surface-alt px-2.5 py-1 text-xs font-semibold text-text-primary" *ngFor="let cat of selectedCategories">
               {{ cat }}
               <button
                 type="button"
+                class="flex border-none bg-transparent p-0 text-xs text-text-subtle hover:text-[#ef4444]"
                 (click)="removeCategory(cat)"
                 [attr.aria-label]="'todo.actions.removeCategory' | translate"
               >
@@ -226,53 +290,54 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label>{{ 'todo.fields.priority' | translate }}</label>
-          <div class="input-wrapper">
-            <i class="fa-solid fa-layer-group input-icon"></i>
-            <select class="modern-input" formControlName="Priority">
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-bold text-text-primary">{{ 'todo.fields.priority' | translate }}</label>
+          <div class="relative flex items-center text-text-subtle">
+            <i class="fa-solid fa-layer-group pointer-events-none absolute left-3.5 z-10 text-sm"></i>
+            <select class="w-full appearance-none rounded-lg border border-border-subtle bg-surface-alt px-4 py-2.5 pl-10 font-inherit text-[0.95rem] text-text-primary transition-all focus:border-accent focus:bg-surface focus:shadow-[0_0_0_3px_rgba(var(--accent-rgb),0.14)] focus:outline-none" formControlName="Priority">
               <option [ngValue]="3">{{ 'todo.priority.high' | translate }}</option>
               <option [ngValue]="2">{{ 'todo.priority.medium' | translate }}</option>
               <option [ngValue]="1">{{ 'todo.priority.low' | translate }}</option>
             </select>
-            <i class="fa-solid fa-chevron-down select-arrow"></i>
+            <i class="fa-solid fa-chevron-down pointer-events-none absolute right-3.5 text-xs text-text-subtle"></i>
           </div>
         </div>
       </div>
 
-      <div class="form-group">
-        <label>{{ 'todo.fields.assignees' | translate }}</label>
-        <div class="input-wrapper assignee-input">
-          <i class="fa-solid fa-user-plus input-icon"></i>
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-bold text-text-primary">{{ 'todo.fields.assignees' | translate }}</label>
+        <div class="relative flex items-center text-text-subtle">
+          <i class="fa-solid fa-user-plus pointer-events-none absolute left-3.5 z-10 text-sm"></i>
           <input
             type="text"
-            class="modern-input"
+            class="w-full appearance-none rounded-lg border border-border-subtle bg-surface-alt px-4 py-2.5 pl-10 font-inherit text-[0.95rem] text-text-primary transition-all focus:border-accent focus:bg-surface focus:shadow-[0_0_0_3px_rgba(var(--accent-rgb),0.14)] focus:outline-none placeholder:text-text-muted"
             [placeholder]="'todo.fields.assigneesPlaceholder' | translate"
             autocomplete="off"
             #assigneeInput
             (keydown.enter)="onAssigneeEnter($event, assigneeInput)"
             (input)="onAssigneeInputChange(assigneeInput.value)"
           />
-          <div class="assignee-suggestions" *ngIf="assigneeSuggestions.length">
+          <div class="absolute left-0 right-0 top-[calc(100%+6px)] z-20 flex flex-col overflow-hidden rounded-lg border border-border-soft bg-surface shadow-soft" *ngIf="assigneeSuggestions.length">
             <button
               type="button"
-              class="assignee-suggestion"
+              class="flex items-center gap-2.5 border-none bg-transparent px-3 py-2.5 text-left text-text-primary hover:bg-surface-alt"
               *ngFor="let option of assigneeSuggestions"
               (click)="selectAssigneeSuggestion(option)"
             >
-              <span class="avatar-thumb">
-                <img *ngIf="option.AvatarUrl" [src]="option.AvatarUrl" [alt]="option.Name" />
+              <span class="inline-flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border border-border-soft bg-surface-alt text-xs font-bold text-text-primary">
+                <img *ngIf="option.AvatarUrl" [src]="option.AvatarUrl" [alt]="option.Name" class="h-full w-full object-cover" />
                 <span *ngIf="!option.AvatarUrl">{{ getAssigneeInitials(option.Name) }}</span>
               </span>
-              <span class="name">{{ option.Name }}</span>
+              <span class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{{ option.Name }}</span>
             </button>
           </div>
         </div>
-        <div class="chip-container" *ngIf="selectedAssignees.length">
-          <span class="modern-chip" *ngFor="let person of selectedAssignees">
+        <div class="mt-2 flex flex-wrap gap-2" *ngIf="selectedAssignees.length">
+          <span class="inline-flex items-center gap-1.5 rounded-full border border-border-subtle bg-surface-alt px-2.5 py-1 text-xs font-semibold text-text-primary" *ngFor="let person of selectedAssignees">
             {{ person.Name }}
             <button
               type="button"
+              class="flex border-none bg-transparent p-0 text-xs text-text-subtle hover:text-[#ef4444]"
               (click)="removeAssignee(person.Name)"
               [attr.aria-label]="'todo.actions.removeAssignee' | translate"
             >
@@ -281,12 +346,13 @@
           </span>
         </div>
       </div>
-
     </form>
 
-    <footer class="create-modal__footer">
-      <button class="btn btn-ghost" type="button" (click)="cancelCreate()">{{ 'todo.actions.cancel' | translate }}</button>
-      <button class="btn btn-primary" type="submit" (click)="submitCreate()">
+    <footer class="flex justify-end gap-3 rounded-b-2xl border-t border-border-subtle bg-surface-alt px-8 py-5">
+      <button class="inline-flex items-center gap-2 rounded-lg border border-border-subtle bg-transparent px-5 py-2.5 text-sm font-bold text-text-subtle transition-all hover:bg-surface-alt hover:text-text-primary" type="button" (click)="cancelCreate()">
+        {{ 'todo.actions.cancel' | translate }}
+      </button>
+      <button class="inline-flex items-center gap-2 rounded-lg border border-transparent bg-accent px-5 py-2.5 text-sm font-bold text-text-inverse shadow-[0_1px_2px_0_rgba(var(--shadow-rgb),0.15)] transition-all hover:-translate-y-px hover:bg-primary-strong" type="submit" (click)="submitCreate()">
         <i class="fa-solid fa-plus"></i>
         <span>{{ 'todo.actions.create' | translate }}</span>
       </button>
@@ -294,8 +360,8 @@
   </div>
 </div>
 
-<div class="detail-modal-backdrop" *ngIf="selectedTask" (click)="closeDetail()">
-  <div class="detail-modal" (click)="$event.stopPropagation()">
+<div class="fixed inset-0 z-[900] flex items-stretch justify-end bg-overlay-strong" *ngIf="selectedTask" (click)="closeDetail()">
+  <div class="flex h-screen w-full max-w-[800px] flex-col border-l border-border-soft bg-surface p-0 shadow-[-10px_0_40px_rgba(var(--shadow-rgb),0.2)]" (click)="$event.stopPropagation()">
     <app-todo-task-detail
       [task]="selectedTask"
       [canManage]="canManage"
@@ -308,7 +374,7 @@
 </div>
 
 <ng-template #loadingState>
-  <div class="loading-state">
+  <div class="flex flex-col items-center justify-center gap-1.5 p-6 text-text-muted">
     <i class="fa-regular fa-compass"></i>
     <p>{{ 'todo.loading' | translate }}</p>
   </div>

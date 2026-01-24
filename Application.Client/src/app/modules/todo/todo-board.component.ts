@@ -20,7 +20,6 @@ type TodoColumn = {
 @Component({
   selector: 'app-todo-board',
   templateUrl: './todo-board.component.html',
-  styleUrls: ['./todo-board.component.scss'],
 })
 export class TodoBoardComponent implements OnInit {
   TodoStatus = TodoStatus;

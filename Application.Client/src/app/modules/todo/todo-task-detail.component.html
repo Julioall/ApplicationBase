@@ -1,38 +1,38 @@
-<section class="task-detail" *ngIf="task">
-  <form class="detail-form" [formGroup]="editForm" (ngSubmit)="submitEdit()">
-    <header class="panel-header">
-      <div class="status-pill">
+<section class="h-full min-h-0 flex flex-col" *ngIf="task">
+  <form class="h-full min-h-0 flex flex-col" [formGroup]="editForm" (ngSubmit)="submitEdit()">
+    <header class="flex-shrink-0 flex items-center justify-between border-b border-border-soft bg-surface px-6 py-4">
+      <div class="inline-flex items-center gap-2 rounded-full bg-surface-alt px-3 py-1.5 text-xs font-semibold text-text-subtle border border-border-soft">
         <i class="fa-regular fa-circle-play"></i>
         <span>{{ getStatusLabel(task.Status) }}</span>
       </div>
-      <div class="header-actions" *ngIf="canManage">
+      <div class="flex gap-1.5" *ngIf="canManage">
         <button
-          class="action-btn"
+          class="inline-flex h-9 w-9 items-center justify-center rounded-lg border-none bg-transparent text-text-muted transition hover:bg-surface-alt hover:text-text-primary"
           type="button"
           (click)="isEditing ? cancelEdit() : startEdit()"
           [attr.aria-label]="isEditing ? ('todo.actions.cancel' | translate) : ('todo.actions.edit' | translate)"
         >
           <i class="fa-regular fa-pen-to-square"></i>
         </button>
-        <button class="action-btn" type="button" (click)="archive()" aria-label="Archive task">
+        <button class="inline-flex h-9 w-9 items-center justify-center rounded-lg border-none bg-transparent text-text-muted transition hover:bg-surface-alt hover:text-text-primary" type="button" (click)="archive()" aria-label="Archive task">
           <i class="fa-solid fa-box-archive"></i>
         </button>
-        <button class="action-btn danger" type="button" (click)="deleteTask()" aria-label="Delete task">
+        <button class="inline-flex h-9 w-9 items-center justify-center rounded-lg border-none bg-transparent text-text-muted transition hover:bg-[color-mix(in_srgb,var(--danger)_10%,transparent)] hover:text-danger" type="button" (click)="deleteTask()" aria-label="Delete task">
           <i class="fa-solid fa-trash-can"></i>
         </button>
-        <button class="action-btn" type="button" (click)="close()" aria-label="Close detail">
+        <button class="inline-flex h-9 w-9 items-center justify-center rounded-lg border-none bg-transparent text-text-muted transition hover:bg-surface-alt hover:text-text-primary" type="button" (click)="close()" aria-label="Close detail">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
     </header>
 
-    <div class="panel-body">
-      <textarea class="editable-title" formControlName="Title" [readonly]="!isEditing"></textarea>
+    <div class="flex-1 min-h-0 overflow-y-auto px-8 py-8 flex flex-col gap-6">
+      <textarea class="w-full border-none text-2xl font-bold text-text-primary mb-1 bg-transparent outline-none resize-none" formControlName="Title" [readonly]="!isEditing"></textarea>
 
-      <div class="properties-grid">
-        <div class="prop-row" *ngIf="task.StartDate || task.DueDate">
-          <span class="prop-label"><i class="fa-regular fa-calendar"></i> {{ 'todo.fields.when' | translate }}</span>
-          <span class="prop-value">
+      <div class="flex flex-col gap-4">
+        <div class="grid grid-cols-[140px_1fr] items-start gap-2.5" *ngIf="task.StartDate || task.DueDate">
+          <span class="text-xs font-semibold text-text-muted flex items-center gap-2"><i class="fa-regular fa-calendar"></i> {{ 'todo.fields.when' | translate }}</span>
+          <span class="text-sm font-semibold text-text-primary">
             <ng-container *ngIf="task.IsAllDay; else timedRange">
               {{ task.StartDate | date: 'MMM d, y' }}
             </ng-container>
@@ -43,59 +43,59 @@
             </ng-template>
           </span>
         </div>
-        <div class="prop-row">
-          <span class="prop-label"><i class="fa-solid fa-layer-group"></i> {{ 'todo.fields.priority' | translate }}</span>
-          <span class="prop-value prop-value--stacked">
-            <span class="priority-badge" *ngIf="task.Priority" [ngClass]="getPriorityClass(task.Priority)">
+        <div class="grid grid-cols-[140px_1fr] items-center gap-2.5">
+          <span class="text-xs font-semibold text-text-muted flex items-center gap-2"><i class="fa-solid fa-layer-group"></i> {{ 'todo.fields.priority' | translate }}</span>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="rounded-md border px-2.5 py-1 text-xs font-semibold" *ngIf="task.Priority" [ngClass]="getPriorityClass(task.Priority)">
               {{ getPriorityLabel(task.Priority) }}
             </span>
-            <select *ngIf="isEditing" formControlName="Priority" class="prop-select">
+            <select *ngIf="isEditing" formControlName="Priority" class="rounded-lg border border-border-soft bg-surface px-2.5 py-1.5 text-xs font-semibold text-text-primary min-w-[140px]">
               <option [ngValue]="null">{{ 'todo.fields.priorityNone' | translate }}</option>
               <option [ngValue]="1">{{ 'todo.priority.low' | translate }}</option>
               <option [ngValue]="2">{{ 'todo.priority.medium' | translate }}</option>
               <option [ngValue]="3">{{ 'todo.priority.high' | translate }}</option>
             </select>
-          </span>
+          </div>
         </div>
-        <div class="prop-row" *ngIf="getTaskCategories().length">
-          <span class="prop-label"><i class="fa-solid fa-tag"></i> {{ 'todo.fields.category' | translate }}</span>
-          <span class="prop-value">
-            <span class="tag-pill" *ngFor="let cat of getTaskCategories()">{{ cat }}</span>
-          </span>
+        <div class="grid grid-cols-[140px_1fr] items-start gap-2.5" *ngIf="getTaskCategories().length">
+          <span class="text-xs font-semibold text-text-muted flex items-center gap-2"><i class="fa-solid fa-tag"></i> {{ 'todo.fields.category' | translate }}</span>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="inline-flex items-center rounded-md border border-border-soft bg-surface-alt px-2.5 py-1 text-xs font-semibold text-text-primary" *ngFor="let cat of getTaskCategories()">{{ cat }}</span>
+          </div>
         </div>
-        <div class="prop-row">
-          <span class="prop-label"><i class="fa-regular fa-circle-check"></i> {{ 'todo.fields.status' | translate }}</span>
-          <span class="prop-value prop-value--stacked">
-            <select *ngIf="isEditing" formControlName="Status" class="prop-select">
+        <div class="grid grid-cols-[140px_1fr] items-center gap-2.5">
+          <span class="text-xs font-semibold text-text-muted flex items-center gap-2"><i class="fa-regular fa-circle-check"></i> {{ 'todo.fields.status' | translate }}</span>
+          <div class="flex items-center gap-2">
+            <select *ngIf="isEditing" formControlName="Status" class="rounded-lg border border-border-soft bg-surface px-2.5 py-1.5 text-xs font-semibold text-text-primary">
               <option *ngFor="let status of statuses" [ngValue]="status.value">{{ status.label | translate }}</option>
             </select>
-            <span *ngIf="!isEditing" class="status-chip" [ngClass]="getStatusClass(task.Status)">{{ getStatusLabel(task.Status) }}</span>
-          </span>
+            <span *ngIf="!isEditing" class="rounded-md border px-2.5 py-1 text-xs font-bold" [ngClass]="getStatusClass(task.Status)">{{ getStatusLabel(task.Status) }}</span>
+          </div>
         </div>
       </div>
 
-      <div class="description-area">
-        <label>{{ 'todo.fields.description' | translate }}</label>
+      <div class="flex flex-col gap-3">
+        <label class="block text-sm font-bold text-text-primary">{{ 'todo.fields.description' | translate }}</label>
         <ng-container *ngIf="isEditing; else viewDescription">
           <ckeditor
-            class="description-editor"
+            class="rounded-lg overflow-hidden border border-border-soft bg-surface shadow-soft"
             [editor]="Editor"
             formControlName="Description"
             [config]="editorConfig"
           ></ckeditor>
         </ng-container>
         <ng-template #viewDescription>
-          <div class="rich-viewer" *ngIf="task.Description" [innerHTML]="task.Description"></div>
-          <div class="rich-viewer muted" *ngIf="!task.Description">{{ 'todo.fields.descriptionPlaceholder' | translate }}</div>
+          <div class="rounded-lg border border-border-soft bg-surface-alt px-4 py-4 text-sm leading-relaxed text-text-primary max-h-[30vh] overflow-auto w-full overflow-wrap break-word" *ngIf="task.Description" [innerHTML]="task.Description"></div>
+          <div class="rounded-lg border border-border-soft bg-surface-alt px-4 py-4 text-sm text-text-muted" *ngIf="!task.Description">{{ 'todo.fields.descriptionPlaceholder' | translate }}</div>
         </ng-template>
       </div>
 
-      <section class="steps-section">
-        <div class="steps-head">
+      <section class="border-t border-border-soft pt-3">
+        <div class="flex items-center justify-between gap-2 mb-1.5">
           <div>
-            <p class="label">{{ 'todo.steps.title' | translate }}</p>
+            <p class="text-xs font-bold text-text-primary">{{ 'todo.steps.title' | translate }}</p>
           </div>
-          <div class="pill ghost">
+          <div class="inline-flex items-center justify-center rounded-full border border-border-subtle bg-surface px-2.5 py-1 text-xs font-bold text-text-primary">
             {{ getCompletedSteps() }}/{{ task.Steps.length || 0 }}
           </div>
         </div>
@@ -113,9 +113,9 @@
       </section>
     </div>
 
-    <footer class="panel-footer" *ngIf="canManage && isEditing">
-      <button class="btn btn--ghost" type="button" (click)="cancelEdit()">{{ 'todo.actions.cancel' | translate }}</button>
-      <button class="btn btn--primary" type="submit">{{ 'todo.actions.save' | translate }}</button>
+    <footer class="flex-shrink-0 flex justify-end gap-3 border-t border-border-soft bg-surface-alt px-8 py-3" *ngIf="canManage && isEditing">
+      <button class="inline-flex items-center gap-2 rounded-lg border border-border-subtle bg-transparent px-5 py-2.5 text-sm font-bold text-text-subtle transition hover:bg-surface-alt hover:text-text-primary" type="button" (click)="cancelEdit()">{{ 'todo.actions.cancel' | translate }}</button>
+      <button class="inline-flex items-center gap-2 rounded-lg border border-transparent bg-accent px-5 py-2.5 text-sm font-bold text-text-inverse transition hover:bg-primary-strong" type="submit">{{ 'todo.actions.save' | translate }}</button>
     </footer>
   </form>
 </section>

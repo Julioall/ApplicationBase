@@ -12,7 +12,6 @@ type AgendaEntry = {
 @Component({
   selector: 'app-todo-agenda',
   templateUrl: './todo-agenda.component.html',
-  styleUrls: ['./todo-agenda.component.scss'],
 })
 export class TodoAgendaComponent {
   @Input() tasks: TodoTask[] = [];

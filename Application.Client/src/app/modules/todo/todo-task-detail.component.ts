@@ -8,7 +8,6 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 @Component({
   selector: 'app-todo-task-detail',
   templateUrl: './todo-task-detail.component.html',
-  styleUrls: ['./todo-task-detail.component.scss'],
 })
 export class TodoTaskDetailComponent implements OnChanges {
   @Input() task: TodoTask | null = null;
