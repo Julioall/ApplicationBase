@@ -12,7 +12,7 @@
     </div>
 
     <article class="flex flex-col gap-5 rounded-2xl border border-border-soft bg-surface p-6 shadow-soft min-h-screen">
-      <div class="flex flex-col gap-4 rounded-xl bg-gradient-to-br from-surface-alt to-surface px-6 py-5 shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.05)] lg:flex-row lg:items-center lg:justify-between">
+      <div class="flex flex-col gap-4 rounded-xl bg-gradient-to-br from-surface to-surface-alt px-6 py-5 shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.05)] lg:flex-row lg:items-center lg:justify-between">
         <div class="space-y-2">
           <h1 class="text-3xl font-semibold text-text-primary">
             {{ isUcDetail ? (selectedUc?.Fullname || ('education.ucDetail.title' | translate)) : (className || ('education.classDetail.title' | translate)) }}

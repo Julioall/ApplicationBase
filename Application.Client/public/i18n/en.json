@@ -537,6 +537,7 @@
     }
   },
   "students": {
+    "category": "Records",
     "common": {
       "error": "Error"
     },
@@ -643,6 +644,7 @@
     }
   },
   "education": {
+    "category": "Education",
     "header": {
       "eyebrow": "Courses",
       "title": "Courses",
@@ -763,6 +765,7 @@
     "pageTitle": "Admin"
   },
   "todo": {
+    "category": "Management",
     "eyebrow": "Workflow",
     "title": "Todo board",
     "subtitle": "Organize tasks, contexts and checklists.",

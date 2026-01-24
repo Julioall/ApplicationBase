@@ -541,6 +541,7 @@
     }
   },
   "admin": {
+    "category": "Administração",
     "pageTitle": "Administração"
   },
   "navbar": {
@@ -559,6 +560,7 @@
     "cancel": "Cancelar"
   },
   "students": {
+    "category": "Registros",
     "common": {
       "error": "Erro"
     },
@@ -670,6 +672,7 @@
     }
   },
   "education": {
+    "category": "Educação",
     "header": {
       "eyebrow": "Cursos",
       "title": "Cursos",
@@ -787,6 +790,7 @@
     }
   },
   "todo": {
+    "category": "Gerenciamento",
     "eyebrow": "Fluxo",
     "title": "Quadro de tarefas",
     "subtitle": "Organize tarefas, contextos e checklists.",

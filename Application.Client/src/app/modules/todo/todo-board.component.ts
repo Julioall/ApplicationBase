@@ -67,6 +67,7 @@ export class TodoBoardComponent implements OnInit {
     [TodoStatus.InProgress]: 'fa-solid fa-spinner',
     [TodoStatus.Done]: 'fa-regular fa-circle-check',
   };
+  selectedMobileStatus: TodoStatus = TodoStatus.NotStarted;
 
   constructor(
     private readonly todoService: TodoService,
@@ -184,6 +185,14 @@ export class TodoBoardComponent implements OnInit {
 
   setViewMode(mode: 'board' | 'agenda'): void {
     this.viewMode = mode;
+  }
+
+  setMobileStatus(status: TodoStatus): void {
+    this.selectedMobileStatus = status;
+  }
+
+  getMobileColumn(): TodoColumn | undefined {
+    return this.columns.find(col => col.status === this.selectedMobileStatus);
   }
 
   onAgendaDateChange(date: Date): void {
