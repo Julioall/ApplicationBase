@@ -19,9 +19,9 @@ import {
 } from '../../model/permissions';
 
 @Component({
-  selector: 'app-admin-services',
-  templateUrl: './admin-services.component.html',
-  styleUrls: ['./admin-services.component.scss'],
+  selector: 'app-services',
+  templateUrl: './services.component.html',
+  styleUrls: ['./services.component.scss'],
 })
 export class AdminServicesComponent implements OnInit, OnDestroy {
   emailConfig: EmailSettings & { testEmail?: string } = {

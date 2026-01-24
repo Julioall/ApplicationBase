@@ -3,7 +3,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { of, throwError } from 'rxjs';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { AdminServicesComponent } from './admin-services.component';
+import { AdminServicesComponent } from './services.component';
 import { EmailSettingsService, EmailSettings } from '../../service/email/email-settings.service';
 import { WhatsAppSettingsService, WhatsAppSettings } from '../../service/whatsapp/whatsapp-settings.service';
 import { WhatsAppInstancesService, WhatsAppInstance } from '../../service/whatsapp/whatsapp-instances.service';

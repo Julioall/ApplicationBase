@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of, Subject } from 'rxjs';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { AdminUsersComponent } from './admin-users.component';
+import { AdminUsersComponent } from './user.component';
 import { NotificationService } from '../../service/notification/notification.service';
 import { UserService } from '../../service/user/user.service';
 import { User } from '../../model/User';

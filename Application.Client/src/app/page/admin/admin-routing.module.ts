@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AdminUsersComponent } from './admin-users.component';
-import { AdminUserDetailComponent } from './admin-user-detail.component';
-import { AdminServicesComponent } from './admin-services.component';
+import { AdminUsersComponent } from './user.component';
+import { AdminUserDetailComponent } from './user-detail.component';
+import { AdminServicesComponent } from './services.component';
 import { PermissionGuard } from '../../service/auth/permission.guard';
 
 const routes: Routes = [

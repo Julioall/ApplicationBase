@@ -7,7 +7,7 @@ import { UserService } from '../../service/user/user.service';
 
 @Component({
   selector: 'app-admin-users',
-  templateUrl: './admin-users.component.html',
+  templateUrl: './user.component.html',
 })
 export class AdminUsersComponent implements OnInit {
   users: User[] = [];

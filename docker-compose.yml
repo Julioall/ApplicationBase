@@ -1,48 +1,54 @@
 services:
-  # ASP.NET Core 8 API (serves Angular build as static files)
-  app-api:
+  # ASP.NET Core 8 API + Angular SPA
+  application-web:
     build:
       context: .
       dockerfile: Application.Web/Dockerfile
-    container_name: app-api
+    container_name: application-web
     ports:
       - "5095:8080"
     environment:
-      # Runtime
       ASPNETCORE_ENVIRONMENT: "Production"
+
       # JWT
       JWT_ISSUER: "https://localhost"
       JWT_AUDIENCE: "https://localhost"
       JWT_SIGNING_KEY: "changeme-super-secret-32-bytes-minimum"
+
       # Secret encryption
       APP_SECRET_ENCRYPTION_KEY: "changeme-encryption-key"
+
       # RavenDB
-      RAVENDBSETTINGS_URLS: "https://raven-db:8080"
+      RAVENDBSETTINGS_URLS: "https://application-ravendb:8080"
       RAVENDBSETTINGS_DATABASE_NAME: "ApplicationDb"
       RAVENDBSETTINGS_CERTIFICATE_SUBJECT: ""
       RAVENDBSETTINGS_CERTIFICATE_PATH: "/certs/ravendb.pfx"
       RAVENDBSETTINGS_CERTIFICATE_PASSWORD: "changeme-ravendb-cert"
-      # Evolution API integration
-      EVOLUTION_API_BASE_URL: "http://evolution-api:8080"
+
+      # Evolution API
+      EVOLUTION_API_BASE_URL: "http://application-evolution:8080"
       EVOLUTION_API_KEY: "changeme-evolution-key"
       EVOLUTION_API_INTEGRATION: "WHATSAPP-BAILEYS"
+
       # Hangfire
-      HANGFIRE_CONNECTION_STRING: "Host=postgresql;Port=5432;Database=evolution;Username=evolution;Password=evolution"
+      HANGFIRE_CONNECTION_STRING: "Host=application-postgres;Port=5432;Database=evolution;Username=evolution;Password=evolution"
+
     depends_on:
-      raven-db:
+      application-ravendb:
         condition: service_healthy
-      evolution-api:
+      application-evolution:
         condition: service_healthy
+
     restart: unless-stopped
     networks:
       - backend-network
     volumes:
       - ./certs:/certs:ro
 
-  # RavenDB (unsecured for development)
-  raven-db:
+  # RavenDB (secured)
+  application-ravendb:
     image: ravendb/ravendb:latest
-    container_name: raven-db
+    container_name: application-ravendb
     ports:
       - "8081:8080"
     environment:
@@ -50,10 +56,10 @@ services:
       RAVEN_Setup_Mode: "Secured"
       RAVEN_Security_Certificate_Path: "/certs/ravendb.pfx"
       RAVEN_Security_Certificate_Password: "changeme-ravendb-cert"
-      RAVEN_ServerUrl: "https://raven-db:8080"
-      RAVEN_PublicServerUrl: "https://raven-db:8080"
+      RAVEN_ServerUrl: "https://application-ravendb:8080"
+      RAVEN_PublicServerUrl: "https://application-ravendb:8080"
     healthcheck:
-      test: ["CMD-SHELL", "/bin/bash -c 'echo > /dev/tcp/raven-db/8080'"]
+      test: ["CMD-SHELL", "/bin/bash -c 'echo > /dev/tcp/application-ravendb/8080'"]
       interval: 10s
       timeout: 3s
       retries: 15
@@ -64,17 +70,16 @@ services:
     networks:
       - backend-network
 
-
   # Evolution API (WhatsApp)
-  evolution-api:
+  application-evolution:
     image: evoapicloud/evolution-api:latest
-    container_name: evolution-api
+    container_name: application-evolution
     ports:
       - "8082:8080"
     environment:
       AUTHENTICATION_API_KEY: "changeme-evolution-key"
       DATABASE_PROVIDER: "postgresql"
-      DATABASE_CONNECTION_URI: "postgresql://evolution:evolution@postgresql:5432/evolution"
+      DATABASE_CONNECTION_URI: "postgresql://evolution:evolution@application-postgres:5432/evolution"
       DATABASE_CONNECTION_CLIENT_NAME: "evolution_exchange"
       CACHE_REDIS_ENABLED: "false"
     healthcheck:
@@ -89,13 +94,13 @@ services:
     networks:
       - backend-network
     depends_on:
-      postgresql:
+      application-postgres:
         condition: service_healthy
 
-  # Postgres for Evolution API
-  postgresql:
+  # Postgres (Evolution)
+  application-postgres:
     image: postgres:16
-    container_name: postgresql
+    container_name: application-postgres
     environment:
       POSTGRES_DB: "evolution"
       POSTGRES_USER: "evolution"

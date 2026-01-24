@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { AdminUserDetailComponent } from './admin-user-detail.component';
+import { AdminUserDetailComponent } from './user-detail.component';
 import { NotificationService } from '../../service/notification/notification.service';
 import { UserService } from '../../service/user/user.service';
 import { User } from '../../model/User';
