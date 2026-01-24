@@ -7,6 +7,7 @@ import { AuthService } from '../../service/auth/auth.service';
 import { UserService } from '../../service/user/user.service';
 import { NotificationApiService } from '../../service/notification/notification-api.service';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { of } from 'rxjs';
 
 class FakeLoader implements TranslateLoader {
@@ -28,9 +29,9 @@ const userServiceStub: Partial<UserService> = {
 
 const notificationApiStub: Partial<NotificationApiService> = {
   getLatest: () => of({ Items: [], UnreadCount: 0 }),
-  markAsRead: () => of(null),
-  markManyAsRead: () => of(null),
-  delete: () => of(null),
+  markAsRead: (_id: string) => of(void 0),
+  markManyAsRead: (_ids: string[]) => of(void 0),
+  delete: (_id: string) => of(void 0),
 };
 
 const themeStub: Partial<ThemeService> = {
@@ -58,7 +59,8 @@ describe('NavbarComponent', () => {
         { provide: AuthService, useValue: authStub },
         { provide: UserService, useValue: userServiceStub },
         { provide: NotificationApiService, useValue: notificationApiStub },
-      ]
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   }));
 

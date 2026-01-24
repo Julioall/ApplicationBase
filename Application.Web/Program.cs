@@ -21,12 +21,18 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Application.Api.RateLimiting;
 using Application.Api.Hangfire;
+using Microsoft.Extensions.Logging;
 
 public class Program
 {
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
+        builder.Logging.AddConsole();
+        builder.Logging.AddDebug();
 
         builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
         builder.Services.AddMemoryCache();

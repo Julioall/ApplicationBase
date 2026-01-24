@@ -1,16 +1,28 @@
+using System;
 using Application.Domain.Model;
 using Application.Infrastructure.Service;
 using Raven.Client.Documents;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Application.Api.Middlewares
 {
     public class MiddlewareServiceRavenDbStore
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger<MiddlewareServiceRavenDbStore> _logger;
 
+        public MiddlewareServiceRavenDbStore(RequestDelegate next, ILogger<MiddlewareServiceRavenDbStore> logger)
+        {
+            _next = next;
+            _logger = logger;
+        }
+
+        // Legacy constructor for tests/backward compatibility
         public MiddlewareServiceRavenDbStore(RequestDelegate next)
         {
             _next = next;
+            _logger = NullLogger<MiddlewareServiceRavenDbStore>.Instance;
         }
 
         public async Task Invoke(HttpContext httpContext, IServiceRavenDB serviceRavenDB, IDocumentStore documentStore)
@@ -24,6 +36,8 @@ namespace Application.Api.Middlewares
                 serviceRavenDB.AsyncSession = documentStore.OpenAsyncSession(dbNameToUse);
             }
 
+            var maxRequests = documentStore.Conventions.MaxNumberOfRequestsPerSession;
+
             try
             {
                 await _next(httpContext);
@@ -36,6 +50,8 @@ namespace Application.Api.Middlewares
             }
             finally
             {
+                LogRequestUsage(serviceRavenDB, maxRequests);
+
                 serviceRavenDB.Session?.Dispose();
                 if (serviceRavenDB.AsyncSession is IAsyncDisposable asyncSessionDisposable)
                 {
@@ -54,6 +70,28 @@ namespace Application.Api.Middlewares
                 {
                     disposable.Dispose();
                 }
+            }
+        }
+
+        private void LogRequestUsage(IServiceRavenDB serviceRavenDB, int maxRequests)
+        {
+            if (maxRequests <= 0)
+            {
+                return;
+            }
+
+            var threshold = Math.Max(1, (int)(maxRequests * 0.8));
+
+            var syncRequests = serviceRavenDB.Session?.Advanced.NumberOfRequests ?? 0;
+            if (syncRequests >= threshold)
+            {
+                _logger.LogWarning("RavenDB sync session used {Requests} requests (threshold {Threshold}/{Max})", syncRequests, threshold, maxRequests);
+            }
+
+            var asyncRequests = serviceRavenDB.AsyncSession?.Advanced.NumberOfRequests ?? 0;
+            if (asyncRequests >= threshold)
+            {
+                _logger.LogWarning("RavenDB async session used {Requests} requests (threshold {Threshold}/{Max})", asyncRequests, threshold, maxRequests);
             }
         }
     }

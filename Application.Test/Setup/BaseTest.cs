@@ -4,7 +4,9 @@ using Application.Infrastructure;
 using Application.Infrastructure.Indexes;
 using Application.Infrastructure.Service;
 using Application.Service;
+using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
 using Raven.Embedded;
@@ -48,6 +50,7 @@ namespace Application.Tests.Setup
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddLocalization(options => options.ResourcesPath = "Resources");
             serviceCollection.AddLogging();
+            serviceCollection.AddSingleton<IBackgroundJobClient>(_ => Mock.Of<IBackgroundJobClient>());
             serviceCollection.AddSingleton<IDocumentStore>(documentStore);
             serviceCollection.AddScoped<IServiceRavenDB>(_ => new ServiceRavenDB
             {

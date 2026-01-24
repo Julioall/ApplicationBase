@@ -34,6 +34,7 @@ class EducationServiceStub {
   ]));
   getSchools = jasmine.createSpy('getSchools').and.returnValue(of([]));
   getPrograms = jasmine.createSpy('getPrograms').and.returnValue(of([]));
+  toggleActivityHidden = jasmine.createSpy('toggleActivityHidden').and.returnValue(of({}));
 }
 
 class StudentsServiceStub {
@@ -131,5 +132,34 @@ describe('EducationClassDetailComponent', () => {
     const renamed = studentsService.importStudents.calls.mostRecent().args[0] as File;
     expect(renamed.name).toBe('courseid_27535_participants.json');
     expect(educationService.getUcStudents).toHaveBeenCalledWith(27535);
+  });
+
+  it('aggregates unique activities across students', () => {
+    paramMapSubject.next(convertToParamMap({ id: 'class-1', ucId: '27535' }));
+    createComponent();
+
+    component.students = [
+      { Id: 's1', Activities: [{ Name: 'A', Hidden: false }, { Name: 'B', Hidden: true }] } as any,
+      { Id: 's2', Activities: [{ Name: 'A', Hidden: true }, { Name: 'C', Hidden: false }] } as any
+    ];
+
+    const activities = component.getAllActivities();
+
+    expect(activities.map((a) => a.Name)).toEqual(['A', 'B', 'C']);
+  });
+
+  it('toggles activity visibility globally and updates all students', () => {
+    paramMapSubject.next(convertToParamMap({ id: 'class-1', ucId: '27535' }));
+    createComponent();
+
+    component.students = [
+      { Id: 's1', Activities: [{ Name: 'A', Hidden: false }] } as any,
+      { Id: 's2', Activities: [{ Name: 'A', Hidden: false }, { Name: 'B', Hidden: true }] } as any
+    ];
+
+    component.toggleActivityHiddenGlobal('A');
+
+    expect(educationService.toggleActivityHidden).toHaveBeenCalledWith('s1', 'ucs/27535', 'A');
+    expect(component.students.every((s) => (s.Activities || []).find((a: any) => a.Name === 'A')?.Hidden === true)).toBeTrue();
   });
 });

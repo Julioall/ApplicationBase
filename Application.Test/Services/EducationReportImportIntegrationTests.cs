@@ -90,6 +90,39 @@ namespace Application.Tests.Services
             Assert.True(result.RowsRead > 0);
         }
 
+        [Fact]
+        public async Task ImportReport_Should_Count_File_Even_When_Empty()
+        {
+            // Arrange
+            var educationService = _serviceProvider.GetService<IEducationService>()
+                ?? throw new Exception("IEducationService not found");
+
+            var emptyStream = CreateEmptyExcelFile();
+            var files = new[] { ("empty.xlsx", emptyStream) }.AsEnumerable();
+
+            // Act
+            var result = await educationService.ImportReportAsync(files);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(1, result.FilesProcessed);
+            Assert.Equal(0, result.RowsRead);
+        }
+
+        [Fact]
+        public async Task ImportReport_Should_Throw_For_NonXlsx_File()
+        {
+            // Arrange
+            var educationService = _serviceProvider.GetService<IEducationService>()
+                ?? throw new Exception("IEducationService not found");
+
+            var invalidStream = new MemoryStream(Encoding.UTF8.GetBytes("invalid"));
+            var files = new[] { ("report.txt", (Stream)invalidStream) }.AsEnumerable();
+
+            // Act & Assert
+            await Assert.ThrowsAsync<ArgumentException>(() => educationService.ImportReportAsync(files));
+        }
+
         private Stream CreateValidExcelFile()
         {
             var stream = new MemoryStream();

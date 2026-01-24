@@ -125,7 +125,7 @@
 
         <!-- Estudantes com Atividades Integradas -->
         <div class="space-y-3" *ngIf="!loadingStudents && students.length > 0">
-          <div 
+          <div
             *ngFor="let student of students; trackBy: trackByStudent"
             class="overflow-hidden rounded-lg border border-border-soft bg-surface shadow-sm transition hover:shadow-md"
           >
@@ -162,13 +162,13 @@
             <!-- Seção de Atividades (conteúdo expandível) -->
             <div *ngIf="student.Activities && student.Activities.length > 0" class="bg-surface p-4">
               <div class="space-y-2">
-                <div 
+                <div
                   *ngFor="let activity of getVisibleActivities(student); trackBy: trackByActivity"
                   class="flex items-start gap-3 rounded border border-border-soft bg-surface-alt p-3 transition hover:border-accent-soft"
                 >
                   <!-- Status Icon e Indicador -->
                   <div class="mt-1 flex-shrink-0">
-                    <span 
+                    <span
                       class="inline-flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold"
                       [ngClass]="{
                         'bg-yellow-100 text-yellow-700': activity.IsPendingCorrection,
@@ -197,7 +197,7 @@
                            }">
                           {{ activity.CorrectionStatus }}
                         </p>
-                        
+
                         <!-- Alertas -->
                         <div class="mt-2 space-y-1">
                           <p *ngIf="activity.IsLate" class="text-xs text-orange-600">
