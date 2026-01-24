@@ -655,6 +655,7 @@
       "refresh": "Reload data"
     },
     "filters": {
+      "button": "Filters",
       "school": "School",
       "program": "Course",
       "search": "Search",
@@ -668,7 +669,9 @@
       "period": "Period",
       "periodUnknown": "Period not available",
       "error": "Error",
-      "viewCourse": "Open course"
+      "viewCourse": "Open course",
+      "viewLabel": "View",
+      "viewLink": "Open class"
     },
     "classes": {
       "count": "{{count}} classes",

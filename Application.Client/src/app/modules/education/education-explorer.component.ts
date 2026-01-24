@@ -26,6 +26,7 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
   loadingPrograms = false;
   loadingClasses = false;
   importing = false;
+  showFilterDropdown = false;
   private searchSub?: Subscription;
 
   constructor(
@@ -50,6 +51,11 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
       .subscribe((value) => {
         this.searchTerm = (value || '').toString().trim().toLowerCase();
       });
+    
+    // Close filter dropdown when clicking outside
+    document.addEventListener('click', () => {
+      this.showFilterDropdown = false;
+    });
   }
 
   ngOnDestroy(): void {
@@ -218,6 +224,15 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
         schoolName
       }
     });
+  }
+
+  toggleFilterDropdown(event: Event): void {
+    event.stopPropagation();
+    this.showFilterDropdown = !this.showFilterDropdown;
+  }
+
+  trackByClass(_index: number, classItem: EducationClass): string {
+    return classItem.Id || _index.toString();
   }
 
   private formatDate(date: Date): string {

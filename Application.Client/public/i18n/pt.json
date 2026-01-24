@@ -683,6 +683,7 @@
       "refresh": "Recarregar dados"
     },
     "filters": {
+      "button": "Filtros",
       "school": "Escola",
       "program": "Curso",
       "search": "Busca",
@@ -696,7 +697,9 @@
       "period": "Periodo",
       "periodUnknown": "Periodo indisponivel",
       "error": "Erro",
-      "viewCourse": "Abrir curso"
+      "viewCourse": "Abrir curso",
+      "viewLabel": "Visualizar",
+      "viewLink": "Abrir turma"
     },
     "empty": {
       "title": "Nenhuma turma para exibir",
