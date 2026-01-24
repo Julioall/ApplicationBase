@@ -304,6 +304,108 @@ namespace Application.Infrastructure.Repository.Education
                 .ToList();
         }
 
+        public async Task<IReadOnlyCollection<StudentUcDto>> GetStudentsByUcWithPerformanceAsync(string ucId, CancellationToken cancellationToken = default)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(ucId);
+
+            // Buscar mapeamentos de studentId -> ucId
+            var mappings = await _serviceRavenDb.AsyncSession.Query<StudentUcMap, StudentUcMaps_ByUc>()
+                .Customize(x => x.WaitForNonStaleResults())
+                .Where(m => m.UcId == ucId)
+                .ToListAsync(cancellationToken);
+
+            if (mappings.Count == 0)
+            {
+                return Array.Empty<StudentUcDto>();
+            }
+
+            var studentIds = mappings.Select(m => m.StudentId).Distinct().ToList();
+
+            // Carregar estudantes
+            var students = await _serviceRavenDb.AsyncSession.LoadAsync<Student>(studentIds, cancellationToken);
+
+            // Buscar performances para este UC (sem usar variável capturada)
+            // RavenDB não consegue resolver variáveis locais em Where, então convertemos ucId para constante dentro da query
+            var performancesList = await _serviceRavenDb.AsyncSession.Query<StudentUcPerformance>()
+                .Customize(x => x.WaitForNonStaleResults())
+                .Where(p => p.UcId == ucId)
+                .ToListAsync(cancellationToken);
+
+            // Filtrar performances apenas para os students desta UC
+            var performances = performancesList
+                .Where(p => studentIds.Contains(p.StudentId))
+                .GroupBy(p => p.StudentId)
+                .Select(g => g.First()) // Pegar apenas o primeiro (não deveria haver duplicatas)
+                .ToList();
+
+            // Criar dicionário de performance por studentId para lookup rápido
+            var performanceDict = performances
+                .ToDictionary(p => p.StudentId, p => p);
+
+            // Carregar configuração de atividades ocultas para esta UC
+            var hiddenConfig = await _serviceRavenDb.AsyncSession
+                .Query<HiddenActivitiesConfig>()
+                .Where(c => c.UcId == ucId)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            var hiddenActivityNames = hiddenConfig?.HiddenActivityNames ?? new List<string>();
+
+            // Combinar dados em DTO
+            var result = new List<StudentUcDto>();
+            foreach (var student in students.Values)
+            {
+                if (student == null) continue;
+
+                var dto = new StudentUcDto
+                {
+                    Id = student.Id,
+                    FirstName = student.FirstName,
+                    LastName = student.LastName,
+                    Email = student.Email,
+                    IdNumber = student.IdNumber,
+                    Phone = student.Phone,
+                    Institution = student.Institution,
+                    IsActive = student.IsActive,
+                    Status = student.Status,
+                    LastAccessAt = student.LastAccessAt,
+                    CreatedAt = student.CreatedAt,
+                    UpdatedAt = student.UpdatedAt
+                };
+
+                // Adicionar performance se existir
+                if (performanceDict.TryGetValue(student.Id, out var performance))
+                {
+                    dto.FinalGrade = performance.FinalGrade;
+                    dto.Activities = performance.Activities
+                        .Select(a => new StudentActivityDto
+                        {
+                            Name = a.Name,
+                            FinalGrade = a.FinalGrade,
+                            SubmittedAt = a.SubmittedAt,
+                            CorrectedAt = a.CorrectedAt,
+                            SubmissionStatus = a.SubmissionStatus,
+                            Restriction = a.Restriction,
+                            StartAt = a.StartAt,
+                            EndAt = a.EndAt,
+                            Type = (int)a.Type,
+                            CorrectionStatus = a.GetCorrectionStatus(),
+                            IsPendingCorrection = a.IsPendingCorrection(),
+                            HasRestriction = a.HasRestriction(),
+                            IsLate = a.IsLate(),
+                            Hidden = hiddenActivityNames.Any(h => h.Equals(a.Name, StringComparison.OrdinalIgnoreCase))
+                        })
+                        .ToList();
+                }
+
+                result.Add(dto);
+            }
+
+            return result
+                .OrderBy(s => s.LastName)
+                .ThenBy(s => s.FirstName)
+                .ToList();
+        }
+
         public async Task<IReadOnlyCollection<School>> GetSchoolsAsync(CancellationToken cancellationToken = default)
         {
             var schools = await _serviceRavenDb.AsyncSession.Query<School>()

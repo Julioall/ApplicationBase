@@ -22,20 +22,14 @@
           </p>
         </div>
         <div *ngIf="isUcDetail" class="flex justify-end">
-          <label
-            class="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-accent-strong to-accent px-4 py-3 text-sm font-semibold text-text-inverse shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent"
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded-lg border border-border-soft bg-surface-raised px-4 py-3 text-sm font-semibold text-text-primary transition hover:bg-surface hover:border-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            (click)="openUcEditor()"
           >
-            <i class="fa-solid fa-file-import"></i>
-            <span>{{ 'education.ucDetail.import' | translate }}</span>
-            <input
-              class="sr-only"
-              type="file"
-              accept=".json,application/json"
-              (change)="onImportParticipants($event)"
-              [disabled]="importingParticipants"
-              [attr.aria-label]="('education.ucDetail.import' | translate)"
-            />
-          </label>
+            <i class="fa-solid fa-gear"></i>
+            <span>{{ 'education.ucDetail.configure' | translate }}</span>
+          </button>
         </div>
       </div>
 
@@ -79,6 +73,48 @@
           </span>
         </div>
 
+        <!-- Modal de Configuração da UC -->
+        <div *ngIf="configModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div class="w-full max-w-3xl rounded-xl border border-border-soft bg-surface shadow-2xl">
+            <div class="flex items-start justify-between border-b border-border-soft px-5 py-4">
+              <div>
+                <h3 class="text-lg font-semibold text-text-primary">{{ 'education.ucDetail.configure' | translate }}</h3>
+                <p class="text-sm text-text-muted">{{ 'education.ucDetail.configureDescription' | translate }}</p>
+              </div>
+              <button type="button" class="text-text-muted hover:text-text-primary" (click)="closeUcEditor()">
+                <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
+                <span class="sr-only">{{ 'education.labels.close' | translate }}</span>
+              </button>
+            </div>
+
+            <div class="max-h-[70vh] overflow-y-auto px-5 py-4">
+              <div class="space-y-3">
+                <div class="flex items-center justify-between rounded-lg border border-border-soft bg-surface-alt px-3 py-2" *ngFor="let activity of getAllActivities(); trackBy: trackByActivity">
+                  <div>
+                    <p class="font-semibold text-text-primary">{{ activity.Name }}</p>
+                    <p class="text-xs text-text-muted">
+                      {{ activity.Hidden ? ('education.ucDetail.activityHidden' | translate) : ('education.ucDetail.activityShown' | translate) }}
+                    </p>
+                  </div>
+                  <button type="button"
+                          class="inline-flex items-center gap-2 rounded px-3 py-2 text-sm font-semibold transition hover:bg-surface-alt"
+                          [ngClass]="activity.Hidden ? 'text-accent-strong' : 'text-text-primary'"
+                          (click)="toggleActivityHiddenGlobal(activity.Name)">
+                    <i class="fa-solid" [ngClass]="activity.Hidden ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
+                    <span>{{ activity.Hidden ? ('education.ucDetail.showActivity' | translate) : ('education.ucDetail.hideActivity' | translate) }}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-end gap-2 border-t border-border-soft px-5 py-4">
+              <button type="button" class="rounded-lg border border-border-soft px-4 py-2 text-sm font-semibold text-text-primary hover:bg-surface-alt" (click)="closeUcEditor()">
+                {{ 'education.labels.close' | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div class="py-4 text-sm text-text-muted" *ngIf="loadingStudents">
           {{ 'education.ucDetail.studentsLoading' | translate }}
         </div>
@@ -87,19 +123,121 @@
           {{ 'education.ucDetail.studentsEmpty' | translate }}
         </div>
 
-        <div class="flex flex-col gap-2" *ngIf="!loadingStudents && students.length > 0">
-          <div class="grid grid-cols-1 gap-3 rounded-lg border border-border-soft bg-surface p-3 shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.05)] sm:grid-cols-3">
-            <span class="text-sm font-semibold text-text-primary">{{ 'education.ucDetail.studentsName' | translate }}</span>
-            <span class="text-sm font-semibold text-text-primary">{{ 'education.ucDetail.studentsEmail' | translate }}</span>
-            <span class="text-sm font-semibold text-text-primary">{{ 'education.ucDetail.studentsPhone' | translate }}</span>
-          </div>
-          <div
-            class="grid grid-cols-1 gap-3 rounded-lg border border-border-soft bg-surface-alt px-3 py-3 text-sm text-text-primary shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.03)] sm:grid-cols-3"
+        <!-- Estudantes com Atividades Integradas -->
+        <div class="space-y-3" *ngIf="!loadingStudents && students.length > 0">
+          <div 
             *ngFor="let student of students; trackBy: trackByStudent"
+            class="overflow-hidden rounded-lg border border-border-soft bg-surface shadow-sm transition hover:shadow-md"
           >
-            <span class="font-medium">{{ getStudentName(student) }}</span>
-            <span class="text-text-subtle">{{ student.Email || '-' }}</span>
-            <span class="text-text-subtle">{{ student.Phone || '-' }}</span>
+            <!-- Cabeçalho do Estudante (sempre visível) -->
+            <div class="grid grid-cols-1 gap-3 border-b border-border-soft bg-surface-alt px-4 py-3 sm:grid-cols-5">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-text-muted">{{ 'education.ucDetail.studentsName' | translate }}</p>
+                <p class="mt-1 font-semibold text-text-primary">{{ getStudentName(student) }}</p>
+              </div>
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-text-muted">{{ 'education.ucDetail.studentsEmail' | translate }}</p>
+                <p class="mt-1 text-sm text-text-subtle">{{ student.Email || '-' }}</p>
+              </div>
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-text-muted">{{ 'education.ucDetail.studentsPhone' | translate }}</p>
+                <p class="mt-1 text-sm text-text-subtle">{{ student.Phone || '-' }}</p>
+              </div>
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-text-muted">Nota Final</p>
+                <p class="mt-1 text-lg font-bold" [ngClass]="{ 'text-accent-strong': student.FinalGrade, 'text-text-muted': !student.FinalGrade }">
+                  {{ student.FinalGrade !== null && student.FinalGrade !== undefined ? (student.FinalGrade | number:'1.2-2') : '-' }}
+                </p>
+              </div>
+              <div class="flex items-end">
+                <div class="text-right">
+                  <p class="text-xs font-semibold uppercase tracking-wide text-text-muted">Atividades</p>
+                  <p class="mt-1 inline-flex items-center justify-center rounded-full bg-accent/20 px-2 py-1 text-sm font-bold text-accent">
+                    {{ student.Activities && student.Activities.length > 0 ? student.Activities.length : 0 }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seção de Atividades (conteúdo expandível) -->
+            <div *ngIf="student.Activities && student.Activities.length > 0" class="bg-surface p-4">
+              <div class="space-y-2">
+                <div 
+                  *ngFor="let activity of getVisibleActivities(student); trackBy: trackByActivity"
+                  class="flex items-start gap-3 rounded border border-border-soft bg-surface-alt p-3 transition hover:border-accent-soft"
+                >
+                  <!-- Status Icon e Indicador -->
+                  <div class="mt-1 flex-shrink-0">
+                    <span 
+                      class="inline-flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold"
+                      [ngClass]="{
+                        'bg-yellow-100 text-yellow-700': activity.IsPendingCorrection,
+                        'bg-green-100 text-green-700': !activity.IsPendingCorrection && activity.SubmittedAt,
+                        'bg-gray-100 text-gray-600': !activity.SubmittedAt
+                      }"
+                    >
+                      <i class="fa-solid" [ngClass]="{
+                        'fa-hourglass-end': activity.IsPendingCorrection,
+                        'fa-check': !activity.IsPendingCorrection && activity.SubmittedAt,
+                        'fa-times': !activity.SubmittedAt
+                      }" aria-hidden="true"></i>
+                    </span>
+                  </div>
+
+                  <!-- Conteúdo da Atividade -->
+                  <div class="flex-1 min-w-0">
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div class="flex-1">
+                        <p class="font-semibold text-text-primary">{{ activity.Name }}</p>
+                        <p class="mt-1 text-xs font-semibold"
+                           [ngClass]="{
+                             'text-yellow-600': activity.IsPendingCorrection,
+                             'text-green-600': !activity.IsPendingCorrection && activity.SubmittedAt,
+                             'text-gray-500': !activity.SubmittedAt
+                           }">
+                          {{ activity.CorrectionStatus }}
+                        </p>
+                        
+                        <!-- Alertas -->
+                        <div class="mt-2 space-y-1">
+                          <p *ngIf="activity.IsLate" class="text-xs text-orange-600">
+                            <i class="fa-solid fa-clock mr-1" aria-hidden="true"></i>Enviada atrasada
+                          </p>
+                          <p *ngIf="activity.HasRestriction" class="text-xs text-red-600">
+                            <i class="fa-solid fa-exclamation-triangle mr-1" aria-hidden="true"></i>{{ activity.Restriction }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <!-- Nota -->
+                      <div class="rounded bg-surface px-3 py-2 text-right text-xs sm:whitespace-nowrap">
+                        <div class="font-semibold text-text-muted">{{ 'education.labels.grade' | translate }}</div>
+                        <div class="mt-1 text-lg font-bold" [ngClass]="{ 'text-accent-strong': activity.FinalGrade, 'text-text-muted': !activity.FinalGrade }">
+                          {{ activity.FinalGrade !== null && activity.FinalGrade !== undefined ? (activity.FinalGrade | number:'1.2-2') : '-' }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Datas -->
+                    <div class="mt-2 grid grid-cols-2 gap-2 text-xs text-text-muted">
+                      <div *ngIf="activity.SubmittedAt">
+                        <span class="font-semibold">{{ 'education.labels.submitted' | translate }}:</span>
+                        {{ activity.SubmittedAt | date:'short' }}
+                      </div>
+                      <div *ngIf="activity.CorrectedAt">
+                        <span class="font-semibold">{{ 'education.labels.corrected' | translate }}:</span>
+                        {{ activity.CorrectedAt | date:'short' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sem atividades -->
+            <div *ngIf="!student.Activities || student.Activities.length === 0" class="bg-surface px-4 py-3 text-center text-sm text-text-muted">
+              {{ 'education.ucDetail.noActivities' | translate }}
+            </div>
           </div>
         </div>
       </section>

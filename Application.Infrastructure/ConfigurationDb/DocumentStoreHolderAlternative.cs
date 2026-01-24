@@ -109,7 +109,7 @@ namespace Application.Infrastructure.ConfigurationDb
         {
             return new DocumentConventions
             {
-                MaxNumberOfRequestsPerSession = 30,
+                MaxNumberOfRequestsPerSession = 500, // Aumentado para 500 como limite máximo de segurança
                 UseOptimisticConcurrency = true,
                 SaveEnumsAsIntegers = true,
                 IdentityPartsSeparator = '-'

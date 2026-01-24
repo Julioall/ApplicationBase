@@ -1,0 +1,11 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "dotnet build": true,
+        "docker logs": true,
+        "dotnet clean": true,
+        "/^cd \"c:\\\\Users\\\\Julio\\\\Desktop\\\\Repositorios\\\\ApplicationBase\\\\Application\\.Client\" ; npm run build 2>&1 \\| Select-String \"error\\|warning: generated\\|failed\\|succeeded\" \\| Select-Object -First 20$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

@@ -3,6 +3,7 @@ using Application.Domain.Exceptions;
 using Application.Domain.Model;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.Education;
+using Application.Domain.Model.Education.Dtos;
 using Application.Domain.Model.Students;
 using Application.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
@@ -133,18 +134,119 @@ namespace Application.Api.Controllers
             return Ok(paged);
         }
 
-        [HttpGet("ucs/students")]
-        [Authorize(Policy = ApplicationPermissions.ViewEducation)]
-        [ProducesResponseType(typeof(IReadOnlyCollection<Student>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetStudentsByUc([FromQuery] int? eadId, CancellationToken cancellationToken)
+        [HttpPost("import-report")]
+        [Authorize(Policy = ApplicationPermissions.ManageEducation)]
+        [ProducesResponseType(typeof(EducationReportImportResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ImportReport([FromForm] IFormFileCollection files, CancellationToken cancellationToken)
         {
-            if (!eadId.HasValue || eadId.Value <= 0)
+            if (files == null || files.Count == 0)
             {
-                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["InvalidRequestDetail"], statusCode: StatusCodes.Status400BadRequest);
+                return Problem(
+                    title: _localizer["InvalidRequestTitle"],
+                    detail: _localizer["ReportImportFilesEmpty"],
+                    statusCode: StatusCodes.Status400BadRequest);
             }
 
-            var students = await _educationService.GetStudentsByUcEadIdAsync(eadId.Value, cancellationToken);
+            // Validar extensões
+            foreach (var file in files)
+            {
+                if (!file.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
+                {
+                    return Problem(
+                        title: _localizer["InvalidRequestTitle"],
+                        detail: _localizer["ReportImportOnlyXlsx"],
+                        statusCode: StatusCodes.Status400BadRequest);
+                }
+            }
+
+            try
+            {
+                // Converter IFormFileCollection para IEnumerable<(string, Stream)>
+                var fileStreams = files.Select(f => (f.FileName, f.OpenReadStream())).ToList();
+                var result = await _educationService.ImportReportAsync(fileStreams, cancellationToken);
+                return Ok(result);
+            }
+            catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException || ex is BusinessException)
+            {
+                return Problem(
+                    title: _localizer["InvalidRequestTitle"],
+                    detail: ex.Message,
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+        }
+
+        [HttpGet("students/{studentId}/ucs")]
+        [Authorize(Policy = ApplicationPermissions.ViewEducation)]
+        [ProducesResponseType(typeof(IReadOnlyCollection<UcDocument>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetStudentUcs(string studentId, CancellationToken cancellationToken)
+        {
+            var ucs = await _educationService.GetUcsByStudentAsync(studentId, cancellationToken);
+            return Ok(ucs);
+        }
+
+        [HttpGet("ucs/students")]
+        [Authorize(Policy = ApplicationPermissions.ViewEducation)]
+        [ProducesResponseType(typeof(IReadOnlyCollection<StudentUcDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetUcStudents([FromQuery] int eadId, CancellationToken cancellationToken)
+        {
+            if (eadId <= 0)
+            {
+                return Problem(
+                    title: _localizer["InvalidRequestTitle"],
+                    detail: "Invalid UC EadId",
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            var students = await _educationService.GetStudentsByUcEadIdWithPerformanceAsync(eadId, cancellationToken);
             return Ok(students);
+        }
+
+        [HttpGet("students/ucs/performance")]
+        [Authorize(Policy = ApplicationPermissions.ViewEducation)]
+        [ProducesResponseType(typeof(StudentUcPerformance), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetStudentPerformance([FromQuery] string studentId, [FromQuery] string ucId, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(studentId) || string.IsNullOrWhiteSpace(ucId))
+            {
+                return Problem(
+                    title: _localizer["InvalidRequestTitle"],
+                    detail: _localizer["InvalidRequestDetail"],
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            var performance = await _educationService.GetStudentUcPerformanceAsync(studentId, ucId, cancellationToken);
+            return Ok(performance);
+        }
+
+        [HttpPatch("students/activities/toggle-hidden")]
+        [Authorize(Policy = ApplicationPermissions.ManageEducation)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ToggleActivityHidden([FromQuery] string studentId, [FromQuery] string ucId, [FromQuery] string activityName, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(studentId) || string.IsNullOrWhiteSpace(ucId) || string.IsNullOrWhiteSpace(activityName))
+            {
+                return Problem(
+                    title: _localizer["InvalidRequestTitle"],
+                    detail: _localizer["InvalidRequestDetail"],
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            try
+            {
+                await _educationService.ToggleActivityHiddenAsync(studentId, ucId, activityName, cancellationToken);
+                return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                return Problem(
+                    title: _localizer["NotFoundTitle"],
+                    detail: ex.Message,
+                    statusCode: StatusCodes.Status404NotFound);
+            }
         }
     }
 }

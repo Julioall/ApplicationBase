@@ -51,7 +51,7 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
       .subscribe((value) => {
         this.searchTerm = (value || '').toString().trim().toLowerCase();
       });
-    
+
     // Close filter dropdown when clicking outside
     document.addEventListener('click', () => {
       this.showFilterDropdown = false;

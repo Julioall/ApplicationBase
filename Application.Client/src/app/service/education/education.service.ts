@@ -11,6 +11,8 @@ import { PagedResult } from '../../model/paged-result';
 import { UcSearchQuery } from '../../model/uc-search-query';
 import { CourseImportResult } from '../../model/course-import-result';
 import { Student } from '../../model/student';
+import { StudentUcDto } from '../../model/student-uc-dto';
+import { EducationReportImportResult } from '../../model/education-report-import-result';
 
 @Injectable({
   providedIn: 'root'
@@ -66,9 +68,18 @@ export class EducationService {
     return this.http.get<EducationUc[]>(`${this.apiUrl}/ucs`, { params }).pipe(catchError(this.handleError));
   }
 
-  getUcStudents(eadId: number): Observable<Student[]> {
+  getUcStudents(eadId: number): Observable<StudentUcDto[]> {
     const params = new HttpParams().set('eadId', eadId);
-    return this.http.get<Student[]>(`${this.apiUrl}/ucs/students`, { params })
+    return this.http.get<StudentUcDto[]>(`${this.apiUrl}/ucs/students`, { params })
+      .pipe(catchError(this.handleError));
+  }
+
+  toggleActivityHidden(studentId: string, ucId: string, activityName: string): Observable<void> {
+    const params = new HttpParams()
+      .set('studentId', studentId)
+      .set('ucId', ucId)
+      .set('activityName', activityName);
+    return this.http.patch<void>(`${this.apiUrl}/students/activities/toggle-hidden`, null, { params })
       .pipe(catchError(this.handleError));
   }
 
@@ -76,6 +87,15 @@ export class EducationService {
     const formData = new FormData();
     formData.append('file', file, file.name);
     return this.http.post<CourseImportResult>(`${this.apiUrl}/import`, formData).pipe(catchError(this.handleError));
+  }
+
+  importReport(files: File[]): Observable<EducationReportImportResult> {
+    const formData = new FormData();
+    files.forEach((file, index) => {
+      formData.append(`files`, file, file.name);
+    });
+    return this.http.post<EducationReportImportResult>(`${this.apiUrl}/import-report`, formData)
+      .pipe(catchError(this.handleError));
   }
 
   private handleError(error: unknown): Observable<never> {

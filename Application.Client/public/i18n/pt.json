@@ -673,6 +673,14 @@
   },
   "education": {
     "category": "Educação",
+    "importReport": {
+      "title": "Importar Relatório",
+      "loading": "Importando relatório...",
+      "success": "Relatório importado com sucesso! {{files}} arquivo(s), {{rows}} linhas processadas, {{students}} alunos, {{links}} vínculos, {{performance}} registros de desempenho.",
+      "error": "Erro ao importar relatório",
+      "selectFiles": "Selecione um ou mais arquivos .xlsx",
+      "onlyXlsx": "Apenas arquivos .xlsx são aceitos"
+    },
     "header": {
       "eyebrow": "Cursos",
       "title": "Cursos",
@@ -694,9 +702,13 @@
       "school": "Escola",
       "program": "Curso",
       "class": "Turma",
-      "period": "Periodo",
-      "periodUnknown": "Periodo indisponivel",
+      "period": "Período",
+      "periodUnknown": "Período indisponível",
       "error": "Erro",
+      "submitted": "Enviada",
+      "corrected": "Corrigida",
+      "grade": "Nota",
+      "close": "Fechar",
       "viewCourse": "Abrir curso",
       "viewLabel": "Visualizar",
       "viewLink": "Abrir turma"
@@ -755,7 +767,14 @@
       "studentsEmail": "E-mail",
       "studentsPhone": "Telefone",
       "studentFallback": "Aluno",
-      "loadStudentsError": "Nao foi possivel carregar os alunos vinculados."
+      "loadStudentsError": "Nao foi possivel carregar os alunos vinculados.",
+      "activityHidden": "Atividade ocultada",
+      "activityShown": "Atividade visível",
+      "toggleHiddenError": "Não foi possível alterar a visibilidade da atividade.",
+      "configure": "Configurar unidade",
+      "configureDescription": "Oculte ou exiba atividades para todos os alunos desta unidade.",
+      "hideActivity": "Ocultar atividade",
+      "showActivity": "Exibir atividade"
     }
   },
   "classes": {

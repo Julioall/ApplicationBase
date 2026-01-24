@@ -119,6 +119,17 @@
         </div>
       </div>
 
+      <button
+        class="inline-flex items-center justify-center h-10 w-10 rounded-lg border border-border-soft bg-surface-alt text-text-primary hover:text-accent-strong hover:bg-accent-soft transition focus:outline-none focus:ring-0"
+        type="button"
+        [attr.aria-label]="'education.importReport.title' | translate"
+        (click)="openImportReportDialog()"
+        *ngIf="canManageEducation"
+        title="Importar Relatório"
+      >
+        <i class="fa-solid fa-file-import"></i>
+      </button>
+
       <div class="relative">
         <button
           #profileMenu
@@ -304,4 +315,10 @@
       <div class="text-text-muted whitespace-nowrap">&copy; 2020-2025 Julio Alves. All rights reserved.</div>
     </footer>
   </div>
+
+  <!-- Education Report Import Dialog -->
+  <app-education-report-import-dialog
+    [isOpen]="isImportDialogOpen"
+    (close)="closeImportDialog()"
+  ></app-education-report-import-dialog>
 </div>

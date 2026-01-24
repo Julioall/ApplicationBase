@@ -6,7 +6,7 @@ import { finalize } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { EducationService } from '../../service/education/education.service';
 import { EducationUc } from '../../model/education-uc';
-import { Student } from '../../model/student';
+import { StudentUcDto } from '../../model/student-uc-dto';
 import { NotificationService } from '../../service/notification/notification.service';
 import { StudentsService } from '../../service/students/students.service';
 
@@ -25,11 +25,12 @@ export class EducationClassDetailComponent implements OnInit, OnDestroy {
   schoolId = '';
   units: EducationUc[] = [];
   selectedUc?: EducationUc;
-  students: Student[] = [];
+  students: StudentUcDto[] = [];
   loadingUnits = false;
   loadingMetadata = false;
   loadingStudents = false;
   importingParticipants = false;
+  configModalOpen = false;
   private routeSub?: Subscription;
 
   constructor(
@@ -137,6 +138,17 @@ export class EducationClassDetailComponent implements OnInit, OnDestroy {
         },
         error: (err) => this.handleError(err, 'education.ucDetail.importError')
       });
+  }
+
+  openUcEditor(): void {
+    if (!this.selectedUc) {
+      return;
+    }
+    this.configModalOpen = true;
+  }
+
+  closeUcEditor(): void {
+    this.configModalOpen = false;
   }
 
   get isUcDetail(): boolean {
@@ -262,11 +274,92 @@ export class EducationClassDetailComponent implements OnInit, OnDestroy {
     return uc?.Id || uc?.EadId || index;
   }
 
-  trackByStudent(index: number, student: Student): string | number {
+  trackByStudent(index: number, student: StudentUcDto): string | number {
     return student?.Id || student?.Email || index;
   }
 
-  getStudentName(student: Student): string {
+  trackByActivity(index: number, activity: any): number {
+    return index;
+  }
+
+  hasActivities(): boolean {
+    return this.students.some(s => s.Activities && s.Activities.length > 0);
+  }
+
+  getVisibleActivities(student: StudentUcDto): any[] {
+    return (student.Activities || []).filter(a => !a.Hidden);
+  }
+
+  getAllActivities(): { Name: string; Hidden: boolean }[] {
+    const map = new Map<string, boolean>();
+    for (const student of this.students) {
+      for (const act of student.Activities || []) {
+        if (!map.has(act.Name)) {
+          map.set(act.Name, !!act.Hidden);
+        }
+      }
+    }
+    return Array.from(map.entries()).map(([Name, Hidden]) => ({ Name, Hidden })).sort((a, b) => a.Name.localeCompare(b.Name));
+  }
+
+  getHiddenActivities(student: StudentUcDto): any[] {
+    return (student.Activities || []).filter(a => a.Hidden);
+  }
+
+  hasHiddenActivities(student: StudentUcDto): boolean {
+    return (student.Activities || []).some(a => a.Hidden);
+  }
+
+  toggleActivityHidden(student: StudentUcDto, activity: any): void {
+    if (!this.selectedUc?.EadId) {
+      return;
+    }
+
+    // Format UcId como "ucs/{EadId}" para corresponder com o banco RavenDB
+    const ucId = `ucs/${this.selectedUc.EadId}`;
+    this.educationService.toggleActivityHidden(student.Id, ucId, activity.Name)
+      .subscribe({
+        next: () => {
+          activity.Hidden = !activity.Hidden;
+          this.notificationService.showSuccess(
+            this.translate.instant(activity.Hidden ? 'education.ucDetail.activityHidden' : 'education.ucDetail.activityShown'),
+            this.translate.instant('education.labels.success')
+          );
+        },
+        error: (err) => this.handleError(err, 'education.ucDetail.toggleHiddenError')
+      });
+  }
+
+  toggleActivityHiddenGlobal(activityName: string): void {
+    if (!this.selectedUc?.EadId || !this.students.length) {
+      return;
+    }
+
+    const ucId = `ucs/${this.selectedUc.EadId}`;
+    const studentId = this.students[0].Id;
+    const currentHidden = this.students[0].Activities?.find(a => a.Name === activityName)?.Hidden ?? false;
+
+    this.educationService.toggleActivityHidden(studentId, ucId, activityName)
+      .subscribe({
+        next: () => {
+          const newHidden = !currentHidden;
+          this.students.forEach(s => {
+            (s.Activities || []).forEach(a => {
+              if (a.Name === activityName) {
+                a.Hidden = newHidden;
+              }
+            });
+          });
+          this.notificationService.showSuccess(
+            this.translate.instant(newHidden ? 'education.ucDetail.activityHidden' : 'education.ucDetail.activityShown'),
+            this.translate.instant('education.labels.success')
+          );
+        },
+        error: (err) => this.handleError(err, 'education.ucDetail.toggleHiddenError')
+      });
+  }
+
+  getStudentName(student: StudentUcDto): string {
     const first = student?.FirstName?.trim() || '';
     const last = student?.LastName?.trim() || '';
     const full = `${first} ${last}`.trim();

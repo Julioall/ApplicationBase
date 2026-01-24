@@ -15,6 +15,7 @@ namespace Application.Domain.Interface.Education
         Task<ClassUcMap> EnsureClassUcMapAsync(string classId, string ucId, CancellationToken cancellationToken = default);
         Task<StudentUcMap> EnsureStudentUcMapAsync(string studentId, string ucId, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<Student>> GetStudentsByUcAsync(string ucId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyCollection<StudentUcDto>> GetStudentsByUcWithPerformanceAsync(string ucId, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<School>> GetSchoolsAsync(CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<ProgramDocument>> GetProgramsBySchoolAsync(string schoolId, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<ClassDocument>> GetClassesByProgramAsync(string programId, CancellationToken cancellationToken = default);

@@ -161,7 +161,13 @@ public class Program
         DependencyInjectionModuleDomain.AddDomainDependencies(builder.Services);
         DependencyInjectionModuleInfra.AddInfraDependencies(builder.Services);
         DependencyInjectionModuleService.AddServiceDependencies(builder.Services);
-        builder.Services.AddHostedService<EducationImportBackgroundService>();
+        
+        // Register Hangfire job for education import
+        builder.Services.AddScoped<EducationImportHangfireJob>();
+        
+        // NOTE: EducationImportBackgroundService is now replaced by Hangfire jobs (EducationImportHangfireJob)
+        // The background service below can be kept as a fallback for missed imports, but Hangfire handles the main processing
+        // builder.Services.AddHostedService<EducationImportBackgroundService>();
 
 
         var app = builder.Build();

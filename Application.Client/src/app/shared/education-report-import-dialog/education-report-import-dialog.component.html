@@ -1,0 +1,130 @@
+<div *ngIf="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+  <div class="bg-surface rounded-2xl shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-6 border-b border-border-soft">
+      <h2 class="text-xl font-semibold">{{ 'education.importReport.title' | translate }}</h2>
+      <button
+        type="button"
+        (click)="closeDialog()"
+        [disabled]="isLoading"
+        class="text-text-muted hover:text-text-primary transition"
+      >
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-1 overflow-y-auto p-6 space-y-6">
+      <!-- File Drop Zone -->
+      <div
+        class="border-2 border-dashed border-border-soft rounded-xl p-8 text-center cursor-pointer transition hover:border-accent hover:bg-accent-soft"
+        (dragover)="onDragOver($event)"
+        (drop)="onDrop($event)"
+        (click)="fileInput.click()"
+      >
+        <input
+          #fileInput
+          type="file"
+          accept=".xlsx"
+          multiple
+          (change)="onFileSelected($event)"
+          class="hidden"
+        />
+        <div class="space-y-2">
+          <div class="text-4xl text-accent">
+            <i class="fa-solid fa-file-excel"></i>
+          </div>
+          <div>
+            <p class="font-semibold text-text-primary">{{ 'education.importReport.selectFiles' | translate }}</p>
+            <p class="text-sm text-text-subtle">{{ 'education.importReport.onlyXlsx' | translate }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected Files -->
+      <div *ngIf="hasFiles" class="space-y-3">
+        <div class="flex items-center justify-between">
+          <p class="font-semibold text-sm">{{ selectedFiles.length }} arquivo(s) selecionado(s)</p>
+          <button
+            type="button"
+            (click)="clearFiles()"
+            [disabled]="isLoading"
+            class="text-xs text-accent hover:text-accent-strong transition"
+          >
+            Limpar
+          </button>
+        </div>
+        <ul class="space-y-2">
+          <li *ngFor="let file of selectedFiles; let i = index" class="flex items-center justify-between p-3 bg-surface-alt rounded-lg">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <i class="fa-solid fa-file-excel text-accent flex-shrink-0"></i>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium truncate">{{ file.name }}</p>
+                <p class="text-xs text-text-subtle">{{ (file.size / 1024).toFixed(2) }} KB</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              (click)="removeFile(i)"
+              [disabled]="isLoading"
+              class="text-text-muted hover:text-danger transition flex-shrink-0"
+            >
+              <i class="fa-solid fa-times"></i>
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Import Result -->
+      <div *ngIf="importResult" class="space-y-3 p-4 bg-success-soft rounded-xl">
+        <p class="font-semibold text-success">Importação concluída com sucesso!</p>
+        <ul class="text-sm space-y-1 text-text-primary">
+          <li>✓ Arquivos processados: {{ importResult.filesProcessed }}</li>
+          <li>✓ Linhas lidas: {{ importResult.rowsRead }}</li>
+          <li>✓ Alunos criados: {{ importResult.studentsCreated }}</li>
+          <li>✓ Alunos atualizados: {{ importResult.studentsUpdated }}</li>
+          <li>✓ Programas criados: {{ importResult.programsCreated }}</li>
+          <li>✓ Programas atualizados: {{ importResult.programsUpdated }}</li>
+          <li>✓ Classes criadas: {{ importResult.classesCreated }}</li>
+          <li>✓ Classes atualizadas: {{ importResult.classesUpdated }}</li>
+          <li>✓ UCs criadas: {{ importResult.ucsCreated }}</li>
+          <li>✓ UCs atualizadas: {{ importResult.ucsUpdated }}</li>
+          <li>✓ Vínculos de UC criados: {{ importResult.ucLinksCreated }}</li>
+          <li>✓ Registros de desempenho: {{ importResult.performanceRecordsUpserted }}</li>
+        </ul>
+
+        <!-- Errors -->
+        <div *ngIf="importResult.errors && importResult.errors.length > 0" class="mt-4 p-3 bg-danger-soft rounded-lg">
+          <p class="font-semibold text-danger text-sm mb-2">Erros encontrados:</p>
+          <ul class="text-xs space-y-1 text-text-primary">
+            <li *ngFor="let error of importResult.errors">
+              Linha {{ error.rowNumber }}: {{ error.message }}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-end gap-3 p-6 border-t border-border-soft">
+      <button
+        type="button"
+        (click)="closeDialog()"
+        [disabled]="isLoading"
+        class="px-6 py-2 rounded-lg border border-border-soft hover:bg-surface-alt transition disabled:opacity-50"
+      >
+        {{ importResult ? 'Fechar' : 'Cancelar' }}
+      </button>
+      <button
+        type="button"
+        (click)="importReport()"
+        [disabled]="!hasFiles || isLoading || importResult !== null"
+        class="px-6 py-2 rounded-lg bg-accent text-text-inverse hover:bg-accent-strong transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+      >
+        <i *ngIf="!isLoading" class="fa-solid fa-upload"></i>
+        <i *ngIf="isLoading" class="fa-solid fa-spinner fa-spin"></i>
+        {{ isLoading ? 'Importando...' : 'Importar' }}
+      </button>
+    </div>
+  </div>
+</div>

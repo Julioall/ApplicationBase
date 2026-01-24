@@ -645,6 +645,14 @@
   },
   "education": {
     "category": "Education",
+    "importReport": {
+      "title": "Import Report",
+      "loading": "Importing report...",
+      "success": "Report imported successfully! {{files}} file(s), {{rows}} rows processed, {{students}} students, {{links}} links, {{performance}} performance records.",
+      "error": "Error importing report",
+      "selectFiles": "Select one or more .xlsx files",
+      "onlyXlsx": "Only .xlsx files are accepted"
+    },
     "header": {
       "eyebrow": "Courses",
       "title": "Courses",
@@ -669,6 +677,10 @@
       "period": "Period",
       "periodUnknown": "Period not available",
       "error": "Error",
+      "submitted": "Submitted",
+      "corrected": "Corrected",
+      "grade": "Grade",
+      "close": "Close",
       "viewCourse": "Open course",
       "viewLabel": "View",
       "viewLink": "Open class"
@@ -704,7 +716,14 @@
       "studentsEmail": "Email",
       "studentsPhone": "Phone",
       "studentFallback": "Student",
-      "loadStudentsError": "Could not load linked students."
+      "loadStudentsError": "Could not load linked students.",
+      "activityHidden": "Activity hidden",
+      "activityShown": "Activity visible",
+      "toggleHiddenError": "Could not change activity visibility.",
+      "configure": "Configure unit",
+      "configureDescription": "Hide or show activities for every student in this unit.",
+      "hideActivity": "Hide activity",
+      "showActivity": "Show activity"
     },
     "empty": {
       "title": "No classes to show",
