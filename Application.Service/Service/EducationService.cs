@@ -22,6 +22,7 @@ namespace Application.Service.Service
     {
         private readonly IEducationRepository _educationRepository;
         private readonly IEducationImportRepository _educationImportRepository;
+        private readonly IEducationReportImportRepository _educationReportImportRepository;
         private readonly IStudentUcPerformanceRepository _studentUcPerformanceRepository;
         private readonly IExcelReportParser _excelReportParser;
         private readonly IEducationReportImportProcessor _importProcessor;
@@ -34,6 +35,7 @@ namespace Application.Service.Service
         public EducationService(
             IEducationRepository educationRepository, 
             IEducationImportRepository educationImportRepository,
+            IEducationReportImportRepository educationReportImportRepository,
             IStudentUcPerformanceRepository studentUcPerformanceRepository,
             IExcelReportParser excelReportParser,
             IEducationReportImportProcessor importProcessor,
@@ -43,6 +45,7 @@ namespace Application.Service.Service
         {
             _educationRepository = educationRepository;
             _educationImportRepository = educationImportRepository;
+            _educationReportImportRepository = educationReportImportRepository;
             _studentUcPerformanceRepository = studentUcPerformanceRepository;
             _excelReportParser = excelReportParser;
             _importProcessor = importProcessor;
@@ -80,6 +83,40 @@ namespace Application.Service.Service
             
             _logger.LogInformation("Education import {ImportId} enqueued for processing", import.Id);
             
+            return import;
+        }
+
+        public async Task<EducationReportImport> EnqueueReportImportAsync(
+            IEnumerable<(string fileName, Stream fileStream)> files,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(files);
+
+            var fileList = files.ToList();
+            if (fileList.Count == 0)
+            {
+                throw new BusinessException(_localizer["ReportImportFilesEmpty"]);
+            }
+
+            foreach (var (fileName, _) in fileList)
+            {
+                if (string.IsNullOrWhiteSpace(fileName) || !fileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new BusinessException(_localizer["ReportImportOnlyXlsx"]);
+                }
+            }
+
+            var import = new EducationReportImport
+            {
+                Status = EducationImportStatus.Pending,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _educationReportImportRepository.AddAsync(import, fileList, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", cancellationToken);
+
+            _backgroundJobScheduler.Enqueue<IEducationReportImportJob>(job => job.ProcessReportAsync(import.Id!, cancellationToken));
+            _logger.LogInformation("Education report import {ImportId} enqueued with {FileCount} files", import.Id, fileList.Count);
+
             return import;
         }
 

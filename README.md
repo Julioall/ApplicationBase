@@ -17,6 +17,7 @@ Base monolítica pronta para produção com ASP.NET Core 8, Angular 18 e RavenDB
 - E-mail: envio de reset/recovery, teste de SMTP e persistencia de credenciais criptografadas.
 - Observabilidade de erros: ProblemDetails com `traceId`, ModelState -> ValidationProblemDetails, i18n backend/frontend.
 - UX: toasts centralizados, loading global, tema claro/escuro, shell dashboard com navegacao protegida por permissoes.
+- Importacoes: cursos (JSON) enfileirados via Hangfire com notificacoes in-app; relatorios XLSX com caches para reduzir round-trips.
 
 ## Arquitetura e Camadas (Backend)
 - **Domain (`Application.Domain`):**
@@ -30,7 +31,7 @@ Base monolítica pronta para produção com ASP.NET Core 8, Angular 18 e RavenDB
   - `UserService`, `TokenService`, `EmailService`, `SettingsService`.
   - `StudentService`: CRUD, validacao, importacao/exportacao XLSX, regras de status.
   - `EducationService`: escolas/programas/turmas/UCs, busca paginada, alunos por UC, enfileiramento de importacao.
-  - Background: `EducationImportBackgroundService` + `EducationImportProcessor`.
+  - Background: `EducationImportHangfireJob` + `EducationImportProcessor` (fallback: `EducationImportBackgroundService`).
   - Seguranca: `SecureHash` (PBKDF2) e `SecretEncryptionService` (AES key derivada do env `APP_SECRET_ENCRYPTION_KEY`).
   - DI: registrado em `DependencyInjectionModuleService`.
 
@@ -75,6 +76,11 @@ Base monolítica pronta para produção com ASP.NET Core 8, Angular 18 e RavenDB
 - **Educacao:** `GET /api/education/schools`, `GET /api/education/programs?schoolId=...`, `GET /api/education/classes?programId=...`, `GET /api/education/ucs?classId=...`, `GET /api/education/ucs/search?PageNumber=1&PageSize=50&Search=...`, `GET /api/education/ucs/students?eadId=123`, `POST /api/education/import` (multipart).
 - **Permissoes:** claim type `permissions`. Defaults: usuario (`view:home`, `view:profile`); adicionais: `manage:users`, `view:students`, `manage:students`, `view:education`, `manage:education`.
 
+## Importacoes e processamento em lote
+- **Cursos (JSON):** `POST /api/education/import` armazena o arquivo como attachment, retorna 202 e agenda `EducationImportHangfireJob` (batch 3 cursos) que reaproveita a `AsyncSession` Raven para repositórios e gera notificacao de sucesso/erro (navbar faz polling a cada 20s).
+- **Relatorios (XLSX):** `POST /api/education/import-report` processa de forma síncrona em memória usando caches (`EducationReportImportProcessor`). Adequado para lotes menores; para volumes maiores, considere enfileirar como no fluxo de cursos.
+- **Visibilidade:** hangfire dashboard em `/hangfire` (com auth) e notificacoes in-app apontam para `/education`.
+
 ## Banco de Dados (RavenDB)
 ### RavenDB em modo seguro (TLS)
 - A UI do RavenDB fica em `https://localhost:8081` (certificado autoassinado).
@@ -93,7 +99,7 @@ certutil -user -delstore Root <thumbprint>
 # pegue o thumbprint via: certutil -user -store Root | findstr ravendb
 ```
 - Configuração via env: `RAVENDBSETTINGS_URLS` (vírgula separada), `RAVENDBSETTINGS_DATABASE_NAME`, `RAVENDBSETTINGS_CERTIFICATE_SUBJECT` (busca certificado no store do usuário atual, exige chave privada).
-- Conexão e criação de DB/índices em `DocumentStoreHolderAlternative`. Convens: `MaxNumberOfRequestsPerSession=30`, optimistic concurrency, `IdentityPartsSeparator='-'`.
+- Conexão e criação de DB/índices em `DocumentStoreHolderAlternative`. Convens: `MaxNumberOfRequestsPerSession=500`, optimistic concurrency, `IdentityPartsSeparator='-'`.
 - Anexos: avatar salvo como attachment (`profile-picture`) com content-type preservado.
 - Índice: `User_ByEmail` para busca de e-mail com `WaitForNonStaleResults` nos cadastros.
 

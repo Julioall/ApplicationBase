@@ -10,9 +10,10 @@ import { EducationUc } from '../../model/education-uc';
 import { PagedResult } from '../../model/paged-result';
 import { UcSearchQuery } from '../../model/uc-search-query';
 import { CourseImportResult } from '../../model/course-import-result';
+import { EducationImport } from '../../model/education-import';
 import { Student } from '../../model/student';
 import { StudentUcDto } from '../../model/student-uc-dto';
-import { EducationReportImportResult } from '../../model/education-report-import-result';
+import { EducationReportImport } from '../../model/education-report-import';
 
 @Injectable({
   providedIn: 'root'
@@ -83,18 +84,23 @@ export class EducationService {
       .pipe(catchError(this.handleError));
   }
 
-  importCourses(file: File): Observable<CourseImportResult> {
+  importCourses(file: File): Observable<EducationImport> {
     const formData = new FormData();
     formData.append('file', file, file.name);
-    return this.http.post<CourseImportResult>(`${this.apiUrl}/import`, formData).pipe(catchError(this.handleError));
+    return this.http.post<EducationImport>(`${this.apiUrl}/import`, formData).pipe(catchError(this.handleError));
   }
 
-  importReport(files: File[]): Observable<EducationReportImportResult> {
+  importReport(files: File[]): Observable<EducationReportImport> {
     const formData = new FormData();
-    files.forEach((file, index) => {
-      formData.append(`files`, file, file.name);
+    files.forEach((file) => {
+      formData.append('files', file, file.name);
     });
-    return this.http.post<EducationReportImportResult>(`${this.apiUrl}/import-report`, formData)
+    return this.http.post<EducationReportImport>(`${this.apiUrl}/import-report`, formData)
+      .pipe(catchError(this.handleError));
+  }
+
+  getImport(importId: string): Observable<EducationImport> {
+    return this.http.get<EducationImport>(`${this.apiUrl}/import/${importId}`)
       .pipe(catchError(this.handleError));
   }
 

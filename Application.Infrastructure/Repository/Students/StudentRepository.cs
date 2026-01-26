@@ -42,6 +42,16 @@ namespace Application.Infrastructure.Repository.Students
             return await _serviceRavenDb.AsyncSession.LoadAsync<Student>(id);
         }
 
+        public async Task<Student?> GetByIdNumberAsync(string idNumber)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(idNumber);
+
+            return await _serviceRavenDb.AsyncSession.Query<Student, Student_ByIdNumber>()
+                .Customize(x => x.WaitForNonStaleResults())
+                .Where(s => s.IdNumber == idNumber)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<PagedResult<Student>> GetPagedAsync(PaginationQuery query)
         {
             var ravenQuery = _serviceRavenDb.AsyncSession.Query<Student>();

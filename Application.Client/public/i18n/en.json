@@ -648,10 +648,19 @@
     "importReport": {
       "title": "Import Report",
       "loading": "Importing report...",
+      "queued": "Report sent for processing. You will be notified when it finishes.",
       "success": "Report imported successfully! {{files}} file(s), {{rows}} rows processed, {{students}} students, {{links}} links, {{performance}} performance records.",
       "error": "Error importing report",
       "selectFiles": "Select one or more .xlsx files",
-      "onlyXlsx": "Only .xlsx files are accepted"
+      "onlyXlsx": "Only .xlsx files are accepted",
+      "idLabel": "ID",
+      "statusLabel": "Status",
+      "filesLabel": "Files",
+      "createdAtLabel": "Created at"
+    },
+    "import": {
+      "title": "Course import",
+      "queuedMessage": "Import received and queued for background processing."
     },
     "header": {
       "eyebrow": "Courses",

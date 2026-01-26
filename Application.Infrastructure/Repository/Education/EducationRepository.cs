@@ -349,6 +349,10 @@ namespace Application.Infrastructure.Repository.Education
                 .FirstOrDefaultAsync(cancellationToken);
 
             var hiddenActivityNames = hiddenConfig?.HiddenActivityNames ?? new List<string>();
+            var hiddenActivitySet = hiddenActivityNames
+                .Select(NormalizeActivityName)
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
             // Combinar dados em DTO
             var result = new List<StudentUcDto>();
@@ -375,26 +379,40 @@ namespace Application.Infrastructure.Repository.Education
                 // Adicionar performance se existir
                 if (performanceDict.TryGetValue(student.Id, out var performance))
                 {
-                    dto.FinalGrade = performance.FinalGrade;
                     dto.Activities = performance.Activities
-                        .Select(a => new StudentActivityDto
+                        .Select(a =>
                         {
-                            Name = a.Name,
-                            FinalGrade = a.FinalGrade,
-                            SubmittedAt = a.SubmittedAt,
-                            CorrectedAt = a.CorrectedAt,
-                            SubmissionStatus = a.SubmissionStatus,
-                            Restriction = a.Restriction,
-                            StartAt = a.StartAt,
-                            EndAt = a.EndAt,
-                            Type = (int)a.Type,
-                            CorrectionStatus = a.GetCorrectionStatus(),
-                            IsPendingCorrection = a.IsPendingCorrection(),
-                            HasRestriction = a.HasRestriction(),
-                            IsLate = a.IsLate(),
-                            Hidden = hiddenActivityNames.Any(h => h.Equals(a.Name, StringComparison.OrdinalIgnoreCase))
+                            var normalizedName = NormalizeActivityName(a.Name);
+                            var isHidden = hiddenActivitySet.Contains(normalizedName);
+
+                            return new StudentActivityDto
+                            {
+                                Name = a.Name,
+                                FinalGrade = a.FinalGrade,
+                                SubmittedAt = a.SubmittedAt,
+                                CorrectedAt = a.CorrectedAt,
+                                SubmissionStatus = a.SubmissionStatus,
+                                Restriction = a.Restriction,
+                                StartAt = a.StartAt,
+                                EndAt = a.EndAt,
+                                Type = (int)a.Type,
+                                CorrectionStatus = a.GetCorrectionStatus(),
+                                IsPendingCorrection = a.IsPendingCorrection(),
+                                HasRestriction = a.HasRestriction(),
+                                IsLate = a.IsLate(),
+                                Hidden = isHidden
+                            };
                         })
                         .ToList();
+
+                    var visibleActivityGrades = dto.Activities
+                        .Where(a => !a.Hidden && a.FinalGrade.HasValue)
+                        .Select(a => a.FinalGrade!.Value)
+                        .ToList();
+
+                    dto.FinalGrade = visibleActivityGrades.Count > 0
+                        ? visibleActivityGrades.Sum()
+                        : null;
                 }
 
                 result.Add(dto);
@@ -591,6 +609,15 @@ namespace Application.Infrastructure.Repository.Education
         private static string NormalizeNull(string? value)
         {
             return string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim();
+        }
+
+        private static string NormalizeActivityName(string? name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return string.Empty;
+
+            return Regex.Replace(name.Trim(), "\\s+", " ", RegexOptions.Compiled)
+                .ToLowerInvariant();
         }
 
         private static string ExtractSlug(string id, string prefix)

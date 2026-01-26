@@ -6,6 +6,8 @@ using Application.Domain.Model.Education.Dtos;
 using Application.Domain.Model.Students;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Application.Service.Education
 {
@@ -196,10 +198,8 @@ namespace Application.Service.Education
             {
                 _logger.LogDebug("EducationReportImportProcessor: Processando UC: {UC}", row.UnidadeCurricular);
                 
-                // Gerar EadId único baseado no hash do nome da UC
-                var eadId = row.UnidadeCurricular.GetHashCode();
-                if (eadId < 0)
-                    eadId = eadId * -1;
+                // Gerar EadId estável e determinístico
+                var eadId = GetDeterministicPositiveHash(row.UnidadeCurricular);
                 
                 var ucCacheKey = eadId.ToString();
                 string ucId;
@@ -297,10 +297,8 @@ namespace Application.Service.Education
                     return cached.Id;
                 }
 
-                // Se não está em cache, buscar todos os estudantes UMA VEZ (primeira requisição)
-                var allStudents = await _studentRepository.GetAllAsync();
-                
-                var existing = allStudents.FirstOrDefault(s => s.IdNumber == cpf);
+                // Buscar aluno pelo documento de forma indexada
+                var existing = await _studentRepository.GetByIdNumberAsync(cpf);
 
                 if (existing != null)
                 {
@@ -470,14 +468,6 @@ namespace Application.Service.Education
             }
         }
 
-        private static string NormalizeCpf(string cpf)
-        {
-            if (string.IsNullOrWhiteSpace(cpf))
-                return string.Empty;
-
-            return new string(cpf.Where(char.IsDigit).ToArray());
-        }
-
         private static decimal? ParseGrade(string? gradeStr)
         {
             if (string.IsNullOrWhiteSpace(gradeStr))
@@ -487,6 +477,32 @@ namespace Application.Service.Education
                 return grade;
 
             return null;
+        }
+
+        private static int GetDeterministicPositiveHash(string? text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return 0;
+
+            var bytes = Encoding.UTF8.GetBytes(text.Trim());
+            using var sha = SHA256.Create();
+            var hash = sha.ComputeHash(bytes);
+
+            var value = BitConverter.ToInt32(hash, 0);
+            if (value == int.MinValue)
+                value = int.MaxValue;
+            if (value == 0)
+                value = 1;
+
+            return value < 0 ? -value : value;
+        }
+
+        private static string NormalizeCpf(string cpf)
+        {
+            if (string.IsNullOrWhiteSpace(cpf))
+                return string.Empty;
+
+            return new string(cpf.Where(char.IsDigit).ToArray());
         }
 
         private static DateTime? ParseExcelDate(object? dateObj)

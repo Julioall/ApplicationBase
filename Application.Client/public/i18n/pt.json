@@ -676,10 +676,19 @@
     "importReport": {
       "title": "Importar Relatório",
       "loading": "Importando relatório...",
+      "queued": "Relatório enviado para processamento. Você será notificado ao concluir.",
       "success": "Relatório importado com sucesso! {{files}} arquivo(s), {{rows}} linhas processadas, {{students}} alunos, {{links}} vínculos, {{performance}} registros de desempenho.",
       "error": "Erro ao importar relatório",
       "selectFiles": "Selecione um ou mais arquivos .xlsx",
-      "onlyXlsx": "Apenas arquivos .xlsx são aceitos"
+      "onlyXlsx": "Apenas arquivos .xlsx são aceitos",
+      "idLabel": "ID",
+      "statusLabel": "Status",
+      "filesLabel": "Arquivos",
+      "createdAtLabel": "Criado em"
+    },
+    "import": {
+      "title": "Importação de cursos",
+      "queuedMessage": "Importação recebida e enfileirada para processamento em segundo plano."
     },
     "header": {
       "eyebrow": "Cursos",

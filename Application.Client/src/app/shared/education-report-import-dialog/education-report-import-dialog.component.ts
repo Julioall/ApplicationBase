@@ -4,7 +4,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { EducationService } from '../../service/education/education.service';
 import { NotificationService } from '../../service/notification/notification.service';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { EducationReportImportResult } from '../../model/education-report-import-result';
+import { EducationReportImport } from '../../model/education-report-import';
 
 @Component({
   selector: 'app-education-report-import-dialog',
@@ -19,7 +19,7 @@ export class EducationReportImportDialogComponent implements OnInit {
 
   selectedFiles: File[] = [];
   isLoading = false;
-  importResult: EducationReportImportResult | null = null;
+  queuedImport: EducationReportImport | null = null;
 
   constructor(
     private educationService: EducationService,
@@ -69,20 +69,15 @@ export class EducationReportImportDialogComponent implements OnInit {
 
     this.isLoading = true;
     await this.spinner.show();
+    this.queuedImport = null;
 
     this.educationService.importReport(this.selectedFiles).subscribe({
-      next: (result) => {
-        this.importResult = result;
+      next: (importInfo) => {
         this.spinner.hide();
         this.isLoading = false;
-
-        const message = `education.importReport.success`;
-        this.notificationService.showSuccess(message);
-
-        // Close dialog after 2 seconds
-        setTimeout(() => {
-          this.closeDialog();
-        }, 2000);
+        this.queuedImport = importInfo;
+        this.notificationService.showSuccess('education.importReport.queued');
+        this.clearFiles();
       },
       error: (error) => {
         this.spinner.hide();
@@ -96,7 +91,7 @@ export class EducationReportImportDialogComponent implements OnInit {
   closeDialog(): void {
     if (!this.isLoading) {
       this.selectedFiles = [];
-      this.importResult = null;
+      this.queuedImport = null;
       this.close.emit();
     }
   }

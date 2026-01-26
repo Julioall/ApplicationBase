@@ -369,6 +369,18 @@
   <data name="NotificationImportFailedMessage" xml:space="preserve">
     <value>Could not process {0}: {1}</value>
   </data>
+  <data name="NotificationReportImportCompletedTitle" xml:space="preserve">
+    <value>Report import completed</value>
+  </data>
+  <data name="NotificationReportImportCompletedMessage" xml:space="preserve">
+    <value>Processed {0} rows and {1} performance records.</value>
+  </data>
+  <data name="NotificationReportImportFailedTitle" xml:space="preserve">
+    <value>Report import failed</value>
+  </data>
+  <data name="NotificationReportImportFailedMessage" xml:space="preserve">
+    <value>Could not process import {0}: {1}</value>
+  </data>
   <data name="NotificationNotFound" xml:space="preserve">
     <value>Notification {0} not found.</value>
   </data>

@@ -10,6 +10,7 @@ using Application.Domain.Localization;
 using Application.Domain.Model;
 using Application.Infrastructure;
 using Application.Service;
+using Application.Shared.Background;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -169,7 +170,10 @@ public class Program
         DependencyInjectionModuleService.AddServiceDependencies(builder.Services);
         
         // Register Hangfire job for education import
+        builder.Services.AddScoped<IEducationImportJob, EducationImportHangfireJob>();
         builder.Services.AddScoped<EducationImportHangfireJob>();
+        builder.Services.AddScoped<IEducationReportImportJob, EducationReportImportHangfireJob>();
+        builder.Services.AddScoped<EducationReportImportHangfireJob>();
         
         // NOTE: EducationImportBackgroundService is now replaced by Hangfire jobs (EducationImportHangfireJob)
         // The background service below can be kept as a fallback for missed imports, but Hangfire handles the main processing

@@ -28,6 +28,7 @@ public class EducationImportHangfireJob : IEducationImportJob
     private readonly IEducationRepository _educationRepository;
     private readonly IStringLocalizer<global::Application.Domain.SharedResource> _localizer;
     private readonly IDocumentStore _documentStore;
+    private readonly IServiceRavenDB _serviceRavenDb;
     private readonly INotificationService _notificationService;
     private readonly ILogger<EducationImportHangfireJob> _logger;
 
@@ -36,6 +37,7 @@ public class EducationImportHangfireJob : IEducationImportJob
         IEducationRepository educationRepository,
         IStringLocalizer<global::Application.Domain.SharedResource> localizer,
         IDocumentStore documentStore,
+        IServiceRavenDB serviceRavenDb,
         INotificationService notificationService,
         ILogger<EducationImportHangfireJob> logger)
     {
@@ -43,6 +45,7 @@ public class EducationImportHangfireJob : IEducationImportJob
         _educationRepository = educationRepository;
         _localizer = localizer;
         _documentStore = documentStore;
+        _serviceRavenDb = serviceRavenDb;
         _notificationService = notificationService;
         _logger = logger;
     }
@@ -55,7 +58,14 @@ public class EducationImportHangfireJob : IEducationImportJob
         ArgumentException.ThrowIfNullOrWhiteSpace(importId);
 
         using var asyncSession = _documentStore.OpenAsyncSession();
+        using var syncSession = _documentStore.OpenSession();
         asyncSession.Advanced.UseOptimisticConcurrency = false;
+        syncSession.Advanced.UseOptimisticConcurrency = false;
+
+        // Reutilizar a mesma sessão nas dependências da infraestrutura
+        _serviceRavenDb.Store = _documentStore;
+        _serviceRavenDb.AsyncSession = asyncSession;
+        _serviceRavenDb.Session = syncSession;
 
         try
         {

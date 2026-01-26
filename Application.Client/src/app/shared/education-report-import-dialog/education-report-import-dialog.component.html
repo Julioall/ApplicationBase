@@ -75,32 +75,14 @@
         </ul>
       </div>
 
-      <!-- Import Result -->
-      <div *ngIf="importResult" class="space-y-3 p-4 bg-success-soft rounded-xl">
-        <p class="font-semibold text-success">Importação concluída com sucesso!</p>
-        <ul class="text-sm space-y-1 text-text-primary">
-          <li>✓ Arquivos processados: {{ importResult.filesProcessed }}</li>
-          <li>✓ Linhas lidas: {{ importResult.rowsRead }}</li>
-          <li>✓ Alunos criados: {{ importResult.studentsCreated }}</li>
-          <li>✓ Alunos atualizados: {{ importResult.studentsUpdated }}</li>
-          <li>✓ Programas criados: {{ importResult.programsCreated }}</li>
-          <li>✓ Programas atualizados: {{ importResult.programsUpdated }}</li>
-          <li>✓ Classes criadas: {{ importResult.classesCreated }}</li>
-          <li>✓ Classes atualizadas: {{ importResult.classesUpdated }}</li>
-          <li>✓ UCs criadas: {{ importResult.ucsCreated }}</li>
-          <li>✓ UCs atualizadas: {{ importResult.ucsUpdated }}</li>
-          <li>✓ Vínculos de UC criados: {{ importResult.ucLinksCreated }}</li>
-          <li>✓ Registros de desempenho: {{ importResult.performanceRecordsUpserted }}</li>
-        </ul>
-
-        <!-- Errors -->
-        <div *ngIf="importResult.errors && importResult.errors.length > 0" class="mt-4 p-3 bg-danger-soft rounded-lg">
-          <p class="font-semibold text-danger text-sm mb-2">Erros encontrados:</p>
-          <ul class="text-xs space-y-1 text-text-primary">
-            <li *ngFor="let error of importResult.errors">
-              Linha {{ error.rowNumber }}: {{ error.message }}
-            </li>
-          </ul>
+      <!-- Import queued summary -->
+      <div *ngIf="queuedImport" class="space-y-3 p-4 bg-info-soft rounded-xl">
+        <p class="font-semibold text-info">{{ 'education.importReport.queued' | translate }}</p>
+        <div class="text-sm text-text-primary space-y-1">
+          <div><strong>{{ 'education.importReport.idLabel' | translate }}:</strong> {{ queuedImport.Id }}</div>
+          <div><strong>{{ 'education.importReport.statusLabel' | translate }}:</strong> {{ queuedImport.Status }}</div>
+          <div><strong>{{ 'education.importReport.filesLabel' | translate }}:</strong> {{ queuedImport.FileNames.join(', ') }}</div>
+          <div><strong>{{ 'education.importReport.createdAtLabel' | translate }}:</strong> {{ queuedImport.CreatedAt | date:'short' }}</div>
         </div>
       </div>
     </div>
@@ -113,12 +95,12 @@
         [disabled]="isLoading"
         class="px-6 py-2 rounded-lg border border-border-soft hover:bg-surface-alt transition disabled:opacity-50"
       >
-        {{ importResult ? 'Fechar' : 'Cancelar' }}
+        {{ queuedImport ? 'Fechar' : 'Cancelar' }}
       </button>
       <button
         type="button"
         (click)="importReport()"
-        [disabled]="!hasFiles || isLoading || importResult !== null"
+        [disabled]="!hasFiles || isLoading || queuedImport"
         class="px-6 py-2 rounded-lg bg-accent text-text-inverse hover:bg-accent-strong transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
       >
         <i *ngIf="!isLoading" class="fa-solid fa-upload"></i>

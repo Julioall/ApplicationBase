@@ -28,6 +28,10 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
   importing = false;
   showFilterDropdown = false;
   private searchSub?: Subscription;
+  private importPollHandle?: number;
+  private importPollAttempts = 0;
+  private readonly maxImportPollAttempts = 20;
+  private readonly importPollIntervalMs = 3000;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -60,6 +64,7 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.searchSub?.unsubscribe();
+    this.clearImportPolling();
   }
 
   onSchoolChange(): void {
@@ -148,6 +153,9 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (result) => {
           this.handleImportQueued(result);
+          if (result?.Id) {
+            this.startImportPolling(result.Id);
+          }
           this.loadSchools();
         },
         error: (err) => this.handleError(err, 'education.errors.import')
@@ -233,6 +241,58 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
 
   trackByClass(_index: number, classItem: EducationClass): string {
     return classItem.Id || _index.toString();
+  }
+
+  private startImportPolling(importId: string): void {
+    this.clearImportPolling();
+    if (!importId) {
+      return;
+    }
+
+    this.importPollAttempts = 0;
+    this.importPollHandle = window.setInterval(() => {
+      this.importPollAttempts++;
+
+      this.educationService.getImport(importId).subscribe({
+        next: (status) => this.handleImportStatus(status),
+        error: () => {
+          if (this.importPollAttempts >= this.maxImportPollAttempts) {
+            this.clearImportPolling();
+          }
+        }
+      });
+
+      if (this.importPollAttempts >= this.maxImportPollAttempts) {
+        this.clearImportPolling();
+      }
+    }, this.importPollIntervalMs);
+  }
+
+  private handleImportStatus(status: any): void {
+    if (!status || !status.Status) {
+      return;
+    }
+
+    if (status.Status === 'Completed') {
+      const detail = `${status.FileName ?? ''} • ${this.translate.instant('notifications.importCompleted')}`.trim();
+      this.notificationService.showSuccess(detail, this.translate.instant('notifications.importCompleted'));
+      this.clearImportPolling();
+      this.loadSchools();
+      return;
+    }
+
+    if (status.Status === 'Failed') {
+      const detail = status.ErrorMessage || this.translate.instant('notifications.importFailed');
+      this.notificationService.showError(detail, this.translate.instant('notifications.importFailed'));
+      this.clearImportPolling();
+    }
+  }
+
+  private clearImportPolling(): void {
+    if (this.importPollHandle !== undefined) {
+      window.clearInterval(this.importPollHandle);
+      this.importPollHandle = undefined;
+    }
   }
 
   private formatDate(date: Date): string {

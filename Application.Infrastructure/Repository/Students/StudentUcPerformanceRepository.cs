@@ -89,7 +89,7 @@ namespace Application.Infrastructure.Repository.Students
                 // Query: Buscar todos os desempenhos deste student que estão na lista de ucIds
                 var performances = await _serviceRavenDb.AsyncSession
                     .Query<StudentUcPerformance>()
-                    .Where(p => p.StudentId == studentId && ucIds.Contains(p.UcId))
+                    .Where(p => p.StudentId == studentId && p.UcId.In(ucIds))
                     .ToListAsync();
 
                 // Adicionar ao resultado com chave composta

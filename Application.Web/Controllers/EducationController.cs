@@ -136,7 +136,7 @@ namespace Application.Api.Controllers
 
         [HttpPost("import-report")]
         [Authorize(Policy = ApplicationPermissions.ManageEducation)]
-        [ProducesResponseType(typeof(EducationReportImportResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(EducationReportImport), StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ImportReport([FromForm] IFormFileCollection files, CancellationToken cancellationToken)
         {
@@ -162,10 +162,15 @@ namespace Application.Api.Controllers
 
             try
             {
-                // Converter IFormFileCollection para IEnumerable<(string, Stream)>
-                var fileStreams = files.Select(f => (f.FileName, f.OpenReadStream())).ToList();
-                var result = await _educationService.ImportReportAsync(fileStreams, cancellationToken);
-                return Ok(result);
+                var fileStreams = files.Select(f => (f.FileName, (Stream)f.OpenReadStream())).ToList();
+                var import = await _educationService.EnqueueReportImportAsync(fileStreams, cancellationToken);
+                return Accepted(new
+                {
+                    import.Id,
+                    import.Status,
+                    import.FileNames,
+                    import.CreatedAt
+                });
             }
             catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException || ex is BusinessException)
             {

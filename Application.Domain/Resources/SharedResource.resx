@@ -366,6 +366,18 @@
   <data name="NotificationImportFailedMessage" xml:space="preserve">
     <value>Não foi possível processar {0}: {1}</value>
   </data>
+  <data name="NotificationReportImportCompletedTitle" xml:space="preserve">
+    <value>Importação de relatório concluída</value>
+  </data>
+  <data name="NotificationReportImportCompletedMessage" xml:space="preserve">
+    <value>Processamos {0} linhas e {1} registros de desempenho.</value>
+  </data>
+  <data name="NotificationReportImportFailedTitle" xml:space="preserve">
+    <value>Falha na importação de relatório</value>
+  </data>
+  <data name="NotificationReportImportFailedMessage" xml:space="preserve">
+    <value>Não foi possível processar a importação {0}: {1}</value>
+  </data>
   <data name="NotificationNotFound" xml:space="preserve">
     <value>Notificação {0} não encontrada.</value>
   </data>
