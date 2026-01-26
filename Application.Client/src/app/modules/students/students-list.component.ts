@@ -48,10 +48,12 @@ export class StudentsListComponent implements OnInit, OnDestroy {
     { id: 'suspended', labelKey: 'students.status.suspended', dotClass: 'bg-danger shadow-[0_0_0_4px_color-mix(in_srgb,_var(--danger)_16%,_transparent)]' },
   ];
   columns: ColumnConfig[] = [
-    { id: 'name', labelKey: 'Nome', width: '1fr', visible: true },
-    { id: 'email', labelKey: 'Email', width: '1fr', visible: false },
-    { id: 'idNumber', labelKey: 'CPF', width: '1fr', visible: false },
-    { id: 'phone', labelKey: 'Telefone', width: '1fr', visible: false },
+    { id: 'name', labelKey: 'students.list.columns.name', width: '1fr', visible: true },
+    { id: 'email', labelKey: 'students.list.columns.email', width: '1fr', visible: false },
+    { id: 'idNumber', labelKey: 'students.list.columns.idNumber', width: '1fr', visible: false },
+    { id: 'phone', labelKey: 'students.list.columns.phone', width: '1fr', visible: false },
+    { id: 'lastAccess', labelKey: 'students.list.columns.lastAccess', width: '1fr', visible: true },
+    { id: 'status', labelKey: 'students.list.columns.status', width: '1fr', visible: true },
   ];
   private searchSub?: Subscription;
 

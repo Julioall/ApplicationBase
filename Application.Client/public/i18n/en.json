@@ -869,7 +869,8 @@
       "stepAdded": "Step added",
       "stepUpdated": "Step updated",
       "stepDeleted": "Step removed",
-      "stepsReordered": "Steps reordered"
+      "stepsReordered": "Steps reordered",
+      "deleted": "Task deleted"
     },
     "badge": {
       "dueToday": "Due today",
@@ -890,6 +891,10 @@
       "yearly": "Yearly",
       "everyNWeeks": "Every {{count}} week(s)",
       "custom": "Custom"
+    },
+    "errors": {
+      "scheduleRange": "Start date cannot be after end date.",
+      "createFailed": "Could not create the task."
     },
     "schedule": {
       "allDay": "All day",

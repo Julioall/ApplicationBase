@@ -894,7 +894,8 @@
       "stepAdded": "Etapa adicionada",
       "stepUpdated": "Etapa atualizada",
       "stepDeleted": "Etapa removida",
-      "stepsReordered": "Etapas reordenadas"
+      "stepsReordered": "Etapas reordenadas",
+      "deleted": "Tarefa excluída"
     },
     "badge": {
       "dueToday": "Vence hoje",
@@ -915,6 +916,10 @@
       "yearly": "Anual",
       "everyNWeeks": "A cada {{count}} semana(s)",
       "custom": "Personalizado"
+    },
+    "errors": {
+      "scheduleRange": "A data de início não pode ser após a data de término.",
+      "createFailed": "Não foi possível criar a tarefa."
     },
     "schedule": {
       "allDay": "Dia inteiro",
