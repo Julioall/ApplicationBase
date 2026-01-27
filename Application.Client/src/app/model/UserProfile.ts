@@ -1,5 +1,5 @@
 export class UserProfile {
-    Name?: string; 
+    Name?: string;
     ProfilePictureUrl?: string | null;
     ProfilePictureOffsetX?: number;
     ProfilePictureOffsetY?: number;
