@@ -81,28 +81,6 @@ namespace Application.Tests.Validator
         }
 
         [Fact]
-        public void Should_Have_Error_When_DateOfBirth_Is_Future()
-        {
-            var user = CreateValidUser();
-            user.Profile.DateOfBirth = DateTime.UtcNow.AddDays(1);
-
-            var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
-
-            Assert.Contains("DateOfBirthPast", result.Message);
-        }
-
-        [Fact]
-        public void Should_Have_Error_When_DateOfBirth_Is_Too_Old()
-        {
-            var user = CreateValidUser();
-            user.Profile.DateOfBirth = DateTime.UtcNow.AddYears(-121);
-
-            var result = Assert.Throws<ValidationException>(() => _userValidator.ValidateAndThrow(user));
-
-            Assert.Contains("DateOfBirthTooOld", result.Message);
-        }
-
-        [Fact]
         public void Should_Have_Error_When_Permissions_Are_Empty()
         {
             var user = CreateValidUser();
@@ -150,8 +128,7 @@ namespace Application.Tests.Validator
                 },
                 Profile = new UserProfile
                 {
-                    Name = "Valid Name",
-                    DateOfBirth = DateTime.UtcNow.AddYears(-25)
+                    Name = "Valid Name"
                 },
             };
         }

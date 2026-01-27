@@ -49,6 +49,34 @@ namespace Application.Api.Controllers
         }
 
         [AllowAnonymous]
+        [HttpPost("moodle/login")]
+        public async Task<ActionResult> MoodleLogin([FromBody] MoodleLoginDto moodleLoginDto)
+        {
+            if (moodleLoginDto == null)
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["LoginInformationMissing"], statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            if (string.IsNullOrWhiteSpace(moodleLoginDto.Username))
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["EmailRequired"], statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            if (string.IsNullOrWhiteSpace(moodleLoginDto.Password))
+            {
+                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["PasswordRequired"], statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            var tokenResponse = await _tokenService.GenerateMoodleTokens(moodleLoginDto);
+            if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.Token))
+            {
+                return Problem(title: _localizer["UnauthorizedTitle"], detail: _localizer["InvalidLoginCredentials"], statusCode: StatusCodes.Status401Unauthorized);
+            }
+
+            return Ok(new { token = tokenResponse.Token, refreshToken = tokenResponse.RefreshToken, expiresAt = tokenResponse.ExpiresAt });
+        }
+
+        [AllowAnonymous]
         [HttpPost("refresh")]
         public async Task<ActionResult> Refresh([FromBody] RefreshRequestDto request)
         {

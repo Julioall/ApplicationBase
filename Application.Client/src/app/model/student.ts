@@ -7,7 +7,6 @@ export interface Student {
   Email?: string;
   IdNumber?: string;
   Phone?: string;
-  DateOfBirth?: string | null;
   Address?: Address;
   Institution?: string;
   Lang?: string;

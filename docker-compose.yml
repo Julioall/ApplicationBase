@@ -25,6 +25,12 @@ services:
       RAVENDBSETTINGS_CERTIFICATE_PATH: "/certs/ravendb.pfx"
       RAVENDBSETTINGS_CERTIFICATE_PASSWORD: "changeme-ravendb-cert"
 
+      # Moodle
+      MOODLESETTINGS__BASEURL: "https://ead.fieg.com.br"
+      MOODLESETTINGS__SERVICENAME: "moodle_mobile_app"
+      MOODLESETTINGS__TIMEOUTSECONDS: "30"
+      MOODLESETTINGS__FIXEDTOKEN: ""
+
       # Evolution API
       EVOLUTION_API_BASE_URL: "http://application-evolution:8080"
       EVOLUTION_API_KEY: "changeme-evolution-key"

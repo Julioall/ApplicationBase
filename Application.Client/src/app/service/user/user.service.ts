@@ -7,7 +7,6 @@ import { environment } from "../../environment/environment";
 
 export interface UpdateProfilePayload {
   Name?: string;
-  DateOfBirth?: string | null;
   ProfilePicture?: File | null;
   RemoveProfilePicture?: boolean;
   ProfilePictureOffsetX?: number;
@@ -114,9 +113,6 @@ export class UserService {
     const formData = new FormData();
     if (payload.Name !== undefined) {
       formData.append('Name', payload.Name);
-    }
-    if (payload.DateOfBirth !== undefined && payload.DateOfBirth !== null) {
-      formData.append('DateOfBirth', payload.DateOfBirth);
     }
     if (payload.ProfilePicture) {
       formData.append('ProfilePicture', payload.ProfilePicture);

@@ -10,7 +10,6 @@ namespace Application.Domain.Model.Students.Dtos
         public string? Email { get; set; }
         public string? IdNumber { get; set; }
         public string? Phone { get; set; }
-        public DateTime? DateOfBirth { get; set; }
         public Address? Address { get; set; }
         public string? Institution { get; set; }
         public string? Lang { get; set; }
@@ -27,7 +26,6 @@ namespace Application.Domain.Model.Students.Dtos
         public string? Email { get; set; }
         public string? IdNumber { get; set; }
         public string? Phone { get; set; }
-        public DateTime? DateOfBirth { get; set; }
         public Address? Address { get; set; }
         public string? Institution { get; set; }
         public string? Lang { get; set; }

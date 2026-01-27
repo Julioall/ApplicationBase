@@ -51,7 +51,7 @@ namespace Application.Tests.Controllers
             public Func<string, Task<User?>>? GetByRefreshTokenFunc { get; set; }
             public Func<User, Task>? UpdateFunc { get; set; }
             public Func<string, Task<(byte[] Data, string ContentType)?>>? GetProfilePictureFunc { get; set; }
-            public Func<string, string?, DateTime?, Stream?, string?, bool, double?, double?, string?, string?, string?, string?, double?, Task>? UpdateProfileFunc { get; set; }
+            public Func<string, string?, Stream?, string?, bool, double?, double?, string?, string?, string?, string?, double?, Task>? UpdateProfileFunc { get; set; }
             public Func<string, string, string, Task>? ChangePasswordFunc { get; set; }
             public Func<string, bool, Task<(string Code, DateTime ExpiresAt)>>? GenerateRecoveryCodeFunc { get; set; }
             public Func<string, string, Task>? ValidateRecoveryCodeFunc { get; set; }
@@ -65,7 +65,7 @@ namespace Application.Tests.Controllers
             public Task<IEnumerable<User>> GetByPermissionAsync(string permission) => GetByPermissionFunc?.Invoke(permission) ?? Task.FromResult<IEnumerable<User>>(Array.Empty<User>());
             public async Task<User> GetByRefreshTokenAsync(string refreshToken) => (await (GetByRefreshTokenFunc?.Invoke(refreshToken) ?? Task.FromResult<User?>(null)))!;
             public Task UpdateAsync(User user) => UpdateFunc?.Invoke(user) ?? Task.CompletedTask;
-            public Task UpdateProfileAsync(string email, string? name, DateTime? dateOfBirth, Stream? profilePictureStream, string? profilePictureContentType, bool removeProfilePicture, double? profilePictureOffsetX, double? profilePictureOffsetY, string? jobTitle, string? department, string? organization, string? location, double? profilePictureScale) => UpdateProfileFunc?.Invoke(email, name, dateOfBirth, profilePictureStream, profilePictureContentType, removeProfilePicture, profilePictureOffsetX, profilePictureOffsetY, jobTitle, department, organization, location, profilePictureScale) ?? Task.CompletedTask;
+            public Task UpdateProfileAsync(string email, string? name, Stream? profilePictureStream, string? profilePictureContentType, bool removeProfilePicture, double? profilePictureOffsetX, double? profilePictureOffsetY, string? jobTitle, string? department, string? organization, string? location, double? profilePictureScale) => UpdateProfileFunc?.Invoke(email, name, profilePictureStream, profilePictureContentType, removeProfilePicture, profilePictureOffsetX, profilePictureOffsetY, jobTitle, department, organization, location, profilePictureScale) ?? Task.CompletedTask;
             public Task ChangePasswordAsync(string email, string currentPassword, string newPassword) => ChangePasswordFunc?.Invoke(email, currentPassword, newPassword) ?? Task.CompletedTask;
             public Task<(byte[] Data, string ContentType)?> GetProfilePictureAsync(string userId) => GetProfilePictureFunc?.Invoke(userId) ?? Task.FromResult<(byte[] Data, string ContentType)?>(null);
             public Task<(string Code, DateTime ExpiresAt)> GenerateRecoveryCodeAsync(string email, bool sendEmail) => GenerateRecoveryCodeFunc?.Invoke(email, sendEmail) ?? Task.FromResult((string.Empty, DateTime.UtcNow));
@@ -93,7 +93,6 @@ namespace Application.Tests.Controllers
                 Profile = new CreateUserProfileDto
                 {
                     Name = name ?? "Tester",
-                    DateOfBirth = null,
                     ProfilePictureUrl = null,
                     Department = null,
                     JobTitle = null,

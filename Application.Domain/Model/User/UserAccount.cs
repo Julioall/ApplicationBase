@@ -6,6 +6,8 @@ namespace Application.Domain.Model.User
     public class UserAccount
     {
         public required string Email { get; set; }
+        public string? Username { get; set; }
+        public string? ExternalId { get; set; }
         [JsonIgnore]
         public string? PasswordHash { get; set; }
         public List<string> Permissions { get; set; } = new();

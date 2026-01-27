@@ -9,7 +9,6 @@ namespace Application.Domain.Model.User
     public class UserProfile
     {
         public required string Name { get; set; }
-        public DateTime? DateOfBirth { get; set; }
         public string? ProfilePictureUrl { get; set; }
         public double ProfilePictureOffsetX { get; set; }
         public double ProfilePictureOffsetY { get; set; }

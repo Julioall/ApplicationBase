@@ -17,7 +17,6 @@ namespace Application.Domain.Model.Dtos
     public class CreateUserProfileDto
     {
         public required string Name { get; set; }
-        public DateTime? DateOfBirth { get; set; }
         public string? ProfilePictureUrl { get; set; }
         public string? JobTitle { get; set; }
         public string? Department { get; set; }

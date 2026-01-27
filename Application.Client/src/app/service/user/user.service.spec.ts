@@ -50,10 +50,8 @@ describe('UserService', () => {
 
   it('should send FormData for updateProfile without password', () => {
     localStorage.setItem('token', 'abc');
-    const dob = '2000-01-01T00:00:00.000Z';
     const payload: UpdateProfilePayload = {
       Name: 'Tester',
-      DateOfBirth: dob,
       JobTitle: 'Engineer',
       Department: 'R&D',
       Organization: 'Org',
@@ -71,7 +69,6 @@ describe('UserService', () => {
     expect(req.request.body instanceof FormData).toBeTrue();
     const body = req.request.body as FormData;
     expect(body.get('Name')).toBe('Tester');
-    expect(body.get('DateOfBirth')).toBe(dob);
     expect(body.get('JobTitle')).toBe('Engineer');
     expect(body.get('Department')).toBe('R&D');
     expect(body.get('Organization')).toBe('Org');

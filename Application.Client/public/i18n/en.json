@@ -59,6 +59,14 @@
       "passwordMin": "Password must be at least 6 characters.",
       "remember": "Remember me",
       "forgot": "Forgot your password?",
+      "mode": {
+        "local": "External user",
+        "moodle": "Moodle"
+      },
+      "usernameLabel": "Moodle username",
+      "usernamePlaceholder": "your Moodle username",
+      "usernameRequired": "Enter your Moodle username.",
+      "moodleRecoveryNotAvailable": "Password recovery for Moodle accounts must be done in Moodle.",
       "submit": "Sign in",
       "noAccount": "Don't have an account?",
       "create": "Create account",
@@ -216,6 +224,7 @@
       "themeLabel": "Theme",
       "passwordLabel": "Password",
       "passwordPlaceholder": "************",
+      "moodleManaged": "Password is managed in Moodle.",
       "languages": {
         "en": "English",
         "pt": "Portuguese"
@@ -600,7 +609,6 @@
       "email": "Email",
       "idNumber": "ID number / CPF",
       "phone": "Phone",
-      "dateOfBirth": "Date of birth",
       "institution": "Institution",
       "lang": "Language",
       "langSelectPlaceholder": "Select a language",

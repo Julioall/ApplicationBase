@@ -49,7 +49,6 @@ namespace Application.Service.Service
                 Email = Normalize(dto.Email),
                 IdNumber = Normalize(dto.IdNumber),
                 Phone = Normalize(dto.Phone),
-                DateOfBirth = dto.DateOfBirth,
                 Address = CloneAddress(dto.Address),
                 Institution = Normalize(dto.Institution),
                 Lang = Normalize(dto.Lang),
@@ -86,7 +85,6 @@ namespace Application.Service.Service
             existing.Email = Normalize(dto.Email);
             existing.IdNumber = Normalize(dto.IdNumber);
             existing.Phone = Normalize(dto.Phone);
-            existing.DateOfBirth = dto.DateOfBirth;
             existing.Address = CloneAddress(dto.Address);
             existing.Institution = Normalize(dto.Institution);
             existing.Lang = Normalize(dto.Lang);
@@ -262,7 +260,6 @@ namespace Application.Service.Service
                             Email = string.IsNullOrWhiteSpace(email) ? existingStudent.Email : email,
                             IdNumber = existingStudent.IdNumber,
                             Phone = existingStudent.Phone,
-                            DateOfBirth = existingStudent.DateOfBirth,
                             Address = CloneAddress(existingStudent.Address),
                             Institution = existingStudent.Institution,
                             Lang = existingStudent.Lang,
@@ -394,7 +391,6 @@ namespace Application.Service.Service
                             Email = email,
                             IdNumber = existingStudent.IdNumber,
                             Phone = existingStudent.Phone,
-                            DateOfBirth = existingStudent.DateOfBirth,
                             Address = CloneAddress(existingStudent.Address),
                             Institution = existingStudent.Institution,
                             Lang = existingStudent.Lang,

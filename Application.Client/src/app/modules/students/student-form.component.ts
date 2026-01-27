@@ -45,7 +45,6 @@ export class StudentFormComponent implements OnInit {
       Email: ['', [Validators.email]],
       IdNumber: ['', [Validators.maxLength(20)]],
       Phone: [''],
-      DateOfBirth: [''],
       Address: this.fb.group({
         Street: [''],
         Number: [''],
@@ -219,7 +218,6 @@ export class StudentFormComponent implements OnInit {
       Email: student.Email,
       IdNumber: student.IdNumber,
       Phone: student.Phone,
-      DateOfBirth: student.DateOfBirth ? student.DateOfBirth.substring(0, 10) : '',
       Institution: student.Institution,
       Lang: student.Lang,
       TimeZone: student.TimeZone,
@@ -258,7 +256,6 @@ export class StudentFormComponent implements OnInit {
       Email: raw.Email ? (raw.Email as string).trim() : undefined,
       IdNumber: raw.IdNumber ? (raw.IdNumber as string).trim() : undefined,
       Phone: raw.Phone ? (raw.Phone as string).trim() : undefined,
-      DateOfBirth: raw.DateOfBirth ? new Date(raw.DateOfBirth).toISOString() : null,
       Address: {
         ...address,
         PostalCode: postalCode || undefined,

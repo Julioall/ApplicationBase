@@ -24,6 +24,7 @@ namespace Application.Tests.Controllers
             public TokenResponseDto? RefreshResponse { get; set; }
 
             public Task<TokenResponseDto?> GenerateTokens(LoginDto loginDto) => Task.FromResult(LoginResponse);
+            public Task<TokenResponseDto?> GenerateMoodleTokens(MoodleLoginDto loginDto) => Task.FromResult(LoginResponse);
             public Task<TokenResponseDto?> RefreshAsync(string refreshToken) => Task.FromResult(RefreshResponse);
         }
 

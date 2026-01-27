@@ -19,10 +19,6 @@ namespace Application.Domain.Validator
                 .NotEmpty().WithMessage("NameRequired")
                 .MaximumLength(100).WithMessage("NameMaxLength");
 
-            RuleFor(user => user.Profile.DateOfBirth)
-                .LessThan(DateTime.UtcNow).WithMessage("DateOfBirthPast")
-                .GreaterThan(DateTime.UtcNow.AddYears(-120)).WithMessage("DateOfBirthTooOld");
-
             RuleFor(user => user.Account.Permissions)
                 .NotNull().WithMessage("PermissionsRequired")
                 .Must(p => p.Any()).WithMessage("PermissionsRequired")

@@ -13,6 +13,7 @@ using Application.Domain.Exceptions;
 using Microsoft.Extensions.Localization;
 using System.Collections.Generic;
 using System.Globalization;
+using Application.Service.Service.Moodle;
 
 namespace Application.Tests.Services
 {
@@ -49,7 +50,7 @@ namespace Application.Tests.Services
                 return Task.CompletedTask;
             }
 
-            public Task UpdateProfileAsync(string email, string? name, DateTime? dateOfBirth, Stream? profilePictureStream, string? profilePictureContentType, bool removeProfilePicture, double? profilePictureOffsetX, double? profilePictureOffsetY, string? jobTitle, string? department, string? organization, string? location, double? profilePictureScale) => Task.CompletedTask;
+            public Task UpdateProfileAsync(string email, string? name, Stream? profilePictureStream, string? profilePictureContentType, bool removeProfilePicture, double? profilePictureOffsetX, double? profilePictureOffsetY, string? jobTitle, string? department, string? organization, string? location, double? profilePictureScale) => Task.CompletedTask;
             public Task ChangePasswordAsync(string email, string currentPassword, string newPassword) => Task.CompletedTask;
             public Task<(byte[] Data, string ContentType)?> GetProfilePictureAsync(string userId) => Task.FromResult<(byte[] Data, string ContentType)?>(null);
             public Task<(string Code, DateTime ExpiresAt)> GenerateRecoveryCodeAsync(string email, bool sendEmail) => Task.FromResult((string.Empty, DateTime.UtcNow.AddMinutes(10)));
@@ -68,11 +69,22 @@ namespace Application.Tests.Services
             public IStringLocalizer WithCulture(CultureInfo culture) => this;
         }
 
+        private sealed class FakeMoodleAuthClient : IMoodleAuthClient
+        {
+            public Task<string?> AuthenticateAsync(string username, string password, CancellationToken cancellationToken = default) => Task.FromResult<string?>(null);
+            public Task<MoodleSiteInfo?> GetSiteInfoAsync(string token, CancellationToken cancellationToken = default) => Task.FromResult<MoodleSiteInfo?>(null);
+        }
+
+        private static TokenService CreateService(User user)
+        {
+            return new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer(), new FakeMoodleAuthClient());
+        }
+
         [Fact]
         public async Task GenerateTokens_Should_Return_Tokens_When_Password_Is_Valid()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
+            var service = CreateService(user);
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
 
             var tokens = await service.GenerateTokens(loginDto);
@@ -88,7 +100,7 @@ namespace Application.Tests.Services
         public async Task GenerateTokens_Should_Return_Null_When_Password_Is_Invalid()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
+            var service = CreateService(user);
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Wrong!" };
 
             var tokens = await service.GenerateTokens(loginDto);
@@ -100,7 +112,7 @@ namespace Application.Tests.Services
         public async Task RefreshAsync_Should_Rotate_RefreshToken_When_Valid()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
+            var service = CreateService(user);
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
 
             var initial = await service.GenerateTokens(loginDto);
@@ -118,7 +130,7 @@ namespace Application.Tests.Services
         public async Task RefreshAsync_Should_Return_Null_For_Invalid_Format()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
+            var service = CreateService(user);
 
             var refreshed = await service.RefreshAsync("invalid-token");
 
@@ -129,7 +141,7 @@ namespace Application.Tests.Services
         public async Task RefreshAsync_Should_Return_Null_When_User_Not_Found()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
+            var service = CreateService(user);
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
 
             var initial = await service.GenerateTokens(loginDto);
@@ -144,7 +156,7 @@ namespace Application.Tests.Services
         public async Task RefreshAsync_Should_Return_Null_When_Hash_Mismatch()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
+            var service = CreateService(user);
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
 
             var initial = await service.GenerateTokens(loginDto);
@@ -162,7 +174,7 @@ namespace Application.Tests.Services
         public async Task GenerateTokens_Should_Return_Null_When_LoginDto_Is_Null()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
+            var service = CreateService(user);
 
             var tokens = await service.GenerateTokens(null!);
 
@@ -173,7 +185,7 @@ namespace Application.Tests.Services
         public async Task GenerateTokens_Should_Throw_When_SigningKey_Missing()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
+            var service = CreateService(user);
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
 
             var previousKey = Environment.GetEnvironmentVariable(ApplicationConstants.JWT_SIGNING_KEY);
@@ -193,7 +205,7 @@ namespace Application.Tests.Services
         public async Task RefreshAsync_Should_Return_Null_When_Token_Expired()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
+            var service = CreateService(user);
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
 
             var initial = await service.GenerateTokens(loginDto);
@@ -209,7 +221,7 @@ namespace Application.Tests.Services
         public async Task RefreshAsync_Should_Return_Null_When_Expiry_Null()
         {
             var user = CreateUser();
-            var service = new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer());
+            var service = CreateService(user);
             var loginDto = new LoginDto { Email = user.Account.Email, Password = "Valid123!" };
 
             var initial = await service.GenerateTokens(loginDto);

@@ -162,6 +162,51 @@ namespace Application.Api.Controllers
                 return Problem(title: _localizer["UnauthorizedTitle"], detail: _localizer["UnauthorizedDetail"], statusCode: StatusCodes.Status401Unauthorized);
             }
 
+            if (IsMoodleUser())
+            {
+                var subject = GetSubject();
+                var externalId = GetExternalId(subject);
+                var username = GetUsernameFromClaims() ?? email;
+                var picture = GetPictureFromClaims();
+                var department = GetClaimValue("department");
+                var organization = GetClaimValue("organization");
+                var city = GetClaimValue("city");
+                var country = GetClaimValue("country");
+                var location = BuildLocation(city, country);
+                var jobTitle = department ?? organization ?? username;
+                var permissions = GetPermissionsFromClaims();
+                if (!permissions.Any())
+                {
+                    permissions = ApplicationPermissions.DefaultUserPermissions.ToList();
+                }
+
+                var displayName = GetNameFromClaims() ?? email;
+
+                var virtualUser = new User
+                {
+                    Id = subject,
+                    Account = new UserAccount
+                    {
+                        Email = email,
+                        Username = username,
+                        ExternalId = GetClaimValue("idnumber") ?? externalId,
+                        Permissions = permissions,
+                        DateJoined = DateTime.UtcNow
+                    },
+                    Profile = new UserProfile
+                    {
+                        Name = displayName,
+                        ProfilePictureUrl = picture,
+                        JobTitle = jobTitle,
+                        Department = department ?? organization ?? username,
+                        Organization = organization ?? department ?? username,
+                        Location = location
+                    }
+                };
+
+                return Ok(virtualUser);
+            }
+
             var user = await _userService.GetByEmailAsync(email);
             if (user == null)
             {
@@ -235,6 +280,11 @@ namespace Application.Api.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdateProfile()
         {
+            if (IsMoodleUser())
+            {
+                return MoodleActionNotAllowed();
+            }
+
             var email = GetAuthenticatedEmail();
             if (string.IsNullOrWhiteSpace(email))
             {
@@ -244,7 +294,6 @@ namespace Application.Api.Controllers
             Stream? profilePictureStream = null;
             string? contentType = null;
             string? name = null;
-            DateTime? dateOfBirth = null;
             bool removeProfilePicture = false;
             double? profilePictureOffsetX = null;
             double? profilePictureOffsetY = null;
@@ -260,7 +309,6 @@ namespace Application.Api.Controllers
                 {
                     var formRequest = MapFormRequest(await Request.ReadFormAsync());
                     name = formRequest.Name;
-                    dateOfBirth = formRequest.DateOfBirth;
                     removeProfilePicture = formRequest.RemoveProfilePicture;
                     profilePictureOffsetX = formRequest.ProfilePictureOffsetX;
                     profilePictureOffsetY = formRequest.ProfilePictureOffsetY;
@@ -294,7 +342,6 @@ namespace Application.Api.Controllers
                     }
 
                     name = profileDto.Name;
-                    dateOfBirth = profileDto.DateOfBirth;
                     removeProfilePicture = profileDto.RemoveProfilePicture;
                     profilePictureOffsetX = profileDto.ProfilePictureOffsetX;
                     profilePictureOffsetY = profileDto.ProfilePictureOffsetY;
@@ -324,7 +371,6 @@ namespace Application.Api.Controllers
                 await _userService.UpdateProfileAsync(
                     email,
                     name,
-                    dateOfBirth,
                     profilePictureStream,
                     contentType,
                     removeProfilePicture,
@@ -352,6 +398,11 @@ namespace Application.Api.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto passwordDto)
         {
+            if (IsMoodleUser())
+            {
+                return MoodleActionNotAllowed();
+            }
+
             if (passwordDto == null || passwordDto.CurrentPassword.IsNullOrEmpty() || passwordDto.NewPassword.IsNullOrEmpty())
             {
                 return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["UserCannotBeNullDetail"], statusCode: StatusCodes.Status400BadRequest);
@@ -373,6 +424,11 @@ namespace Application.Api.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GenerateRecoveryCode([FromBody] GenerateRecoveryCodeDto? request)
         {
+            if (IsMoodleUser())
+            {
+                return MoodleActionNotAllowed();
+            }
+
             var email = request?.Email;
             email ??= GetAuthenticatedEmail();
             if (string.IsNullOrWhiteSpace(email))
@@ -422,6 +478,11 @@ namespace Application.Api.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ValidateRecoveryCode([FromBody] ValidateRecoveryCodeDto? request)
         {
+            if (IsMoodleUser())
+            {
+                return MoodleActionNotAllowed();
+            }
+
             if (request == null || string.IsNullOrWhiteSpace(request.Code))
             {
                 return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["UserCannotBeNullDetail"], statusCode: StatusCodes.Status400BadRequest);
@@ -448,6 +509,11 @@ namespace Application.Api.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> VerifyRecoveryCode([FromBody] VerifyRecoveryCodeDto? request)
         {
+            if (IsMoodleUser())
+            {
+                return MoodleActionNotAllowed();
+            }
+
             if (request == null || string.IsNullOrWhiteSpace(request.Code) || string.IsNullOrWhiteSpace(request.NewPassword))
             {
                 return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["UserCannotBeNullDetail"], statusCode: StatusCodes.Status400BadRequest);
@@ -579,6 +645,104 @@ namespace Application.Api.Controllers
             return User.Identity?.Name;
         }
 
+        private string? GetNameFromClaims()
+        {
+            var claimOrder = new[] { "name", ClaimTypes.Name, JwtRegisteredClaimNames.Name, JwtRegisteredClaimNames.UniqueName };
+            foreach (var claimType in claimOrder)
+            {
+                var value = User.FindFirstValue(claimType);
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    return value;
+                }
+            }
+
+            return null;
+        }
+
+        private string? GetUsernameFromClaims()
+        {
+            var claimOrder = new[] { "username", ClaimTypes.Upn, ClaimTypes.Name, JwtRegisteredClaimNames.UniqueName };
+            foreach (var claimType in claimOrder)
+            {
+                var value = User.FindFirstValue(claimType);
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    return value;
+                }
+            }
+
+            return null;
+        }
+
+        private string? GetPictureFromClaims()
+        {
+            var value = User.FindFirstValue("picture");
+            return string.IsNullOrWhiteSpace(value) ? null : value;
+        }
+
+        private string? GetClaimValue(string type)
+        {
+            var value = User.FindFirstValue(type);
+            return string.IsNullOrWhiteSpace(value) ? null : value;
+        }
+
+        private static string? BuildLocation(string? city, string? country)
+        {
+            if (string.IsNullOrWhiteSpace(city) && string.IsNullOrWhiteSpace(country))
+            {
+                return null;
+            }
+
+            if (!string.IsNullOrWhiteSpace(city) && !string.IsNullOrWhiteSpace(country))
+            {
+                return $"{city}, {country}";
+            }
+
+            return city ?? country;
+        }
+
+        private bool IsMoodleUser()
+        {
+            var provider = User.FindFirstValue("auth_provider");
+            return !string.IsNullOrWhiteSpace(provider) && provider.Equals("moodle", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private string? GetSubject()
+        {
+            return User.FindFirstValue(JwtRegisteredClaimNames.Sub)
+                   ?? User.FindFirstValue(ClaimTypes.NameIdentifier)
+                   ?? User.FindFirstValue(ClaimTypes.Name);
+        }
+
+        private static string? GetExternalId(string? subject)
+        {
+            if (string.IsNullOrWhiteSpace(subject))
+            {
+                return null;
+            }
+
+            const string prefix = "moodle:";
+            return subject.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+                ? subject[prefix.Length..]
+                : subject;
+        }
+
+        private List<string> GetPermissionsFromClaims()
+        {
+            return User.FindAll(ApplicationPermissions.PermissionClaimType)
+                .Select(c => c.Value)
+                .Where(value => !string.IsNullOrWhiteSpace(value))
+                .Select(value => value.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
+        private ActionResult MoodleActionNotAllowed()
+        {
+            return Problem(title: _localizer["InvalidOperationTitle"], detail: _localizer["MoodleActionNotAllowed"], statusCode: StatusCodes.Status403Forbidden);
+        }
+
         private static bool TryParseDataUrl(string dataUrl, out string contentType, out byte[] data)
         {
             contentType = "application/octet-stream";
@@ -629,11 +793,6 @@ namespace Application.Api.Controllers
                 Organization = GetValue(form, "Organization"),
                 Location = GetValue(form, "Location")
             };
-
-            if (form.TryGetValue("DateOfBirth", out var dateValues) && DateTime.TryParse(dateValues.ToString(), out var parsedDate))
-            {
-                request.DateOfBirth = parsedDate;
-            }
 
             return request;
         }
@@ -692,7 +851,6 @@ namespace Application.Api.Controllers
                 Profile = new UserProfile
                 {
                     Name = dto.Profile.Name,
-                    DateOfBirth = dto.Profile.DateOfBirth,
                     ProfilePictureUrl = dto.Profile.ProfilePictureUrl,
                     JobTitle = dto.Profile.JobTitle,
                     Department = dto.Profile.Department,

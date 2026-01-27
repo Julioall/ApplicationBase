@@ -59,6 +59,14 @@
       "passwordMin": "A senha precisa de pelo menos 6 caracteres.",
       "remember": "Lembrar de mim",
       "forgot": "Esqueceu a senha?",
+      "mode": {
+        "local": "Usuário externo",
+        "moodle": "Moodle"
+      },
+      "usernameLabel": "Usuário do Moodle",
+      "usernamePlaceholder": "seu usuário do Moodle",
+      "usernameRequired": "Informe seu usuário do Moodle.",
+      "moodleRecoveryNotAvailable": "A recuperação de senha de contas Moodle deve ser feita no próprio Moodle.",
       "submit": "Entrar",
       "noAccount": "Não tem conta?",
       "create": "Criar conta",
@@ -216,6 +224,7 @@
       "themeLabel": "Tema",
       "passwordLabel": "Senha",
       "passwordPlaceholder": "************",
+      "moodleManaged": "Senha gerenciada no Moodle.",
       "languages": {
         "en": "Inglês",
         "pt": "Português"
@@ -623,7 +632,6 @@
       "email": "E-mail",
       "idNumber": "Matrícula / CPF",
       "phone": "Telefone",
-      "dateOfBirth": "Data de nascimento",
       "institution": "Instituição",
       "lang": "Idioma",
       "langSelectPlaceholder": "Selecione o idioma",

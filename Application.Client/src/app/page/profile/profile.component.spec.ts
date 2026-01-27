@@ -3,6 +3,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of, throwError } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { ProfileComponent } from './profile.component';
@@ -11,6 +12,7 @@ import { NotificationService } from '../../service/notification/notification.ser
 import { User } from '../../model/User';
 import { UserAccount } from '../../model/UserAccount';
 import { UserProfile } from '../../model/UserProfile';
+import { AuthService } from '../../service/auth/auth.service';
 
 type TestHydratedUser = User & { Account: UserAccount; Profile: UserProfile };
 
@@ -26,6 +28,7 @@ describe('ProfileComponent', () => {
   let fixture: ComponentFixture<ProfileComponent>;
   let userServiceSpy: jasmine.SpyObj<UserService>;
   let notificationSpy: jasmine.SpyObj<NotificationService>;
+  let authServiceStub: Partial<AuthService>;
   let router: Router;
 
   const translateStub = {
@@ -42,7 +45,6 @@ describe('ProfileComponent', () => {
     },
     Profile: {
       Name: 'Tester',
-      DateOfBirth: new Date('1990-01-01'),
       ProfilePictureUrl: 'https://cdn/avatar.png',
       JobTitle: 'Engineer',
       Department: 'Platform',
@@ -54,18 +56,20 @@ describe('ProfileComponent', () => {
   beforeEach(async () => {
     userServiceSpy = jasmine.createSpyObj<UserService>('UserService', ['getCurrentUser', 'updateProfile', 'changePassword']);
     notificationSpy = jasmine.createSpyObj<NotificationService>('NotificationService', ['showSuccess', 'showError', 'showWarning']);
+    authServiceStub = { isMoodleUser: () => false } as AuthService;
 
     userServiceSpy.getCurrentUser.and.returnValue(of(sampleUser));
     userServiceSpy.updateProfile.and.returnValue(of({}));
     userServiceSpy.changePassword.and.returnValue(of({}));
 
     await TestBed.configureTestingModule({
-      imports: [FormsModule, ReactiveFormsModule, RouterTestingModule],
+      imports: [FormsModule, ReactiveFormsModule, RouterTestingModule, HttpClientTestingModule],
       declarations: [ProfileComponent, TranslatePipeMock],
       providers: [
         { provide: UserService, useValue: userServiceSpy },
         { provide: NotificationService, useValue: notificationSpy },
         { provide: TranslateService, useValue: translateStub },
+        { provide: AuthService, useValue: authServiceStub },
       ],
     }).compileComponents();
 
@@ -88,7 +92,6 @@ describe('ProfileComponent', () => {
     component.user = sampleUser;
     component.startProfileEdit();
     component.profileForm.get('name')?.setValue('  Updated Name  ');
-    component.profileForm.get('dateOfBirth')?.setValue('1995-05-05');
     component.profileForm.get('jobTitle')?.setValue('Designer');
     component.profileForm.get('department')?.setValue('Product');
     component.profileForm.get('organization')?.setValue('Workspace Inc');
@@ -98,7 +101,6 @@ describe('ProfileComponent', () => {
 
     const expectedPayload: UpdateProfilePayload = {
       Name: 'Updated Name',
-      DateOfBirth: new Date('1995-05-05').toISOString(),
       JobTitle: 'Designer',
       Department: 'Product',
       Organization: 'Workspace Inc',

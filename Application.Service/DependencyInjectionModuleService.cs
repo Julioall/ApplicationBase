@@ -1,5 +1,6 @@
 using Application.Service.Interface;
 using Application.Service.Service;
+using Application.Service.Service.Moodle;
 using Application.Service.Service.Security;
 using Application.Service.Education;
 using Application.Service.Education.Parsers;
@@ -16,6 +17,7 @@ namespace Application.Service
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ISettingsService, SettingsService>();
             services.AddScoped<ISecretEncryptionService, SecretEncryptionService>();
+            services.AddHttpClient<IMoodleAuthClient, MoodleAuthClient>();
             services.AddHttpClient<EvolutionWhatsAppInstanceProvider>();
             services.AddScoped<IWhatsAppInstanceProvider, EvolutionWhatsAppInstanceProvider>();
             services.AddScoped<IWhatsAppInstanceService, WhatsAppInstanceService>();

@@ -37,6 +37,29 @@ export class AuthService {
     );
   }
 
+  loginMoodle(username: string, password: string, remember: boolean = true): Observable<any> {
+    const url = `${environment.apiUrl}/Authentication/moodle/login`;
+    const body = {
+      Username: username,
+      Password: password
+    };
+
+    return this.http.post<any>(url, body).pipe(
+      map((response) => {
+        if (response && response.token) {
+          this.saveToken(response.token, remember);
+          if (response.refreshToken) {
+            this.saveRefreshToken(response.refreshToken, remember);
+          }
+        }
+        return response;
+      }),
+      catchError(() => {
+        return throwError(() => new Error(this.translate.instant('auth.errors.loginFailed')));
+      })
+    );
+  }
+
   signup(user: User): Observable<any> {
     return this.http.post<any>(this.apiUrl, user).pipe(
       catchError((err) => throwError(() => err))
@@ -162,6 +185,22 @@ export class AuthService {
 
   hasPermission(permission: string): boolean {
     return this.getPermissions().includes(permission);
+  }
+
+  isMoodleUser(): boolean {
+    const token = this.getToken();
+    if (!token) {
+      return false;
+    }
+
+    try {
+      const decoded: any = jwtDecode(token);
+      const provider = decoded['auth_provider'];
+      const sub = decoded['sub'] as string | undefined;
+      return (typeof provider === 'string' && provider.toLowerCase() === 'moodle') || (sub?.toLowerCase().startsWith('moodle:') ?? false);
+    } catch {
+      return false;
+    }
   }
 
   hasAnyPermission(permissions: string[]): boolean {

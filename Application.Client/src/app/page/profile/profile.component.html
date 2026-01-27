@@ -16,10 +16,16 @@
                     />
                   </ng-container>
                 </div>
-                <button class="avatar-trigger" type="button" (click)="toggleAvatarMenu($event)">
+                <button
+                  class="avatar-trigger"
+                  type="button"
+                  (click)="toggleAvatarMenu($event)"
+                  [disabled]="isMoodleUser"
+                  [attr.title]="isMoodleUser ? ('profile.account.moodleManaged' | translate) : null"
+                >
                   <i class="fa-solid fa-camera" aria-hidden="true"></i>
                 </button>
-                <div class="avatar-menu" *ngIf="avatarMenuOpen">
+                <div class="avatar-menu" *ngIf="avatarMenuOpen && !isMoodleUser">
                   <button type="button" (click)="openAvatarModal()">
                     <i class="fa-solid fa-image" aria-hidden="true"></i>
                     <span>{{ 'profile.photo.menu.add' | translate }}</span>
@@ -47,11 +53,19 @@
                 <div>
                   <h2>{{ 'profile.about.title' | translate }}</h2>
                 </div>
-                <button *ngIf="!isEditingProfile" class="btn subtle" type="button" (click)="startProfileEdit()">
+                <button
+                  *ngIf="!isEditingProfile"
+                  class="btn subtle"
+                  type="button"
+                  (click)="startProfileEdit()"
+                  [disabled]="isMoodleUser"
+                  [attr.title]="isMoodleUser ? ('profile.account.moodleManaged' | translate) : null"
+                >
                   <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
                   <span>{{ 'profile.actions.editProfile' | translate }}</span>
                 </button>
               </div>
+              <small *ngIf="isMoodleUser" class="read-only-hint">{{ 'profile.account.moodleManaged' | translate }}</small>
 
               <div class="about-list">
                 <div class="about-row" [class.editing]="isEditingProfile">
@@ -70,18 +84,6 @@
                     </ng-container>
                     <ng-template #nameValue>
                       <span>{{ currentUser.Profile.Name }}</span>
-                    </ng-template>
-                  </div>
-                </div>
-
-                <div class="about-row" [class.editing]="isEditingProfile">
-                  <div class="about-label">{{ 'profile.form.birthLabel' | translate }}</div>
-                  <div class="about-value">
-                    <ng-container *ngIf="isEditingProfile; else birthValue">
-                      <input id="profileBirth" type="date" formControlName="dateOfBirth" />
-                    </ng-container>
-                    <ng-template #birthValue>
-                      <span>{{ safeDate(currentUser.Profile.DateOfBirth) || ('profile.form.birthHelper' | translate) }}</span>
                     </ng-template>
                   </div>
                 </div>
@@ -202,7 +204,7 @@
               </div>
             </form>
 
-            <section class="account-section">
+            <section class="account-section" *ngIf="!isMoodleUser; else moodleAccountInfo">
               <div class="section-header">
                 <div>
                   <h2>{{ 'profile.account.title' | translate }}</h2>
@@ -325,6 +327,31 @@
                 </div>
               </ng-container>
             </section>
+
+            <ng-template #moodleAccountInfo>
+              <section class="account-section">
+                <div class="section-header">
+                  <div>
+                    <h2>{{ 'profile.account.title' | translate }}</h2>
+                  </div>
+                </div>
+
+                <div class="account-list">
+                  <div class="account-row">
+                    <div class="account-label">{{ 'profile.form.emailLabel' | translate }}</div>
+                    <div class="account-value">
+                      <span>{{ currentUser.Account.Email }}</span>
+                    </div>
+                  </div>
+                  <div class="account-row">
+                    <div class="account-label">{{ 'profile.account.passwordLabel' | translate }}</div>
+                    <div class="account-value">
+                      <span class="password-mask">{{ 'profile.account.moodleManaged' | translate }}</span>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </ng-template>
           </div>
         </section>
 

@@ -74,7 +74,6 @@ namespace Application.Tests.Services
                 Email = "maria@school.com",
                 IdNumber = "UPD001",
                 Phone = "555-1234",
-                DateOfBirth = DateTime.UtcNow.AddYears(-20),
                 Address = new Address
                 {
                     Street = "Rua A",
@@ -278,7 +277,6 @@ namespace Application.Tests.Services
                 Email = $"{firstName}.{lastName}@test.com".ToLowerInvariant(),
                 IdNumber = idNumber,
                 Phone = "123456789",
-                DateOfBirth = DateTime.UtcNow.AddYears(-18),
                 Address = new Address
                 {
                     Street = "Main St",

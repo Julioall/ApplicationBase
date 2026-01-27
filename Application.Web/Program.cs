@@ -165,6 +165,7 @@ public class Program
 
         // Register dependency injection modules
         builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+        builder.Services.Configure<MoodleSettings>(builder.Configuration.GetSection("MoodleSettings"));
         DependencyInjectionModuleDomain.AddDomainDependencies(builder.Services);
         DependencyInjectionModuleInfra.AddInfraDependencies(builder.Services);
         DependencyInjectionModuleService.AddServiceDependencies(builder.Services);

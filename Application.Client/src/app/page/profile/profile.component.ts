@@ -9,6 +9,7 @@ import { ChangePasswordPayload, UpdateProfilePayload, UserService } from '../../
 import { NotificationService } from '../../service/notification/notification.service';
 import { ThemeService } from '../../service/theme/theme.service';
 import { passwordValidators } from '../../shared/validators/password-rules';
+import { AuthService } from '../../service/auth/auth.service';
 
 type HydratedUser = User & { Account: UserAccount; Profile: UserProfile };
 
@@ -22,6 +23,7 @@ export class ProfileComponent implements OnInit {
   passwordForm: FormGroup;
   recoveryForm: FormGroup;
   user: HydratedUser | null = null;
+  isMoodleUser = false;
   isLoading = false;
   isSavingProfile = false;
   isSavingPassword = false;
@@ -85,11 +87,11 @@ export class ProfileComponent implements OnInit {
     private readonly translate: TranslateService,
     private readonly router: Router,
     private readonly themeService: ThemeService,
+    private readonly authService: AuthService,
   ) {
     this.profileForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       email: [{ value: '', disabled: true }],
-      dateOfBirth: [''],
       jobTitle: [''],
       department: [''],
       organization: [''],
@@ -125,6 +127,7 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializePreferences();
+    this.isMoodleUser = this.authService.isMoodleUser();
     this.loadUser();
   }
 
@@ -143,6 +146,14 @@ export class ProfileComponent implements OnInit {
   }
 
   handleAvatarChange(event: Event): void {
+    if (this.isMoodleUser) {
+      this.notificationService.showWarning(this.translate.instant('profile.account.moodleManaged'));
+      const fileInput = event.target as HTMLInputElement;
+      if (fileInput) {
+        fileInput.value = '';
+      }
+      return;
+    }
     const fileInput = event.target as HTMLInputElement;
     const file = fileInput?.files?.[0];
     if (!file) {
@@ -176,6 +187,10 @@ export class ProfileComponent implements OnInit {
   }
 
   removeAvatar(): void {
+    if (this.isMoodleUser) {
+      this.notificationService.showWarning(this.translate.instant('profile.account.moodleManaged'));
+      return;
+    }
     if (!this.user) {
       this.notificationService.showError(this.translate.instant('profile.messages.missingUser'));
       return;
@@ -206,6 +221,9 @@ export class ProfileComponent implements OnInit {
   }
 
   startAvatarDrag(event: PointerEvent): void {
+    if (this.isMoodleUser) {
+      return;
+    }
     if (!this.isAvatarModalOpen || !this.avatarDraftPreview || !this.cropArea) {
       return;
     }
@@ -323,6 +341,10 @@ export class ProfileComponent implements OnInit {
   }
 
   generateRecoveryCode(): void {
+    if (this.isMoodleUser) {
+      this.notificationService.showWarning(this.translate.instant('profile.account.moodleManaged'));
+      return;
+    }
     if (this.isGeneratingRecovery) {
       return;
     }
@@ -349,6 +371,10 @@ export class ProfileComponent implements OnInit {
   }
 
   onRecoverySubmit(): void {
+    if (this.isMoodleUser) {
+      this.notificationService.showWarning(this.translate.instant('profile.account.moodleManaged'));
+      return;
+    }
     if (this.recoveryForm.invalid) {
       this.recoveryForm.markAllAsTouched();
       const messageKey = this.recoveryForm.hasError('passwordMismatch')
@@ -384,6 +410,10 @@ export class ProfileComponent implements OnInit {
   }
 
   startProfileEdit(): void {
+    if (this.isMoodleUser) {
+      this.notificationService.showWarning(this.translate.instant('profile.account.moodleManaged'));
+      return;
+    }
     if (!this.user) {
       return;
     }
@@ -398,6 +428,10 @@ export class ProfileComponent implements OnInit {
   }
 
   startPasswordEdit(): void {
+    if (this.isMoodleUser) {
+      this.notificationService.showWarning(this.translate.instant('profile.account.moodleManaged'));
+      return;
+    }
     this.isEditingPassword = true;
     this.resetPasswordVisibility();
     this.passwordForm.reset();
@@ -469,7 +503,6 @@ export class ProfileComponent implements OnInit {
       {
         name: this.user.Profile?.Name ?? '',
         email: this.user.Account?.Email ?? '',
-        dateOfBirth: this.safeDate(this.user.Profile?.DateOfBirth),
         jobTitle: this.user.Profile?.JobTitle ?? '',
         department: this.user.Profile?.Department ?? '',
         organization: this.user.Profile?.Organization ?? '',
@@ -488,20 +521,11 @@ export class ProfileComponent implements OnInit {
     this.setProfileControlsState(this.isEditingProfile);
   }
 
-  safeDate(value: string | Date | null | undefined): string {
-    if (!value) {
-      return '';
-    }
-    const date = new Date(value);
-    return isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
-  }
-
   private buildProfilePayload(): UpdateProfilePayload | null {
     if (!this.user) {
       return null;
     }
 
-    const dateValue = this.profileForm.get('dateOfBirth')?.value;
     const trimmedName = (this.profileForm.get('name')?.value || '').trim();
     const jobTitle = (this.profileForm.get('jobTitle')?.value || '').trim();
     const department = (this.profileForm.get('department')?.value || '').trim();
@@ -509,7 +533,6 @@ export class ProfileComponent implements OnInit {
     const location = (this.profileForm.get('location')?.value || '').trim();
     return {
       Name: trimmedName || this.user.Profile?.Name || '',
-      DateOfBirth: dateValue ? new Date(dateValue).toISOString() : null,
       JobTitle: jobTitle || null,
       Department: department || null,
       Organization: organization || null,
@@ -691,7 +714,7 @@ export class ProfileComponent implements OnInit {
 
   private setProfileControlsState(enabled: boolean): void {
     const method = enabled ? 'enable' : 'disable';
-    ['name', 'dateOfBirth', 'jobTitle', 'department', 'organization', 'location'].forEach((controlName) =>
+    ['name', 'jobTitle', 'department', 'organization', 'location'].forEach((controlName) =>
     {
       this.profileForm.get(controlName)?.[method]({ emitEvent: false });
     });
@@ -699,11 +722,19 @@ export class ProfileComponent implements OnInit {
   }
 
   triggerAvatarSelection(): void {
+    if (this.isMoodleUser) {
+      this.notificationService.showWarning(this.translate.instant('profile.account.moodleManaged'));
+      return;
+    }
     this.avatarInput?.nativeElement.click();
   }
 
   toggleAvatarMenu(event: Event): void {
     event.stopPropagation();
+    if (this.isMoodleUser) {
+      this.notificationService.showWarning(this.translate.instant('profile.account.moodleManaged'));
+      return;
+    }
     this.avatarMenuOpen = !this.avatarMenuOpen;
   }
 
@@ -713,6 +744,10 @@ export class ProfileComponent implements OnInit {
   }
 
   openAvatarModal(): void {
+    if (this.isMoodleUser) {
+      this.notificationService.showWarning(this.translate.instant('profile.account.moodleManaged'));
+      return;
+    }
     this.avatarMenuOpen = false;
     this.isAvatarModalOpen = true;
     if (this.avatarPreview) {

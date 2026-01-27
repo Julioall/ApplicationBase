@@ -262,7 +262,6 @@ namespace Application.Tests.Services
             _session.Store(existing);
             _session.SaveChanges();
 
-            var newDate = new DateTime(1992, 5, 10);
             const string newName = "Updated Profile";
             var imageBytes = new byte[] { 1, 2, 3, 4 };
 
@@ -278,13 +277,12 @@ namespace Application.Tests.Services
 
             const double scale = 1.3;
 
-            await _userService.UpdateProfileAsync(existing.Account.Email, newName, newDate, stream, "image/png", false, offsetX, offsetY, jobTitle, department, organization, location, scale);
+            await _userService.UpdateProfileAsync(existing.Account.Email, newName, stream, "image/png", false, offsetX, offsetY, jobTitle, department, organization, location, scale);
             await _asyncSession.SaveChangesAsync();
 
             var updated = await _userService.GetByEmailAsync(existing.Account.Email);
             Assert.NotNull(updated);
             Assert.Equal(newName, updated!.Profile.Name);
-            Assert.Equal(newDate, updated.Profile.DateOfBirth);
             Assert.Equal(offsetX, updated.Profile.ProfilePictureOffsetX);
             Assert.Equal(offsetY, updated.Profile.ProfilePictureOffsetY);
             Assert.Equal(jobTitle, updated.Profile.JobTitle);

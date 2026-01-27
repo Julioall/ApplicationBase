@@ -1,6 +1,5 @@
 export class UserProfile {
     Name?: string; 
-    DateOfBirth?: Date | null;
     ProfilePictureUrl?: string | null;
     ProfilePictureOffsetX?: number;
     ProfilePictureOffsetY?: number;

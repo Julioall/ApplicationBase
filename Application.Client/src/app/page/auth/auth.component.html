@@ -11,10 +11,30 @@
       <p class="text-text-subtle text-sm sm:text-base md:text-lg">
         {{ 'auth.login.subtitle' | translate }}
       </p>
+      <div class="mt-3 inline-flex rounded-full bg-surface-alt p-1 border border-border-soft shadow-inner">
+        <button
+          type="button"
+          class="px-4 py-2 text-sm font-semibold rounded-full transition"
+          [class.bg-accent]="loginMode === 'local'"
+          [class.text-text-inverse]="loginMode === 'local'"
+          (click)="setMode('local')"
+        >
+          {{ 'auth.login.mode.local' | translate }}
+        </button>
+        <button
+          type="button"
+          class="px-4 py-2 text-sm font-semibold rounded-full transition"
+          [class.bg-accent]="loginMode === 'moodle'"
+          [class.text-text-inverse]="loginMode === 'moodle'"
+          (click)="setMode('moodle')"
+        >
+          {{ 'auth.login.mode.moodle' | translate }}
+        </button>
+      </div>
     </header>
 
     <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-4 sm:space-y-5">
-      <label class="flex flex-col gap-2 text-sm font-semibold text-text-primary">
+      <label class="flex flex-col gap-2 text-sm font-semibold text-text-primary" *ngIf="loginMode === 'local'">
         <span>{{ 'auth.login.emailLabel' | translate }}</span>
         <input
           type="email"
@@ -31,6 +51,22 @@
               ? ('auth.login.emailRequired' | translate)
               : ('auth.login.emailInvalid' | translate)
           }}
+        </small>
+      </label>
+
+      <label class="flex flex-col gap-2 text-sm font-semibold text-text-primary" *ngIf="loginMode === 'moodle'">
+        <span>{{ 'auth.login.usernameLabel' | translate }}</span>
+        <input
+          type="text"
+          [placeholder]="'auth.login.usernamePlaceholder' | translate"
+          formControlName="username"
+          class="w-full rounded-xl border border-border-soft bg-surface-alt px-4 py-3 text-base font-medium text-text-primary placeholder:text-text-muted shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.08)] focus:outline-none focus:ring-2 focus:ring-focus focus:border-transparent transition"
+        />
+        <small
+          class="text-xs text-danger font-medium"
+          *ngIf="loginForm.get('username')?.invalid && (loginForm.get('username')?.touched || loginSubmitted)"
+        >
+          {{ 'auth.login.usernameRequired' | translate }}
         </small>
       </label>
 

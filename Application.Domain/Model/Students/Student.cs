@@ -11,7 +11,6 @@ namespace Application.Domain.Model.Students
         public string? IdNumber { get; set; }
         public string? Phone { get; set; }
         public string? Phone2 { get; set; }
-        public DateTime? DateOfBirth { get; set; }
         public Address? Address { get; set; }
         public string? Institution { get; set; }
         public string? Lang { get; set; }

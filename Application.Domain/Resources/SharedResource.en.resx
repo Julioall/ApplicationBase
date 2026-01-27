@@ -92,6 +92,9 @@
   <data name="InvalidOperationTitle" xml:space="preserve">
     <value>Invalid operation</value>
   </data>
+  <data name="MoodleActionNotAllowed" xml:space="preserve">
+    <value>This action is not available for Moodle accounts.</value>
+  </data>
   <data name="InvalidRefreshToken" xml:space="preserve">
     <value>Invalid refresh token.</value>
   </data>

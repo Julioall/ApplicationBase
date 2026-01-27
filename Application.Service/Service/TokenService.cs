@@ -4,14 +4,16 @@ using Application.Domain.Model;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
+using Application.Service.Service.Moodle;
 using Application.Service.Service.Security;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.Extensions.Localization;
 
 namespace Application.Service.Service
 {
@@ -20,12 +22,18 @@ namespace Application.Service.Service
         private readonly IUserService _userService;
         private readonly ILogger<TokenService> _logger;
         private readonly IStringLocalizer<SharedResource> _localizer;
+        private readonly IMoodleAuthClient _moodleAuthClient;
 
-        public TokenService(IUserService userService, ILogger<TokenService> logger, IStringLocalizer<SharedResource> localizer)
+        public TokenService(
+            IUserService userService,
+            ILogger<TokenService> logger,
+            IStringLocalizer<SharedResource> localizer,
+            IMoodleAuthClient moodleAuthClient)
         {
             _userService = userService;
             _logger = logger;
             _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
+            _moodleAuthClient = moodleAuthClient ?? throw new ArgumentNullException(nameof(moodleAuthClient));
         }
 
         public async Task<TokenResponseDto?> GenerateTokens(LoginDto loginDto)
@@ -100,7 +108,139 @@ namespace Application.Service.Service
             };
         }
 
+        public async Task<TokenResponseDto?> GenerateMoodleTokens(MoodleLoginDto loginDto)
+        {
+            if (loginDto == null)
+            {
+                return null;
+            }
+
+            var token = await _moodleAuthClient.AuthenticateAsync(loginDto.Username, loginDto.Password);
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                _logger.LogWarning("Moodle authentication failed for user {Username}", loginDto.Username);
+                return null;
+            }
+
+            var siteInfo = await _moodleAuthClient.GetSiteInfoAsync(token);
+            if (siteInfo == null)
+            {
+                _logger.LogWarning("Moodle site info unavailable for token issued to {Username}", loginDto.Username);
+                return null;
+            }
+
+            var email = !string.IsNullOrWhiteSpace(siteInfo.Email) ? siteInfo.Email : siteInfo.UserName;
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                _logger.LogWarning("Moodle user info missing email/username for id {UserId}", siteInfo.UserId);
+                return null;
+            }
+
+            var name = string.IsNullOrWhiteSpace(siteInfo.FullName) ? siteInfo.UserName : siteInfo.FullName;
+            var permissions = ApplicationPermissions.DefaultUserPermissions;
+
+            var baseClaims = new List<Claim>
+            {
+                new(type: ClaimTypes.Email, email),
+                new(type: JwtRegisteredClaimNames.Email, email),
+                new(type: ClaimTypes.Name, name),
+                new(type: "name", name),
+                new(type: "username", siteInfo.UserName ?? email),
+                new(type: JwtRegisteredClaimNames.Sub, $"moodle:{siteInfo.UserId}"),
+                new(type: "auth_provider", "moodle")
+            };
+
+            if (!string.IsNullOrWhiteSpace(siteInfo.PictureUrl))
+            {
+                baseClaims.Add(new Claim("picture", siteInfo.PictureUrl));
+            }
+
+            if (!string.IsNullOrWhiteSpace(siteInfo.FirstName))
+            {
+                baseClaims.Add(new Claim(JwtRegisteredClaimNames.GivenName, siteInfo.FirstName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(siteInfo.LastName))
+            {
+                baseClaims.Add(new Claim(JwtRegisteredClaimNames.FamilyName, siteInfo.LastName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(siteInfo.City))
+            {
+                baseClaims.Add(new Claim("city", siteInfo.City));
+            }
+
+            if (!string.IsNullOrWhiteSpace(siteInfo.Country))
+            {
+                baseClaims.Add(new Claim("country", siteInfo.Country));
+            }
+
+            if (!string.IsNullOrWhiteSpace(siteInfo.Department))
+            {
+                baseClaims.Add(new Claim("department", siteInfo.Department));
+            }
+
+            if (!string.IsNullOrWhiteSpace(siteInfo.Institution))
+            {
+                baseClaims.Add(new Claim("organization", siteInfo.Institution));
+            }
+
+            if (!string.IsNullOrWhiteSpace(siteInfo.Phone1))
+            {
+                baseClaims.Add(new Claim("phone1", siteInfo.Phone1));
+            }
+
+            if (!string.IsNullOrWhiteSpace(siteInfo.Phone2))
+            {
+                baseClaims.Add(new Claim("phone2", siteInfo.Phone2));
+            }
+
+            if (!string.IsNullOrWhiteSpace(siteInfo.Description))
+            {
+                baseClaims.Add(new Claim("bio", siteInfo.Description));
+            }
+
+            if (!string.IsNullOrWhiteSpace(siteInfo.Lang))
+            {
+                baseClaims.Add(new Claim("locale", siteInfo.Lang));
+            }
+
+            if (!string.IsNullOrWhiteSpace(siteInfo.TimeZone))
+            {
+                baseClaims.Add(new Claim("zoneinfo", siteInfo.TimeZone));
+            }
+
+            if (!string.IsNullOrWhiteSpace(siteInfo.IdNumber))
+            {
+                baseClaims.Add(new Claim("idnumber", siteInfo.IdNumber));
+            }
+
+            var jwtSecurityToken = CreateJwt(baseClaims, permissions);
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+
+            return new TokenResponseDto
+            {
+                Token = accessToken,
+                RefreshToken = null,
+                ExpiresAt = jwtSecurityToken.ValidTo
+            };
+        }
+
         private JwtSecurityToken CreateJwt(User user)
+        {
+            user.Account.Permissions ??= new List<string>();
+
+            var claims = new List<Claim>
+            {
+                new(type: ClaimTypes.Name, user.Account.Email),
+                new(type: ClaimTypes.Email, user.Account.Email),
+                new(type: JwtRegisteredClaimNames.Email, user.Account.Email)
+            };
+
+            return CreateJwt(claims, user.Account.Permissions);
+        }
+
+        private JwtSecurityToken CreateJwt(IEnumerable<Claim> baseClaims, IEnumerable<string>? permissions)
         {
             var signingKeyValue = Environment.GetEnvironmentVariable(ApplicationConstants.JWT_SIGNING_KEY);
             if (string.IsNullOrWhiteSpace(signingKeyValue))
@@ -110,16 +250,15 @@ namespace Application.Service.Service
 
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKeyValue));
             var signinCredentials = new SigningCredentials(secretKey, algorithm: SecurityAlgorithms.HmacSha256);
-            var claims = new List<Claim>
-            {
-                new(type: ClaimTypes.Name, user.Account.Email),
-                new(type: ClaimTypes.Email, user.Account.Email),
-                new(type: JwtRegisteredClaimNames.Email, user.Account.Email)
-            };
 
-            user.Account.Permissions ??= new List<string>();
+            var claims = new List<Claim>(baseClaims ?? Enumerable.Empty<Claim>());
 
-            foreach (var permission in user.Account.Permissions)
+            var normalizedPermissions = permissions?
+                .Where(p => !string.IsNullOrWhiteSpace(p))
+                .Select(p => p.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase) ?? Enumerable.Empty<string>();
+
+            foreach (var permission in normalizedPermissions)
             {
                 claims.Add(new Claim(ApplicationPermissions.PermissionClaimType, permission));
             }

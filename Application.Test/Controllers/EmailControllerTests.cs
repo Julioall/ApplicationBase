@@ -57,7 +57,7 @@ namespace Application.Tests.Controllers
             public Task<IEnumerable<User>> GetByPermissionAsync(string permission) => Task.FromResult<IEnumerable<User>>(Array.Empty<User>());
             public Task<User> GetByRefreshTokenAsync(string refreshTokenId) => Task.FromResult<User>(null!);
             public Task UpdateAsync(User user) => Task.CompletedTask;
-            public Task UpdateProfileAsync(string email, string? name, DateTime? dateOfBirth, Stream? profilePictureStream, string? profilePictureContentType, bool removeProfilePicture, double? profilePictureOffsetX, double? profilePictureOffsetY, string? jobTitle, string? department, string? organization, string? location, double? profilePictureScale) => Task.CompletedTask;
+            public Task UpdateProfileAsync(string email, string? name, Stream? profilePictureStream, string? profilePictureContentType, bool removeProfilePicture, double? profilePictureOffsetX, double? profilePictureOffsetY, string? jobTitle, string? department, string? organization, string? location, double? profilePictureScale) => Task.CompletedTask;
             public Task ChangePasswordAsync(string email, string currentPassword, string newPassword) => Task.CompletedTask;
             public Task<(byte[] Data, string ContentType)?> GetProfilePictureAsync(string userId) => Task.FromResult<(byte[] Data, string ContentType)?>(null);
             public Task<(string Code, DateTime ExpiresAt)> GenerateRecoveryCodeAsync(string email, bool sendEmail) => Task.FromResult((string.Empty, DateTime.UtcNow));

@@ -104,7 +104,7 @@ namespace Application.Service.Service
             return _userRepository.GetByRefreshTokenAsync(refreshTokenId);
         }
 
-        public async Task UpdateProfileAsync(string email, string? name, DateTime? dateOfBirth, Stream? profilePictureStream, string? profilePictureContentType, bool removeProfilePicture, double? profilePictureOffsetX, double? profilePictureOffsetY, string? jobTitle, string? department, string? organization, string? location, double? profilePictureScale)
+        public async Task UpdateProfileAsync(string email, string? name, Stream? profilePictureStream, string? profilePictureContentType, bool removeProfilePicture, double? profilePictureOffsetX, double? profilePictureOffsetY, string? jobTitle, string? department, string? organization, string? location, double? profilePictureScale)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(email);
 
@@ -122,7 +122,6 @@ namespace Application.Service.Service
                 user.Profile.Name = trimmedName;
             }
 
-            user.Profile.DateOfBirth = dateOfBirth;
             if (profilePictureOffsetX.HasValue)
             {
                 user.Profile.ProfilePictureOffsetX = profilePictureOffsetX.Value;
