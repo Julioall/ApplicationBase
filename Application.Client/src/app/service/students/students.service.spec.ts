@@ -66,17 +66,6 @@ describe('StudentsService', () => {
     req.flush({});
   });
 
-  it('should import students with form data', () => {
-    const file = new File(['content'], 'students.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    service.importStudents(file).subscribe();
-
-    const req = httpMock.expectOne(`${environment.apiUrl}/students/import`);
-    expect(req.request.method).toBe('POST');
-    expect(req.request.headers.get('Content-Type')).toBeNull();
-    expect(req.request.body instanceof FormData).toBeTrue();
-    req.flush({ Processed: 1, Created: 1, Updated: 0, Skipped: 0, Errors: [] });
-  });
-
   it('should export students as blob', () => {
     service.exportStudents().subscribe();
 

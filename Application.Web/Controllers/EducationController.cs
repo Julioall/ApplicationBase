@@ -27,29 +27,7 @@ namespace Application.Api.Controllers
             _localizer = localizer;
         }
 
-        [HttpPost("import")]
-        [Authorize(Policy = ApplicationPermissions.ManageEducation)]
-        [ProducesResponseType(typeof(EducationImport), StatusCodes.Status202Accepted)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Import([FromForm] IFormFile? file, CancellationToken cancellationToken)
-        {
-            return EducationReadOnlyProblem();
-        }
 
-        [HttpGet("import/{id}")]
-        [Authorize(Policy = ApplicationPermissions.ViewEducation)]
-        [ProducesResponseType(typeof(EducationImport), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetImport(string id, CancellationToken cancellationToken)
-        {
-            var import = await _educationService.GetImportAsync(id, cancellationToken);
-            if (import == null)
-            {
-                throw new NotFoundException(_localizer["ImportNotFound", id]);
-            }
-
-            return Ok(import);
-        }
 
         [HttpGet("schools")]
         [Authorize(Policy = ApplicationPermissions.ViewEducation)]
@@ -121,14 +99,7 @@ namespace Application.Api.Controllers
             return Ok(paged);
         }
 
-        [HttpPost("import-report")]
-        [Authorize(Policy = ApplicationPermissions.ManageEducation)]
-        [ProducesResponseType(typeof(EducationReportImport), StatusCodes.Status202Accepted)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> ImportReport([FromForm] IFormFileCollection files, CancellationToken cancellationToken)
-        {
-            return EducationReadOnlyProblem();
-        }
+
 
         [HttpGet("students/{studentId}/ucs")]
         [Authorize(Policy = ApplicationPermissions.ViewEducation)]

@@ -265,36 +265,6 @@
     <value>Email password is stored as hash. Reconfigure SMTP credentials.</value>
   </data>
 
-  <data name="StudentImportFileEmpty" xml:space="preserve">
-    <value>Import file is empty.</value>
-  </data>
-  <data name="StudentImportOnlyXlsx" xml:space="preserve">
-    <value>Only .xlsx or .json files are supported for import.</value>
-  </data>
-  <data name="StudentImportCourseIdMissing" xml:space="preserve">
-    <value>Could not identify the course ID from the file name.</value>
-  </data>
-  <data name="StudentImportInvalidJson" xml:space="preserve">
-    <value>Invalid JSON file for participant import.</value>
-  </data>
-  <data name="StudentImportEmailRequired" xml:space="preserve">
-    <value>Email is required for participant import.</value>
-  </data>
-  <data name="StudentImportWorksheetMissing" xml:space="preserve">
-    <value>No worksheet found in the uploaded file.</value>
-  </data>
-  <data name="StudentImportNamesRequired" xml:space="preserve">
-    <value>First name and last name are required.</value>
-  </data>
-  <data name="StudentImportInvalidDate" xml:space="preserve">
-    <value>Invalid date value.</value>
-  </data>
-  <data name="StudentImportInvalidDateWithValue" xml:space="preserve">
-    <value>Invalid date value: "{0}".</value>
-  </data>
-  <data name="StudentImportMissingId" xml:space="preserve">
-    <value>Existing student is missing an identifier.</value>
-  </data>
   <data name="StudentExportHeaderFirstName" xml:space="preserve">
     <value>First name</value>
   </data>
@@ -321,27 +291,6 @@
     <value>Failed to decrypt email password. Reconfigure SMTP credentials.</value>
   </data>
 
-  <data name="CourseImportFileEmpty" xml:space="preserve">
-    <value>Courses file cannot be empty.</value>
-  </data>
-  <data name="CourseImportOnlyJson" xml:space="preserve">
-    <value>Upload a .json file with courses.</value>
-  </data>
-  <data name="CourseImportInvalidJson" xml:space="preserve">
-    <value>The courses file is invalid or not valid JSON.</value>
-  </data>
-  <data name="CourseImportCoursesMissing" xml:space="preserve">
-    <value>No courses list found at data.courses.</value>
-  </data>
-  <data name="CourseImportProgramMissing" xml:space="preserve">
-    <value>Program name not found in the summary.</value>
-  </data>
-  <data name="CourseImportSchoolMissing" xml:space="preserve">
-    <value>School name not found in the summary.</value>
-  </data>
-  <data name="CourseImportFieldMissing" xml:space="preserve">
-    <value>Missing required field: {0}.</value>
-  </data>
   <data name="EducationReadOnly" xml:space="preserve">
     <value>Education is in read-only mode. Imports and edits are disabled.</value>
   </data>

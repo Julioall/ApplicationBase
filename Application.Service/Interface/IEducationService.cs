@@ -7,11 +7,6 @@ namespace Application.Service.Interface
 {
     public interface IEducationService
     {
-        Task<CourseImportResult> ImportCoursesAsync(Stream fileStream, string fileName, CancellationToken cancellationToken = default);
-        Task<EducationImport> EnqueueImportAsync(Stream fileStream, string fileName, CancellationToken cancellationToken = default);
-        Task<EducationImport?> GetImportAsync(string id, CancellationToken cancellationToken = default);
-        Task<EducationReportImport> EnqueueReportImportAsync(IEnumerable<(string fileName, Stream fileStream)> files, CancellationToken cancellationToken = default);
-        Task<EducationReportImportResult> ImportReportAsync(IEnumerable<(string fileName, Stream fileStream)> files, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<School>> GetSchoolsAsync(CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<ProgramDocument>> GetProgramsBySchoolAsync(string schoolId, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<ClassDocument>> GetClassesByProgramAsync(string programId, CancellationToken cancellationToken = default);

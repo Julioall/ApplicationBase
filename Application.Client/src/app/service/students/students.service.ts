@@ -6,7 +6,6 @@ import { environment } from '../../environment/environment';
 import { Student } from '../../model/student';
 import { StudentQuery } from '../../model/student-query';
 import { PagedResult } from '../../model/paged-result';
-import { StudentImportResult } from '../../model/student-import-result';
 
 @Injectable({
   providedIn: 'root'
@@ -55,15 +54,6 @@ export class StudentsService {
   deleteStudent(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getAuthHeaders() })
       .pipe(catchError(this.handleError));
-  }
-
-  importStudents(file: File): Observable<StudentImportResult> {
-    const formData = new FormData();
-    formData.append('file', file, file.name);
-
-    return this.http.post<StudentImportResult>(`${this.apiUrl}/import`, formData, {
-      headers: this.getAuthHeaders(false)
-    }).pipe(catchError(this.handleError));
   }
 
   exportStudents(): Observable<Blob> {

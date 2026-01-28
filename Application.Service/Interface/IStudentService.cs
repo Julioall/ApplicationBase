@@ -11,7 +11,6 @@ namespace Application.Service.Interface
         Task DeleteStudentAsync(string id);
         Task<Student?> GetStudentAsync(string id);
         Task<PagedResult<Student>> GetStudentsAsync(PaginationQuery query);
-        Task<StudentImportResult> ImportStudentsAsync(Stream fileStream, string fileName);
         Task<byte[]> ExportStudentsAsync();
     }
 }

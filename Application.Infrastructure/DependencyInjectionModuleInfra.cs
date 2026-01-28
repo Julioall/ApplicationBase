@@ -37,8 +37,6 @@ namespace Application.Infrastructure
             services.TryAddScoped<IStudentRepository, StudentRepository>();
             services.TryAddScoped<IStudentUcPerformanceRepository, StudentUcPerformanceRepository>();
             services.TryAddScoped<IEducationRepository, EducationRepository>();
-            services.TryAddScoped<IEducationImportRepository, EducationImportRepository>();
-            services.TryAddScoped<IEducationReportImportRepository, EducationReportImportRepository>();
             services.TryAddScoped<INotificationRepository, NotificationRepository>();
             services.TryAddScoped<IWhatsAppInstanceRepository, WhatsAppInstanceRepository>();
             services.TryAddScoped<ITodoRepository, TodoRepository>();

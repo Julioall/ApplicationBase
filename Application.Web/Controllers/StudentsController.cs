@@ -90,29 +90,6 @@ namespace Application.Api.Controllers
             return Ok(new { updated.Id, message = _localizer["StudentUpdated"] });
         }
 
-        [HttpPost("import")]
-        [Authorize(Policy = ApplicationPermissions.ManageStudents)]
-        [ProducesResponseType(typeof(StudentImportResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> ImportStudents([FromForm] IFormFile? file)
-        {
-            if (file == null || file.Length == 0)
-            {
-                return Problem(title: _localizer["InvalidRequestTitle"], detail: "A planilha nao pode estar vazia.", statusCode: StatusCodes.Status400BadRequest);
-            }
-
-            try
-            {
-                await using var stream = file.OpenReadStream();
-                var result = await _studentService.ImportStudentsAsync(stream, file.FileName);
-                return Ok(result);
-            }
-            catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
-            {
-                return Problem(title: _localizer["InvalidRequestTitle"], detail: ex.Message, statusCode: StatusCodes.Status400BadRequest);
-            }
-        }
-
         [HttpDelete("{id}")]
         [Authorize(Policy = ApplicationPermissions.ManageStudents)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

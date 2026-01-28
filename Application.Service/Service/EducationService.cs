@@ -10,9 +10,6 @@ using Application.Domain.Model.Education;
 using Application.Domain.Model.Education.Dtos;
 using Application.Domain.Model.Students;
 using Application.Service.Interface;
-using Application.Service.Education;
-using Application.Service.Education.Parsers;
-using Application.Shared.Background;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
@@ -21,16 +18,9 @@ namespace Application.Service.Service
     public class EducationService : IEducationService
     {
         private readonly IEducationRepository _educationRepository;
-        private readonly IEducationImportRepository _educationImportRepository;
-        private readonly IEducationReportImportRepository _educationReportImportRepository;
         private readonly IStudentUcPerformanceRepository _studentUcPerformanceRepository;
-        private readonly IExcelReportParser _excelReportParser;
-        private readonly IEducationReportImportProcessor _importProcessor;
         private readonly IStringLocalizer<SharedResource> _localizer;
         private readonly ILogger<EducationService> _logger;
-        private readonly IBackgroundJobScheduler _backgroundJobScheduler;
-        private static readonly Regex BreakRegex = new("<br\\s*/?>", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private static readonly Regex HtmlTagRegex = new("<.*?>", RegexOptions.Compiled);
         private const string SyncStatusRunning = "Running";
         private const string SyncStatusSuccess = "Success";
         private const string SyncStatusFailed = "Failed";
@@ -38,160 +28,14 @@ namespace Application.Service.Service
 
         public EducationService(
             IEducationRepository educationRepository, 
-            IEducationImportRepository educationImportRepository,
-            IEducationReportImportRepository educationReportImportRepository,
             IStudentUcPerformanceRepository studentUcPerformanceRepository,
-            IExcelReportParser excelReportParser,
-            IEducationReportImportProcessor importProcessor,
             IStringLocalizer<SharedResource> localizer,
-            ILogger<EducationService> logger,
-            IBackgroundJobScheduler backgroundJobScheduler)
+            ILogger<EducationService> logger)
         {
             _educationRepository = educationRepository;
-            _educationImportRepository = educationImportRepository;
-            _educationReportImportRepository = educationReportImportRepository;
             _studentUcPerformanceRepository = studentUcPerformanceRepository;
-            _excelReportParser = excelReportParser;
-            _importProcessor = importProcessor;
             _localizer = localizer;
             _logger = logger;
-            _backgroundJobScheduler = backgroundJobScheduler;
-        }
-
-        public async Task<EducationImport> EnqueueImportAsync(Stream fileStream, string fileName, CancellationToken cancellationToken = default)
-        {
-            ArgumentNullException.ThrowIfNull(fileStream);
-
-            ThrowReadOnly();
-
-            if (fileStream.Length == 0)
-            {
-                throw new BusinessException(_localizer["CourseImportFileEmpty"]);
-            }
-
-            if (string.IsNullOrWhiteSpace(fileName) || !fileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
-            {
-                throw new BusinessException(_localizer["CourseImportOnlyJson"]);
-            }
-
-            var import = new EducationImport
-            {
-                FileName = fileName,
-                Status = EducationImportStatus.Pending,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            await _educationImportRepository.AddAsync(import, fileStream, "application/json", cancellationToken);
-            
-            // Enfileirar o job Hangfire para processar a importação
-            _backgroundJobScheduler.Enqueue<IEducationImportJob>(
-                job => job.ProcessImportAsync(import.Id!, cancellationToken));
-            
-            _logger.LogInformation("Education import {ImportId} enqueued for processing", import.Id);
-            
-            return import;
-        }
-
-        public async Task<EducationReportImport> EnqueueReportImportAsync(
-            IEnumerable<(string fileName, Stream fileStream)> files,
-            CancellationToken cancellationToken = default)
-        {
-            ArgumentNullException.ThrowIfNull(files);
-
-            ThrowReadOnly();
-
-            var fileList = files.ToList();
-            if (fileList.Count == 0)
-            {
-                throw new BusinessException(_localizer["ReportImportFilesEmpty"]);
-            }
-
-            foreach (var (fileName, _) in fileList)
-            {
-                if (string.IsNullOrWhiteSpace(fileName) || !fileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
-                {
-                    throw new BusinessException(_localizer["ReportImportOnlyXlsx"]);
-                }
-            }
-
-            var import = new EducationReportImport
-            {
-                Status = EducationImportStatus.Pending,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            await _educationReportImportRepository.AddAsync(import, fileList, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", cancellationToken);
-
-            _backgroundJobScheduler.Enqueue<IEducationReportImportJob>(job => job.ProcessReportAsync(import.Id!, cancellationToken));
-            _logger.LogInformation("Education report import {ImportId} enqueued with {FileCount} files", import.Id, fileList.Count);
-
-            return import;
-        }
-
-        public async Task<CourseImportResult> ImportCoursesAsync(Stream fileStream, string fileName, CancellationToken cancellationToken = default)
-        {
-            ArgumentNullException.ThrowIfNull(fileStream);
-
-            ThrowReadOnly();
-
-            if (fileStream.Length == 0)
-            {
-                throw new BusinessException(_localizer["CourseImportFileEmpty"]);
-            }
-
-            if (string.IsNullOrWhiteSpace(fileName) || !fileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
-            {
-                throw new BusinessException(_localizer["CourseImportOnlyJson"]);
-            }
-
-            if (fileStream.CanSeek)
-            {
-                fileStream.Position = 0;
-            }
-
-            JsonDocument document;
-            try
-            {
-                document = await JsonDocument.ParseAsync(fileStream, cancellationToken: cancellationToken);
-            }
-            catch (Exception)
-            {
-                throw new BusinessException(_localizer["CourseImportInvalidJson"]);
-            }
-
-            using var _ = document;
-            var coursesElement = ExtractCoursesElement(document.RootElement);
-            var result = new CourseImportResult();
-            var classPeriods = new Dictionary<string, (long Min, long Max, ClassDocument ClassDoc)>();
-
-            foreach (var courseElement in coursesElement.EnumerateArray())
-            {
-                result.Processed++;
-                try
-                {
-                    await ProcessCourseAsync(courseElement, classPeriods, result, cancellationToken);
-                }
-                catch (Exception ex)
-                {
-                    result.Errors.Add(new CourseImportError
-                    {
-                        CourseCategory = TryGetString(courseElement, "coursecategory"),
-                        UcName = TryGetString(courseElement, "fullname"),
-                        Message = ex.Message
-                    });
-                }
-            }
-
-            foreach (var period in classPeriods.Values)
-            {
-                if (period.ClassDoc.StartDate != period.Min || period.ClassDoc.EndDate != period.Max)
-                {
-                    period.ClassDoc.StartDate = period.Min;
-                    period.ClassDoc.EndDate = period.Max;
-                }
-            }
-
-            return result;
         }
 
         public Task<IReadOnlyCollection<School>> GetSchoolsAsync(CancellationToken cancellationToken = default)
@@ -254,8 +98,6 @@ namespace Application.Service.Service
 
             await _educationRepository.UpdateSyncStatusAsync(status, cancellationToken);
 
-            _backgroundJobScheduler.Enqueue<IEducationSyncJob>(job => job.RunAsync(userId, userName ?? string.Empty, cancellationToken));
-
             _logger.LogInformation("Education manual sync triggered by {UserId}", userId);
 
             return status;
@@ -291,262 +133,6 @@ namespace Application.Service.Service
             }
 
             return await _educationRepository.GetStudentsByUcWithPerformanceAsync(uc.Id, cancellationToken);
-        }
-
-        public Task<EducationImport?> GetImportAsync(string id, CancellationToken cancellationToken = default)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(id);
-            return _educationImportRepository.GetByIdAsync(id, cancellationToken);
-        }
-
-        internal async Task ProcessCourseAsync(JsonElement courseElement, Dictionary<string, (long Min, long Max, ClassDocument ClassDoc)> classPeriods, CourseImportResult result, CancellationToken cancellationToken)
-        {
-            var eadId = GetRequiredInt(courseElement, "id");
-            var fullname = GetRequiredString(courseElement, "fullname");
-            var startDate = GetRequiredLong(courseElement, "startdate");
-            var endDate = GetRequiredLong(courseElement, "enddate");
-            var viewUrl = TryGetString(courseElement, "viewurl");
-            var courseImage = TryGetString(courseElement, "courseimage");
-            var courseCategory = GetRequiredString(courseElement, "coursecategory");
-            var summary = TryGetString(courseElement, "summary") ?? string.Empty;
-
-            var lines = ParseSummary(summary);
-            var programName = lines.ElementAtOrDefault(0);
-            var schoolName = lines.ElementAtOrDefault(1);
-            var periodText = lines.ElementAtOrDefault(2);
-
-            if (string.IsNullOrWhiteSpace(programName))
-            {
-                throw new BusinessException(_localizer["CourseImportProgramMissing"]);
-            }
-
-            if (string.IsNullOrWhiteSpace(schoolName))
-            {
-                throw new BusinessException(_localizer["CourseImportSchoolMissing"]);
-            }
-
-            var school = await _educationRepository.UpsertSchoolAsync(schoolName!, cancellationToken);
-            var program = await _educationRepository.UpsertProgramAsync(school.Id!, programName!, cancellationToken);
-            var classDoc = await _educationRepository.UpsertClassAsync(school.Id!, program.Id!, courseCategory, courseCategory, cancellationToken);
-
-            if (!classPeriods.TryGetValue(classDoc.Id!, out var currentPeriod))
-            {
-                currentPeriod = (startDate, endDate, classDoc);
-            }
-            else
-            {
-                currentPeriod = (Math.Min(currentPeriod.Min, startDate), Math.Max(currentPeriod.Max, endDate), classDoc);
-            }
-            classPeriods[classDoc.Id!] = currentPeriod;
-
-            var ucToUpsert = new UcDocument
-            {
-                EadId = eadId,
-                Fullname = fullname,
-                StartDate = startDate,
-                EndDate = endDate,
-                ViewUrl = viewUrl,
-                CourseImage = courseImage,
-                CourseCategory = courseCategory,
-                SchoolNameDerived = schoolName,
-                ProgramNameDerived = programName,
-                PeriodTextDerived = periodText
-            };
-
-            var upsertResult = await _educationRepository.UpsertUcAsync(ucToUpsert, cancellationToken);
-            await _educationRepository.EnsureClassUcMapAsync(classDoc.Id!, $"ucs/{eadId}", cancellationToken);
-
-            if (upsertResult.Created)
-            {
-                result.CreatedUcs++;
-            }
-            else
-            {
-                result.UpdatedUcs++;
-            }
-
-            result.Linked++;
-        }
-
-        private static List<string> ParseSummary(string summary)
-        {
-            if (string.IsNullOrWhiteSpace(summary))
-            {
-                return new List<string>();
-            }
-
-            var decoded = WebUtility.HtmlDecode(summary);
-            var withBreaks = BreakRegex.Replace(decoded, "\n");
-            var withoutTags = HtmlTagRegex.Replace(withBreaks, "\n");
-
-            return withoutTags
-                .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-                .Select(line => line.Trim())
-                .Where(line => !string.IsNullOrWhiteSpace(line))
-                .ToList();
-        }
-
-        private JsonElement ExtractCoursesElement(JsonElement root)
-        {
-            if (root.ValueKind == JsonValueKind.Array)
-            {
-                foreach (var item in root.EnumerateArray())
-                {
-                    if (item.ValueKind != JsonValueKind.Object)
-                    {
-                        continue;
-                    }
-
-                    if (item.TryGetProperty("data", out var dataFromArray) &&
-                        dataFromArray.TryGetProperty("courses", out var coursesFromArray) &&
-                        coursesFromArray.ValueKind == JsonValueKind.Array)
-                    {
-                        return coursesFromArray;
-                    }
-                }
-            }
-            else if (root.ValueKind == JsonValueKind.Object &&
-                     root.TryGetProperty("data", out var dataElement) &&
-                     dataElement.TryGetProperty("courses", out var coursesElement) &&
-                     coursesElement.ValueKind == JsonValueKind.Array)
-            {
-                return coursesElement;
-            }
-
-            throw new BusinessException(_localizer["CourseImportCoursesMissing"]);
-        }
-
-        private string GetRequiredString(JsonElement element, string propertyName)
-        {
-            if (!element.TryGetProperty(propertyName, out var value) || value.ValueKind != JsonValueKind.String)
-            {
-                throw new BusinessException(_localizer["CourseImportFieldMissing", propertyName]);
-            }
-
-            var text = value.GetString();
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                throw new BusinessException(_localizer["CourseImportFieldMissing", propertyName]);
-            }
-
-            return text!;
-        }
-
-        private int GetRequiredInt(JsonElement element, string propertyName)
-        {
-            if (!element.TryGetProperty(propertyName, out var value))
-            {
-                throw new BusinessException(_localizer["CourseImportFieldMissing", propertyName]);
-            }
-
-            if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var intValue))
-            {
-                return intValue;
-            }
-
-            throw new BusinessException(_localizer["CourseImportFieldMissing", propertyName]);
-        }
-
-        private long GetRequiredLong(JsonElement element, string propertyName)
-        {
-            if (!element.TryGetProperty(propertyName, out var value))
-            {
-                throw new BusinessException(_localizer["CourseImportFieldMissing", propertyName]);
-            }
-
-            if (value.ValueKind == JsonValueKind.Number && value.TryGetInt64(out var longValue))
-            {
-                return longValue;
-            }
-
-            throw new BusinessException(_localizer["CourseImportFieldMissing", propertyName]);
-        }
-
-        public async Task<EducationReportImportResult> ImportReportAsync(IEnumerable<(string fileName, Stream fileStream)> files, CancellationToken cancellationToken = default)
-        {
-            ThrowReadOnly();
-
-            var result = new EducationReportImportResult();
-            var fileList = files.ToList();
-
-            _logger.LogInformation("EducationService: Iniciando importação de relatório com {FileCount} arquivo(s)", fileList.Count);
-
-            if (fileList.Count == 0)
-            {
-                _logger.LogWarning("EducationService: Nenhum arquivo fornecido para importação");
-                throw new ArgumentException(_localizer["ReportImportFilesEmpty"]);
-            }
-
-            // Validar extensões
-            foreach (var (fileName, _) in fileList)
-            {
-                if (!fileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
-                {
-                    _logger.LogWarning("EducationService: Arquivo {FileName} com extensão inválida (não é .xlsx)", fileName);
-                    throw new ArgumentException(_localizer["ReportImportOnlyXlsx"]);
-                }
-            }
-
-            // Processar cada arquivo
-            var allRows = new List<EducationReportRow>();
-
-            foreach (var (fileName, fileStream) in fileList)
-            {
-                _logger.LogDebug("EducationService: Processando arquivo {FileName}", fileName);
-                try
-                {
-                    var rows = await _excelReportParser.ParseAsync(fileStream);
-                    _logger.LogDebug("EducationService: Arquivo {FileName} retornou {RowCount} linhas", fileName, rows.Count);
-                    allRows.AddRange(rows);
-                    result.FilesProcessed++;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "EducationService: Erro ao processar arquivo {FileName}", fileName);
-                    throw;
-                }
-            }
-
-            result.RowsRead = allRows.Count;
-            _logger.LogInformation("EducationService: Total de {RowCount} linhas lidas de {FileCount} arquivo(s)", 
-                allRows.Count, fileList.Count);
-
-            // Processar as linhas lidas
-            if (allRows.Count > 0)
-            {
-                _logger.LogDebug("EducationService: Iniciando processamento de linhas...");
-                result = await _importProcessor.ProcessRowsAsync(allRows);
-                result.FilesProcessed = fileList.Count;
-                
-                _logger.LogInformation("EducationService: Processamento concluído. Estudantes criados: {Created}, Atualizados: {Updated}, Erros: {Errors}", 
-                    result.StudentsCreated, result.StudentsUpdated, result.Errors.Count);
-            }
-            else
-            {
-                _logger.LogWarning("EducationService: Nenhuma linha foi lida dos arquivos");
-            }
-
-            return result;
-        }
-
-        private void ThrowReadOnly()
-        {
-            throw new BusinessException(_localizer["EducationReadOnly"]);
-        }
-
-        private static string? TryGetString(JsonElement element, string propertyName)
-        {
-            if (!element.TryGetProperty(propertyName, out var value))
-            {
-                return null;
-            }
-
-            if (value.ValueKind == JsonValueKind.String)
-            {
-                return value.GetString();
-            }
-
-            return null;
         }
 
         public async Task<IEnumerable<string>> GetUcsByStudentAsync(string studentId, CancellationToken cancellationToken = default)
@@ -590,6 +176,11 @@ namespace Application.Service.Service
             // Toggle
             config.ToggleActivityName(activityName);
             await _studentUcPerformanceRepository.SaveHiddenActivitiesAsync(config);
+        }
+
+        private void ThrowReadOnly()
+        {
+            throw new BusinessException(_localizer["EducationReadOnly"]);
         }
     }
 }

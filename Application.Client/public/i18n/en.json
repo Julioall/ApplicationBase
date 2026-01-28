@@ -554,15 +554,8 @@
       "title": "Students",
       "subtitle": "Manage student records without logins or credentials.",
       "add": "New student",
-      "import": "Import",
       "export": "Export",
       "exportFilenamePrefix": "students",
-      "importTitle": "Student import",
-      "importSuccess": "{{created}} created, {{updated}} updated.",
-      "importWarning": "{{count}} row(s) had errors.",
-      "importError": "Could not import students.",
-      "importErrorRow": "Row {{row}}: {{message}}",
-      "importHint": "Use an .xlsx file with columns: First name, Last name, Last access and Email address.",
       "exportError": "Could not export students.",
       "searchPlaceholder": "Search by name, email or ID number",
       "searchAria": "Search students",
@@ -652,23 +645,6 @@
   },
   "education": {
     "category": "Education",
-    "importReport": {
-      "title": "Import Report",
-      "loading": "Importing report...",
-      "queued": "Report sent for processing. You will be notified when it finishes.",
-      "success": "Report imported successfully! {{files}} file(s), {{rows}} rows processed, {{students}} students, {{links}} links, {{performance}} performance records.",
-      "error": "Error importing report",
-      "selectFiles": "Select one or more .xlsx files",
-      "onlyXlsx": "Only .xlsx files are accepted",
-      "idLabel": "ID",
-      "statusLabel": "Status",
-      "filesLabel": "Files",
-      "createdAtLabel": "Created at"
-    },
-    "import": {
-      "title": "Course import",
-      "queuedMessage": "Import received and queued for background processing."
-    },
     "header": {
       "eyebrow": "Courses",
       "title": "Courses",
@@ -687,7 +663,6 @@
       "triggerError": "Could not start Moodle sync."
     },
     "actions": {
-      "import": "Import",
       "refresh": "Reload data"
     },
     "filters": {
@@ -729,12 +704,6 @@
     "ucDetail": {
       "title": "Curricular unit",
       "subtitle": "Details of the selected unit.",
-      "import": "Import link",
-      "importTitle": "Import link",
-      "importSuccess": "{{created}} created, {{updated}} updated. {{skipped}} skipped.",
-      "importWarning": "{{count}} record(s) had issues in the file.",
-      "importError": "Could not import participants.",
-      "importMissingCourse": "Selected unit is missing an identifier for linking.",
       "notFound": "Could not find the selected unit.",
       "studentsTitle": "Linked students",
       "studentsSubtitle": "Students linked to this curricular unit.",

@@ -20,7 +20,6 @@ class StudentsServiceStub {
   students: Student[] = [{ Id: 'students-1', FirstName: 'Ana', LastName: 'Silva', IsActive: true }];
   getStudents = jasmine.createSpy('getStudents').and.returnValue(of({ Items: this.students, Total: 1, PageNumber: 1, PageSize: 10 }));
   deleteStudent = jasmine.createSpy('deleteStudent').and.returnValue(of(void 0));
-  importStudents = jasmine.createSpy('importStudents').and.returnValue(of({ Processed: 0, Created: 0, Updated: 0, Skipped: 0, Errors: [] }));
   exportStudents = jasmine.createSpy('exportStudents').and.returnValue(of(new Blob()));
 }
 

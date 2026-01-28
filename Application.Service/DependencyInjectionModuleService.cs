@@ -2,8 +2,6 @@ using Application.Service.Interface;
 using Application.Service.Service;
 using Application.Service.Service.Moodle;
 using Application.Service.Service.Security;
-using Application.Service.Education;
-using Application.Service.Education.Parsers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Service
@@ -23,8 +21,6 @@ namespace Application.Service
             services.AddScoped<IWhatsAppInstanceService, WhatsAppInstanceService>();
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<IEducationService, EducationService>();
-            services.AddScoped<IExcelReportParser, ExcelReportParser>();
-            services.AddScoped<IEducationReportImportProcessor, EducationReportImportProcessor>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<ITodoService, TodoService>();
             services.AddHttpClient<IMoodleCourseClient, MoodleCourseClient>();
