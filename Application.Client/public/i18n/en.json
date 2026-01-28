@@ -747,6 +747,97 @@
       "next": "Next"
     }
   },
+  "moodle": {
+    "category": "Moodle",
+    "header": {
+      "eyebrow": "Moodle",
+      "title": "Moodle Courses",
+      "subtitle": "Browse categories, programs, and cohorts synced from Moodle."
+    },
+    "syncStatus": {
+      "readOnly": "Read-only from Moodle cache",
+      "lastSync": "Last sync",
+      "never": "Never synced",
+      "loading": "Loading..."
+    },
+    "sync": {
+      "buttonLabel": "Sync Moodle",
+      "triggerSuccessTitle": "Sync started",
+      "triggerSuccessDetail": "Moodle sync was queued and will run shortly.",
+      "triggerError": "Could not start Moodle sync."
+    },
+    "actions": {
+      "refresh": "Reload data"
+    },
+    "filters": {
+      "button": "Filters",
+      "category": "Category",
+      "courseCategory": "Program",
+      "cohort": "Cohort",
+      "search": "Search",
+      "searchPlaceholder": "Search courses by name",
+      "selectPlaceholder": "Select"
+    },
+    "labels": {
+      "category": "Category",
+      "courseCategory": "Program",
+      "cohort": "Cohort",
+      "course": "Course",
+      "period": "Period",
+      "periodUnknown": "Period not available",
+      "error": "Error",
+      "submitted": "Submitted",
+      "corrected": "Corrected",
+      "grade": "Grade",
+      "close": "Close",
+      "viewCourse": "Open course",
+      "viewLabel": "View",
+      "viewLink": "Open course"
+    },
+    "empty": {
+      "title": "No courses to show",
+      "subtitle": "Choose a category and program to list courses."
+    },
+    "errors": {
+      "loadCategories": "Could not load categories.",
+      "loadCourseCategories": "Could not load programs.",
+      "loadCohorts": "Could not load cohorts.",
+      "loadCourses": "Could not load courses.",
+      "loadSyncStatus": "Could not load sync status."
+    },
+    "pagination": {
+      "page": "Page {{current}} of {{total}}",
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "cohorts": {
+      "count": "{{count}} cohorts",
+      "open": "Open cohort",
+      "loadingCourses": "Loading courses...",
+      "emptyCourses": "No courses found for this cohort."
+    },
+    "courseDetail": {
+      "title": "Course",
+      "subtitle": "Details of the selected course.",
+      "notFound": "Could not find the selected course.",
+      "studentsTitle": "Enrolled students",
+      "studentsSubtitle": "Students enrolled in this course.",
+      "studentsLoading": "Loading students...",
+      "studentsEmpty": "No students enrolled in this course.",
+      "studentsName": "Name",
+      "studentsEmail": "Email",
+      "studentsPhone": "Phone",
+      "studentFallback": "Student",
+      "loadStudentsError": "Could not load enrolled students.",
+      "activityHidden": "Activity hidden",
+      "activityShown": "Activity visible",
+      "toggleHiddenError": "Could not change activity visibility.",
+      "configure": "Configure course",
+      "configureDescription": "Hide or show activities for every student in this course.",
+      "hideActivity": "Hide activity",
+      "showActivity": "Show activity"
+    }
+  },
   "classes": {
     "eyebrow": "Classes",
     "title": "Classes",

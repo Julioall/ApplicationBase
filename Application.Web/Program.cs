@@ -208,7 +208,7 @@ public class Program
         app.UseAuthorization();
         app.UseHangfireDashboard("/hangfire", new DashboardOptions
         {
-            Authorization = new[] { new HangfireDashboardAuthorizationFilter() }
+            Authorization = new[] { new HangfireDashboardAuthorizationFilter(allowAnonymous: app.Environment.IsDevelopment()) }
         });
 
         app.MapHealthChecks("/health/startup", new HealthCheckOptions

@@ -363,6 +363,12 @@
   <data name="EducationSyncFailed" xml:space="preserve">
     <value>Falha na sincronização. Tente novamente mais tarde.</value>
   </data>
+  <data name="EducationSyncInvalidUserId" xml:space="preserve">
+    <value>ID do usuário inválido. O ID deve ser o número do usuário no Moodle.</value>
+  </data>
+  <data name="EducationSyncMissingToken" xml:space="preserve">
+    <value>Token do Moodle não configurado. Configure MOODLESETTINGS__FIXEDTOKEN ou faça login novamente.</value>
+  </data>
   <data name="EducationSchoolRequired" xml:space="preserve">
     <value>schoolId Ã© obrigatÃ³rio.</value>
   </data>
@@ -372,6 +378,39 @@
   <data name="EducationClassRequired" xml:space="preserve">
     <value>classId Ã© obrigatÃ³rio.</value>
   </data>
+  
+  <!-- Terminologia Moodle -->
+  <data name="MoodleReadOnly" xml:space="preserve">
+    <value>A integração Moodle está em modo somente leitura. Edições foram desativadas.</value>
+  </data>
+  <data name="MoodleSyncAlreadyRunning" xml:space="preserve">
+    <value>Já existe uma sincronização Moodle em andamento. Aguarde a conclusão.</value>
+  </data>
+  <data name="MoodleSyncRateLimited" xml:space="preserve">
+    <value>Aguarde {0} minuto(s) antes de iniciar uma nova sincronização Moodle.</value>
+  </data>
+  <data name="MoodleSyncQueued" xml:space="preserve">
+    <value>Sincronização Moodle enfileirada.</value>
+  </data>
+  <data name="MoodleSyncRunning" xml:space="preserve">
+    <value>Sincronização Moodle em andamento.</value>
+  </data>
+  <data name="MoodleSyncCompleted" xml:space="preserve">
+    <value>Sincronização Moodle concluída com sucesso.</value>
+  </data>
+  <data name="MoodleSyncFailed" xml:space="preserve">
+    <value>Falha na sincronização Moodle. Tente novamente mais tarde.</value>
+  </data>
+  <data name="MoodleCategoryRequired" xml:space="preserve">
+    <value>categoryId é obrigatório.</value>
+  </data>
+  <data name="MoodleCourseCategoryRequired" xml:space="preserve">
+    <value>courseCategoryId é obrigatório.</value>
+  </data>
+  <data name="MoodleCohortRequired" xml:space="preserve">
+    <value>cohortId é obrigatório.</value>
+  </data>
+  
   <data name="ImportNotFound" xml:space="preserve">
     <value>ImportaÃ§Ã£o {0} nÃ£o encontrada.</value>
   </data>

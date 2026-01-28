@@ -1,9 +1,11 @@
 using Application.Domain.Interface;
 using Application.Domain.Interface.Students;
 using Application.Domain.Interface.Education;
+using Application.Domain.Interface.Moodle;
 using Application.Domain.Interface.Todo;
 using Application.Infrastructure.Background;
 using Application.Infrastructure.Repository.Education;
+using Application.Infrastructure.Repository.Moodle;
 using Application.Infrastructure.Repository;
 using Application.Infrastructure.ConfigurationDb;
 using Application.Infrastructure.Indexes;
@@ -37,6 +39,8 @@ namespace Application.Infrastructure
             services.TryAddScoped<IStudentRepository, StudentRepository>();
             services.TryAddScoped<IStudentUcPerformanceRepository, StudentUcPerformanceRepository>();
             services.TryAddScoped<IEducationRepository, EducationRepository>();
+            services.TryAddScoped<IMoodleRepository, MoodleRepository>();
+            services.TryAddScoped<IStudentCoursePerformanceRepository, StudentCoursePerformanceRepository>();
             services.TryAddScoped<INotificationRepository, NotificationRepository>();
             services.TryAddScoped<IWhatsAppInstanceRepository, WhatsAppInstanceRepository>();
             services.TryAddScoped<ITodoRepository, TodoRepository>();

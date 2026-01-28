@@ -1,9 +1,11 @@
 using Application.Domain.Interface.Education;
+using Application.Domain.Model;
 using Application.Domain.Model.Education;
 using Application.Infrastructure.Service;
 using Application.Shared.Background;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Raven.Client.Documents;
 
 namespace Application.Api.Background
@@ -18,6 +20,7 @@ namespace Application.Api.Background
         private readonly ILogger<EducationSyncHangfireJob> _logger;
         private readonly Service.Interface.IMoodleAuthClient _moodleAuthClient;
         private readonly Service.Interface.IMoodleCourseClient _moodleCourseClient;
+        private readonly MoodleSettings _moodleSettings;
         private const string SyncStatusRunning = "Running";
         private const string SyncStatusSuccess = "Success";
         private const string SyncStatusFailed = "Failed";
@@ -31,7 +34,8 @@ namespace Application.Api.Background
             ILogger<EducationSyncHangfireJob> logger,
             Service.Interface.IMoodleAuthClient moodleAuthClient,
             Service.Interface.IMoodleCourseClient moodleCourseClient,
-            Shared.Session.ISessionTokenCache sessionTokenCache)
+            Shared.Session.ISessionTokenCache sessionTokenCache,
+            IOptions<MoodleSettings> moodleSettings)
         {
             _educationRepository = educationRepository;
             _serviceRavenDb = serviceRavenDb;
@@ -41,6 +45,7 @@ namespace Application.Api.Background
             _moodleAuthClient = moodleAuthClient;
             _moodleCourseClient = moodleCourseClient;
             _sessionTokenCache = sessionTokenCache;
+            _moodleSettings = moodleSettings.Value;
         }
 
         public async Task RunAsync(string triggeredByUserId, string triggeredByName, CancellationToken cancellationToken = default)
@@ -81,7 +86,12 @@ namespace Application.Api.Background
                     }
                     else
                     {
-                        throw new InvalidOperationException("O triggeredByUserId deve ser o id numérico do usuário Moodle para sincronização.");
+                        status.Status = SyncStatusFailed;
+                        status.Message = _localizer["EducationSyncInvalidUserId"];
+                        await _educationRepository.UpdateSyncStatusAsync(status, cancellationToken);
+                        await asyncSession.SaveChangesAsync(cancellationToken);
+                        _logger.LogWarning("Education sync failed: triggeredByUserId must be a numeric Moodle user id. Got: {UserId}", triggeredByUserId);
+                        return;
                     }
                 }
 
@@ -90,7 +100,14 @@ namespace Application.Api.Background
                 // Adapte para obter o token real do usuário logado.
                 var token = await ObterTokenUsuarioAsync(moodleUserId, cancellationToken);
                 if (string.IsNullOrWhiteSpace(token))
-                    throw new InvalidOperationException("Token do usuário Moodle não encontrado para sincronização.");
+                {
+                    status.Status = SyncStatusFailed;
+                    status.Message = _localizer["EducationSyncMissingToken"];
+                    await _educationRepository.UpdateSyncStatusAsync(status, cancellationToken);
+                    await asyncSession.SaveChangesAsync(cancellationToken);
+                    _logger.LogWarning("Education sync failed: Moodle token not found for user {UserId}. Configure MOODLESETTINGS__FIXEDTOKEN or ensure user is authenticated.", moodleUserId);
+                    return;
+                }
 
                 // 2. Buscar cursos do usuário logado
                 var cursos = await _moodleCourseClient.GetUserCoursesAsync(moodleUserId, token, cancellationToken);
@@ -159,10 +176,23 @@ namespace Application.Api.Background
         }
 
         // Método auxiliar para obter token do usuário logado (ajuste conforme sua estratégia de autenticação)
-        private async Task<string?> ObterTokenUsuarioAsync(int moodleUserId, CancellationToken cancellationToken)
+        private Task<string?> ObterTokenUsuarioAsync(int moodleUserId, CancellationToken cancellationToken)
         {
-            // Buscar token do cache de sessão
-            return _sessionTokenCache.GetMoodleToken(moodleUserId);
+            // Primeiro tenta o cache de sessão
+            var cachedToken = _sessionTokenCache.GetMoodleToken(moodleUserId);
+            if (!string.IsNullOrWhiteSpace(cachedToken))
+            {
+                return Task.FromResult<string?>(cachedToken);
+            }
+
+            // Fallback para o token fixo configurado (para jobs em background)
+            if (!string.IsNullOrWhiteSpace(_moodleSettings.FixedToken))
+            {
+                _logger.LogDebug("Using fixed Moodle token for background sync");
+                return Task.FromResult<string?>(_moodleSettings.FixedToken);
+            }
+
+            return Task.FromResult<string?>(null);
         }
     }
 }

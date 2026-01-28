@@ -8,7 +8,7 @@ services:
     ports:
       - "5095:8080"
     environment:
-      ASPNETCORE_ENVIRONMENT: "Production"
+      ASPNETCORE_ENVIRONMENT: "Development"
 
       # JWT
       JWT_ISSUER: "https://localhost"

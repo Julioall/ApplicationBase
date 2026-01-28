@@ -312,6 +312,12 @@
   <data name="EducationSyncFailed" xml:space="preserve">
     <value>Synchronization failed. Try again later.</value>
   </data>
+  <data name="EducationSyncInvalidUserId" xml:space="preserve">
+    <value>Invalid user ID. The ID must be the Moodle user number.</value>
+  </data>
+  <data name="EducationSyncMissingToken" xml:space="preserve">
+    <value>Moodle token not configured. Set MOODLESETTINGS__FIXEDTOKEN or log in again.</value>
+  </data>
   <data name="CourseImportFileMissing" xml:space="preserve">
     <value>Import file not found.</value>
   </data>
@@ -324,6 +330,39 @@
   <data name="EducationClassRequired" xml:space="preserve">
     <value>classId is required.</value>
   </data>
+  
+  <!-- Moodle terminology -->
+  <data name="MoodleReadOnly" xml:space="preserve">
+    <value>Moodle integration is in read-only mode. Edits are disabled.</value>
+  </data>
+  <data name="MoodleSyncAlreadyRunning" xml:space="preserve">
+    <value>A Moodle synchronization is already running. Please wait for it to finish.</value>
+  </data>
+  <data name="MoodleSyncRateLimited" xml:space="preserve">
+    <value>Please wait {0} minute(s) before triggering a new Moodle synchronization.</value>
+  </data>
+  <data name="MoodleSyncQueued" xml:space="preserve">
+    <value>Moodle synchronization queued.</value>
+  </data>
+  <data name="MoodleSyncRunning" xml:space="preserve">
+    <value>Moodle synchronization in progress.</value>
+  </data>
+  <data name="MoodleSyncCompleted" xml:space="preserve">
+    <value>Moodle synchronization completed successfully.</value>
+  </data>
+  <data name="MoodleSyncFailed" xml:space="preserve">
+    <value>Moodle synchronization failed. Try again later.</value>
+  </data>
+  <data name="MoodleCategoryRequired" xml:space="preserve">
+    <value>categoryId is required.</value>
+  </data>
+  <data name="MoodleCourseCategoryRequired" xml:space="preserve">
+    <value>courseCategoryId is required.</value>
+  </data>
+  <data name="MoodleCohortRequired" xml:space="preserve">
+    <value>cohortId is required.</value>
+  </data>
+  
   <data name="ImportNotFound" xml:space="preserve">
     <value>Import {0} not found.</value>
   </data>

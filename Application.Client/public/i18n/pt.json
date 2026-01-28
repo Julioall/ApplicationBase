@@ -767,6 +767,97 @@
       "showActivity": "Exibir atividade"
     }
   },
+  "moodle": {
+    "category": "Moodle",
+    "header": {
+      "eyebrow": "Moodle",
+      "title": "Cursos Moodle",
+      "subtitle": "Explore categorias, programas e turmas sincronizados do Moodle."
+    },
+    "syncStatus": {
+      "readOnly": "Somente leitura via cache do Moodle",
+      "lastSync": "Última sincronização",
+      "never": "Nunca sincronizado",
+      "loading": "Carregando..."
+    },
+    "sync": {
+      "buttonLabel": "Sincronizar Moodle",
+      "triggerSuccessTitle": "Sincronização iniciada",
+      "triggerSuccessDetail": "A sincronização com o Moodle foi enfileirada e executará em breve.",
+      "triggerError": "Não foi possível iniciar a sincronização com o Moodle."
+    },
+    "actions": {
+      "refresh": "Recarregar dados"
+    },
+    "filters": {
+      "button": "Filtros",
+      "category": "Categoria",
+      "courseCategory": "Programa",
+      "cohort": "Turma",
+      "search": "Busca",
+      "searchPlaceholder": "Busque cursos pelo nome",
+      "selectPlaceholder": "Selecione"
+    },
+    "labels": {
+      "category": "Categoria",
+      "courseCategory": "Programa",
+      "cohort": "Turma",
+      "course": "Curso",
+      "period": "Período",
+      "periodUnknown": "Período indisponível",
+      "error": "Erro",
+      "submitted": "Enviada",
+      "corrected": "Corrigida",
+      "grade": "Nota",
+      "close": "Fechar",
+      "viewCourse": "Abrir curso",
+      "viewLabel": "Visualizar",
+      "viewLink": "Abrir curso"
+    },
+    "empty": {
+      "title": "Nenhum curso para exibir",
+      "subtitle": "Escolha uma categoria e um programa para listar cursos."
+    },
+    "errors": {
+      "loadCategories": "Não foi possível carregar as categorias.",
+      "loadCourseCategories": "Não foi possível carregar os programas.",
+      "loadCohorts": "Não foi possível carregar as turmas.",
+      "loadCourses": "Não foi possível carregar os cursos.",
+      "loadSyncStatus": "Não foi possível carregar o status de sincronização."
+    },
+    "pagination": {
+      "page": "Página {{current}} de {{total}}",
+      "prev": "Anterior",
+      "next": "Próxima"
+    },
+    "cohorts": {
+      "count": "{{count}} turmas",
+      "open": "Abrir turma",
+      "loadingCourses": "Carregando cursos...",
+      "emptyCourses": "Nenhum curso cadastrado para esta turma."
+    },
+    "courseDetail": {
+      "title": "Curso",
+      "subtitle": "Detalhes do curso selecionado.",
+      "notFound": "Não foi possível localizar o curso selecionado.",
+      "studentsTitle": "Alunos matriculados",
+      "studentsSubtitle": "Lista de alunos matriculados neste curso.",
+      "studentsLoading": "Carregando alunos...",
+      "studentsEmpty": "Nenhum aluno matriculado neste curso.",
+      "studentsName": "Nome",
+      "studentsEmail": "E-mail",
+      "studentsPhone": "Telefone",
+      "studentFallback": "Aluno",
+      "loadStudentsError": "Não foi possível carregar os alunos matriculados.",
+      "activityHidden": "Atividade ocultada",
+      "activityShown": "Atividade visível",
+      "toggleHiddenError": "Não foi possível alterar a visibilidade da atividade.",
+      "configure": "Configurar curso",
+      "configureDescription": "Oculte ou exiba atividades para todos os alunos deste curso.",
+      "hideActivity": "Ocultar atividade",
+      "showActivity": "Exibir atividade"
+    }
+  },
   "classes": {
     "eyebrow": "Turmas",
     "title": "Turmas",

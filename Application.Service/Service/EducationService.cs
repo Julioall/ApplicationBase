@@ -10,6 +10,7 @@ using Application.Domain.Model.Education;
 using Application.Domain.Model.Education.Dtos;
 using Application.Domain.Model.Students;
 using Application.Service.Interface;
+using Application.Shared.Background;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
@@ -19,6 +20,7 @@ namespace Application.Service.Service
     {
         private readonly IEducationRepository _educationRepository;
         private readonly IStudentUcPerformanceRepository _studentUcPerformanceRepository;
+        private readonly IBackgroundJobScheduler _backgroundJobScheduler;
         private readonly IStringLocalizer<SharedResource> _localizer;
         private readonly ILogger<EducationService> _logger;
         private const string SyncStatusRunning = "Running";
@@ -29,11 +31,13 @@ namespace Application.Service.Service
         public EducationService(
             IEducationRepository educationRepository, 
             IStudentUcPerformanceRepository studentUcPerformanceRepository,
+            IBackgroundJobScheduler backgroundJobScheduler,
             IStringLocalizer<SharedResource> localizer,
             ILogger<EducationService> logger)
         {
             _educationRepository = educationRepository;
             _studentUcPerformanceRepository = studentUcPerformanceRepository;
+            _backgroundJobScheduler = backgroundJobScheduler;
             _localizer = localizer;
             _logger = logger;
         }
@@ -98,7 +102,12 @@ namespace Application.Service.Service
 
             await _educationRepository.UpdateSyncStatusAsync(status, cancellationToken);
 
-            _logger.LogInformation("Education manual sync triggered by {UserId}", userId);
+            // Enqueue the background job
+            var triggeredByUserId = userId;
+            var triggeredByName = userName ?? string.Empty;
+            _backgroundJobScheduler.Enqueue<IEducationSyncJob>(job => job.RunAsync(triggeredByUserId, triggeredByName, CancellationToken.None));
+
+            _logger.LogInformation("Education manual sync triggered and queued by {UserId}", userId);
 
             return status;
         }
