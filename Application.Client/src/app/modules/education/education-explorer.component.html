@@ -5,6 +5,16 @@
         <p class="text-xs font-semibold uppercase tracking-[0.28em] text-text-subtle">{{ 'education.category' | translate }}</p>
         <h1 class="text-3xl font-semibold text-text-primary">{{ 'education.header.title' | translate }}</h1>
         <p class="text-base text-text-subtle">{{ 'education.header.subtitle' | translate }}</p>
+        <div class="flex flex-wrap items-center gap-2 text-sm text-text-subtle">
+          <span class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface px-3 py-1 font-semibold text-text-primary">
+            <i class="fa-solid fa-lock" aria-hidden="true"></i>
+            <span>{{ 'education.syncStatus.readOnly' | translate }}</span>
+          </span>
+          <span class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface px-3 py-1 font-semibold text-text-primary">
+            <i class="fa-regular fa-clock" aria-hidden="true"></i>
+            <span>{{ 'education.syncStatus.lastSync' | translate }}: {{ lastSyncLabel }}</span>
+          </span>
+        </div>
       </div>
     </div>
 
@@ -73,21 +83,6 @@
           </div>
         </div>
 
-        <label
-          class="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-accent-strong to-accent px-4 py-3 text-sm font-semibold text-text-inverse shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent"
-          *ngIf="canImport"
-        >
-          <i class="fa-solid fa-file-import"></i>
-          <span>{{ 'education.actions.import' | translate }}</span>
-          <input
-            class="sr-only"
-            type="file"
-            accept=".json,application/json"
-            (change)="onImportCourses($event)"
-            [disabled]="importing"
-            [attr.aria-label]="('education.actions.import' | translate)"
-          />
-        </label>
       </div>
 
       <div

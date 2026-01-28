@@ -31,6 +31,10 @@ namespace Application.Service.Service
         private readonly IBackgroundJobScheduler _backgroundJobScheduler;
         private static readonly Regex BreakRegex = new("<br\\s*/?>", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static readonly Regex HtmlTagRegex = new("<.*?>", RegexOptions.Compiled);
+        private const string SyncStatusRunning = "Running";
+        private const string SyncStatusSuccess = "Success";
+        private const string SyncStatusFailed = "Failed";
+        private const int ManualSyncCooldownSeconds = 300;
 
         public EducationService(
             IEducationRepository educationRepository, 
@@ -57,6 +61,8 @@ namespace Application.Service.Service
         public async Task<EducationImport> EnqueueImportAsync(Stream fileStream, string fileName, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(fileStream);
+
+            ThrowReadOnly();
 
             if (fileStream.Length == 0)
             {
@@ -92,6 +98,8 @@ namespace Application.Service.Service
         {
             ArgumentNullException.ThrowIfNull(files);
 
+            ThrowReadOnly();
+
             var fileList = files.ToList();
             if (fileList.Count == 0)
             {
@@ -123,6 +131,8 @@ namespace Application.Service.Service
         public async Task<CourseImportResult> ImportCoursesAsync(Stream fileStream, string fileName, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(fileStream);
+
+            ThrowReadOnly();
 
             if (fileStream.Length == 0)
             {
@@ -211,6 +221,44 @@ namespace Application.Service.Service
         {
             ArgumentNullException.ThrowIfNull(query);
             return _educationRepository.SearchUcsAsync(query.Search, classId, programId, query, cancellationToken);
+        }
+
+        public Task<EducationSyncStatus> GetSyncStatusAsync(CancellationToken cancellationToken = default)
+        {
+            return _educationRepository.GetSyncStatusAsync(cancellationToken);
+        }
+
+        public async Task<EducationSyncStatus> TriggerSyncAsync(string userId, string? userName, CancellationToken cancellationToken = default)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(userId);
+
+            var status = await _educationRepository.GetSyncStatusAsync(cancellationToken);
+            var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+            if (string.Equals(status.Status, SyncStatusRunning, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ConflictException(_localizer["EducationSyncAlreadyRunning"]);
+            }
+
+            if (status.TriggeredAt.HasValue && now - status.TriggeredAt.Value < ManualSyncCooldownSeconds)
+            {
+                var minutes = (int)Math.Ceiling(ManualSyncCooldownSeconds / 60.0);
+                throw new TooManyRequestsException(_localizer["EducationSyncRateLimited", minutes]);
+            }
+
+            status.Status = SyncStatusRunning;
+            status.Message = _localizer["EducationSyncQueued"];
+            status.TriggeredAt = now;
+            status.TriggeredByUserId = userId;
+            status.TriggeredByName = string.IsNullOrWhiteSpace(userName) ? null : userName;
+
+            await _educationRepository.UpdateSyncStatusAsync(status, cancellationToken);
+
+            _backgroundJobScheduler.Enqueue<IEducationSyncJob>(job => job.RunAsync(userId, userName ?? string.Empty, cancellationToken));
+
+            _logger.LogInformation("Education manual sync triggered by {UserId}", userId);
+
+            return status;
         }
 
         public async Task<IReadOnlyCollection<Student>> GetStudentsByUcEadIdAsync(int eadId, CancellationToken cancellationToken = default)
@@ -416,6 +464,8 @@ namespace Application.Service.Service
 
         public async Task<EducationReportImportResult> ImportReportAsync(IEnumerable<(string fileName, Stream fileStream)> files, CancellationToken cancellationToken = default)
         {
+            ThrowReadOnly();
+
             var result = new EducationReportImportResult();
             var fileList = files.ToList();
 
@@ -479,6 +529,11 @@ namespace Application.Service.Service
             return result;
         }
 
+        private void ThrowReadOnly()
+        {
+            throw new BusinessException(_localizer["EducationReadOnly"]);
+        }
+
         private static string? TryGetString(JsonElement element, string propertyName)
         {
             if (!element.TryGetProperty(propertyName, out var value))
@@ -512,6 +567,8 @@ namespace Application.Service.Service
             ArgumentNullException.ThrowIfNull(studentId);
             ArgumentNullException.ThrowIfNull(ucId);
             ArgumentNullException.ThrowIfNull(activityName);
+
+            ThrowReadOnly();
 
             // Validar que a atividade existe
             var performance = await _studentUcPerformanceRepository.GetByStudentAndUcAsync(studentId, ucId);

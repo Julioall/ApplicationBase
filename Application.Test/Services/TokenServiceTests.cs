@@ -75,9 +75,21 @@ namespace Application.Tests.Services
             public Task<MoodleSiteInfo?> GetSiteInfoAsync(string token, CancellationToken cancellationToken = default) => Task.FromResult<MoodleSiteInfo?>(null);
         }
 
+        private sealed class FakeSessionTokenCache : Application.Shared.Session.ISessionTokenCache
+        {
+            public void SetMoodleToken(int moodleUserId, string token, TimeSpan ttl) { }
+            public string? GetMoodleToken(int moodleUserId) => null;
+        }
+
         private static TokenService CreateService(User user)
         {
-            return new TokenService(new InMemoryUserService(user), NullLogger<TokenService>.Instance, new FakeLocalizer(), new FakeMoodleAuthClient());
+            return new TokenService(
+                new InMemoryUserService(user),
+                NullLogger<TokenService>.Instance,
+                new FakeLocalizer(),
+                new FakeMoodleAuthClient(),
+                new FakeSessionTokenCache()
+            );
         }
 
         [Fact]

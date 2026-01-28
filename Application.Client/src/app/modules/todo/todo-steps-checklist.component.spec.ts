@@ -38,10 +38,10 @@ describe('TodoStepsChecklistComponent', () => {
     expect(emitted[0].Order).toBe(0);
   });
 
-  it('should emit toggle event', () => {
-    spyOn(component.toggle, 'emit');
+  it('should emit stepToggle event', () => {
+    spyOn(component.stepToggle, 'emit');
     component.onToggle(steps[0], true);
-    expect(component.toggle.emit).toHaveBeenCalledWith({ stepId: steps[0].Id, isCompleted: true });
+    expect(component.stepToggle.emit).toHaveBeenCalledWith({ stepId: steps[0].Id, isCompleted: true });
   });
 
   it('should emit addStep when submitting new step', () => {

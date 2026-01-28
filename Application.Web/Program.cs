@@ -169,12 +169,16 @@ public class Program
         DependencyInjectionModuleDomain.AddDomainDependencies(builder.Services);
         DependencyInjectionModuleInfra.AddInfraDependencies(builder.Services);
         DependencyInjectionModuleService.AddServiceDependencies(builder.Services);
+        // Registro do cache de sessão de token Moodle
+        builder.Services.AddSingleton<Application.Shared.Session.ISessionTokenCache, Application.Shared.Session.SessionTokenCache>();
         
         // Register Hangfire job for education import
         builder.Services.AddScoped<IEducationImportJob, EducationImportHangfireJob>();
         builder.Services.AddScoped<EducationImportHangfireJob>();
         builder.Services.AddScoped<IEducationReportImportJob, EducationReportImportHangfireJob>();
         builder.Services.AddScoped<EducationReportImportHangfireJob>();
+        builder.Services.AddScoped<IEducationSyncJob, EducationSyncHangfireJob>();
+        builder.Services.AddScoped<EducationSyncHangfireJob>();
         
         // NOTE: EducationImportBackgroundService is now replaced by Hangfire jobs (EducationImportHangfireJob)
         // The background service below can be kept as a fallback for missed imports, but Hangfire handles the main processing

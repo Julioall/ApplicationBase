@@ -6,9 +6,10 @@ import { EducationRoutingModule } from './education-routing.module';
 import { EducationExplorerComponent } from './education-explorer.component';
 import { EducationClassDetailComponent } from './education-class-detail.component';
 import { EducationClassesComponent } from './education-classes.component';
+import { EducationUcCardComponent } from './education-uc-card.component';
 
 @NgModule({
-  declarations: [EducationExplorerComponent, EducationClassDetailComponent, EducationClassesComponent],
+  declarations: [EducationExplorerComponent, EducationClassDetailComponent, EducationClassesComponent, EducationUcCardComponent],
   imports: [
     CommonModule,
     FormsModule,

@@ -18,6 +18,28 @@ namespace Application.Service.Service
 {
     public class UserService : IUserService
     {
+        /// <summary>
+        /// Adiciona ou atualiza um usuário externo (ex: Moodle) sem exigir senha.
+        /// </summary>
+        public async Task AddOrUpdateExternalUserAsync(User user)
+        {
+            ArgumentNullException.ThrowIfNull(user);
+            _userValidator.ValidateAndThrow(user);
+
+            var existingUser = await _userRepository.GetByEmailAsync(user.Account.Email);
+            if (existingUser != null)
+            {
+                // Atualiza apenas dados externos
+                existingUser.Account.Username = user.Account.Username;
+                existingUser.Account.ExternalId = user.Account.ExternalId;
+                existingUser.Profile.Name = user.Profile.Name;
+                await _userRepository.UpdateAsync(existingUser);
+            }
+            else
+            {
+                await _userRepository.AddAsync(user);
+            }
+        }
         private readonly IUserRepository _userRepository;
         private readonly IValidator<User> _userValidator;
         private readonly IValidator<PasswordInput> _passwordValidator;

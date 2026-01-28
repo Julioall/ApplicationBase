@@ -224,7 +224,6 @@
       "themeLabel": "Theme",
       "passwordLabel": "Password",
       "passwordPlaceholder": "************",
-      "moodleManaged": "Password is managed in Moodle.",
       "languages": {
         "en": "English",
         "pt": "Portuguese"
@@ -675,6 +674,18 @@
       "title": "Courses",
       "subtitle": "Browse schools, courses, and classes in one place. Open a class to see its units."
     },
+    "syncStatus": {
+      "readOnly": "Read-only from Moodle cache",
+      "lastSync": "Last sync",
+      "never": "Never synced",
+      "loading": "Loading..."
+    },
+    "sync": {
+      "buttonLabel": "Sync Moodle",
+      "triggerSuccessTitle": "Sync started",
+      "triggerSuccessDetail": "Moodle sync was queued and will run shortly.",
+      "triggerError": "Could not start Moodle sync."
+    },
     "actions": {
       "import": "Import",
       "refresh": "Reload data"
@@ -758,6 +769,7 @@
       "loadPrograms": "Could not load courses.",
       "loadClasses": "Could not load classes.",
       "loadUcs": "Could not load curricular units.",
+      "loadSyncStatus": "Could not load sync status.",
       "import": "Could not import courses."
     },
     "pagination": {

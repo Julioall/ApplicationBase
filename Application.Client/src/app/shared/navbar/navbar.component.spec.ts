@@ -9,6 +9,8 @@ import { NotificationApiService } from '../../service/notification/notification-
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { of } from 'rxjs';
+import { NotificationService } from '../../service/notification/notification.service';
+import { EducationService } from '../../service/education/education.service';
 
 class FakeLoader implements TranslateLoader {
   getTranslation(): any {
@@ -40,6 +42,10 @@ const themeStub: Partial<ThemeService> = {
   toggleTheme: () => 'light' as any,
 };
 
+const educationServiceStub: Partial<EducationService> = {
+  triggerSync: () => of({}) as any,
+};
+
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
   let fixture: ComponentFixture<NavbarComponent>;
@@ -59,6 +65,8 @@ describe('NavbarComponent', () => {
         { provide: AuthService, useValue: authStub },
         { provide: UserService, useValue: userServiceStub },
         { provide: NotificationApiService, useValue: notificationApiStub },
+        NotificationService,
+        { provide: EducationService, useValue: educationServiceStub },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();

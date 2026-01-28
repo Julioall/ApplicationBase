@@ -27,6 +27,7 @@ namespace Application.Service
             services.AddScoped<IEducationReportImportProcessor, EducationReportImportProcessor>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<ITodoService, TodoService>();
+            services.AddHttpClient<IMoodleCourseClient, MoodleCourseClient>();
             return services;
         }
     }

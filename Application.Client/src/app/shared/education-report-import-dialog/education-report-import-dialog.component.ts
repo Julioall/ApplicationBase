@@ -13,7 +13,7 @@ import { EducationReportImport } from '../../model/education-report-import';
   standalone: true,
   imports: [CommonModule, TranslateModule],
 })
-export class EducationReportImportDialogComponent implements OnInit {
+export class EducationReportImportDialogComponent {
   @Input() isOpen = false;
   @Output() close = new EventEmitter<void>();
 
@@ -27,9 +27,7 @@ export class EducationReportImportDialogComponent implements OnInit {
     private spinner: NgxSpinnerService,
   ) {}
 
-  ngOnInit(): void {
-    // Initialize component if needed
-  }
+
 
   onFileSelected(event: Event): void {
     const target = event.target as HTMLInputElement;

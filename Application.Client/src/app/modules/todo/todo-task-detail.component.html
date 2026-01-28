@@ -105,7 +105,7 @@
           [canEdit]="canManage && isEditing"
           [canToggle]="canManage"
           (reorder)="onReorderSteps($event)"
-          (toggle)="onToggleStep($event)"
+          (stepToggle)="onToggleStep($event)"
           (titleChange)="onTitleChange($event)"
           (addStep)="onAddStep($event)"
           (deleteStep)="onDeleteStep($event)"

@@ -4,7 +4,6 @@ import { BehaviorSubject, of } from 'rxjs';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { EducationClassDetailComponent } from './education-class-detail.component';
 import { EducationService } from '../../service/education/education.service';
-import { StudentsService } from '../../service/students/students.service';
 import { NotificationService } from '../../service/notification/notification.service';
 import { Location } from '@angular/common';
 import { Student } from '../../model/student';
@@ -34,17 +33,6 @@ class EducationServiceStub {
   ]));
   getSchools = jasmine.createSpy('getSchools').and.returnValue(of([]));
   getPrograms = jasmine.createSpy('getPrograms').and.returnValue(of([]));
-  toggleActivityHidden = jasmine.createSpy('toggleActivityHidden').and.returnValue(of({}));
-}
-
-class StudentsServiceStub {
-  importStudents = jasmine.createSpy('importStudents').and.returnValue(of({
-    Processed: 1,
-    Created: 1,
-    Updated: 0,
-    Skipped: 0,
-    Errors: []
-  }));
 }
 
 class NotificationStub {
@@ -57,7 +45,6 @@ describe('EducationClassDetailComponent', () => {
   let fixture: ComponentFixture<EducationClassDetailComponent>;
   let component: EducationClassDetailComponent;
   let educationService: EducationServiceStub;
-  let studentsService: StudentsServiceStub;
   let paramMapSubject: BehaviorSubject<ParamMap>;
 
   const queryParamMap = convertToParamMap({
@@ -77,7 +64,6 @@ describe('EducationClassDetailComponent', () => {
   beforeEach(async () => {
     paramMapSubject = new BehaviorSubject(convertToParamMap({ id: 'class-1' }));
     educationService = new EducationServiceStub();
-    studentsService = new StudentsServiceStub();
 
     await TestBed.configureTestingModule({
       declarations: [EducationClassDetailComponent],
@@ -86,7 +72,6 @@ describe('EducationClassDetailComponent', () => {
       ],
       providers: [
         { provide: EducationService, useValue: educationService },
-        { provide: StudentsService, useValue: studentsService },
         { provide: NotificationService, useClass: NotificationStub },
         { provide: Router, useValue: { navigate: jasmine.createSpy('navigate') } },
         { provide: Location, useValue: { back: jasmine.createSpy('back') } },
@@ -117,23 +102,6 @@ describe('EducationClassDetailComponent', () => {
     expect(component.students.length).toBe(0);
   });
 
-  it('imports participants and reloads linked students', () => {
-    paramMapSubject.next(convertToParamMap({ id: 'class-1', ucId: '27535' }));
-    createComponent();
-
-    educationService.getUcStudents.calls.reset();
-    const file = new File(['{}'], 'participants.json', { type: 'application/json' });
-    const input = document.createElement('input');
-    Object.defineProperty(input, 'files', { value: [file] });
-
-    component.onImportParticipants({ target: input } as unknown as Event);
-
-    expect(studentsService.importStudents).toHaveBeenCalled();
-    const renamed = studentsService.importStudents.calls.mostRecent().args[0] as File;
-    expect(renamed.name).toBe('courseid_27535_participants.json');
-    expect(educationService.getUcStudents).toHaveBeenCalledWith(27535);
-  });
-
   it('aggregates unique activities across students', () => {
     paramMapSubject.next(convertToParamMap({ id: 'class-1', ucId: '27535' }));
     createComponent();
@@ -146,20 +114,5 @@ describe('EducationClassDetailComponent', () => {
     const activities = component.getAllActivities();
 
     expect(activities.map((a) => a.Name)).toEqual(['A', 'B', 'C']);
-  });
-
-  it('toggles activity visibility globally and updates all students', () => {
-    paramMapSubject.next(convertToParamMap({ id: 'class-1', ucId: '27535' }));
-    createComponent();
-
-    component.students = [
-      { Id: 's1', Activities: [{ Name: 'A', Hidden: false }] } as any,
-      { Id: 's2', Activities: [{ Name: 'A', Hidden: false }, { Name: 'B', Hidden: true }] } as any
-    ];
-
-    component.toggleActivityHiddenGlobal('A');
-
-    expect(educationService.toggleActivityHidden).toHaveBeenCalledWith('s1', 'ucs/27535', 'A');
-    expect(component.students.every((s) => (s.Activities || []).find((a: any) => a.Name === 'A')?.Hidden === true)).toBeTrue();
   });
 });

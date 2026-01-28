@@ -17,6 +17,7 @@ namespace Application.Infrastructure.Repository.Education
     public class EducationRepository : IEducationRepository
     {
         private readonly IServiceRavenDB _serviceRavenDb;
+        private const string SyncStatusId = "education/sync-status";
         private static readonly Regex NonAlphaNumeric = new("[^a-z0-9]+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public EducationRepository(IServiceRavenDB serviceRavenDb)
@@ -604,6 +605,39 @@ namespace Application.Infrastructure.Repository.Education
                 classDoc.EndDate = end;
                 await _serviceRavenDb.AsyncSession.StoreAsync(classDoc, classId, cancellationToken);
             }
+        }
+
+        public async Task<EducationSyncStatus> GetSyncStatusAsync(CancellationToken cancellationToken = default)
+        {
+            var status = await _serviceRavenDb.AsyncSession.LoadAsync<EducationSyncStatus>(SyncStatusId, cancellationToken);
+            if (status != null)
+            {
+                return status;
+            }
+
+            status = new EducationSyncStatus
+            {
+                Id = SyncStatusId,
+                Status = "NotStarted",
+                LastSyncAt = null,
+                ExpiresAt = null,
+                Message = null,
+                TriggeredAt = null,
+                TriggeredByName = null,
+                TriggeredByUserId = null
+            };
+
+            await _serviceRavenDb.AsyncSession.StoreAsync(status, SyncStatusId, cancellationToken);
+            return status;
+        }
+
+        public async Task UpdateSyncStatusAsync(EducationSyncStatus status, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(status);
+
+            var id = string.IsNullOrWhiteSpace(status.Id) ? SyncStatusId : status.Id;
+            status.Id = id;
+            await _serviceRavenDb.AsyncSession.StoreAsync(status, id, cancellationToken);
         }
 
         private static string NormalizeNull(string? value)

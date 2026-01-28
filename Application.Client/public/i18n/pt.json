@@ -224,7 +224,6 @@
       "themeLabel": "Tema",
       "passwordLabel": "Senha",
       "passwordPlaceholder": "************",
-      "moodleManaged": "Senha gerenciada no Moodle.",
       "languages": {
         "en": "Inglês",
         "pt": "Português"
@@ -703,6 +702,18 @@
       "title": "Cursos",
       "subtitle": "Explore escolas, cursos e turmas em um só lugar. Abra a turma para ver as unidades."
     },
+    "syncStatus": {
+      "readOnly": "Somente leitura via cache do Moodle",
+      "lastSync": "Última sincronização",
+      "never": "Nunca sincronizado",
+      "loading": "Carregando..."
+    },
+    "sync": {
+      "buttonLabel": "Sincronizar Moodle",
+      "triggerSuccessTitle": "Sincronização iniciada",
+      "triggerSuccessDetail": "A sincronização com o Moodle foi enfileirada e executará em breve.",
+      "triggerError": "Não foi possível iniciar a sincronização com o Moodle."
+    },
     "actions": {
       "import": "Importar",
       "refresh": "Recarregar dados"
@@ -746,6 +757,7 @@
       "loadPrograms": "Não foi possível carregar os cursos.",
       "loadClasses": "Não foi possível carregar as turmas.",
       "loadUcs": "Não foi possível carregar as UCs.",
+      "loadSyncStatus": "Não foi possível carregar o status de sincronização.",
       "import": "Não foi possível importar os cursos."
     },
     "pagination": {

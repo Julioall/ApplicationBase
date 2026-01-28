@@ -9,6 +9,7 @@ using Application.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System.Security.Claims;
 
 namespace Application.Api.Controllers
 {
@@ -32,21 +33,7 @@ namespace Application.Api.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Import([FromForm] IFormFile? file, CancellationToken cancellationToken)
         {
-            if (file == null || file.Length == 0)
-            {
-                return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["CourseImportFileEmpty"], statusCode: StatusCodes.Status400BadRequest);
-            }
-
-            try
-            {
-                await using var stream = file.OpenReadStream();
-                var import = await _educationService.EnqueueImportAsync(stream, file.FileName, cancellationToken);
-                return Accepted(new { import.Id, import.Status, import.FileName, import.CreatedAt });
-            }
-            catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException || ex is BusinessException)
-            {
-                return Problem(title: _localizer["InvalidRequestTitle"], detail: ex.Message, statusCode: StatusCodes.Status400BadRequest);
-            }
+            return EducationReadOnlyProblem();
         }
 
         [HttpGet("import/{id}")]
@@ -140,45 +127,7 @@ namespace Application.Api.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ImportReport([FromForm] IFormFileCollection files, CancellationToken cancellationToken)
         {
-            if (files == null || files.Count == 0)
-            {
-                return Problem(
-                    title: _localizer["InvalidRequestTitle"],
-                    detail: _localizer["ReportImportFilesEmpty"],
-                    statusCode: StatusCodes.Status400BadRequest);
-            }
-
-            // Validar extensões
-            foreach (var file in files)
-            {
-                if (!file.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
-                {
-                    return Problem(
-                        title: _localizer["InvalidRequestTitle"],
-                        detail: _localizer["ReportImportOnlyXlsx"],
-                        statusCode: StatusCodes.Status400BadRequest);
-                }
-            }
-
-            try
-            {
-                var fileStreams = files.Select(f => (f.FileName, (Stream)f.OpenReadStream())).ToList();
-                var import = await _educationService.EnqueueReportImportAsync(fileStreams, cancellationToken);
-                return Accepted(new
-                {
-                    import.Id,
-                    import.Status,
-                    import.FileNames,
-                    import.CreatedAt
-                });
-            }
-            catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException || ex is BusinessException)
-            {
-                return Problem(
-                    title: _localizer["InvalidRequestTitle"],
-                    detail: ex.Message,
-                    statusCode: StatusCodes.Status400BadRequest);
-            }
+            return EducationReadOnlyProblem();
         }
 
         [HttpGet("students/{studentId}/ucs")]
@@ -232,26 +181,84 @@ namespace Application.Api.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> ToggleActivityHidden([FromQuery] string studentId, [FromQuery] string ucId, [FromQuery] string activityName, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(studentId) || string.IsNullOrWhiteSpace(ucId) || string.IsNullOrWhiteSpace(activityName))
+            return EducationReadOnlyProblem();
+        }
+
+        [HttpGet("sync-status")]
+        [Authorize(Policy = ApplicationPermissions.ViewEducation)]
+        [ProducesResponseType(typeof(EducationSyncStatus), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetSyncStatus(CancellationToken cancellationToken)
+        {
+            var status = await _educationService.GetSyncStatusAsync(cancellationToken);
+            return Ok(status);
+        }
+
+        [HttpPost("sync/trigger")]
+        [Authorize(Policy = ApplicationPermissions.ViewEducation)]
+        [ProducesResponseType(typeof(EducationSyncStatus), StatusCodes.Status202Accepted)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
+        public async Task<IActionResult> TriggerSync(CancellationToken cancellationToken)
+        {
+            var (userId, userName) = GetCurrentUserIdentity();
+            if (string.IsNullOrWhiteSpace(userId))
             {
                 return Problem(
-                    title: _localizer["InvalidRequestTitle"],
-                    detail: _localizer["InvalidRequestDetail"],
-                    statusCode: StatusCodes.Status400BadRequest);
+                    title: _localizer["UnauthorizedTitle"],
+                    detail: _localizer["UnauthorizedDetail"],
+                    statusCode: StatusCodes.Status401Unauthorized);
             }
 
             try
             {
-                await _educationService.ToggleActivityHiddenAsync(studentId, ucId, activityName, cancellationToken);
-                return NoContent();
+                var status = await _educationService.TriggerSyncAsync(userId, userName, cancellationToken);
+                return Accepted(status);
             }
-            catch (NotFoundException ex)
+            catch (ConflictException ex)
             {
                 return Problem(
-                    title: _localizer["NotFoundTitle"],
+                    title: _localizer["InvalidOperationTitle"],
                     detail: ex.Message,
-                    statusCode: StatusCodes.Status404NotFound);
+                    statusCode: StatusCodes.Status409Conflict);
             }
+            catch (TooManyRequestsException ex)
+            {
+                return Problem(
+                    title: _localizer["InvalidOperationTitle"],
+                    detail: ex.Message,
+                    statusCode: StatusCodes.Status429TooManyRequests);
+            }
+        }
+
+        private ObjectResult EducationReadOnlyProblem()
+        {
+            return Problem(
+                title: _localizer["InvalidOperationTitle"],
+                detail: _localizer["EducationReadOnly"],
+                statusCode: StatusCodes.Status409Conflict);
+        }
+
+        private (string? Id, string? Name) GetCurrentUserIdentity()
+        {
+            var claimOrder = new[]
+            {
+                ClaimTypes.NameIdentifier,
+                "sub",
+                "user_id",
+                "id"
+            };
+
+            foreach (var claim in claimOrder)
+            {
+                var value = User.FindFirstValue(claim);
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    var name = User.FindFirstValue(ClaimTypes.Name) ?? User.Identity?.Name;
+                    return (value, name);
+                }
+            }
+
+            return (null, null);
         }
     }
 }

@@ -13,5 +13,14 @@ namespace Application.Domain.Model.Education
         public string? SchoolNameDerived { get; set; }
         public string? ProgramNameDerived { get; set; }
         public string? PeriodTextDerived { get; set; }
+        // Novos campos trazidos do Moodle
+        public float? Progress { get; set; }
+        public bool? Completed { get; set; }
+        public bool? IsFavourite { get; set; }
+        public bool? Hidden { get; set; }
+        public string? Summary { get; set; }
+        public int? LastAccess { get; set; }
+        public string? IdNumber { get; set; }
+        public string? Lang { get; set; }
     }
 }

@@ -7,6 +7,7 @@ import { EducationSchool } from '../../model/education-school';
 import { EducationProgram } from '../../model/education-program';
 import { EducationClass } from '../../model/education-class';
 import { EducationUc } from '../../model/education-uc';
+import { EducationSyncStatus } from '../../model/education-sync-status';
 import { PagedResult } from '../../model/paged-result';
 import { UcSearchQuery } from '../../model/uc-search-query';
 import { CourseImportResult } from '../../model/course-import-result';
@@ -37,6 +38,16 @@ export class EducationService {
   getClasses(programId: string): Observable<EducationClass[]> {
     const params = new HttpParams().set('programId', programId);
     return this.http.get<EducationClass[]>(`${this.apiUrl}/classes`, { params })
+      .pipe(catchError(this.handleError));
+  }
+
+  getSyncStatus(): Observable<EducationSyncStatus> {
+    return this.http.get<EducationSyncStatus>(`${this.apiUrl}/sync-status`)
+      .pipe(catchError(this.handleError));
+  }
+
+  triggerSync(): Observable<EducationSyncStatus> {
+    return this.http.post<EducationSyncStatus>(`${this.apiUrl}/sync/trigger`, null)
       .pipe(catchError(this.handleError));
   }
 

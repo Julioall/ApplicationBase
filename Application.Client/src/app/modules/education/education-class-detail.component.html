@@ -21,16 +21,6 @@
             {{ isUcDetail ? ('education.ucDetail.subtitle' | translate) : ('education.classDetail.subtitle' | translate) }}
           </p>
         </div>
-        <div *ngIf="isUcDetail" class="flex justify-end">
-          <button
-            type="button"
-            class="inline-flex items-center gap-2 rounded-lg border border-border-soft bg-surface-raised px-4 py-3 text-sm font-semibold text-text-primary transition hover:bg-surface hover:border-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            (click)="openUcEditor()"
-          >
-            <i class="fa-solid fa-gear"></i>
-            <span>{{ 'education.ucDetail.configure' | translate }}</span>
-          </button>
-        </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
@@ -71,48 +61,6 @@
           <span class="inline-flex min-w-10 justify-center rounded-full border border-border-soft bg-surface px-3 py-1 text-sm font-semibold text-text-primary" *ngIf="students.length">
             {{ students.length }}
           </span>
-        </div>
-
-        <!-- Modal de Configuração da UC -->
-        <div *ngIf="configModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div class="w-full max-w-3xl rounded-xl border border-border-soft bg-surface shadow-2xl">
-            <div class="flex items-start justify-between border-b border-border-soft px-5 py-4">
-              <div>
-                <h3 class="text-lg font-semibold text-text-primary">{{ 'education.ucDetail.configure' | translate }}</h3>
-                <p class="text-sm text-text-muted">{{ 'education.ucDetail.configureDescription' | translate }}</p>
-              </div>
-              <button type="button" class="text-text-muted hover:text-text-primary" (click)="closeUcEditor()">
-                <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
-                <span class="sr-only">{{ 'education.labels.close' | translate }}</span>
-              </button>
-            </div>
-
-            <div class="max-h-[70vh] overflow-y-auto px-5 py-4">
-              <div class="space-y-3">
-                <div class="flex items-center justify-between rounded-lg border border-border-soft bg-surface-alt px-3 py-2" *ngFor="let activity of getAllActivities(); trackBy: trackByActivity">
-                  <div>
-                    <p class="font-semibold text-text-primary">{{ activity.Name }}</p>
-                    <p class="text-xs text-text-muted">
-                      {{ activity.Hidden ? ('education.ucDetail.activityHidden' | translate) : ('education.ucDetail.activityShown' | translate) }}
-                    </p>
-                  </div>
-                  <button type="button"
-                          class="inline-flex items-center gap-2 rounded px-3 py-2 text-sm font-semibold transition hover:bg-surface-alt"
-                          [ngClass]="activity.Hidden ? 'text-accent-strong' : 'text-text-primary'"
-                          (click)="toggleActivityHiddenGlobal(activity.Name)">
-                    <i class="fa-solid" [ngClass]="activity.Hidden ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
-                    <span>{{ activity.Hidden ? ('education.ucDetail.showActivity' | translate) : ('education.ucDetail.hideActivity' | translate) }}</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex justify-end gap-2 border-t border-border-soft px-5 py-4">
-              <button type="button" class="rounded-lg border border-border-soft px-4 py-2 text-sm font-semibold text-text-primary hover:bg-surface-alt" (click)="closeUcEditor()">
-                {{ 'education.labels.close' | translate }}
-              </button>
-            </div>
-          </div>
         </div>
 
         <div class="py-4 text-sm text-text-muted" *ngIf="loadingStudents">

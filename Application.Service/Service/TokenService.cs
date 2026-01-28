@@ -19,6 +19,7 @@ namespace Application.Service.Service
 {
     public class TokenService : ITokenService
     {
+        private readonly Application.Shared.Session.ISessionTokenCache _sessionTokenCache;
         private readonly IUserService _userService;
         private readonly ILogger<TokenService> _logger;
         private readonly IStringLocalizer<SharedResource> _localizer;
@@ -28,12 +29,14 @@ namespace Application.Service.Service
             IUserService userService,
             ILogger<TokenService> logger,
             IStringLocalizer<SharedResource> localizer,
-            IMoodleAuthClient moodleAuthClient)
+            IMoodleAuthClient moodleAuthClient,
+            Application.Shared.Session.ISessionTokenCache sessionTokenCache)
         {
             _userService = userService;
             _logger = logger;
             _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
             _moodleAuthClient = moodleAuthClient ?? throw new ArgumentNullException(nameof(moodleAuthClient));
+            _sessionTokenCache = sessionTokenCache ?? throw new ArgumentNullException(nameof(sessionTokenCache));
         }
 
         public async Task<TokenResponseDto?> GenerateTokens(LoginDto loginDto)
@@ -128,6 +131,11 @@ namespace Application.Service.Service
                 _logger.LogWarning("Moodle site info unavailable for token issued to {Username}", loginDto.Username);
                 return null;
             }
+            // Salvar token no cache de sessão
+            if (int.TryParse(siteInfo.UserId?.ToString(), out var moodleUserId))
+            {
+                _sessionTokenCache.SetMoodleToken(moodleUserId, token, TimeSpan.FromHours(2));
+            }
 
             var email = !string.IsNullOrWhiteSpace(siteInfo.Email) ? siteInfo.Email : siteInfo.UserName;
             if (string.IsNullOrWhiteSpace(email))
@@ -139,6 +147,31 @@ namespace Application.Service.Service
             var name = string.IsNullOrWhiteSpace(siteInfo.FullName) ? siteInfo.UserName : siteInfo.FullName;
             var permissions = ApplicationPermissions.DefaultUserPermissions;
 
+            // Persistir usuário Moodle no RavenDB sem exigir senha
+            var user = new User
+            {
+                Account = new UserAccount
+                {
+                    Email = email,
+                    Username = siteInfo.UserName,
+                    ExternalId = siteInfo.UserId?.ToString(),
+                    Permissions = permissions.ToList(),
+                    DateJoined = DateTime.UtcNow
+                },
+                Profile = new UserProfile
+                {
+                    Name = name
+                }
+            };
+            if (_userService is Application.Service.Service.UserService concreteUserService)
+            {
+                await concreteUserService.AddOrUpdateExternalUserAsync(user);
+            }
+            else
+            {
+                await _userService.UpdateAsync(user);
+            }
+
             var baseClaims = new List<Claim>
             {
                 new(type: ClaimTypes.Email, email),
@@ -146,7 +179,7 @@ namespace Application.Service.Service
                 new(type: ClaimTypes.Name, name),
                 new(type: "name", name),
                 new(type: "username", siteInfo.UserName ?? email),
-                new(type: JwtRegisteredClaimNames.Sub, $"moodle:{siteInfo.UserId}"),
+                new(type: JwtRegisteredClaimNames.Sub, siteInfo.UserId?.ToString() ?? string.Empty),
                 new(type: "auth_provider", "moodle")
             };
 

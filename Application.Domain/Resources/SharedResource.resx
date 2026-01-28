@@ -342,6 +342,27 @@
   <data name="CourseImportFileMissing" xml:space="preserve">
     <value>Arquivo de importação não encontrado.</value>
   </data>
+  <data name="EducationReadOnly" xml:space="preserve">
+    <value>Educação está em modo somente leitura. Importações e edições foram desativadas.</value>
+  </data>
+  <data name="EducationSyncAlreadyRunning" xml:space="preserve">
+    <value>Já existe uma sincronização em andamento. Aguarde a conclusão.</value>
+  </data>
+  <data name="EducationSyncRateLimited" xml:space="preserve">
+    <value>Aguarde {0} minuto(s) antes de iniciar uma nova sincronização.</value>
+  </data>
+  <data name="EducationSyncQueued" xml:space="preserve">
+    <value>Sincronização enfileirada.</value>
+  </data>
+  <data name="EducationSyncRunning" xml:space="preserve">
+    <value>Sincronização em andamento.</value>
+  </data>
+  <data name="EducationSyncCompleted" xml:space="preserve">
+    <value>Sincronização concluída com sucesso.</value>
+  </data>
+  <data name="EducationSyncFailed" xml:space="preserve">
+    <value>Falha na sincronização. Tente novamente mais tarde.</value>
+  </data>
   <data name="EducationSchoolRequired" xml:space="preserve">
     <value>schoolId Ã© obrigatÃ³rio.</value>
   </data>

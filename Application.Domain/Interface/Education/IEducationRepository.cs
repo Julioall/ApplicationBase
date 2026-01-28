@@ -22,5 +22,7 @@ namespace Application.Domain.Interface.Education
         Task<IReadOnlyCollection<UcDocument>> GetUcsByClassAsync(string classId, string? search = null, CancellationToken cancellationToken = default);
         Task<PagedResult<UcDocument>> SearchUcsAsync(string? search, string? classId, string? programId, PaginationQuery query, CancellationToken cancellationToken = default);
         Task RecalculateClassPeriodAsync(string classId, CancellationToken cancellationToken = default);
+        Task<EducationSyncStatus> GetSyncStatusAsync(CancellationToken cancellationToken = default);
+        Task UpdateSyncStatusAsync(EducationSyncStatus status, CancellationToken cancellationToken = default);
     }
 }

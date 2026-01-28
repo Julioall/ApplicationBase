@@ -8,7 +8,6 @@ import { EducationService } from '../../service/education/education.service';
 import { EducationUc } from '../../model/education-uc';
 import { StudentUcDto } from '../../model/student-uc-dto';
 import { NotificationService } from '../../service/notification/notification.service';
-import { StudentsService } from '../../service/students/students.service';
 
 @Component({
   selector: 'app-education-class-detail',
@@ -29,15 +28,12 @@ export class EducationClassDetailComponent implements OnInit, OnDestroy {
   loadingUnits = false;
   loadingMetadata = false;
   loadingStudents = false;
-  importingParticipants = false;
-  configModalOpen = false;
   private routeSub?: Subscription;
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly educationService: EducationService,
-    private readonly studentsService: StudentsService,
     private readonly translate: TranslateService,
     private readonly notificationService: NotificationService,
     private readonly location: Location
@@ -93,62 +89,6 @@ export class EducationClassDetailComponent implements OnInit, OnDestroy {
     this.router.navigate(['/education', 'classes', this.classId, 'ucs', uc.EadId], {
       queryParams: this.buildQueryParams()
     });
-  }
-
-  onImportParticipants(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) {
-      return;
-    }
-
-    if (!this.selectedUc?.EadId) {
-      this.notificationService.showError(
-        this.translate.instant('education.ucDetail.importMissingCourse'),
-        this.translate.instant('education.labels.error')
-      );
-      input.value = '';
-      return;
-    }
-
-    const renamed = new File([file], `courseid_${this.selectedUc.EadId}_participants.json`, {
-      type: file.type || 'application/json'
-    });
-
-    this.importingParticipants = true;
-    this.studentsService.importStudents(renamed)
-      .pipe(finalize(() => {
-        this.importingParticipants = false;
-        input.value = '';
-      }))
-      .subscribe({
-        next: (result) => {
-          if (result.Errors?.length) {
-            this.notificationService.showWarning(
-              this.translate.instant('education.ucDetail.importWarning', { count: result.Errors.length }),
-              this.translate.instant('education.ucDetail.importTitle')
-            );
-          } else {
-            this.notificationService.showSuccess(
-              this.translate.instant('education.ucDetail.importSuccess', { created: result.Created, updated: result.Updated, skipped: result.Skipped }),
-              this.translate.instant('education.ucDetail.importTitle')
-            );
-          }
-          this.loadUcStudents();
-        },
-        error: (err) => this.handleError(err, 'education.ucDetail.importError')
-      });
-  }
-
-  openUcEditor(): void {
-    if (!this.selectedUc) {
-      return;
-    }
-    this.configModalOpen = true;
-  }
-
-  closeUcEditor(): void {
-    this.configModalOpen = false;
   }
 
   get isUcDetail(): boolean {
@@ -308,55 +248,6 @@ export class EducationClassDetailComponent implements OnInit, OnDestroy {
 
   hasHiddenActivities(student: StudentUcDto): boolean {
     return (student.Activities || []).some(a => a.Hidden);
-  }
-
-  toggleActivityHidden(student: StudentUcDto, activity: any): void {
-    if (!this.selectedUc?.EadId) {
-      return;
-    }
-
-    // Format UcId como "ucs/{EadId}" para corresponder com o banco RavenDB
-    const ucId = `ucs/${this.selectedUc.EadId}`;
-    this.educationService.toggleActivityHidden(student.Id, ucId, activity.Name)
-      .subscribe({
-        next: () => {
-          activity.Hidden = !activity.Hidden;
-          this.notificationService.showSuccess(
-            this.translate.instant(activity.Hidden ? 'education.ucDetail.activityHidden' : 'education.ucDetail.activityShown'),
-            this.translate.instant('education.labels.success')
-          );
-        },
-        error: (err) => this.handleError(err, 'education.ucDetail.toggleHiddenError')
-      });
-  }
-
-  toggleActivityHiddenGlobal(activityName: string): void {
-    if (!this.selectedUc?.EadId || !this.students.length) {
-      return;
-    }
-
-    const ucId = `ucs/${this.selectedUc.EadId}`;
-    const studentId = this.students[0].Id;
-    const currentHidden = this.students[0].Activities?.find(a => a.Name === activityName)?.Hidden ?? false;
-
-    this.educationService.toggleActivityHidden(studentId, ucId, activityName)
-      .subscribe({
-        next: () => {
-          const newHidden = !currentHidden;
-          this.students.forEach(s => {
-            (s.Activities || []).forEach(a => {
-              if (a.Name === activityName) {
-                a.Hidden = newHidden;
-              }
-            });
-          });
-          this.notificationService.showSuccess(
-            this.translate.instant(newHidden ? 'education.ucDetail.activityHidden' : 'education.ucDetail.activityShown'),
-            this.translate.instant('education.labels.success')
-          );
-        },
-        error: (err) => this.handleError(err, 'education.ucDetail.toggleHiddenError')
-      });
   }
 
   getStudentName(student: StudentUcDto): string {

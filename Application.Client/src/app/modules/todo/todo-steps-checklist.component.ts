@@ -1,3 +1,4 @@
+// eslint-disable-next-line @angular-eslint/no-output-native
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { TodoStep } from '../../model/todo';
@@ -12,7 +13,7 @@ export class TodoStepsChecklistComponent {
   @Input() canToggle = true;
 
   @Output() reorder = new EventEmitter<TodoStep[]>();
-  @Output() toggle = new EventEmitter<{ stepId: string; isCompleted: boolean }>();
+  @Output() stepToggle = new EventEmitter<{ stepId: string; isCompleted: boolean }>();
   @Output() titleChange = new EventEmitter<{ stepId: string; newTitle: string }>();
   @Output() addStep = new EventEmitter<string>();
   @Output() deleteStep = new EventEmitter<string>();
@@ -35,7 +36,7 @@ export class TodoStepsChecklistComponent {
     if (!this.canToggle) {
       return;
     }
-    this.toggle.emit({ stepId: step.Id, isCompleted: checked });
+    this.stepToggle.emit({ stepId: step.Id, isCompleted: checked });
   }
 
   startEditing(step: TodoStep): void {

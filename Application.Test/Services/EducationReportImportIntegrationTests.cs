@@ -1,4 +1,5 @@
 using System.Text;
+using Application.Domain.Exceptions;
 using Application.Domain.Model.Education;
 using Application.Service.Education.Parsers;
 using Application.Service.Interface;
@@ -82,12 +83,8 @@ namespace Application.Tests.Services
 
             var excelStream = CreateValidExcelFile();
             var files = new[] { ("report.xlsx", excelStream) }.AsEnumerable();
-            // Act
-            var result = await educationService.ImportReportAsync(files);
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal(1, result.FilesProcessed);
-            Assert.True(result.RowsRead > 0);
+            // Act & Assert
+            await Assert.ThrowsAsync<BusinessException>(() => educationService.ImportReportAsync(files));
         }
 
         [Fact]
@@ -100,13 +97,8 @@ namespace Application.Tests.Services
             var emptyStream = CreateEmptyExcelFile();
             var files = new[] { ("empty.xlsx", emptyStream) }.AsEnumerable();
 
-            // Act
-            var result = await educationService.ImportReportAsync(files);
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal(1, result.FilesProcessed);
-            Assert.Equal(0, result.RowsRead);
+            // Act & Assert
+            await Assert.ThrowsAsync<BusinessException>(() => educationService.ImportReportAsync(files));
         }
 
         [Fact]
@@ -120,7 +112,7 @@ namespace Application.Tests.Services
             var files = new[] { ("report.txt", (Stream)invalidStream) }.AsEnumerable();
 
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(() => educationService.ImportReportAsync(files));
+            await Assert.ThrowsAsync<BusinessException>(() => educationService.ImportReportAsync(files));
         }
 
         private Stream CreateValidExcelFile()

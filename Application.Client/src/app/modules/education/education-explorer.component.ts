@@ -8,9 +8,8 @@ import { EducationService } from '../../service/education/education.service';
 import { EducationSchool } from '../../model/education-school';
 import { EducationProgram } from '../../model/education-program';
 import { EducationClass } from '../../model/education-class';
-import { AuthService } from '../../service/auth/auth.service';
-import { MANAGE_EDUCATION_PERMISSION } from '../../model/permissions';
 import { Router } from '@angular/router';
+import { EducationSyncStatus } from '../../model/education-sync-status';
 
 @Component({
   selector: 'app-education-explorer',
@@ -25,20 +24,16 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
   loadingSchools = false;
   loadingPrograms = false;
   loadingClasses = false;
-  importing = false;
+  loadingSyncStatus = false;
+  syncStatus?: EducationSyncStatus;
   showFilterDropdown = false;
   private searchSub?: Subscription;
-  private importPollHandle?: number;
-  private importPollAttempts = 0;
-  private readonly maxImportPollAttempts = 20;
-  private readonly importPollIntervalMs = 3000;
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly educationService: EducationService,
     private readonly notificationService: NotificationService,
     private readonly translate: TranslateService,
-    private readonly authService: AuthService,
     private readonly router: Router,
   ) {
     this.form = this.fb.group({
@@ -49,6 +44,7 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.loadSyncStatus();
     this.loadSchools();
     this.searchSub = this.searchControl.valueChanges
       .pipe(debounceTime(300))
@@ -64,7 +60,6 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.searchSub?.unsubscribe();
-    this.clearImportPolling();
   }
 
   onSchoolChange(): void {
@@ -137,29 +132,33 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
       });
   }
 
-  onImportCourses(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) {
-      return;
+  loadSyncStatus(): void {
+    this.loadingSyncStatus = true;
+    this.educationService.getSyncStatus()
+      .pipe(finalize(() => this.loadingSyncStatus = false))
+      .subscribe({
+        next: (status) => {
+          this.syncStatus = status;
+        },
+        error: (err) => {
+          this.syncStatus = undefined;
+          this.handleError(err, 'education.errors.loadSyncStatus');
+        }
+      });
+  }
+
+  get lastSyncLabel(): string {
+    if (this.loadingSyncStatus) {
+      return this.translate.instant('education.syncStatus.loading');
     }
 
-    this.importing = true;
-    this.educationService.importCourses(file)
-      .pipe(finalize(() => {
-        this.importing = false;
-        input.value = '';
-      }))
-      .subscribe({
-        next: (result) => {
-          this.handleImportQueued(result);
-          if (result?.Id) {
-            this.startImportPolling(result.Id);
-          }
-          this.loadSchools();
-        },
-        error: (err) => this.handleError(err, 'education.errors.import')
-      });
+    const last = this.syncStatus?.LastSyncAt;
+    if (!last) {
+      return this.translate.instant('education.syncStatus.never');
+    }
+
+    const date = new Date(last * 1000);
+    return this.formatDate(date);
   }
 
   formatPeriod(start?: number | null, end?: number | null, fallback?: string | null): string {
@@ -173,10 +172,6 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
 
   formatClassPeriod(classItem: EducationClass): string {
     return this.formatPeriod(classItem.StartDate ?? undefined, classItem.EndDate ?? undefined, undefined);
-  }
-
-  get canImport(): boolean {
-    return this.authService.hasPermission(MANAGE_EDUCATION_PERMISSION);
   }
 
   get hasResults(): boolean {
@@ -242,59 +237,6 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
   trackByClass(_index: number, classItem: EducationClass): string {
     return classItem.Id || _index.toString();
   }
-
-  private startImportPolling(importId: string): void {
-    this.clearImportPolling();
-    if (!importId) {
-      return;
-    }
-
-    this.importPollAttempts = 0;
-    this.importPollHandle = window.setInterval(() => {
-      this.importPollAttempts++;
-
-      this.educationService.getImport(importId).subscribe({
-        next: (status) => this.handleImportStatus(status),
-        error: () => {
-          if (this.importPollAttempts >= this.maxImportPollAttempts) {
-            this.clearImportPolling();
-          }
-        }
-      });
-
-      if (this.importPollAttempts >= this.maxImportPollAttempts) {
-        this.clearImportPolling();
-      }
-    }, this.importPollIntervalMs);
-  }
-
-  private handleImportStatus(status: any): void {
-    if (!status || !status.Status) {
-      return;
-    }
-
-    if (status.Status === 'Completed') {
-      const detail = `${status.FileName ?? ''} • ${this.translate.instant('notifications.importCompleted')}`.trim();
-      this.notificationService.showSuccess(detail, this.translate.instant('notifications.importCompleted'));
-      this.clearImportPolling();
-      this.loadSchools();
-      return;
-    }
-
-    if (status.Status === 'Failed') {
-      const detail = status.ErrorMessage || this.translate.instant('notifications.importFailed');
-      this.notificationService.showError(detail, this.translate.instant('notifications.importFailed'));
-      this.clearImportPolling();
-    }
-  }
-
-  private clearImportPolling(): void {
-    if (this.importPollHandle !== undefined) {
-      window.clearInterval(this.importPollHandle);
-      this.importPollHandle = undefined;
-    }
-  }
-
   private formatDate(date: Date): string {
     return date.toLocaleDateString(this.translate.currentLang || 'en', {
       year: 'numeric',
@@ -314,13 +256,6 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
   private handleError(err: any, translationKey: string): void {
     const detail = err?.detail || err?.title || err?.message || this.translate.instant(translationKey);
     this.notificationService.showError(detail, this.translate.instant('education.labels.error'));
-  }
-
-  private handleImportQueued(_: any): void {
-    this.notificationService.showInfo(
-      this.translate.instant('education.import.queuedMessage'),
-      this.translate.instant('education.import.title')
-    );
   }
 
   private resetSearch(): void {

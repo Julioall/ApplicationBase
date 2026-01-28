@@ -17,6 +17,8 @@ namespace Application.Service.Interface
         Task<IReadOnlyCollection<ClassDocument>> GetClassesByProgramAsync(string programId, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<UcDocument>> GetUcsByClassAsync(string classId, string? search = null, CancellationToken cancellationToken = default);
         Task<PagedResult<UcDocument>> SearchUcsAsync(PaginationQuery query, string? classId = null, string? programId = null, CancellationToken cancellationToken = default);
+        Task<EducationSyncStatus> GetSyncStatusAsync(CancellationToken cancellationToken = default);
+        Task<EducationSyncStatus> TriggerSyncAsync(string userId, string? userName, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<Student>> GetStudentsByUcEadIdAsync(int eadId, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<StudentUcDto>> GetStudentsByUcEadIdWithPerformanceAsync(int eadId, CancellationToken cancellationToken = default);
         Task<IEnumerable<string>> GetUcsByStudentAsync(string studentId, CancellationToken cancellationToken = default);

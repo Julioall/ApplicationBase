@@ -10,4 +10,12 @@ export interface EducationUc {
   SchoolNameDerived?: string;
   ProgramNameDerived?: string;
   PeriodTextDerived?: string;
+  Progress?: number;
+  Completed?: boolean;
+  IsFavourite?: boolean;
+  Hidden?: boolean;
+  Summary?: string;
+  LastAccess?: number;
+  IdNumber?: string;
+  Lang?: string;
 }

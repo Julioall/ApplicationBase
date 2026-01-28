@@ -1,0 +1,11 @@
+.uc-card {
+  transition: box-shadow 0.2s, border-color 0.2s;
+  cursor: pointer;
+  &:hover {
+    border-color: var(--accent-strong);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  }
+  img {
+    background: #f3f4f6;
+  }
+}

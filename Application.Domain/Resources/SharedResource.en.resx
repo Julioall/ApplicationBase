@@ -342,6 +342,27 @@
   <data name="CourseImportFieldMissing" xml:space="preserve">
     <value>Missing required field: {0}.</value>
   </data>
+  <data name="EducationReadOnly" xml:space="preserve">
+    <value>Education is in read-only mode. Imports and edits are disabled.</value>
+  </data>
+  <data name="EducationSyncAlreadyRunning" xml:space="preserve">
+    <value>A synchronization is already running. Please wait for it to finish.</value>
+  </data>
+  <data name="EducationSyncRateLimited" xml:space="preserve">
+    <value>Please wait {0} minute(s) before triggering a new synchronization.</value>
+  </data>
+  <data name="EducationSyncQueued" xml:space="preserve">
+    <value>Synchronization queued.</value>
+  </data>
+  <data name="EducationSyncRunning" xml:space="preserve">
+    <value>Synchronization in progress.</value>
+  </data>
+  <data name="EducationSyncCompleted" xml:space="preserve">
+    <value>Synchronization completed successfully.</value>
+  </data>
+  <data name="EducationSyncFailed" xml:space="preserve">
+    <value>Synchronization failed. Try again later.</value>
+  </data>
   <data name="CourseImportFileMissing" xml:space="preserve">
     <value>Import file not found.</value>
   </data>
