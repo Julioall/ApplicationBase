@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
-using Application.Domain;
 using Application.Domain.Exceptions;
+using Application.Domain.Localization;
 using Application.Domain.Model;
 using Application.Service.Interface;
 using Microsoft.Extensions.Localization;

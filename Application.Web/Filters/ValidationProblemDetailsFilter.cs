@@ -1,4 +1,4 @@
-using Application.Domain;
+using Application.Domain.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Localization;

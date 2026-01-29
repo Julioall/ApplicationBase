@@ -1,4 +1,3 @@
-using Application.Domain;
 using Application.Domain.Model;
 using Application.Domain.Model.Todo;
 using Application.Domain.Model.Todo.Dtos;
@@ -9,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using System.IO;
 using System.Security.Claims;
+using Application.Domain.Localization;
 
 namespace Application.Api.Controllers
 {

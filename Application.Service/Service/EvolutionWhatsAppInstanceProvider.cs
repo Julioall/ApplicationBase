@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
-using Application.Domain;
 using Application.Domain.Exceptions;
+using Application.Domain.Localization;
 using Application.Domain.Model;
 using Application.Domain.Model.WhatsApp;
 using Application.Service.Interface;

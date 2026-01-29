@@ -1,5 +1,5 @@
 using Application.Api.Controllers;
-using Application.Domain;
+using Application.Domain.Localization;
 using Application.Domain.Model.Dtos;
 using Application.Service.Interface;
 using Microsoft.AspNetCore.Http;

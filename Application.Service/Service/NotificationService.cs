@@ -1,4 +1,5 @@
 using Application.Domain.Interface;
+using Application.Domain.Localization;
 using Application.Domain.Model.Notification;
 using Application.Service.Interface;
 using Microsoft.Extensions.Localization;
@@ -8,9 +9,9 @@ namespace Application.Service.Service
     public class NotificationService : INotificationService
     {
         private readonly INotificationRepository _notificationRepository;
-        private readonly IStringLocalizer<Application.Domain.SharedResource> _localizer;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
-        public NotificationService(INotificationRepository notificationRepository, IStringLocalizer<Application.Domain.SharedResource> localizer)
+        public NotificationService(INotificationRepository notificationRepository, IStringLocalizer<SharedResource> localizer)
         {
             _notificationRepository = notificationRepository;
             _localizer = localizer;

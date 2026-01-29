@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents;
 using Raven.TestDriver;
 
-namespace Application.Test.Middlewares
+namespace Application.Tests.Middlewares
 {
     public class MiddlewareServiceRavenDbStoreTests : RavenTestDriver
     {

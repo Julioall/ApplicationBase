@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using Application.Domain;
 using Application.Domain.Exceptions;
+using Application.Domain.Localization;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;

@@ -4,7 +4,7 @@
  */
 export interface CourseUnit {
   Id?: string;
-  EadId: number;
+  MoodleId: number;
   Fullname: string;
   StartDate: number;
   EndDate: number;

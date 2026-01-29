@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Application.Domain;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
@@ -14,6 +13,7 @@ using Microsoft.Extensions.Localization;
 using System.Collections.Generic;
 using System.Globalization;
 using Application.Service.Service.Moodle;
+using Application.Domain.Localization;
 
 namespace Application.Tests.Services
 {

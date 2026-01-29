@@ -1,6 +1,6 @@
 export interface MoodleCourse {
   Id?: string;
-  EadId: number;
+  MoodleId: number;
   Fullname: string;
   StartDate: number;
   EndDate: number;

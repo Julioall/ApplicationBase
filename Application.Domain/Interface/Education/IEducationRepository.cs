@@ -12,7 +12,7 @@ namespace Application.Domain.Interface.Education
         Task<ClassDocument> UpsertClassAsync(string schoolId, string programId, string courseCategoryRaw, string name, CancellationToken cancellationToken = default);
         Task<CourseUnitUpsertResult> UpsertCourseUnitAsync(CourseUnit courseUnit, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<CourseUnitUpsertResult>> UpsertCourseUnitBatchAsync(IEnumerable<CourseUnit> courseUnits, CancellationToken cancellationToken = default);
-        Task<CourseUnit?> GetCourseUnitByEadIdAsync(int eadId, CancellationToken cancellationToken = default);
+        Task<CourseUnit?> GetCourseUnitByMoodleIdAsync(int moodleId, CancellationToken cancellationToken = default);
         Task<ClassUcMap> EnsureClassCourseUnitMapAsync(string classId, string courseUnitId, CancellationToken cancellationToken = default);
         Task<StudentUcMap> EnsureStudentCourseUnitMapAsync(string studentId, string courseUnitId, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<Student>> GetStudentsByCourseUnitAsync(string courseUnitId, CancellationToken cancellationToken = default);

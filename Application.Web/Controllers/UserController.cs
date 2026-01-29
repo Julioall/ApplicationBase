@@ -1,7 +1,7 @@
 using Application.Api.Models.User;
 using Application.Api.RateLimiting;
-using Application.Domain;
 using Application.Domain.Exceptions;
+using Application.Domain.Localization;
 using Application.Domain.Model;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.User;
@@ -165,7 +165,7 @@ namespace Application.Api.Controllers
             if (IsMoodleUser())
             {
                 var subject = GetSubject();
-                var externalId = GetExternalId(subject);
+                var moodleId = GetMoodleId(subject);
                 var username = GetUsernameFromClaims() ?? email;
                 var picture = GetPictureFromClaims();
                 var department = GetClaimValue("department");
@@ -185,11 +185,11 @@ namespace Application.Api.Controllers
                 var virtualUser = new User
                 {
                     Id = subject,
-                    Account = new UserAccount
+                        Account = new UserAccount
                     {
                         Email = email,
                         Username = username,
-                        ExternalId = GetClaimValue("idnumber") ?? externalId,
+                        MoodleId = GetClaimValue("idnumber") ?? moodleId,
                         Permissions = permissions,
                         DateJoined = DateTime.UtcNow
                     },
@@ -715,7 +715,7 @@ namespace Application.Api.Controllers
                    ?? User.FindFirstValue(ClaimTypes.Name);
         }
 
-        private static string? GetExternalId(string? subject)
+        private static string? GetMoodleId(string? subject)
         {
             if (string.IsNullOrWhiteSpace(subject))
             {

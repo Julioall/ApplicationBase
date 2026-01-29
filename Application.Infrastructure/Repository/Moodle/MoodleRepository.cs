@@ -143,7 +143,7 @@ namespace Application.Infrastructure.Repository.Moodle
         public async Task<CourseUpsertResult> UpsertCourseAsync(MoodleCourse course, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(course);
-            var id = $"moodle-courses/{course.EadId}";
+            var id = $"moodle-courses/{course.MoodleId}";
 
             var existing = await _serviceRavenDb.AsyncSession.LoadAsync<MoodleCourse>(id, cancellationToken);
             if (existing == null)
@@ -226,9 +226,9 @@ namespace Application.Infrastructure.Repository.Moodle
             };
         }
 
-        public Task<MoodleCourse?> GetCourseByEadIdAsync(int eadId, CancellationToken cancellationToken = default)
+        public Task<MoodleCourse?> GetCourseByMoodleIdAsync(int moodleId, CancellationToken cancellationToken = default)
         {
-            var id = $"moodle-courses/{eadId}";
+            var id = $"moodle-courses/{moodleId}";
             return _serviceRavenDb.AsyncSession.LoadAsync<MoodleCourse?>(id, cancellationToken);
         }
 
@@ -276,6 +276,29 @@ namespace Application.Infrastructure.Repository.Moodle
 
             await _serviceRavenDb.AsyncSession.StoreAsync(map, mapId, cancellationToken);
             return map;
+        }
+
+        public async Task EnsureStudentCourseMapBatchAsync(IEnumerable<StudentCourseMap> maps, CancellationToken cancellationToken = default)
+        {
+            var mapList = maps?.ToList();
+            if (mapList == null || mapList.Count == 0)
+                return;
+
+            // Generate ids for batch load
+            var idsToLoad = mapList.Select(m => $"student-course-maps/{m.StudentId}/{m.CourseId}").Distinct().ToList();
+
+            // Load existing maps in single batch
+            var existingDocs = await _serviceRavenDb.AsyncSession.LoadAsync<StudentCourseMap>(idsToLoad, cancellationToken);
+
+            foreach (var m in mapList)
+            {
+                var id = $"student-course-maps/{m.StudentId}/{m.CourseId}";
+                if (existingDocs.ContainsKey(id))
+                    continue;
+
+                m.Id = id;
+                await _serviceRavenDb.AsyncSession.StoreAsync(m, id, cancellationToken);
+            }
         }
 
         public async Task<IReadOnlyCollection<Student>> GetStudentsByCourseAsync(string courseId, CancellationToken cancellationToken = default)

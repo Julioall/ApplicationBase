@@ -1,4 +1,3 @@
-using Application.Domain;
 using Application.Domain.Exceptions;
 using Application.Domain.Model;
 using Application.Service.Interface;
@@ -8,6 +7,7 @@ using System.Net;
 using System.Net.Mail;
 using System.Text;
 using Microsoft.Extensions.Localization;
+using Application.Domain.Localization;
 
 namespace Application.Service.Service
 {

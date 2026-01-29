@@ -1,7 +1,7 @@
 using Application.Api.Controllers;
 using Application.Api.RateLimiting;
-using Application.Domain;
 using Application.Domain.Exceptions;
+using Application.Domain.Localization;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.User;
 using Application.Service.Interface;

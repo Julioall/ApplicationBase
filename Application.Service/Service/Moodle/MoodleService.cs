@@ -1,6 +1,6 @@
-using Application.Domain;
 using Application.Domain.Exceptions;
 using Application.Domain.Interface.Moodle;
+using Application.Domain.Localization;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.Moodle;
 using Application.Domain.Model.Moodle.Dtos;
@@ -113,7 +113,7 @@ namespace Application.Service.Service.Moodle
                 throw new ArgumentException("Invalid course id.", nameof(eadId));
             }
 
-            var course = await _moodleRepository.GetCourseByEadIdAsync(eadId, cancellationToken);
+            var course = await _moodleRepository.GetCourseByMoodleIdAsync(eadId, cancellationToken);
             if (course == null || string.IsNullOrWhiteSpace(course.Id))
             {
                 return Array.Empty<Student>();
@@ -129,7 +129,7 @@ namespace Application.Service.Service.Moodle
                 throw new ArgumentException("Invalid course id.", nameof(eadId));
             }
 
-            var course = await _moodleRepository.GetCourseByEadIdAsync(eadId, cancellationToken);
+            var course = await _moodleRepository.GetCourseByMoodleIdAsync(eadId, cancellationToken);
             if (course == null || string.IsNullOrWhiteSpace(course.Id))
             {
                 return Array.Empty<StudentCourseDto>();

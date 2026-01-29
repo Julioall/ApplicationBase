@@ -1,4 +1,4 @@
-namespace Application.Domain
+namespace Application.Domain.Localization
 {
     /// <summary>
     /// Marker class used for localization resources shared across the application layers.

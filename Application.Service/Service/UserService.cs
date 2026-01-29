@@ -1,6 +1,6 @@
-using Application.Domain;
 using Application.Domain.Exceptions;
 using Application.Domain.Interface;
+using Application.Domain.Localization;
 using Application.Domain.Model;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.User;
@@ -31,7 +31,7 @@ namespace Application.Service.Service
             {
                 // Atualiza apenas dados externos
                 existingUser.Account.Username = user.Account.Username;
-                existingUser.Account.ExternalId = user.Account.ExternalId;
+                existingUser.Account.MoodleId = user.Account.MoodleId;
                 existingUser.Profile.Name = user.Profile.Name;
                 await _userRepository.UpdateAsync(existingUser);
             }

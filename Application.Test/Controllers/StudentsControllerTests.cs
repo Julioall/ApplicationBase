@@ -1,6 +1,6 @@
 using Application.Api.Controllers;
-using Application.Domain;
 using Application.Domain.Exceptions;
+using Application.Domain.Localization;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.Students;
 using Application.Domain.Model.Students.Dtos;

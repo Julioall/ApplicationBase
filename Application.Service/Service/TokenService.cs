@@ -1,5 +1,5 @@
-using Application.Domain;
 using Application.Domain.Exceptions;
+using Application.Domain.Localization;
 using Application.Domain.Model;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.User;
@@ -154,7 +154,7 @@ namespace Application.Service.Service
                 {
                     Email = email,
                     Username = siteInfo.UserName,
-                    ExternalId = siteInfo.UserId?.ToString(),
+                    MoodleId = siteInfo.UserId?.ToString(),
                     Permissions = permissions.ToList(),
                     DateJoined = DateTime.UtcNow
                 },

@@ -4,6 +4,7 @@ using Application.Domain.Model;
 using Application.Domain.Model.Education;
 using Application.Infrastructure.Service;
 using Application.Shared.Background;
+using Application.Domain.Localization;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -18,7 +19,7 @@ namespace Application.Api.Background
         private readonly IMoodleRepository _moodleRepository;
         private readonly IServiceRavenDB _serviceRavenDb;
         private readonly IDocumentStore _documentStore;
-        private readonly IStringLocalizer<Domain.SharedResource> _localizer;
+        private readonly IStringLocalizer<SharedResource> _localizer;
         private readonly ILogger<MoodleSyncHangfireJob> _logger;
         private readonly Service.Interface.IMoodleAuthClient _moodleAuthClient;
         private readonly Service.Interface.IMoodleCourseClient _moodleCourseClient;
@@ -33,7 +34,7 @@ namespace Application.Api.Background
             IMoodleRepository moodleRepository,
             IServiceRavenDB serviceRavenDb,
             IDocumentStore documentStore,
-            IStringLocalizer<Domain.SharedResource> localizer,
+            IStringLocalizer<SharedResource> localizer,
             ILogger<MoodleSyncHangfireJob> logger,
             Service.Interface.IMoodleAuthClient moodleAuthClient,
             Service.Interface.IMoodleCourseClient moodleCourseClient,
@@ -238,7 +239,7 @@ namespace Application.Api.Background
 
                     var courseUnit = new CourseUnit
                     {
-                        EadId = curso.Id,
+                        MoodleId = curso.Id,
                         Fullname = curso.FullName ?? curso.DisplayName ?? string.Empty,
                         StartDate = curso.StartDate ?? 0,
                         EndDate = curso.EndDate ?? 0,
@@ -274,10 +275,58 @@ namespace Application.Api.Background
                 }
 
                 // Upsert todos os cursos em uma única operação batch
+                List<Application.Domain.Model.Education.Dtos.CourseUnitUpsertResult> upsertResults = new();
                 if (courseUnitsToUpsert.Count > 0)
                 {
                     _logger.LogInformation("Upserting {Count} courses in batch", courseUnitsToUpsert.Count);
-                    await _educationRepository.UpsertCourseUnitBatchAsync(courseUnitsToUpsert, cancellationToken);
+                    var results = await _educationRepository.UpsertCourseUnitBatchAsync(courseUnitsToUpsert, cancellationToken);
+                    upsertResults = results.ToList();
+                }
+
+                // Criar mapeamentos usuário->curso em batch (se usuário app existir)
+                try
+                {
+                    // Resolve usuário interno pelo MoodleId (armazena apenas o número normalmente)
+                    var moodleUserKey = moodleUserId.ToString();
+                    var appUser = await _serviceRavenDb.AsyncSession.Query<Application.Domain.Model.User.User>()
+                        .Where(u => u.Account.MoodleId == moodleUserKey)
+                        .FirstOrDefaultAsync(cancellationToken);
+
+                    if (appUser == null)
+                    {
+                        // Tentar com prefixo 'moodle:' caso o MoodleId tenha sido salvo assim
+                        var prefixed = $"moodle:{moodleUserKey}";
+                        appUser = await _serviceRavenDb.AsyncSession.Query<Application.Domain.Model.User.User>()
+                            .Where(u => u.Account.MoodleId == prefixed)
+                            .FirstOrDefaultAsync(cancellationToken);
+                    }
+
+                    if (appUser != null && upsertResults.Count > 0)
+                    {
+                        // Construir mapas com os ids resultantes do upsert (Entity.Id)
+                        var maps = upsertResults
+                            .Where(r => r.Entity != null && !string.IsNullOrWhiteSpace(r.Entity.Id))
+                            .Select(r => new Application.Domain.Model.Moodle.StudentCourseMap
+                            {
+                                StudentId = appUser.Id,
+                                CourseId = r.Entity.Id
+                            })
+                            .ToList();
+
+                        if (maps.Count > 0)
+                        {
+                            var batchSize = _moodleSettings.SyncBatchSize > 0 ? _moodleSettings.SyncBatchSize : 50;
+                            for (int i = 0; i < maps.Count; i += batchSize)
+                            {
+                                var batch = maps.Skip(i).Take(batchSize);
+                                await _moodleRepository.EnsureStudentCourseMapBatchAsync(batch, cancellationToken);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to create student-course maps during Moodle sync for user {UserId}", triggeredByUserId);
                 }
 
 
