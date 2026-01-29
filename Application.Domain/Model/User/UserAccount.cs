@@ -7,7 +7,7 @@ namespace Application.Domain.Model.User
     {
         public required string Email { get; set; }
         public string? Username { get; set; }
-        public string? ExternalId { get; set; }
+        public string? MoodleId { get; set; }
         [JsonIgnore]
         public string? PasswordHash { get; set; }
         public List<string> Permissions { get; set; } = new();

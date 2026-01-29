@@ -11,5 +11,6 @@ namespace Application.Infrastructure.Configuration
         public string ServiceName { get; set; } = string.Empty;
         public int TimeoutSeconds { get; set; } = 30;
         public string? FixedToken { get; set; }
+        public int SyncBatchSize { get; set; } = 50;
     }
 }

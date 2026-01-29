@@ -1,7 +1,7 @@
 export class UserAccount {
     Email?: string;
     Username?: string;
-    ExternalId?: string;
+    MoodleId?: string;
     Password?: string;
     Permissions?: string[];
     DateJoined?: Date;

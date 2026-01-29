@@ -7,7 +7,7 @@ namespace Application.Domain.Model.Education
     public class CourseUnit
     {
         public string? Id { get; set; }
-        public required int EadId { get; set; }
+        public required int MoodleId { get; set; }
         public required string Fullname { get; set; }
         public required long StartDate { get; set; }
         public required long EndDate { get; set; }

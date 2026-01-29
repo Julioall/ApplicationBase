@@ -11,6 +11,7 @@ using Application.Domain.Model.Education.Dtos;
 using Application.Domain.Model.Students;
 using Application.Service.Interface;
 using Application.Shared.Background;
+using Application.Domain.Localization;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
@@ -119,7 +120,7 @@ namespace Application.Service.Service
                 throw new ArgumentException("Invalid CourseUnit id.", nameof(eadId));
             }
 
-            var uc = await _educationRepository.GetCourseUnitByEadIdAsync(eadId, cancellationToken);
+                var uc = await _educationRepository.GetCourseUnitByMoodleIdAsync(eadId, cancellationToken);
             if (uc == null || string.IsNullOrWhiteSpace(uc.Id))
             {
                 return Array.Empty<Student>();
@@ -135,7 +136,7 @@ namespace Application.Service.Service
                 throw new ArgumentException("Invalid CourseUnit id.", nameof(eadId));
             }
 
-            var uc = await _educationRepository.GetCourseUnitByEadIdAsync(eadId, cancellationToken);
+                var uc = await _educationRepository.GetCourseUnitByMoodleIdAsync(eadId, cancellationToken);
             if (uc == null || string.IsNullOrWhiteSpace(uc.Id))
             {
                 return Array.Empty<StudentUcDto>();

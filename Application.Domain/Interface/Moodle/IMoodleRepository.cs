@@ -12,9 +12,10 @@ namespace Application.Domain.Interface.Moodle
         Task<MoodleCourseCategory> UpsertCourseCategoryAsync(string categoryId, string name, CancellationToken cancellationToken = default);
         Task<MoodleCohort> UpsertCohortAsync(string categoryId, string courseCategoryId, string courseCategoryRaw, string name, CancellationToken cancellationToken = default);
         Task<CourseUpsertResult> UpsertCourseAsync(MoodleCourse course, CancellationToken cancellationToken = default);
-        Task<MoodleCourse?> GetCourseByEadIdAsync(int eadId, CancellationToken cancellationToken = default);
+        Task<MoodleCourse?> GetCourseByMoodleIdAsync(int moodleId, CancellationToken cancellationToken = default);
         Task<MoodleCohortCourseMap> EnsureCohortCourseMapAsync(string cohortId, string courseId, CancellationToken cancellationToken = default);
         Task<StudentCourseMap> EnsureStudentCourseMapAsync(string studentId, string courseId, CancellationToken cancellationToken = default);
+        Task EnsureStudentCourseMapBatchAsync(IEnumerable<StudentCourseMap> maps, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<Student>> GetStudentsByCourseAsync(string courseId, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<StudentCourseDto>> GetStudentsByCourseWithPerformanceAsync(string courseId, CancellationToken cancellationToken = default);
         Task<IReadOnlyCollection<MoodleCategory>> GetCategoriesAsync(CancellationToken cancellationToken = default);

@@ -143,7 +143,7 @@ namespace Application.Infrastructure.Repository.Education
         public async Task<CourseUnitUpsertResult> UpsertCourseUnitAsync(CourseUnit uc, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(uc);
-            var id = $"course-units/{uc.EadId}";
+            var id = $"course-units/{uc.MoodleId}";
 
             var existing = await _serviceRavenDb.AsyncSession.LoadAsync<CourseUnit>(id, cancellationToken);
             if (existing == null)
@@ -223,7 +223,7 @@ namespace Application.Infrastructure.Repository.Education
             }
 
             // Generate IDs for all documents
-            var idsToLoad = ucList.Select(uc => $"course-units/{uc.EadId}").ToList();
+            var idsToLoad = ucList.Select(uc => $"course-units/{uc.MoodleId}").ToList();
 
             // Load all existing documents in a single batch call
             var existingDocs = await _serviceRavenDb.AsyncSession.LoadAsync<CourseUnit>(idsToLoad, cancellationToken);
@@ -232,7 +232,7 @@ namespace Application.Infrastructure.Repository.Education
 
             foreach (var uc in ucList)
             {
-                var id = $"ucs/{uc.EadId}";
+                var id = $"ucs/{uc.MoodleId}";
                 existingDocs.TryGetValue(id, out var existing);
 
                 if (existing == null)
@@ -354,9 +354,9 @@ namespace Application.Infrastructure.Repository.Education
             return results;
         }
 
-        public Task<CourseUnit?> GetCourseUnitByEadIdAsync(int eadId, CancellationToken cancellationToken = default)
+        public Task<CourseUnit?> GetCourseUnitByMoodleIdAsync(int moodleId, CancellationToken cancellationToken = default)
         {
-            var id = $"course-units/{eadId}";
+            var id = $"course-units/{moodleId}";
             return _serviceRavenDb.AsyncSession.LoadAsync<CourseUnit?>(id, cancellationToken);
         }
 

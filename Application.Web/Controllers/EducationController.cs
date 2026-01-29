@@ -1,5 +1,5 @@
-using Application.Domain;
 using Application.Domain.Exceptions;
+using Application.Domain.Localization;
 using Application.Domain.Model;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.Education;

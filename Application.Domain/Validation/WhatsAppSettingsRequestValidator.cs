@@ -1,3 +1,4 @@
+using Application.Domain.Localization;
 using Application.Domain.Model.Dtos;
 using FluentValidation;
 using Microsoft.Extensions.Localization;

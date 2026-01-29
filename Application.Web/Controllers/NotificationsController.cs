@@ -1,10 +1,10 @@
-using Application.Domain;
 using Application.Domain.Model.Notification;
 using Application.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Application.Domain.Model;
+using Application.Domain.Localization;
 
 namespace Application.Api.Controllers
 {

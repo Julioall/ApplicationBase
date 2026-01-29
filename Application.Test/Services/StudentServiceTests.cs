@@ -1,4 +1,5 @@
 using Application.Domain.Exceptions;
+using Application.Domain.Localization;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.Students;
 using Application.Domain.Model.Students.Dtos;
@@ -15,13 +16,13 @@ namespace Application.Tests.Services
     public class StudentServiceTests : BaseTest
     {
         private readonly IStudentService _studentService;
-        private readonly IStringLocalizer<Application.Domain.SharedResource> _localizer;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
         public StudentServiceTests()
         {
             _studentService = _serviceProvider.GetService<IStudentService>()
                 ?? throw new Exception($"{nameof(IStudentService)} não foi encontrado");
-            _localizer = _serviceProvider.GetService<IStringLocalizer<Application.Domain.SharedResource>>()
+            _localizer = _serviceProvider.GetService<IStringLocalizer<SharedResource>>()
                 ?? throw new Exception("Localizador não encontrado");
         }
 

@@ -1,4 +1,3 @@
-using Application.Domain;
 using Application.Domain.Exceptions;
 using Application.Domain.Interface.Todo;
 using Application.Domain.Model.Todo;
@@ -8,6 +7,7 @@ using HtmlAgilityPack;
 using FluentValidation;
 using Ganss.Xss;
 using Microsoft.Extensions.Localization;
+using Application.Domain.Localization;
 
 namespace Application.Service.Service
 {

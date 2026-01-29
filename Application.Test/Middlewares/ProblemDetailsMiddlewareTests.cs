@@ -1,8 +1,8 @@
 using System.Globalization;
 using System.Text.Json;
 using Application.Api.Middlewares;
-using Application.Domain;
 using Application.Domain.Exceptions;
+using Application.Domain.Localization;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
