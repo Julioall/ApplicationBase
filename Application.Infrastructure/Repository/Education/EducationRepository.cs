@@ -140,17 +140,17 @@ namespace Application.Infrastructure.Repository.Education
             return classDoc;
         }
 
-        public async Task<UcUpsertResult> UpsertUcAsync(UcDocument uc, CancellationToken cancellationToken = default)
+        public async Task<CourseUnitUpsertResult> UpsertCourseUnitAsync(CourseUnit uc, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(uc);
-            var id = $"ucs/{uc.EadId}";
+            var id = $"course-units/{uc.EadId}";
 
-            var existing = await _serviceRavenDb.AsyncSession.LoadAsync<UcDocument>(id, cancellationToken);
+            var existing = await _serviceRavenDb.AsyncSession.LoadAsync<CourseUnit>(id, cancellationToken);
             if (existing == null)
             {
                 uc.Id = id;
                 await _serviceRavenDb.AsyncSession.StoreAsync(uc, id, cancellationToken);
-                return new UcUpsertResult
+                return new CourseUnitUpsertResult
                 {
                     Created = true,
                     Updated = true,
@@ -195,18 +195,6 @@ namespace Application.Infrastructure.Repository.Education
                 updated = true;
             }
 
-            if (!string.Equals(existing.SchoolNameDerived, uc.SchoolNameDerived, StringComparison.Ordinal))
-            {
-                existing.SchoolNameDerived = uc.SchoolNameDerived;
-                updated = true;
-            }
-
-            if (!string.Equals(existing.ProgramNameDerived, uc.ProgramNameDerived, StringComparison.Ordinal))
-            {
-                existing.ProgramNameDerived = uc.ProgramNameDerived;
-                updated = true;
-            }
-
             if (!string.Equals(existing.PeriodTextDerived, uc.PeriodTextDerived, StringComparison.Ordinal))
             {
                 existing.PeriodTextDerived = uc.PeriodTextDerived;
@@ -218,7 +206,7 @@ namespace Application.Infrastructure.Repository.Education
                 await _serviceRavenDb.AsyncSession.StoreAsync(existing, id, cancellationToken);
             }
 
-            return new UcUpsertResult
+            return new CourseUnitUpsertResult
             {
                 Created = false,
                 Updated = updated,
@@ -226,21 +214,21 @@ namespace Application.Infrastructure.Repository.Education
             };
         }
 
-        public async Task<IReadOnlyCollection<UcUpsertResult>> UpsertUcBatchAsync(IEnumerable<UcDocument> ucs, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyCollection<CourseUnitUpsertResult>> UpsertCourseUnitBatchAsync(IEnumerable<CourseUnit> ucs, CancellationToken cancellationToken = default)
         {
             var ucList = ucs.ToList();
             if (ucList.Count == 0)
             {
-                return Array.Empty<UcUpsertResult>();
+                return Array.Empty<CourseUnitUpsertResult>();
             }
 
             // Generate IDs for all documents
-            var idsToLoad = ucList.Select(uc => $"ucs/{uc.EadId}").ToList();
+            var idsToLoad = ucList.Select(uc => $"course-units/{uc.EadId}").ToList();
 
             // Load all existing documents in a single batch call
-            var existingDocs = await _serviceRavenDb.AsyncSession.LoadAsync<UcDocument>(idsToLoad, cancellationToken);
+            var existingDocs = await _serviceRavenDb.AsyncSession.LoadAsync<CourseUnit>(idsToLoad, cancellationToken);
 
-            var results = new List<UcUpsertResult>(ucList.Count);
+            var results = new List<CourseUnitUpsertResult>(ucList.Count);
 
             foreach (var uc in ucList)
             {
@@ -252,7 +240,7 @@ namespace Application.Infrastructure.Repository.Education
                     // New document
                     uc.Id = id;
                     await _serviceRavenDb.AsyncSession.StoreAsync(uc, id, cancellationToken);
-                    results.Add(new UcUpsertResult
+                    results.Add(new CourseUnitUpsertResult
                     {
                         Created = true,
                         Updated = true,
@@ -297,18 +285,6 @@ namespace Application.Infrastructure.Repository.Education
                 if (!string.Equals(existing.CourseCategory, uc.CourseCategory, StringComparison.Ordinal))
                 {
                     existing.CourseCategory = uc.CourseCategory;
-                    updated = true;
-                }
-
-                if (!string.Equals(existing.SchoolNameDerived, uc.SchoolNameDerived, StringComparison.Ordinal))
-                {
-                    existing.SchoolNameDerived = uc.SchoolNameDerived;
-                    updated = true;
-                }
-
-                if (!string.Equals(existing.ProgramNameDerived, uc.ProgramNameDerived, StringComparison.Ordinal))
-                {
-                    existing.ProgramNameDerived = uc.ProgramNameDerived;
                     updated = true;
                 }
 
@@ -367,7 +343,7 @@ namespace Application.Infrastructure.Repository.Education
                 }
 
                 // RavenDB tracks changes automatically, no need to call StoreAsync for updates
-                results.Add(new UcUpsertResult
+                results.Add(new CourseUnitUpsertResult
                 {
                     Created = false,
                     Updated = updated,
@@ -378,18 +354,18 @@ namespace Application.Infrastructure.Repository.Education
             return results;
         }
 
-        public Task<UcDocument?> GetUcByEadIdAsync(int eadId, CancellationToken cancellationToken = default)
+        public Task<CourseUnit?> GetCourseUnitByEadIdAsync(int eadId, CancellationToken cancellationToken = default)
         {
-            var id = $"ucs/{eadId}";
-            return _serviceRavenDb.AsyncSession.LoadAsync<UcDocument?>(id, cancellationToken);
+            var id = $"course-units/{eadId}";
+            return _serviceRavenDb.AsyncSession.LoadAsync<CourseUnit?>(id, cancellationToken);
         }
 
-        public async Task<ClassUcMap> EnsureClassUcMapAsync(string classId, string ucId, CancellationToken cancellationToken = default)
+        public async Task<ClassUcMap> EnsureClassCourseUnitMapAsync(string classId, string courseUnitId, CancellationToken cancellationToken = default)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(classId);
-            ArgumentException.ThrowIfNullOrWhiteSpace(ucId);
+            ArgumentException.ThrowIfNullOrWhiteSpace(courseUnitId);
 
-            var mapId = $"class_uc_maps/{classId}/{ucId}";
+            var mapId = $"class_uc_maps/{classId}/{courseUnitId}";
             var existing = await _serviceRavenDb.AsyncSession.LoadAsync<ClassUcMap>(mapId, cancellationToken);
             if (existing != null)
             {
@@ -400,7 +376,7 @@ namespace Application.Infrastructure.Repository.Education
             {
                 Id = mapId,
                 ClassId = classId,
-                UcId = ucId,
+                CourseUnitId = courseUnitId,
                 ImportedAt = DateTime.UtcNow
             };
 
@@ -408,12 +384,12 @@ namespace Application.Infrastructure.Repository.Education
             return map;
         }
 
-        public async Task<StudentUcMap> EnsureStudentUcMapAsync(string studentId, string ucId, CancellationToken cancellationToken = default)
+        public async Task<StudentUcMap> EnsureStudentCourseUnitMapAsync(string studentId, string courseUnitId, CancellationToken cancellationToken = default)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(studentId);
-            ArgumentException.ThrowIfNullOrWhiteSpace(ucId);
+            ArgumentException.ThrowIfNullOrWhiteSpace(courseUnitId);
 
-            var mapId = $"student_uc_maps/{studentId}/{ucId}";
+            var mapId = $"student_uc_maps/{studentId}/{courseUnitId}";
             var existing = await _serviceRavenDb.AsyncSession.LoadAsync<StudentUcMap>(mapId, cancellationToken);
             if (existing != null)
             {
@@ -424,7 +400,7 @@ namespace Application.Infrastructure.Repository.Education
             {
                 Id = mapId,
                 StudentId = studentId,
-                UcId = ucId,
+                CourseUnitId = courseUnitId,
                 ImportedAt = DateTime.UtcNow
             };
 
@@ -432,13 +408,13 @@ namespace Application.Infrastructure.Repository.Education
             return map;
         }
 
-        public async Task<IReadOnlyCollection<Student>> GetStudentsByUcAsync(string ucId, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyCollection<Student>> GetStudentsByCourseUnitAsync(string courseUnitId, CancellationToken cancellationToken = default)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(ucId);
+            ArgumentException.ThrowIfNullOrWhiteSpace(courseUnitId);
 
             var mappings = await _serviceRavenDb.AsyncSession.Query<StudentUcMap, StudentUcMaps_ByUc>()
                 .Customize(x => x.WaitForNonStaleResults())
-                .Where(m => m.UcId == ucId)
+                .Where(m => m.CourseUnitId == courseUnitId)
                 .ToListAsync(cancellationToken);
 
             if (mappings.Count == 0)
@@ -457,14 +433,14 @@ namespace Application.Infrastructure.Repository.Education
                 .ToList();
         }
 
-        public async Task<IReadOnlyCollection<StudentUcDto>> GetStudentsByUcWithPerformanceAsync(string ucId, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyCollection<StudentUcDto>> GetStudentsByCourseUnitWithPerformanceAsync(string ucId, CancellationToken cancellationToken = default)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(ucId);
 
             // Buscar mapeamentos de studentId -> ucId
             var mappings = await _serviceRavenDb.AsyncSession.Query<StudentUcMap, StudentUcMaps_ByUc>()
                 .Customize(x => x.WaitForNonStaleResults())
-                .Where(m => m.UcId == ucId)
+                .Where(m => m.CourseUnitId == ucId)
                 .ToListAsync(cancellationToken);
 
             if (mappings.Count == 0)
@@ -479,9 +455,9 @@ namespace Application.Infrastructure.Repository.Education
 
             // Buscar performances para este UC (sem usar variável capturada)
             // RavenDB não consegue resolver variáveis locais em Where, então convertemos ucId para constante dentro da query
-            var performancesList = await _serviceRavenDb.AsyncSession.Query<StudentUcPerformance>()
+            var performancesList = await _serviceRavenDb.AsyncSession.Query<StudentCourseUnitPerformance>()
                 .Customize(x => x.WaitForNonStaleResults())
-                .Where(p => p.UcId == ucId)
+                .Where(p => p.CourseUnitId == ucId)
                 .ToListAsync(cancellationToken);
 
             // Filtrar performances apenas para os students desta UC
@@ -498,7 +474,7 @@ namespace Application.Infrastructure.Repository.Education
             // Carregar configuração de atividades ocultas para esta UC
             var hiddenConfig = await _serviceRavenDb.AsyncSession
                 .Query<HiddenActivitiesConfig>()
-                .Where(c => c.UcId == ucId)
+                .Where(c => c.CourseUnitId == ucId)
                 .FirstOrDefaultAsync(cancellationToken);
 
             var hiddenActivityNames = hiddenConfig?.HiddenActivityNames ?? new List<string>();
@@ -613,16 +589,16 @@ namespace Application.Infrastructure.Repository.Education
             return classes;
         }
 
-        public async Task<IReadOnlyCollection<UcDocument>> GetUcsByClassAsync(string classId, string? search = null, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyCollection<CourseUnit>> GetCourseUnitsByClassAsync(string classId, string? search = null, CancellationToken cancellationToken = default)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(classId);
 
             search = NormalizeNull(search);
 
-            var query = _serviceRavenDb.AsyncSession.Query<ClassUcMap, UcSearchIndex>()
+            var query = _serviceRavenDb.AsyncSession.Query<ClassUcMap, CourseUnitSearchIndex>()
                 .Customize(x => x.WaitForNonStaleResults())
                 .Where(m => m.ClassId == classId)
-                .ProjectInto<UcSearchIndex.Result>();
+                .ProjectInto<CourseUnitSearchIndex.Result>();
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -636,20 +612,20 @@ namespace Application.Infrastructure.Repository.Education
 
             if (results.Count == 0)
             {
-                return Array.Empty<UcDocument>();
+                return Array.Empty<CourseUnit>();
             }
 
-            var ucIds = results.Select(m => m.UcId).Distinct().ToList();
-            var loaded = await _serviceRavenDb.AsyncSession.LoadAsync<UcDocument>(ucIds, cancellationToken);
+            var courseUnitIds = results.Select(m => m.CourseUnitId).Distinct().ToList();
+            var loaded = await _serviceRavenDb.AsyncSession.LoadAsync<CourseUnit>(courseUnitIds, cancellationToken);
 
             return results
-                .Select(r => loaded.TryGetValue(r.UcId, out var uc) ? uc : null)
+                .Select(r => loaded.TryGetValue(r.CourseUnitId, out var uc) ? uc : null)
                 .Where(uc => uc != null)
                 .Select(uc => uc!)
                 .ToList();
         }
 
-        public async Task<PagedResult<UcDocument>> SearchUcsAsync(string? search, string? classId, string? programId, PaginationQuery query, CancellationToken cancellationToken = default)
+        public async Task<PagedResult<CourseUnit>> SearchCourseUnitsAsync(string? search, string? classId, string? programId, PaginationQuery query, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(query);
 
@@ -659,9 +635,9 @@ namespace Application.Infrastructure.Repository.Education
             classId = NormalizeNull(classId);
             programId = NormalizeNull(programId);
 
-            var ravenQuery = _serviceRavenDb.AsyncSession.Query<ClassUcMap, UcSearchIndex>()
+            var ravenQuery = _serviceRavenDb.AsyncSession.Query<ClassUcMap, CourseUnitSearchIndex>()
                 .Customize(x => x.WaitForNonStaleResults())
-                .ProjectInto<UcSearchIndex.Result>();
+                .ProjectInto<CourseUnitSearchIndex.Result>();
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -687,24 +663,24 @@ namespace Application.Infrastructure.Repository.Education
 
             if (results.Count == 0)
             {
-                return new PagedResult<UcDocument>
+                return new PagedResult<CourseUnit>
                 {
-                    Items = Array.Empty<UcDocument>(),
+                    Items = Array.Empty<CourseUnit>(),
                     Total = 0,
                     PageNumber = pageNumber,
                     PageSize = pageSize
                 };
             }
 
-            var ucIds = results.Select(r => r.UcId).Distinct().ToList();
-            var loaded = await _serviceRavenDb.AsyncSession.LoadAsync<UcDocument>(ucIds, cancellationToken);
+            var courseUnitIds = results.Select(r => r.CourseUnitId).Distinct().ToList();
+            var loaded = await _serviceRavenDb.AsyncSession.LoadAsync<CourseUnit>(courseUnitIds, cancellationToken);
             var items = results
-                .Select(r => loaded.TryGetValue(r.UcId, out var uc) ? uc : null)
+                .Select(r => loaded.TryGetValue(r.CourseUnitId, out var uc) ? uc : null)
                 .Where(uc => uc != null)
                 .Select(uc => uc!)
                 .ToList();
 
-            return new PagedResult<UcDocument>
+            return new PagedResult<CourseUnit>
             {
                 Items = items,
                 Total = total,
@@ -736,8 +712,8 @@ namespace Application.Infrastructure.Repository.Education
                 return;
             }
 
-            var ucIds = mappings.Select(m => m.UcId).Distinct().ToList();
-            var loaded = await _serviceRavenDb.AsyncSession.LoadAsync<UcDocument>(ucIds, cancellationToken);
+            var ucIds = mappings.Select(m => m.CourseUnitId).Distinct().ToList();
+            var loaded = await _serviceRavenDb.AsyncSession.LoadAsync<CourseUnit>(ucIds, cancellationToken);
             var ucs = loaded.Values.Where(v => v != null).Select(v => v!).ToList();
 
             if (ucs.Count == 0)

@@ -4,14 +4,14 @@ namespace Application.Domain.Interface
 {
     public interface IStudentUcPerformanceRepository
     {
-        Task<StudentUcPerformance?> GetByStudentAndUcAsync(string studentId, string ucId);
-        Task<IEnumerable<string>> GetUcsByStudentAsync(string studentId);
-        Task<IEnumerable<StudentUcPerformance>> GetStudentUcPerformanceAsync(string studentId);
-        Task SaveAsync(StudentUcPerformance performance);
-        Task UpdateAsync(StudentUcPerformance performance);
-        Task<Dictionary<string, StudentUcPerformance>> GetByStudentAndUcBatchAsync(List<(string StudentId, string UcId)> pairs);
-        Task<Dictionary<string, StudentUcPerformance>> GetAllByStudentAsync(string studentId);
-        Task<HiddenActivitiesConfig?> GetHiddenActivitiesAsync(string ucId);
+        Task<StudentCourseUnitPerformance?> GetByStudentAndCourseUnitAsync(string studentId, string courseUnitId);
+        Task<IEnumerable<string>> GetCourseUnitsByStudentAsync(string studentId);
+        Task<IEnumerable<StudentCourseUnitPerformance>> GetStudentCourseUnitPerformanceAsync(string studentId);
+        Task SaveAsync(StudentCourseUnitPerformance performance);
+        Task UpdateAsync(StudentCourseUnitPerformance performance);
+        Task<Dictionary<string, StudentCourseUnitPerformance>> GetByStudentAndCourseUnitBatchAsync(List<(string StudentId, string CourseUnitId)> pairs);
+        Task<Dictionary<string, StudentCourseUnitPerformance>> GetAllByStudentAsync(string studentId);
+        Task<HiddenActivitiesConfig?> GetHiddenActivitiesAsync(string courseUnitId);
         Task SaveHiddenActivitiesAsync(HiddenActivitiesConfig config);
     }
 }

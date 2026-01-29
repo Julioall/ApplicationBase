@@ -187,8 +187,8 @@ namespace Application.Api.Background
                     }
                 }
 
-                // 3. Mapear cursos para UcDocuments (batch processing para evitar limite de requisições do RavenDB)
-                var ucsToUpsert = new List<UcDocument>();
+                // 3. Mapear cursos para CourseUnits (batch processing para evitar limite de requisições do RavenDB)
+                var courseUnitsToUpsert = new List<CourseUnit>();
                 foreach (var curso in cursos)
                 {
                     // Extrair a hierarquia completa da categoria
@@ -236,7 +236,7 @@ namespace Application.Api.Background
                         }
                     }
 
-                    var uc = new UcDocument
+                    var courseUnit = new CourseUnit
                     {
                         EadId = curso.Id,
                         Fullname = curso.FullName ?? curso.DisplayName ?? string.Empty,
@@ -258,12 +258,6 @@ namespace Application.Api.Background
                         EventName = eventName,
                         EventMoodleId = eventMoodleId,
 
-                        // Campos legados (mantidos para compatibilidade)
-#pragma warning disable CS0618 // Type or member is obsolete
-                        SchoolNameDerived = eventName ?? schoolName, // Fallback para compatibilidade
-                        ProgramNameDerived = courseName ?? curso.FullName ?? curso.DisplayName ?? string.Empty,
-#pragma warning restore CS0618
-
                         PeriodTextDerived = (curso.StartDate.HasValue && curso.EndDate.HasValue)
                             ? $"{DateTimeOffset.FromUnixTimeSeconds(curso.StartDate.Value).UtcDateTime:dd/MM/yyyy} a {DateTimeOffset.FromUnixTimeSeconds(curso.EndDate.Value).UtcDateTime:dd/MM/yyyy}"
                             : null,
@@ -276,14 +270,14 @@ namespace Application.Api.Background
                         IdNumber = curso.IdNumber,
                         Lang = curso.Lang
                     };
-                    ucsToUpsert.Add(uc);
+                    courseUnitsToUpsert.Add(courseUnit);
                 }
 
                 // Upsert todos os cursos em uma única operação batch
-                if (ucsToUpsert.Count > 0)
+                if (courseUnitsToUpsert.Count > 0)
                 {
-                    _logger.LogInformation("Upserting {Count} courses in batch", ucsToUpsert.Count);
-                    await _educationRepository.UpsertUcBatchAsync(ucsToUpsert, cancellationToken);
+                    _logger.LogInformation("Upserting {Count} courses in batch", courseUnitsToUpsert.Count);
+                    await _educationRepository.UpsertCourseUnitBatchAsync(courseUnitsToUpsert, cancellationToken);
                 }
 
 

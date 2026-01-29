@@ -160,6 +160,97 @@ namespace Application.Api.Controllers
             return Ok(status);
         }
 
+        #region Category Hierarchy Endpoints
+
+        /// <summary>
+        /// Retorna todas as instituições (depth 1) - Ex: SENAI, SESI
+        /// </summary>
+        [HttpGet("hierarchy/institutions")]
+        [Authorize(Policy = ApplicationPermissions.ViewEducation)]
+        [ProducesResponseType(typeof(IReadOnlyCollection<MoodleCategory>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetInstitutions(CancellationToken cancellationToken)
+        {
+            var institutions = await _moodleService.GetInstitutionsAsync(cancellationToken);
+            return Ok(institutions);
+        }
+
+        /// <summary>
+        /// Retorna todas as escolas (depth 2) de uma instituição
+        /// </summary>
+        [HttpGet("hierarchy/institutions/{institutionMoodleId}/schools")]
+        [Authorize(Policy = ApplicationPermissions.ViewEducation)]
+        [ProducesResponseType(typeof(IReadOnlyCollection<MoodleCategory>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetSchoolsByInstitution(int institutionMoodleId, CancellationToken cancellationToken)
+        {
+            if (institutionMoodleId <= 0)
+            {
+                return Problem(
+                    title: _localizer["InvalidRequestTitle"],
+                    detail: "Invalid institution Moodle ID",
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            var schools = await _moodleService.GetSchoolsByInstitutionAsync(institutionMoodleId, cancellationToken);
+            return Ok(schools);
+        }
+
+        /// <summary>
+        /// Retorna todos os cursos/programas (depth 3) de uma escola
+        /// </summary>
+        [HttpGet("hierarchy/schools/{schoolMoodleId}/courses")]
+        [Authorize(Policy = ApplicationPermissions.ViewEducation)]
+        [ProducesResponseType(typeof(IReadOnlyCollection<MoodleCategory>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetCoursesBySchool(int schoolMoodleId, CancellationToken cancellationToken)
+        {
+            if (schoolMoodleId <= 0)
+            {
+                return Problem(
+                    title: _localizer["InvalidRequestTitle"],
+                    detail: "Invalid school Moodle ID",
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            var courses = await _moodleService.GetCoursesBySchoolAsync(schoolMoodleId, cancellationToken);
+            return Ok(courses);
+        }
+
+        /// <summary>
+        /// Retorna todos os eventos/turmas (depth 4) de um curso
+        /// </summary>
+        [HttpGet("hierarchy/courses/{courseMoodleId}/events")]
+        [Authorize(Policy = ApplicationPermissions.ViewEducation)]
+        [ProducesResponseType(typeof(IReadOnlyCollection<MoodleCategory>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetEventsByCourse(int courseMoodleId, CancellationToken cancellationToken)
+        {
+            if (courseMoodleId <= 0)
+            {
+                return Problem(
+                    title: _localizer["InvalidRequestTitle"],
+                    detail: "Invalid course Moodle ID",
+                    statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            var events = await _moodleService.GetEventsByCourseAsync(courseMoodleId, cancellationToken);
+            return Ok(events);
+        }
+
+        /// <summary>
+        /// Constrói e retorna a hierarquia completa de categorias a partir de um path
+        /// </summary>
+        [HttpGet("hierarchy")]
+        [Authorize(Policy = ApplicationPermissions.ViewEducation)]
+        [ProducesResponseType(typeof(MoodleCategoryHierarchy), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetCategoryHierarchy([FromQuery] string? path, CancellationToken cancellationToken)
+        {
+            var hierarchy = await _moodleService.GetCategoryHierarchyAsync(path, cancellationToken);
+            return Ok(hierarchy);
+        }
+
+        #endregion
+
         [HttpPost("sync/trigger")]
         [Authorize(Policy = ApplicationPermissions.ViewEducation)]
         [ProducesResponseType(typeof(MoodleSyncStatus), StatusCodes.Status202Accepted)]

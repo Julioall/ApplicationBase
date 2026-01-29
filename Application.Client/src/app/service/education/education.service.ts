@@ -3,10 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../environment/environment';
-import { EducationSchool } from '../../model/education-school';
-import { EducationProgram } from '../../model/education-program';
-import { EducationClass } from '../../model/education-class';
-import { EducationUc } from '../../model/education-uc';
+import { MoodleCategory, School, Program, Class } from '../../model/moodle-category';
+import { CourseUnit } from '../../model/course-unit';
 import { EducationSyncStatus } from '../../model/education-sync-status';
 import { PagedResult } from '../../model/paged-result';
 import { UcSearchQuery } from '../../model/uc-search-query';
@@ -21,20 +19,20 @@ export class EducationService {
 
   constructor(private readonly http: HttpClient) {}
 
-  getSchools(): Observable<EducationSchool[]> {
-    return this.http.get<EducationSchool[]>(`${this.apiUrl}/schools`)
+  getSchools(): Observable<School[]> {
+    return this.http.get<School[]>(`${this.apiUrl}/schools`)
       .pipe(catchError(this.handleError));
   }
 
-  getPrograms(schoolId: string): Observable<EducationProgram[]> {
+  getPrograms(schoolId: string): Observable<Program[]> {
     const params = new HttpParams().set('schoolId', schoolId);
-    return this.http.get<EducationProgram[]>(`${this.apiUrl}/programs`, { params })
+    return this.http.get<Program[]>(`${this.apiUrl}/programs`, { params })
       .pipe(catchError(this.handleError));
   }
 
-  getClasses(programId: string): Observable<EducationClass[]> {
+  getClasses(programId: string): Observable<Class[]> {
     const params = new HttpParams().set('programId', programId);
-    return this.http.get<EducationClass[]>(`${this.apiUrl}/classes`, { params })
+    return this.http.get<Class[]>(`${this.apiUrl}/classes`, { params })
       .pipe(catchError(this.handleError));
   }
 
@@ -48,7 +46,7 @@ export class EducationService {
       .pipe(catchError(this.handleError));
   }
 
-  searchUcs(query: UcSearchQuery, classId?: string, programId?: string): Observable<PagedResult<EducationUc>> {
+  searchCourseUnits(query: UcSearchQuery, classId?: string, programId?: string): Observable<PagedResult<CourseUnit>> {
     let params = new HttpParams();
 
     if (query.PageNumber) {
@@ -67,26 +65,26 @@ export class EducationService {
       params = params.set('programId', programId);
     }
 
-    return this.http.get<PagedResult<EducationUc>>(`${this.apiUrl}/ucs/search`, { params })
+    return this.http.get<PagedResult<CourseUnit>>(`${this.apiUrl}/course-units/search`, { params })
       .pipe(catchError(this.handleError));
   }
 
-  getClassUcs(classId: string): Observable<EducationUc[]> {
+  getClassCourseUnits(classId: string): Observable<CourseUnit[]> {
     const params = new HttpParams().set('classId', classId);
 
-    return this.http.get<EducationUc[]>(`${this.apiUrl}/ucs`, { params }).pipe(catchError(this.handleError));
+    return this.http.get<CourseUnit[]>(`${this.apiUrl}/course-units`, { params }).pipe(catchError(this.handleError));
   }
 
-  getUcStudents(eadId: number): Observable<StudentUcDto[]> {
+  getCourseUnitStudents(eadId: number): Observable<StudentUcDto[]> {
     const params = new HttpParams().set('eadId', eadId);
-    return this.http.get<StudentUcDto[]>(`${this.apiUrl}/ucs/students`, { params })
+    return this.http.get<StudentUcDto[]>(`${this.apiUrl}/course-units/students`, { params })
       .pipe(catchError(this.handleError));
   }
 
-  toggleActivityHidden(studentId: string, ucId: string, activityName: string): Observable<void> {
+  toggleActivityHidden(studentId: string, courseUnitId: string, activityName: string): Observable<void> {
     const params = new HttpParams()
       .set('studentId', studentId)
-      .set('ucId', ucId)
+      .set('courseUnitId', courseUnitId)
       .set('activityName', activityName);
     return this.http.patch<void>(`${this.apiUrl}/students/activities/toggle-hidden`, null, { params })
       .pipe(catchError(this.handleError));

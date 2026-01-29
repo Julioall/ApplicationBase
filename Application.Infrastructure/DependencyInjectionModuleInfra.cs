@@ -37,7 +37,7 @@ namespace Application.Infrastructure
             services.TryAddScoped<IUserRepository, UserRepository>();
             services.TryAddScoped<ISettingsRepository, SettingsRepository>();
             services.TryAddScoped<IStudentRepository, StudentRepository>();
-            services.TryAddScoped<IStudentUcPerformanceRepository, StudentUcPerformanceRepository>();
+            services.TryAddScoped<IStudentUcPerformanceRepository, StudentCourseUnitPerformanceRepository>();
             services.TryAddScoped<IEducationRepository, EducationRepository>();
             services.TryAddScoped<IMoodleRepository, MoodleRepository>();
             services.TryAddScoped<IStudentCoursePerformanceRepository, StudentCoursePerformanceRepository>();

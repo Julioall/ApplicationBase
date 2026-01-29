@@ -178,6 +178,50 @@ namespace Application.Service.Service.Moodle
             await _studentCoursePerformanceRepository.SaveHiddenActivitiesAsync(config);
         }
 
+        #region Category Hierarchy Methods
+
+        public Task<IReadOnlyCollection<MoodleCategory>> GetInstitutionsAsync(CancellationToken cancellationToken = default)
+        {
+            return _moodleRepository.GetInstitutionsAsync(cancellationToken);
+        }
+
+        public Task<IReadOnlyCollection<MoodleCategory>> GetSchoolsByInstitutionAsync(int institutionMoodleId, CancellationToken cancellationToken = default)
+        {
+            if (institutionMoodleId <= 0)
+            {
+                throw new ArgumentException("Invalid institution Moodle ID.", nameof(institutionMoodleId));
+            }
+
+            return _moodleRepository.GetSchoolsByInstitutionAsync(institutionMoodleId, cancellationToken);
+        }
+
+        public Task<IReadOnlyCollection<MoodleCategory>> GetCoursesBySchoolAsync(int schoolMoodleId, CancellationToken cancellationToken = default)
+        {
+            if (schoolMoodleId <= 0)
+            {
+                throw new ArgumentException("Invalid school Moodle ID.", nameof(schoolMoodleId));
+            }
+
+            return _moodleRepository.GetCoursesBySchoolAsync(schoolMoodleId, cancellationToken);
+        }
+
+        public Task<IReadOnlyCollection<MoodleCategory>> GetEventsByCourseAsync(int courseMoodleId, CancellationToken cancellationToken = default)
+        {
+            if (courseMoodleId <= 0)
+            {
+                throw new ArgumentException("Invalid course Moodle ID.", nameof(courseMoodleId));
+            }
+
+            return _moodleRepository.GetEventsByCourseAsync(courseMoodleId, cancellationToken);
+        }
+
+        public Task<MoodleCategoryHierarchy> GetCategoryHierarchyAsync(string? path, CancellationToken cancellationToken = default)
+        {
+            return _moodleRepository.GetCategoryHierarchyAsync(path, cancellationToken);
+        }
+
+        #endregion
+
         private void ThrowReadOnly()
         {
             throw new BusinessException(_localizer["MoodleReadOnly"]);

@@ -20,7 +20,7 @@ const routes: Routes = [
     data: { permissions: [VIEW_EDUCATION_PERMISSION] }
   },
   {
-    path: 'classes/:id/ucs/:ucId',
+    path: 'classes/:id/course-units/:courseUnitId',
     component: EducationClassDetailComponent,
     canActivate: [PermissionGuard],
     data: { permissions: [VIEW_EDUCATION_PERMISSION] }

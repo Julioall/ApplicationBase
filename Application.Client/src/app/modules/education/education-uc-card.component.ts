@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { EducationUc } from '../../model/education-uc';
+import { CourseUnit } from '../../model/course-unit';
 
 @Component({
   selector: 'app-education-uc-card',
@@ -7,5 +7,5 @@ import { EducationUc } from '../../model/education-uc';
   styleUrls: ['./education-uc-card.component.scss']
 })
 export class EducationUcCardComponent {
-  @Input() uc!: EducationUc;
+  @Input() uc!: CourseUnit;
 }

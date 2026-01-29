@@ -16,7 +16,7 @@ A aplicação **não mantém mais entidades de “Educação”** (escolas/progr
 ## O que mudou
 ### Removido / descontinuado
 - CRUD e armazenamento interno de:
-  - escolas / programas / turmas / UCs
+  - escolas / programas / turmas / CourseUnits
   - fluxos de importação (JSON/XLSX) e processamento em lote relacionados a Educação
 - Endpoints de **criação/atualização/exclusão** do módulo Educação (agora o app não “cria” esses dados).
 
@@ -78,7 +78,7 @@ A aplicação **não persiste** entidades educacionais como fonte de verdade. O 
 ## Arquitetura e Camadas (Backend)
 ### Domain (`Application.Domain`)
 - Mantém modelos/contratos essenciais (auth, erros, validações, constantes, i18n).
-- **Não** contém mais modelos de Educação como “entidades de negócio persistidas” (School/Program/Class/UC etc.).
+- **Não** contém mais modelos de Educação como “entidades de negócio persistidas” (School/Program/Class/CourseUnit etc.).
 - Pode conter **DTOs** para representar dados vindos do Moodle.
 
 ### Service (`Application.Service`)

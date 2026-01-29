@@ -33,5 +33,36 @@ namespace Application.Domain.Interface.Moodle
         /// Batch upsert multiple categories efficiently in a single operation.
         /// </summary>
         Task<IReadOnlyDictionary<int, MoodleCategory>> UpsertCategoriesBatchAsync(IEnumerable<MoodleCategoryDto> categories, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Retorna todas as categorias de um determinado nível de profundidade.
+        /// Depth 1 = Instituição, Depth 2 = Escola, Depth 3 = Curso, Depth 4 = Evento/Turma
+        /// </summary>
+        Task<IReadOnlyCollection<MoodleCategory>> GetCategoriesByDepthAsync(int depth, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Retorna todas as instituições (depth 1)
+        /// </summary>
+        Task<IReadOnlyCollection<MoodleCategory>> GetInstitutionsAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Retorna todas as escolas (depth 2) de uma instituição
+        /// </summary>
+        Task<IReadOnlyCollection<MoodleCategory>> GetSchoolsByInstitutionAsync(int institutionMoodleId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Retorna todos os cursos (depth 3) de uma escola
+        /// </summary>
+        Task<IReadOnlyCollection<MoodleCategory>> GetCoursesBySchoolAsync(int schoolMoodleId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Retorna todos os eventos/turmas (depth 4) de um curso
+        /// </summary>
+        Task<IReadOnlyCollection<MoodleCategory>> GetEventsByCourseAsync(int courseMoodleId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Constrói a hierarquia completa de categorias a partir do path de uma categoria
+        /// </summary>
+        Task<MoodleCategoryHierarchy> GetCategoryHierarchyAsync(string? path, CancellationToken cancellationToken = default);
     }
 }

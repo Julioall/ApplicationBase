@@ -11,7 +11,7 @@ namespace Application.Infrastructure.Indexes
             Map = maps => from map in maps
                           select new
                           {
-                              map.UcId,
+                              map.CourseUnitId,
                               map.StudentId,
                               map.ImportedAt
                           };

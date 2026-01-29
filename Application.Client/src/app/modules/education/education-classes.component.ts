@@ -5,7 +5,8 @@ import { finalize } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { EducationService } from '../../service/education/education.service';
-import { EducationUc } from '../../model/education-uc';
+import { CourseUnit } from '../../model/course-unit';
+import { PagedResult } from '../../model/paged-result';
 import { NotificationService } from '../../service/notification/notification.service';
 
 @Component({
@@ -13,8 +14,8 @@ import { NotificationService } from '../../service/notification/notification.ser
   templateUrl: './education-classes.component.html'
 })
 export class EducationClassesComponent implements OnInit, OnDestroy {
-  ucs: EducationUc[] = [];
-  groupedUcs: { category: string; items: EducationUc[] }[] = [];
+  ucs: CourseUnit[] = [];
+  groupedUcs: { category: string; items: CourseUnit[] }[] = [];
   loadingUcs = false;
   searchControl = new FormControl('');
   private searchSub?: Subscription;
@@ -37,7 +38,7 @@ export class EducationClassesComponent implements OnInit, OnDestroy {
     this.searchSub?.unsubscribe();
   }
 
-  openClassGroup(group: { category: string; items: EducationUc[] }): void {
+  openClassGroup(group: { category: string; items: CourseUnit[] }): void {
     const category = group.category;
     const classId = this.slugify(category);
     if (!classId) {
@@ -47,25 +48,25 @@ export class EducationClassesComponent implements OnInit, OnDestroy {
     const sample = group.items[0];
     const queryParams = {
       className: category,
-      programName: sample?.ProgramNameDerived || undefined,
-      schoolName: sample?.SchoolNameDerived || undefined
+      programName: sample?.CourseName || undefined,
+      schoolName: sample?.SchoolName || sample?.EventName || undefined
     };
 
     this.router.navigate(['/education', 'classes', classId], { queryParams });
   }
 
-  trackByUc(_: number, uc: EducationUc): string | number {
+  trackByUc(_: number, uc: CourseUnit): string | number {
     return uc.Id || uc.EadId;
   }
 
-  getGroupMeta(group: { category: string; items: EducationUc[] }): string {
+  getGroupMeta(group: { category: string; items: CourseUnit[] }): string {
     if (!group.items.length) {
       return this.translate.instant('classes.countLabel', { count: 0 });
     }
 
     const sample = group.items[0];
-    const program = sample.ProgramNameDerived || '-';
-    const school = sample.SchoolNameDerived || '-';
+    const program = sample.CourseName || '-';
+    const school = sample.SchoolName || sample.EventName || '-';
     const count = this.translate.instant('classes.countLabel', { count: group.items.length });
     return `${program} • ${school} • ${count}`;
   }
@@ -74,10 +75,10 @@ export class EducationClassesComponent implements OnInit, OnDestroy {
     this.loadingUcs = true;
     const search = (this.searchControl.value ?? '').toString().trim();
 
-    this.educationService.searchUcs({ PageNumber: 1, PageSize: 50, Search: search || undefined })
+    this.educationService.searchCourseUnits({ PageNumber: 1, PageSize: 50, Search: search || undefined })
       .pipe(finalize(() => this.loadingUcs = false))
       .subscribe({
-        next: (result) => {
+        next: (result: PagedResult<CourseUnit>) => {
           this.ucs = result.Items || [];
           this.groupedUcs = this.buildGroups(this.ucs);
         },
@@ -90,8 +91,8 @@ export class EducationClassesComponent implements OnInit, OnDestroy {
     this.notificationService.showError(detail, this.translate.instant('education.labels.error'));
   }
 
-  private buildGroups(items: EducationUc[]): { category: string; items: EducationUc[] }[] {
-    const groups = new Map<string, EducationUc[]>();
+  private buildGroups(items: CourseUnit[]): { category: string; items: CourseUnit[] }[] {
+    const groups = new Map<string, CourseUnit[]>();
     items.forEach(item => {
       const category = (item.CourseCategory || '').trim() || this.translate.instant('classes.uncategorized');
       const list = groups.get(category) ?? [];

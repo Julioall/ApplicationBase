@@ -1,7 +1,7 @@
 namespace Application.Domain.Model.Moodle
 {
     /// <summary>
-    /// Represents a Moodle course (formerly UC/Curricular Unit).
+    /// Represents a Moodle course (formerly CourseUnit/Curricular Unit).
     /// </summary>
     public class MoodleCourse
     {

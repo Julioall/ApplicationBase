@@ -421,7 +421,7 @@
     <value>Importação concluída</value>
   </data>
   <data name="NotificationImportCompletedMessage" xml:space="preserve">
-    <value>O arquivo {0} gerou {1} UCs novas, {2} atualizadas e {3} vínculos.</value>
+    <value>O arquivo {0} gerou {1} CourseUnits novas, {2} atualizadas e {3} vínculos.</value>
   </data>
   <data name="NotificationImportFailedTitle" xml:space="preserve">
     <value>Falha na importação</value>

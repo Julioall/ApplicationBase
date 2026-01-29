@@ -15,10 +15,10 @@
       <div class="flex flex-col gap-4 rounded-xl bg-gradient-to-br from-surface to-surface-alt px-6 py-5 shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.05)] lg:flex-row lg:items-center lg:justify-between">
         <div class="space-y-2">
           <h1 class="text-3xl font-semibold text-text-primary">
-            {{ isUcDetail ? (selectedUc?.Fullname || ('education.ucDetail.title' | translate)) : (className || ('education.classDetail.title' | translate)) }}
+            {{ isCourseUnitDetail ? (selectedCourseUnit?.Fullname || ('education.ucDetail.title' | translate)) : (className || ('education.classDetail.title' | translate)) }}
           </h1>
           <p class="text-base text-text-subtle">
-            {{ isUcDetail ? ('education.ucDetail.subtitle' | translate) : ('education.classDetail.subtitle' | translate) }}
+            {{ isCourseUnitDetail ? ('education.ucDetail.subtitle' | translate) : ('education.classDetail.subtitle' | translate) }}
           </p>
         </div>
       </div>
@@ -44,15 +44,15 @@
           <span class="font-semibold">{{ 'education.labels.period' | translate }}:</span>
           <span>{{ displayPeriodText }}</span>
         </div>
-        <div class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-raised px-3 py-1 text-sm text-text-primary" *ngIf="isUcDetail && selectedUc?.ViewUrl">
+        <div class="inline-flex items-center gap-2 rounded-full border border-border-soft bg-surface-raised px-3 py-1 text-sm text-text-primary" *ngIf="isCourseUnitDetail && selectedCourseUnit?.ViewUrl">
           <i class="fa-solid fa-arrow-up-right-from-square text-accent" aria-hidden="true"></i>
-          <a class="font-semibold text-accent hover:text-accent-strong" [href]="selectedUc?.ViewUrl" target="_blank" rel="noreferrer">
+          <a class="font-semibold text-accent hover:text-accent-strong" [href]="selectedCourseUnit?.ViewUrl" target="_blank" rel="noreferrer">
             {{ 'education.labels.viewCourse' | translate }}
           </a>
         </div>
       </div>
 
-      <section class="rounded-xl border border-border-soft bg-surface-alt/70 p-4 shadow-soft lg:p-5" *ngIf="isUcDetail && selectedUc; else classList">
+      <section class="rounded-xl border border-border-soft bg-surface-alt/70 p-4 shadow-soft lg:p-5" *ngIf="isCourseUnitDetail && selectedCourseUnit; else classList">
         <div class="flex items-start justify-between gap-3 border-b border-border-soft pb-4">
           <div class="space-y-1">
             <h2 class="text-xl font-semibold text-text-primary">{{ 'education.ucDetail.studentsTitle' | translate }}</h2>
@@ -194,7 +194,7 @@
         <section *ngIf="units.length; else emptyState" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           <article
             class="group relative isolate flex cursor-pointer flex-col gap-4 overflow-hidden rounded-xl border border-accent-soft bg-gradient-to-br from-surface-alt via-surface to-accent-soft/20 p-4 shadow-soft transition hover:-translate-y-0.5 hover:border-accent-strong hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-            *ngFor="let uc of units; trackBy: trackByUc"
+            *ngFor="let uc of units; trackBy: trackByCourseUnit"
             role="button"
             tabindex="0"
             (click)="openUc(uc)"
@@ -216,7 +216,7 @@
 
             <div class="space-y-3">
               <p class="text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-text-muted">
-                {{ programName || uc.ProgramNameDerived }}
+                {{ programName || uc.CourseName }}
               </p>
               <div class="overflow-hidden rounded-lg border border-border-soft bg-surface-alt">
                 <ng-container *ngIf="uc.CourseImage; else coverPlaceholder">
@@ -229,7 +229,7 @@
                 </ng-template>
               </div>
               <h3 class="text-lg font-semibold text-text-primary">{{ uc.Fullname }}</h3>
-              <p class="text-sm text-text-subtle">{{ uc.SchoolNameDerived || schoolName }}</p>
+              <p class="text-sm text-text-subtle">{{ uc.SchoolName || uc.EventName || schoolName }}</p>
             </div>
 
             <div class="mt-auto flex items-center gap-2 text-sm font-semibold text-text-primary">

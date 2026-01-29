@@ -59,16 +59,16 @@ namespace Application.Service.Service
             return _educationRepository.GetClassesByProgramAsync(programId, cancellationToken);
         }
 
-        public Task<IReadOnlyCollection<UcDocument>> GetUcsByClassAsync(string classId, string? search = null, CancellationToken cancellationToken = default)
+        public Task<IReadOnlyCollection<CourseUnit>> GetCourseUnitsByClassAsync(string classId, string? search = null, CancellationToken cancellationToken = default)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(classId);
-            return _educationRepository.GetUcsByClassAsync(classId, search, cancellationToken);
+            return _educationRepository.GetCourseUnitsByClassAsync(classId, search, cancellationToken);
         }
 
-        public Task<PagedResult<UcDocument>> SearchUcsAsync(PaginationQuery query, string? classId = null, string? programId = null, CancellationToken cancellationToken = default)
+        public Task<PagedResult<CourseUnit>> SearchCourseUnitsAsync(PaginationQuery query, string? classId = null, string? programId = null, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(query);
-            return _educationRepository.SearchUcsAsync(query.Search, classId, programId, query, cancellationToken);
+            return _educationRepository.SearchCourseUnitsAsync(query.Search, classId, programId, query, cancellationToken);
         }
 
         public Task<EducationSyncStatus> GetSyncStatusAsync(CancellationToken cancellationToken = default)
@@ -112,61 +112,61 @@ namespace Application.Service.Service
             return status;
         }
 
-        public async Task<IReadOnlyCollection<Student>> GetStudentsByUcEadIdAsync(int eadId, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyCollection<Student>> GetStudentsByCourseUnitEadIdAsync(int eadId, CancellationToken cancellationToken = default)
         {
             if (eadId <= 0)
             {
-                throw new ArgumentException("Invalid UC id.", nameof(eadId));
+                throw new ArgumentException("Invalid CourseUnit id.", nameof(eadId));
             }
 
-            var uc = await _educationRepository.GetUcByEadIdAsync(eadId, cancellationToken);
+            var uc = await _educationRepository.GetCourseUnitByEadIdAsync(eadId, cancellationToken);
             if (uc == null || string.IsNullOrWhiteSpace(uc.Id))
             {
                 return Array.Empty<Student>();
             }
 
-            return await _educationRepository.GetStudentsByUcAsync(uc.Id, cancellationToken);
+            return await _educationRepository.GetStudentsByCourseUnitAsync(uc.Id, cancellationToken);
         }
 
-        public async Task<IReadOnlyCollection<StudentUcDto>> GetStudentsByUcEadIdWithPerformanceAsync(int eadId, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyCollection<StudentUcDto>> GetStudentsByCourseUnitEadIdWithPerformanceAsync(int eadId, CancellationToken cancellationToken = default)
         {
             if (eadId <= 0)
             {
-                throw new ArgumentException("Invalid UC id.", nameof(eadId));
+                throw new ArgumentException("Invalid CourseUnit id.", nameof(eadId));
             }
 
-            var uc = await _educationRepository.GetUcByEadIdAsync(eadId, cancellationToken);
+            var uc = await _educationRepository.GetCourseUnitByEadIdAsync(eadId, cancellationToken);
             if (uc == null || string.IsNullOrWhiteSpace(uc.Id))
             {
                 return Array.Empty<StudentUcDto>();
             }
 
-            return await _educationRepository.GetStudentsByUcWithPerformanceAsync(uc.Id, cancellationToken);
+            return await _educationRepository.GetStudentsByCourseUnitWithPerformanceAsync(uc.Id, cancellationToken);
         }
 
-        public async Task<IEnumerable<string>> GetUcsByStudentAsync(string studentId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<string>> GetCourseUnitsByStudentAsync(string studentId, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(studentId);
-            return await _studentUcPerformanceRepository.GetUcsByStudentAsync(studentId);
+            return await _studentUcPerformanceRepository.GetCourseUnitsByStudentAsync(studentId);
         }
 
-        public async Task<StudentUcPerformance?> GetStudentUcPerformanceAsync(string studentId, string ucId, CancellationToken cancellationToken = default)
+        public async Task<StudentCourseUnitPerformance?> GetStudentCourseUnitPerformanceAsync(string studentId, string courseUnitId, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(studentId);
-            ArgumentNullException.ThrowIfNull(ucId);
-            return await _studentUcPerformanceRepository.GetByStudentAndUcAsync(studentId, ucId);
+            ArgumentNullException.ThrowIfNull(courseUnitId);
+            return await _studentUcPerformanceRepository.GetByStudentAndCourseUnitAsync(studentId, courseUnitId);
         }
 
-        public async Task ToggleActivityHiddenAsync(string studentId, string ucId, string activityName, CancellationToken cancellationToken = default)
+        public async Task ToggleActivityHiddenAsync(string studentId, string courseUnitId, string activityName, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(studentId);
-            ArgumentNullException.ThrowIfNull(ucId);
+            ArgumentNullException.ThrowIfNull(courseUnitId);
             ArgumentNullException.ThrowIfNull(activityName);
 
             ThrowReadOnly();
 
             // Validar que a atividade existe
-            var performance = await _studentUcPerformanceRepository.GetByStudentAndUcAsync(studentId, ucId);
+            var performance = await _studentUcPerformanceRepository.GetByStudentAndCourseUnitAsync(studentId, courseUnitId);
             if (performance == null)
                 throw new NotFoundException("Desempenho do estudante não encontrado");
 
@@ -176,10 +176,10 @@ namespace Application.Service.Service
                 throw new NotFoundException("Atividade não encontrada");
 
             // Carregar ou criar config de atividades ocultas
-            var config = await _studentUcPerformanceRepository.GetHiddenActivitiesAsync(ucId);
+            var config = await _studentUcPerformanceRepository.GetHiddenActivitiesAsync(courseUnitId);
             if (config == null)
             {
-                config = new HiddenActivitiesConfig { UcId = ucId };
+                config = new HiddenActivitiesConfig { CourseUnitId = courseUnitId };
             }
 
             // Toggle

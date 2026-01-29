@@ -7,48 +7,48 @@ using System.Linq;
 
 namespace Application.Infrastructure.Repository.Students
 {
-    public class StudentUcPerformanceRepository : IStudentUcPerformanceRepository
+    public class StudentCourseUnitPerformanceRepository : IStudentUcPerformanceRepository
     {
         private readonly IServiceRavenDB _serviceRavenDb;
 
-        public StudentUcPerformanceRepository(IServiceRavenDB serviceRavenDb)
+        public StudentCourseUnitPerformanceRepository(IServiceRavenDB serviceRavenDb)
         {
             _serviceRavenDb = serviceRavenDb;
         }
 
-        public async Task<StudentUcPerformance?> GetByStudentAndUcAsync(string studentId, string ucId)
+        public async Task<StudentCourseUnitPerformance?> GetByStudentAndCourseUnitAsync(string studentId, string courseUnitId)
         {
             var result = await _serviceRavenDb.AsyncSession
-                .Query<StudentUcPerformance>()
-                .Where(p => p.StudentId == studentId && p.UcId == ucId)
+                .Query<StudentCourseUnitPerformance>()
+                .Where(p => p.StudentId == studentId && p.CourseUnitId == courseUnitId)
                 .FirstOrDefaultAsync();
             
             return result;
         }
 
-        public async Task<IEnumerable<string>> GetUcsByStudentAsync(string studentId)
+        public async Task<IEnumerable<string>> GetCourseUnitsByStudentAsync(string studentId)
         {
-            var ucs = await _serviceRavenDb.AsyncSession
-                .Query<StudentUcPerformance>()
+            var courseUnits = await _serviceRavenDb.AsyncSession
+                .Query<StudentCourseUnitPerformance>()
                 .Where(p => p.StudentId == studentId)
-                .Select(p => p.UcId)
+                .Select(p => p.CourseUnitId)
                 .Distinct()
                 .ToListAsync();
             
-            return ucs;
+            return courseUnits;
         }
 
-        public async Task<IEnumerable<StudentUcPerformance>> GetStudentUcPerformanceAsync(string studentId)
+        public async Task<IEnumerable<StudentCourseUnitPerformance>> GetStudentCourseUnitPerformanceAsync(string studentId)
         {
             var performances = await _serviceRavenDb.AsyncSession
-                .Query<StudentUcPerformance>()
+                .Query<StudentCourseUnitPerformance>()
                 .Where(p => p.StudentId == studentId)
                 .ToListAsync();
             
             return performances;
         }
 
-        public async Task SaveAsync(StudentUcPerformance performance)
+        public async Task SaveAsync(StudentCourseUnitPerformance performance)
         {
             ArgumentNullException.ThrowIfNull(performance);
             
@@ -58,7 +58,7 @@ namespace Application.Infrastructure.Repository.Students
             await _serviceRavenDb.AsyncSession.StoreAsync(performance);
         }
 
-        public async Task UpdateAsync(StudentUcPerformance performance)
+        public async Task UpdateAsync(StudentCourseUnitPerformance performance)
         {
             ArgumentNullException.ThrowIfNull(performance);
             await _serviceRavenDb.AsyncSession.StoreAsync(performance);
@@ -68,34 +68,34 @@ namespace Application.Infrastructure.Repository.Students
         /// Carrega múltiplos desempenhos por studentId e ucId
         /// Agrupa por studentId para evitar comparações entre campos no LINQ
         /// </summary>
-        public async Task<Dictionary<string, StudentUcPerformance>> GetByStudentAndUcBatchAsync(List<(string StudentId, string UcId)> pairs)
+        public async Task<Dictionary<string, StudentCourseUnitPerformance>> GetByStudentAndCourseUnitBatchAsync(List<(string StudentId, string CourseUnitId)> pairs)
         {
             if (!pairs.Any())
-                return new Dictionary<string, StudentUcPerformance>();
+                return new Dictionary<string, StudentCourseUnitPerformance>();
 
             // Agrupar pairs por StudentId para fazer queries mais eficientes
             var groupedByStudent = pairs
                 .GroupBy(p => p.StudentId)
                 .ToList();
 
-            var result = new Dictionary<string, StudentUcPerformance>();
+            var result = new Dictionary<string, StudentCourseUnitPerformance>();
 
             // Para cada grupo de studentId, fazer uma query
             foreach (var studentGroup in groupedByStudent)
             {
                 var studentId = studentGroup.Key;
-                var ucIds = studentGroup.Select(p => p.UcId).ToHashSet();
+                var courseUnitIds = studentGroup.Select(p => p.CourseUnitId).ToHashSet();
 
                 // Query: Buscar todos os desempenhos deste student que estão na lista de ucIds
                 var performances = await _serviceRavenDb.AsyncSession
-                    .Query<StudentUcPerformance>()
-                    .Where(p => p.StudentId == studentId && p.UcId.In(ucIds))
+                    .Query<StudentCourseUnitPerformance>()
+                    .Where(p => p.StudentId == studentId && p.CourseUnitId.In(courseUnitIds))
                     .ToListAsync();
 
                 // Adicionar ao resultado com chave composta
                 foreach (var perf in performances)
                 {
-                    var key = $"{perf.StudentId}:{perf.UcId}";
+                    var key = $"{perf.StudentId}:{perf.CourseUnitId}";
                     result[key] = perf;
                 }
             }
@@ -107,47 +107,47 @@ namespace Application.Infrastructure.Repository.Students
         /// Carrega todos os desempenhos de um único estudante
         /// Método útil para cache inicial
         /// </summary>
-        public async Task<Dictionary<string, StudentUcPerformance>> GetAllByStudentAsync(string studentId)
+        public async Task<Dictionary<string, StudentCourseUnitPerformance>> GetAllByStudentAsync(string studentId)
         {
             var performances = await _serviceRavenDb.AsyncSession
-                .Query<StudentUcPerformance>()
+                .Query<StudentCourseUnitPerformance>()
                 .Where(p => p.StudentId == studentId)
                 .ToListAsync();
 
-            var result = new Dictionary<string, StudentUcPerformance>();
+            var result = new Dictionary<string, StudentCourseUnitPerformance>();
             foreach (var perf in performances)
             {
-                var key = $"{perf.StudentId}:{perf.UcId}";
+                var key = $"{perf.StudentId}:{perf.CourseUnitId}";
                 result[key] = perf;
             }
             return result;
         }
 
         /// <summary>
-        /// Carrega configuração de atividades ocultas para uma UC
+        /// Carrega configuração de atividades ocultas para uma CourseUnit
         /// </summary>
-        public async Task<HiddenActivitiesConfig?> GetHiddenActivitiesAsync(string ucId)
+        public async Task<HiddenActivitiesConfig?> GetHiddenActivitiesAsync(string courseUnitId)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(ucId);
+            ArgumentException.ThrowIfNullOrWhiteSpace(courseUnitId);
             
             var config = await _serviceRavenDb.AsyncSession
                 .Query<HiddenActivitiesConfig>()
-                .Where(c => c.UcId == ucId)
+                .Where(c => c.CourseUnitId == courseUnitId)
                 .FirstOrDefaultAsync();
             
             return config;
         }
 
         /// <summary>
-        /// Salva configuração de atividades ocultas para uma UC
+        /// Salva configuração de atividades ocultas para uma CourseUnit
         /// </summary>
         public async Task SaveHiddenActivitiesAsync(HiddenActivitiesConfig config)
         {
             ArgumentNullException.ThrowIfNull(config);
-            ArgumentException.ThrowIfNullOrWhiteSpace(config.UcId);
+            ArgumentException.ThrowIfNullOrWhiteSpace(config.CourseUnitId);
             
             // Usar ID consistente baseado no UcId
-            var id = $"hidden-activities/{config.UcId}";
+            var id = $"hidden-activities/{config.CourseUnitId}";
             await _serviceRavenDb.AsyncSession.StoreAsync(config, id);
         }
     }

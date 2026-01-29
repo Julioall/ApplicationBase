@@ -823,5 +823,86 @@ namespace Application.Infrastructure.Repository.Moodle
         }
 
         #endregion
+
+        #region Category Hierarchy Methods
+
+        public async Task<IReadOnlyCollection<MoodleCategory>> GetCategoriesByDepthAsync(int depth, CancellationToken cancellationToken = default)
+        {
+            var categories = await _serviceRavenDb.AsyncSession.Query<MoodleCategory, MoodleCategories_ByDepthAndParent>()
+                .Customize(x => x.WaitForNonStaleResults())
+                .Where(c => c.Depth == depth)
+                .OrderBy(c => c.Name)
+                .ToListAsync(cancellationToken);
+
+            return categories;
+        }
+
+        public Task<IReadOnlyCollection<MoodleCategory>> GetInstitutionsAsync(CancellationToken cancellationToken = default)
+        {
+            // Depth 1 = Instituição (SENAI, SESI, etc.)
+            return GetCategoriesByDepthAsync(1, cancellationToken);
+        }
+
+        public async Task<IReadOnlyCollection<MoodleCategory>> GetSchoolsByInstitutionAsync(int institutionMoodleId, CancellationToken cancellationToken = default)
+        {
+            // Depth 2 = Escola, com ParentId = institutionMoodleId
+            var categories = await _serviceRavenDb.AsyncSession.Query<MoodleCategory, MoodleCategories_ByDepthAndParent>()
+                .Customize(x => x.WaitForNonStaleResults())
+                .Where(c => c.Depth == 2 && c.ParentId == institutionMoodleId)
+                .OrderBy(c => c.Name)
+                .ToListAsync(cancellationToken);
+
+            return categories;
+        }
+
+        public async Task<IReadOnlyCollection<MoodleCategory>> GetCoursesBySchoolAsync(int schoolMoodleId, CancellationToken cancellationToken = default)
+        {
+            // Depth 3 = Curso, com ParentId = schoolMoodleId
+            var categories = await _serviceRavenDb.AsyncSession.Query<MoodleCategory, MoodleCategories_ByDepthAndParent>()
+                .Customize(x => x.WaitForNonStaleResults())
+                .Where(c => c.Depth == 3 && c.ParentId == schoolMoodleId)
+                .OrderBy(c => c.Name)
+                .ToListAsync(cancellationToken);
+
+            return categories;
+        }
+
+        public async Task<IReadOnlyCollection<MoodleCategory>> GetEventsByCourseAsync(int courseMoodleId, CancellationToken cancellationToken = default)
+        {
+            // Depth 4 = Evento/Turma, com ParentId = courseMoodleId
+            var categories = await _serviceRavenDb.AsyncSession.Query<MoodleCategory, MoodleCategories_ByDepthAndParent>()
+                .Customize(x => x.WaitForNonStaleResults())
+                .Where(c => c.Depth == 4 && c.ParentId == courseMoodleId)
+                .OrderBy(c => c.Name)
+                .ToListAsync(cancellationToken);
+
+            return categories;
+        }
+
+        public async Task<MoodleCategoryHierarchy> GetCategoryHierarchyAsync(string? path, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return new MoodleCategoryHierarchy();
+            }
+
+            // Extrair IDs do path
+            var pathIds = path.Split('/', StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => int.TryParse(s, out var id) ? id : 0)
+                .Where(id => id > 0)
+                .ToList();
+
+            if (pathIds.Count == 0)
+            {
+                return new MoodleCategoryHierarchy();
+            }
+
+            // Buscar todas as categorias do path em uma única operação
+            var categories = await GetCategoriesByMoodleIdsAsync(pathIds, cancellationToken);
+
+            return MoodleCategoryHierarchy.FromPath(path, categories);
+        }
+
+        #endregion
     }
 }

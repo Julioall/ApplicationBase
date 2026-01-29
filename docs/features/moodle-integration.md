@@ -125,7 +125,7 @@ A nomenclatura anterior (`Education*`) foi mantida para compatibilidade mas est√
 | `School` | `MoodleCategory` |
 | `ProgramDocument` | `MoodleCourseCategory` |
 | `ClassDocument` | `MoodleCohort` |
-| `UcDocument` | `MoodleCourse` |
+| `CourseUnit` | `MoodleCourse` |
 | `ClassUcMap` | `MoodleCohortCourseMap` |
 | `StudentUcMap` | `StudentCourseMap` |
 | `StudentUcPerformance` | `StudentCoursePerformance` |

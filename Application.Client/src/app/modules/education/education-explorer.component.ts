@@ -5,9 +5,7 @@ import { finalize } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { EducationService } from '../../service/education/education.service';
-import { EducationSchool } from '../../model/education-school';
-import { EducationProgram } from '../../model/education-program';
-import { EducationClass } from '../../model/education-class';
+import { MoodleCategory, School, Program, Class } from '../../model/moodle-category';
 import { Router } from '@angular/router';
 import { EducationSyncStatus } from '../../model/education-sync-status';
 
@@ -17,9 +15,9 @@ import { EducationSyncStatus } from '../../model/education-sync-status';
 })
 export class EducationExplorerComponent implements OnInit, OnDestroy {
   form: FormGroup;
-  schools: EducationSchool[] = [];
-  programs: EducationProgram[] = [];
-  classes: EducationClass[] = [];
+  schools: School[] = [];
+  programs: Program[] = [];
+  classes: Class[] = [];
   searchTerm = '';
   loadingSchools = false;
   loadingPrograms = false;
@@ -170,7 +168,7 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
     return fallback || this.translate.instant('education.labels.periodUnknown');
   }
 
-  formatClassPeriod(classItem: EducationClass): string {
+  formatClassPeriod(classItem: Class): string {
     return this.formatPeriod(classItem.StartDate ?? undefined, classItem.EndDate ?? undefined, undefined);
   }
 
@@ -200,7 +198,7 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
     return this.programs.find(p => p.Id === id)?.Name || '-';
   }
 
-  get filteredClasses(): EducationClass[] {
+  get filteredClasses(): Class[] {
     if (!this.searchTerm) {
       return this.classes;
     }
@@ -212,7 +210,7 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
     });
   }
 
-  openClass(classItem: EducationClass): void {
+  openClass(classItem: Class): void {
     if (!classItem?.Id) {
       return;
     }
@@ -234,7 +232,7 @@ export class EducationExplorerComponent implements OnInit, OnDestroy {
     this.showFilterDropdown = !this.showFilterDropdown;
   }
 
-  trackByClass(_index: number, classItem: EducationClass): string {
+  trackByClass(_index: number, classItem: Class): string {
     return classItem.Id || _index.toString();
   }
   private formatDate(date: Date): string {

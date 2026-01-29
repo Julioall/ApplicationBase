@@ -724,7 +724,7 @@
       "loadSchools": "Não foi possível carregar as escolas.",
       "loadPrograms": "Não foi possível carregar os cursos.",
       "loadClasses": "Não foi possível carregar as turmas.",
-      "loadUcs": "Não foi possível carregar as UCs.",
+      "loadUcs": "Não foi possível carregar as CourseUnits.",
       "loadSyncStatus": "Não foi possível carregar o status de sincronização."
     },
     "pagination": {

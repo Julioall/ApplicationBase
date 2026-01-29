@@ -16,11 +16,11 @@ namespace Application.Domain.Model.Education
         Unknown = 99
     }
 
-    /// <summary>Configuração de atividades ocultas para uma UC (global para todos os alunos)</summary>
+    /// <summary>Configuração de atividades ocultas para uma CourseUnit (global para todos os alunos)</summary>
     public class HiddenActivitiesConfig
     {
         public string? Id { get; set; }
-        public string UcId { get; set; } = string.Empty;
+        public string CourseUnitId { get; set; } = string.Empty;
         public List<string> HiddenActivityNames { get; set; } = new();
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
@@ -50,18 +50,18 @@ namespace Application.Domain.Model.Education
         }
     }
 
-    public class StudentUcPerformance
+    public class StudentCourseUnitPerformance
     {
         public string? Id { get; set; }
         public string StudentId { get; set; } = string.Empty;
-        public string UcId { get; set; } = string.Empty;
+        public string CourseUnitId { get; set; } = string.Empty;
         public DateTime? LastAccessAt { get; set; }
         public decimal? FinalGrade { get; set; }
         public List<StudentActivity> Activities { get; set; } = new();
         public DateTime ImportedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
 
-        public void Merge(StudentUcPerformance other)
+        public void Merge(StudentCourseUnitPerformance other)
         {
             if (other.LastAccessAt.HasValue)
             {

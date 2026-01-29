@@ -12,7 +12,7 @@ namespace Application.Infrastructure.Indexes
                           select new
                           {
                               map.ClassId,
-                              map.UcId,
+                              map.CourseUnitId,
                               map.ImportedAt
                           };
         }

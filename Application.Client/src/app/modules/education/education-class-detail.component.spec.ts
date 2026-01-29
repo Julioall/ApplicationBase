@@ -7,7 +7,7 @@ import { EducationService } from '../../service/education/education.service';
 import { NotificationService } from '../../service/notification/notification.service';
 import { Location } from '@angular/common';
 import { Student } from '../../model/student';
-import { EducationUc } from '../../model/education-uc';
+import { CourseUnit } from '../../model/course-unit';
 
 class FakeLoader implements TranslateLoader {
   getTranslation(): any {
@@ -23,7 +23,7 @@ class EducationServiceStub {
       Fullname: 'Logica de Programacao',
       StartDate: 1706745600,
       EndDate: 1709251200
-    } as EducationUc
+    } as CourseUnit
   ]));
   getUcStudents = jasmine.createSpy('getUcStudents').and.returnValue(of([
     { Id: 'students-1', FirstName: 'Ana', LastName: 'Silva', Email: 'ana@test.com', Phone: '123', IsActive: true } as Student

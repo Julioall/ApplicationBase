@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { EducationService } from '../../service/education/education.service';
-import { EducationUc } from '../../model/education-uc';
+import { CourseUnit } from '../../model/course-unit';
 import { StudentUcDto } from '../../model/student-uc-dto';
 import { NotificationService } from '../../service/notification/notification.service';
 
@@ -15,15 +15,15 @@ import { NotificationService } from '../../service/notification/notification.ser
 })
 export class EducationClassDetailComponent implements OnInit, OnDestroy {
   classId = '';
-  ucId = '';
+  courseUnitId = '';
   className = '';
   programName = '';
   schoolName = '';
   classPeriodText = '';
   programId = '';
   schoolId = '';
-  units: EducationUc[] = [];
-  selectedUc?: EducationUc;
+  units: CourseUnit[] = [];
+  selectedCourseUnit?: CourseUnit;
   students: StudentUcDto[] = [];
   loadingUnits = false;
   loadingMetadata = false;
@@ -42,15 +42,15 @@ export class EducationClassDetailComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.routeSub = this.route.paramMap.subscribe((params) => {
       const classId = params.get('id') || '';
-      const ucId = params.get('ucId') || '';
+      const courseUnitId = params.get('courseUnitId') || '';
       if (!classId) {
         this.handleError(null, 'education.errors.loadClasses');
         return;
       }
 
       this.classId = classId;
-      this.ucId = ucId;
-      this.selectedUc = undefined;
+      this.courseUnitId = courseUnitId;
+      this.selectedCourseUnit = undefined;
       this.resolveMetadata();
       this.loadUnits();
     });
@@ -61,7 +61,7 @@ export class EducationClassDetailComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    if (this.isUcDetail) {
+    if (this.isCourseUnitDetail) {
       this.router.navigate(['/education', 'classes', this.classId], { queryParams: this.buildQueryParams() });
       return;
     }
@@ -81,31 +81,31 @@ export class EducationClassDetailComponent implements OnInit, OnDestroy {
     return fallback || this.translate.instant('education.labels.periodUnknown');
   }
 
-  openUc(uc: EducationUc): void {
+  openUc(uc: CourseUnit): void {
     if (!uc || !uc.EadId) {
       return;
     }
 
-    this.router.navigate(['/education', 'classes', this.classId, 'ucs', uc.EadId], {
+    this.router.navigate(['/education', 'classes', this.classId, 'course-units', uc.EadId], {
       queryParams: this.buildQueryParams()
     });
   }
 
-  get isUcDetail(): boolean {
-    return !!this.ucId;
+  get isCourseUnitDetail(): boolean {
+    return !!this.courseUnitId;
   }
 
   get displaySchoolName(): string {
-    return this.selectedUc?.SchoolNameDerived || this.schoolName;
+    return this.selectedCourseUnit?.SchoolName || this.selectedCourseUnit?.EventName || this.schoolName;
   }
 
   get displayProgramName(): string {
-    return this.selectedUc?.ProgramNameDerived || this.programName;
+    return this.selectedCourseUnit?.CourseName || this.programName;
   }
 
   get displayPeriodText(): string {
-    if (this.isUcDetail && this.selectedUc) {
-      return this.formatPeriod(this.selectedUc.StartDate, this.selectedUc.EndDate, this.selectedUc.PeriodTextDerived || null);
+    if (this.isCourseUnitDetail && this.selectedCourseUnit) {
+      return this.formatPeriod(this.selectedCourseUnit.StartDate, this.selectedCourseUnit.EndDate, this.selectedCourseUnit.PeriodTextDerived || null);
     }
     return this.classPeriodText;
   }
@@ -132,7 +132,7 @@ export class EducationClassDetailComponent implements OnInit, OnDestroy {
               if (!this.schoolName && found.SchoolId) {
                 this.loadSchoolName(found.SchoolId);
               }
-              if (!this.programName && this.schoolId) {
+              if (!this.programName && this.schoolId && found.ProgramId) {
                 this.loadProgramName(this.schoolId, found.ProgramId);
               }
             }
@@ -178,22 +178,22 @@ export class EducationClassDetailComponent implements OnInit, OnDestroy {
 
   private loadUnits(): void {
     this.loadingUnits = true;
-    this.educationService.getClassUcs(this.classId)
+    this.educationService.getClassCourseUnits(this.classId)
       .pipe(finalize(() => this.loadingUnits = false))
       .subscribe({
         next: (ucs) => {
           this.units = ucs || [];
-          if (this.ucId) {
-            this.selectedUc = this.units.find(uc =>
-              uc.EadId?.toString() === this.ucId || uc.Id === this.ucId || uc.Id?.endsWith(`/${this.ucId}`)
+          if (this.courseUnitId) {
+            this.selectedCourseUnit = this.units.find(uc =>
+              uc.EadId?.toString() === this.courseUnitId || uc.Id === this.courseUnitId || uc.Id?.endsWith(`/${this.courseUnitId}`)
             );
-            if (!this.selectedUc) {
+            if (!this.selectedCourseUnit) {
               this.handleError(null, 'education.ucDetail.notFound');
               this.students = [];
               this.loadingStudents = false;
               return;
             }
-            this.loadUcStudents();
+            this.loadCourseUnitStudents();
           } else {
             this.students = [];
           }
@@ -210,7 +210,7 @@ export class EducationClassDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  trackByUc(index: number, uc: EducationUc): string | number {
+  trackByCourseUnit(index: number, uc: CourseUnit): string | number {
     return uc?.Id || uc?.EadId || index;
   }
 
@@ -268,14 +268,14 @@ export class EducationClassDetailComponent implements OnInit, OnDestroy {
     };
   }
 
-  private loadUcStudents(): void {
-    if (!this.selectedUc?.EadId) {
+  private loadCourseUnitStudents(): void {
+    if (!this.selectedCourseUnit?.EadId) {
       this.students = [];
       return;
     }
 
     this.loadingStudents = true;
-    this.educationService.getUcStudents(this.selectedUc.EadId)
+    this.educationService.getCourseUnitStudents(this.selectedCourseUnit.EadId)
       .pipe(finalize(() => this.loadingStudents = false))
       .subscribe({
         next: (students) => {

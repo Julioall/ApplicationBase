@@ -36,7 +36,7 @@ export interface StudentUcDto {
   CreatedAt?: string;
   UpdatedAt?: string | null;
 
-  // Performance na UC
+  // Performance na CourseUnit
   FinalGrade?: number | null;
   Activities: StudentActivity[];
 }

@@ -68,11 +68,11 @@ namespace Application.Api.Controllers
             return Ok(classes);
         }
 
-        [HttpGet("classes/{classId}/ucs")]
-        [HttpGet("ucs")]
+        [HttpGet("classes/{classId}/course-units")]
+        [HttpGet("course-units")]
         [Authorize(Policy = ApplicationPermissions.ViewEducation)]
-        [ProducesResponseType(typeof(IReadOnlyCollection<UcDocument>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetUcs(
+        [ProducesResponseType(typeof(IReadOnlyCollection<CourseUnit>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetCourseUnits(
             [FromRoute] string? classId,
             [FromQuery(Name = "classId")] string? classIdQuery,
             [FromQuery] string? search,
@@ -85,55 +85,55 @@ namespace Application.Api.Controllers
                 return Problem(title: _localizer["InvalidRequestTitle"], detail: _localizer["EducationClassRequired"], statusCode: StatusCodes.Status400BadRequest);
             }
 
-            var ucs = await _educationService.GetUcsByClassAsync(classId, search, cancellationToken);
-            return Ok(ucs);
+            var courseUnits = await _educationService.GetCourseUnitsByClassAsync(classId, search, cancellationToken);
+            return Ok(courseUnits);
         }
 
-        [HttpGet("ucs/search")]
+        [HttpGet("course-units/search")]
         [Authorize(Policy = ApplicationPermissions.ViewEducation)]
-        [ProducesResponseType(typeof(PagedResult<UcDocument>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> SearchUcs([FromQuery] PaginationQuery? query, [FromQuery] string? classId, [FromQuery] string? programId, CancellationToken cancellationToken)
+        [ProducesResponseType(typeof(PagedResult<CourseUnit>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> SearchCourseUnits([FromQuery] PaginationQuery? query, [FromQuery] string? classId, [FromQuery] string? programId, CancellationToken cancellationToken)
         {
             var safeQuery = query ?? new PaginationQuery();
-            var paged = await _educationService.SearchUcsAsync(safeQuery, classId, programId, cancellationToken);
+            var paged = await _educationService.SearchCourseUnitsAsync(safeQuery, classId, programId, cancellationToken);
             return Ok(paged);
         }
 
 
 
-        [HttpGet("students/{studentId}/ucs")]
+        [HttpGet("students/{studentId}/course-units")]
         [Authorize(Policy = ApplicationPermissions.ViewEducation)]
-        [ProducesResponseType(typeof(IReadOnlyCollection<UcDocument>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetStudentUcs(string studentId, CancellationToken cancellationToken)
+        [ProducesResponseType(typeof(IReadOnlyCollection<CourseUnit>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetStudentCourseUnits(string studentId, CancellationToken cancellationToken)
         {
-            var ucs = await _educationService.GetUcsByStudentAsync(studentId, cancellationToken);
-            return Ok(ucs);
+            var courseUnits = await _educationService.GetCourseUnitsByStudentAsync(studentId, cancellationToken);
+            return Ok(courseUnits);
         }
 
-        [HttpGet("ucs/students")]
+        [HttpGet("course-units/students")]
         [Authorize(Policy = ApplicationPermissions.ViewEducation)]
         [ProducesResponseType(typeof(IReadOnlyCollection<StudentUcDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetUcStudents([FromQuery] int eadId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetCourseUnitStudents([FromQuery] int eadId, CancellationToken cancellationToken)
         {
             if (eadId <= 0)
             {
                 return Problem(
                     title: _localizer["InvalidRequestTitle"],
-                    detail: "Invalid UC EadId",
+                    detail: "Invalid CourseUnit EadId",
                     statusCode: StatusCodes.Status400BadRequest);
             }
 
-            var students = await _educationService.GetStudentsByUcEadIdWithPerformanceAsync(eadId, cancellationToken);
+            var students = await _educationService.GetStudentsByCourseUnitEadIdWithPerformanceAsync(eadId, cancellationToken);
             return Ok(students);
         }
 
-        [HttpGet("students/ucs/performance")]
+        [HttpGet("students/course-units/performance")]
         [Authorize(Policy = ApplicationPermissions.ViewEducation)]
-        [ProducesResponseType(typeof(StudentUcPerformance), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetStudentPerformance([FromQuery] string studentId, [FromQuery] string ucId, CancellationToken cancellationToken)
+        [ProducesResponseType(typeof(StudentCourseUnitPerformance), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetStudentPerformance([FromQuery] string studentId, [FromQuery] string courseUnitId, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(studentId) || string.IsNullOrWhiteSpace(ucId))
+            if (string.IsNullOrWhiteSpace(studentId) || string.IsNullOrWhiteSpace(courseUnitId))
             {
                 return Problem(
                     title: _localizer["InvalidRequestTitle"],
@@ -141,7 +141,7 @@ namespace Application.Api.Controllers
                     statusCode: StatusCodes.Status400BadRequest);
             }
 
-            var performance = await _educationService.GetStudentUcPerformanceAsync(studentId, ucId, cancellationToken);
+            var performance = await _educationService.GetStudentCourseUnitPerformanceAsync(studentId, courseUnitId, cancellationToken);
             return Ok(performance);
         }
 
@@ -150,7 +150,7 @@ namespace Application.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ToggleActivityHidden([FromQuery] string studentId, [FromQuery] string ucId, [FromQuery] string activityName, CancellationToken cancellationToken)
+        public async Task<IActionResult> ToggleActivityHidden([FromQuery] string studentId, [FromQuery] string courseUnitId, [FromQuery] string activityName, CancellationToken cancellationToken)
         {
             return EducationReadOnlyProblem();
         }
