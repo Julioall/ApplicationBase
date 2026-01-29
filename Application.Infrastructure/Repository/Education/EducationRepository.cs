@@ -226,6 +226,158 @@ namespace Application.Infrastructure.Repository.Education
             };
         }
 
+        public async Task<IReadOnlyCollection<UcUpsertResult>> UpsertUcBatchAsync(IEnumerable<UcDocument> ucs, CancellationToken cancellationToken = default)
+        {
+            var ucList = ucs.ToList();
+            if (ucList.Count == 0)
+            {
+                return Array.Empty<UcUpsertResult>();
+            }
+
+            // Generate IDs for all documents
+            var idsToLoad = ucList.Select(uc => $"ucs/{uc.EadId}").ToList();
+
+            // Load all existing documents in a single batch call
+            var existingDocs = await _serviceRavenDb.AsyncSession.LoadAsync<UcDocument>(idsToLoad, cancellationToken);
+
+            var results = new List<UcUpsertResult>(ucList.Count);
+
+            foreach (var uc in ucList)
+            {
+                var id = $"ucs/{uc.EadId}";
+                existingDocs.TryGetValue(id, out var existing);
+
+                if (existing == null)
+                {
+                    // New document
+                    uc.Id = id;
+                    await _serviceRavenDb.AsyncSession.StoreAsync(uc, id, cancellationToken);
+                    results.Add(new UcUpsertResult
+                    {
+                        Created = true,
+                        Updated = true,
+                        Entity = uc
+                    });
+                    continue;
+                }
+
+                // Update existing document
+                var updated = false;
+
+                if (!string.Equals(existing.Fullname, uc.Fullname, StringComparison.Ordinal))
+                {
+                    existing.Fullname = uc.Fullname;
+                    updated = true;
+                }
+
+                if (existing.StartDate != uc.StartDate)
+                {
+                    existing.StartDate = uc.StartDate;
+                    updated = true;
+                }
+
+                if (existing.EndDate != uc.EndDate)
+                {
+                    existing.EndDate = uc.EndDate;
+                    updated = true;
+                }
+
+                if (!string.Equals(existing.ViewUrl, uc.ViewUrl, StringComparison.Ordinal))
+                {
+                    existing.ViewUrl = uc.ViewUrl;
+                    updated = true;
+                }
+
+                if (!string.Equals(existing.CourseImage, uc.CourseImage, StringComparison.Ordinal))
+                {
+                    existing.CourseImage = uc.CourseImage;
+                    updated = true;
+                }
+
+                if (!string.Equals(existing.CourseCategory, uc.CourseCategory, StringComparison.Ordinal))
+                {
+                    existing.CourseCategory = uc.CourseCategory;
+                    updated = true;
+                }
+
+                if (!string.Equals(existing.SchoolNameDerived, uc.SchoolNameDerived, StringComparison.Ordinal))
+                {
+                    existing.SchoolNameDerived = uc.SchoolNameDerived;
+                    updated = true;
+                }
+
+                if (!string.Equals(existing.ProgramNameDerived, uc.ProgramNameDerived, StringComparison.Ordinal))
+                {
+                    existing.ProgramNameDerived = uc.ProgramNameDerived;
+                    updated = true;
+                }
+
+                if (!string.Equals(existing.PeriodTextDerived, uc.PeriodTextDerived, StringComparison.Ordinal))
+                {
+                    existing.PeriodTextDerived = uc.PeriodTextDerived;
+                    updated = true;
+                }
+
+                if (existing.Progress != uc.Progress)
+                {
+                    existing.Progress = uc.Progress;
+                    updated = true;
+                }
+
+                if (existing.Completed != uc.Completed)
+                {
+                    existing.Completed = uc.Completed;
+                    updated = true;
+                }
+
+                if (existing.IsFavourite != uc.IsFavourite)
+                {
+                    existing.IsFavourite = uc.IsFavourite;
+                    updated = true;
+                }
+
+                if (existing.Hidden != uc.Hidden)
+                {
+                    existing.Hidden = uc.Hidden;
+                    updated = true;
+                }
+
+                if (!string.Equals(existing.Summary, uc.Summary, StringComparison.Ordinal))
+                {
+                    existing.Summary = uc.Summary;
+                    updated = true;
+                }
+
+                if (existing.LastAccess != uc.LastAccess)
+                {
+                    existing.LastAccess = uc.LastAccess;
+                    updated = true;
+                }
+
+                if (!string.Equals(existing.IdNumber, uc.IdNumber, StringComparison.Ordinal))
+                {
+                    existing.IdNumber = uc.IdNumber;
+                    updated = true;
+                }
+
+                if (!string.Equals(existing.Lang, uc.Lang, StringComparison.Ordinal))
+                {
+                    existing.Lang = uc.Lang;
+                    updated = true;
+                }
+
+                // RavenDB tracks changes automatically, no need to call StoreAsync for updates
+                results.Add(new UcUpsertResult
+                {
+                    Created = false,
+                    Updated = updated,
+                    Entity = existing
+                });
+            }
+
+            return results;
+        }
+
         public Task<UcDocument?> GetUcByEadIdAsync(int eadId, CancellationToken cancellationToken = default)
         {
             var id = $"ucs/{eadId}";

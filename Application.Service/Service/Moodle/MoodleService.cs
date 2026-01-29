@@ -99,7 +99,7 @@ namespace Application.Service.Service.Moodle
             // Enqueue the background job
             var triggeredByUserId = userId;
             var triggeredByName = userName ?? string.Empty;
-            _backgroundJobScheduler.Enqueue<IEducationSyncJob>(job => job.RunAsync(triggeredByUserId, triggeredByName, CancellationToken.None));
+            _backgroundJobScheduler.Enqueue<IMoodleSyncJob>(job => job.RunAsync(triggeredByUserId, triggeredByName, CancellationToken.None));
 
             _logger.LogInformation("Moodle manual sync triggered and queued by {UserId}", userId);
 

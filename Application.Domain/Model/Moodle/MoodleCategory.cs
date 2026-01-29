@@ -1,11 +1,13 @@
 namespace Application.Domain.Model.Moodle
 {
-    /// <summary>
-    /// Represents a top-level Moodle category (e.g., School/Unit).
-    /// </summary>
     public class MoodleCategory
     {
         public string? Id { get; set; }
+        public int MoodleId { get; set; }
         public required string Name { get; set; }
+        public int ParentId { get; set; }
+        public int Depth { get; set; }
+        public string? Path { get; set; }
+        public long LastSyncedAt { get; set; }
     }
 }

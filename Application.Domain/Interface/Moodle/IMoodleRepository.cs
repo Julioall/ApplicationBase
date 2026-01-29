@@ -1,4 +1,5 @@
 using Application.Domain.Model.Dtos;
+using Application.Domain.Model.Education.Dtos;
 using Application.Domain.Model.Moodle;
 using Application.Domain.Model.Moodle.Dtos;
 using Application.Domain.Model.Students;
@@ -24,5 +25,13 @@ namespace Application.Domain.Interface.Moodle
         Task RecalculateCohortPeriodAsync(string cohortId, CancellationToken cancellationToken = default);
         Task<MoodleSyncStatus> GetSyncStatusAsync(CancellationToken cancellationToken = default);
         Task UpdateSyncStatusAsync(MoodleSyncStatus status, CancellationToken cancellationToken = default);
+        Task<MoodleCategory> UpsertCategoryByMoodleIdAsync(int moodleId, string name, int parentId, int depth, string? path, CancellationToken cancellationToken = default);
+        Task<MoodleCategory?> GetCategoryByMoodleIdAsync(int moodleId, CancellationToken cancellationToken = default);
+        Task<IReadOnlyDictionary<int, MoodleCategory>> GetCategoriesByMoodleIdsAsync(IEnumerable<int> moodleIds, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Batch upsert multiple categories efficiently in a single operation.
+        /// </summary>
+        Task<IReadOnlyDictionary<int, MoodleCategory>> UpsertCategoriesBatchAsync(IEnumerable<MoodleCategoryDto> categories, CancellationToken cancellationToken = default);
     }
 }

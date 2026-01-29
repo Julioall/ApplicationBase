@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using Application.Domain.Interface.Moodle;
 using Application.Domain.Model.Dtos;
+using Application.Domain.Model.Education.Dtos;
 using Application.Domain.Model.Moodle;
 using Application.Domain.Model.Moodle.Dtos;
 using Application.Domain.Model.Students;
@@ -372,7 +373,7 @@ namespace Application.Infrastructure.Repository.Moodle
                             var normalizedName = NormalizeActivityName(a.Name);
                             var isHidden = hiddenActivitySet.Contains(normalizedName);
 
-                            return new StudentActivityDto
+                            return new Domain.Model.Moodle.Dtos.StudentActivityDto
                             {
                                 Name = a.Name,
                                 FinalGrade = a.FinalGrade,
@@ -669,5 +670,158 @@ namespace Application.Infrastructure.Repository.Moodle
             cleaned = cleaned.Trim('-');
             return string.IsNullOrWhiteSpace(cleaned) ? "item" : cleaned;
         }
+
+        #region Category Management by MoodleId
+
+        public async Task<MoodleCategory> UpsertCategoryByMoodleIdAsync(int moodleId, string name, int parentId, int depth, string? path, CancellationToken cancellationToken = default)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
+            var id = $"moodle-categories/{moodleId}";
+            var existing = await _serviceRavenDb.AsyncSession.LoadAsync<MoodleCategory>(id, cancellationToken);
+
+            var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+            if (existing != null)
+            {
+                var hasChanges = false;
+
+                if (!string.Equals(existing.Name, name, StringComparison.Ordinal))
+                {
+                    existing.Name = name;
+                    hasChanges = true;
+                }
+                if (existing.ParentId != parentId)
+                {
+                    existing.ParentId = parentId;
+                    hasChanges = true;
+                }
+                if (existing.Depth != depth)
+                {
+                    existing.Depth = depth;
+                    hasChanges = true;
+                }
+                if (!string.Equals(existing.Path, path, StringComparison.Ordinal))
+                {
+                    existing.Path = path;
+                    hasChanges = true;
+                }
+
+                existing.LastSyncedAt = now;
+
+                if (hasChanges)
+                {
+                    await _serviceRavenDb.AsyncSession.StoreAsync(existing, id, cancellationToken);
+                }
+
+                return existing;
+            }
+
+            var category = new MoodleCategory
+            {
+                Id = id,
+                MoodleId = moodleId,
+                Name = name,
+                ParentId = parentId,
+                Depth = depth,
+                Path = path,
+                LastSyncedAt = now
+            };
+
+            await _serviceRavenDb.AsyncSession.StoreAsync(category, id, cancellationToken);
+            return category;
+        }
+
+        public async Task<MoodleCategory?> GetCategoryByMoodleIdAsync(int moodleId, CancellationToken cancellationToken = default)
+        {
+            var id = $"moodle-categories/{moodleId}";
+            return await _serviceRavenDb.AsyncSession.LoadAsync<MoodleCategory>(id, cancellationToken);
+        }
+
+        public async Task<IReadOnlyDictionary<int, MoodleCategory>> GetCategoriesByMoodleIdsAsync(IEnumerable<int> moodleIds, CancellationToken cancellationToken = default)
+        {
+            var ids = moodleIds.Distinct().Select(id => $"moodle-categories/{id}").ToList();
+
+            if (ids.Count == 0)
+            {
+                return new Dictionary<int, MoodleCategory>();
+            }
+
+            var loaded = await _serviceRavenDb.AsyncSession.LoadAsync<MoodleCategory>(ids, cancellationToken);
+
+            return loaded
+                .Where(kvp => kvp.Value != null)
+                .ToDictionary(kvp => kvp.Value.MoodleId, kvp => kvp.Value);
+        }
+
+        public async Task<IReadOnlyDictionary<int, MoodleCategory>> UpsertCategoriesBatchAsync(IEnumerable<MoodleCategoryDto> categories, CancellationToken cancellationToken = default)
+        {
+            var categoryList = categories.ToList();
+            if (categoryList.Count == 0)
+            {
+                return new Dictionary<int, MoodleCategory>();
+            }
+
+            // Generate IDs for all categories
+            var idsToLoad = categoryList.Select(c => $"moodle-categories/{c.Id}").Distinct().ToList();
+
+            // Single batch load of all existing documents
+            var existingDocs = await _serviceRavenDb.AsyncSession.LoadAsync<MoodleCategory>(idsToLoad, cancellationToken);
+
+            var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            var result = new Dictionary<int, MoodleCategory>();
+
+            foreach (var cat in categoryList)
+            {
+                var id = $"moodle-categories/{cat.Id}";
+                var existing = existingDocs.TryGetValue(id, out var doc) ? doc : null;
+
+                if (existing != null)
+                {
+                    // Update existing in memory - RavenDB tracks changes automatically
+                    if (!string.Equals(existing.Name, cat.Name, StringComparison.Ordinal))
+                    {
+                        existing.Name = cat.Name;
+                    }
+                    if (existing.ParentId != cat.Parent)
+                    {
+                        existing.ParentId = cat.Parent;
+                    }
+                    if (existing.Depth != cat.Depth)
+                    {
+                        existing.Depth = cat.Depth;
+                    }
+                    if (!string.Equals(existing.Path, cat.Path, StringComparison.Ordinal))
+                    {
+                        existing.Path = cat.Path;
+                    }
+                    existing.LastSyncedAt = now;
+
+                    result[cat.Id] = existing;
+                }
+                else
+                {
+                    // Create new category
+                    var newCategory = new MoodleCategory
+                    {
+                        Id = id,
+                        MoodleId = cat.Id,
+                        Name = cat.Name,
+                        ParentId = cat.Parent,
+                        Depth = cat.Depth,
+                        Path = cat.Path,
+                        LastSyncedAt = now
+                    };
+
+                    await _serviceRavenDb.AsyncSession.StoreAsync(newCategory, id, cancellationToken);
+                    result[cat.Id] = newCategory;
+                }
+            }
+
+            // RavenDB tracks all changes automatically, SaveChangesAsync called by caller/session management
+            return result;
+        }
+
+        #endregion
     }
 }

@@ -11,6 +11,7 @@ namespace Application.Domain.Interface.Education
         Task<ProgramDocument> UpsertProgramAsync(string schoolId, string name, CancellationToken cancellationToken = default);
         Task<ClassDocument> UpsertClassAsync(string schoolId, string programId, string courseCategoryRaw, string name, CancellationToken cancellationToken = default);
         Task<UcUpsertResult> UpsertUcAsync(UcDocument uc, CancellationToken cancellationToken = default);
+        Task<IReadOnlyCollection<UcUpsertResult>> UpsertUcBatchAsync(IEnumerable<UcDocument> ucs, CancellationToken cancellationToken = default);
         Task<UcDocument?> GetUcByEadIdAsync(int eadId, CancellationToken cancellationToken = default);
         Task<ClassUcMap> EnsureClassUcMapAsync(string classId, string ucId, CancellationToken cancellationToken = default);
         Task<StudentUcMap> EnsureStudentUcMapAsync(string studentId, string ucId, CancellationToken cancellationToken = default);

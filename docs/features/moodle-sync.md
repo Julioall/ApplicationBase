@@ -1,7 +1,7 @@
-# Sincronização de Educação (EducationSyncHangfireJob)
+# Sincronização do Moodle (MoodleSyncHangfireJob)
 
 ## Visão Geral
-Este documento descreve o funcionamento da sincronização automática de cursos do usuário logado a partir do Moodle, realizada pelo job `EducationSyncHangfireJob`.
+Este documento descreve o funcionamento da sincronização automática de cursos do usuário logado a partir do Moodle, realizada pelo job `MoodleSyncHangfireJob`.
 
 ## Fluxo de Sincronização
 1. **Autenticação**: O job utiliza o ID do usuário Moodle para buscar o token de acesso (ajuste conforme sua estratégia de autenticação).
@@ -18,8 +18,9 @@ Este documento descreve o funcionamento da sincronização automática de cursos
 ## Estruturas e Interfaces
 - `IMoodleCourseClient`: Interface para buscar cursos do usuário no Moodle.
 - `MoodleCourseClient`: Implementação que consome o endpoint REST do Moodle.
-- `IEducationRepository`: Responsável por persistir os dados sincronizados.
-- `EducationSyncHangfireJob`: Job Hangfire que orquestra todo o fluxo.
+- `IMoodleRepository`: Responsável por persistir os dados sincronizados (categorias).
+- `IEducationRepository`: Responsável por persistir os cursos (UcDocument).
+- `MoodleSyncHangfireJob`: Job Hangfire que orquestra todo o fluxo.
 
 ## Exemplo de Uso
 O job pode ser disparado manualmente ou agendado, recebendo o ID do usuário Moodle como parâmetro.

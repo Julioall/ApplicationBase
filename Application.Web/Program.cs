@@ -172,9 +172,9 @@ public class Program
         // Registro do cache de sessão de token Moodle
         builder.Services.AddSingleton<Application.Shared.Session.ISessionTokenCache, Application.Shared.Session.SessionTokenCache>();
         
-        // Register Hangfire job for education sync
-        builder.Services.AddScoped<IEducationSyncJob, EducationSyncHangfireJob>();
-        builder.Services.AddScoped<EducationSyncHangfireJob>();
+        // Register Hangfire job for Moodle sync
+        builder.Services.AddScoped<IMoodleSyncJob, MoodleSyncHangfireJob>();
+        builder.Services.AddScoped<MoodleSyncHangfireJob>();
 
 
         var app = builder.Build();
