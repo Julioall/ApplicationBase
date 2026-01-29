@@ -82,11 +82,11 @@ export class EducationClassDetailComponent implements OnInit, OnDestroy {
   }
 
   openUc(uc: CourseUnit): void {
-    if (!uc || !uc.EadId) {
+    if (!uc || !uc.MoodleId) {
       return;
     }
 
-    this.router.navigate(['/education', 'classes', this.classId, 'course-units', uc.EadId], {
+    this.router.navigate(['/education', 'classes', this.classId, 'course-units', uc.MoodleId], {
       queryParams: this.buildQueryParams()
     });
   }
@@ -185,7 +185,7 @@ export class EducationClassDetailComponent implements OnInit, OnDestroy {
           this.units = ucs || [];
           if (this.courseUnitId) {
             this.selectedCourseUnit = this.units.find(uc =>
-              uc.EadId?.toString() === this.courseUnitId || uc.Id === this.courseUnitId || uc.Id?.endsWith(`/${this.courseUnitId}`)
+              uc.MoodleId?.toString() === this.courseUnitId || uc.Id === this.courseUnitId || uc.Id?.endsWith(`/${this.courseUnitId}`)
             );
             if (!this.selectedCourseUnit) {
               this.handleError(null, 'education.ucDetail.notFound');
@@ -210,8 +210,8 @@ export class EducationClassDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  trackByCourseUnit(index: number, uc: CourseUnit): string | number {
-    return uc?.Id || uc?.EadId || index;
+    trackByCourseUnit(index: number, uc: CourseUnit): string | number {
+    return uc?.Id || uc?.MoodleId || index;
   }
 
   trackByStudent(index: number, student: StudentUcDto): string | number {
@@ -269,13 +269,13 @@ export class EducationClassDetailComponent implements OnInit, OnDestroy {
   }
 
   private loadCourseUnitStudents(): void {
-    if (!this.selectedCourseUnit?.EadId) {
+    if (!this.selectedCourseUnit?.MoodleId) {
       this.students = [];
       return;
     }
 
     this.loadingStudents = true;
-    this.educationService.getCourseUnitStudents(this.selectedCourseUnit.EadId)
+    this.educationService.getCourseUnitStudents(this.selectedCourseUnit.MoodleId)
       .pipe(finalize(() => this.loadingStudents = false))
       .subscribe({
         next: (students) => {

@@ -16,16 +16,16 @@ class FakeLoader implements TranslateLoader {
 }
 
 class EducationServiceStub {
-  getClassUcs = jasmine.createSpy('getClassUcs').and.returnValue(of([
+    getClassCourseUnits = jasmine.createSpy('getClassCourseUnits').and.returnValue(of([
     {
       Id: 'ucs/27535',
-      EadId: 27535,
+      MoodleId: 27535,
       Fullname: 'Logica de Programacao',
       StartDate: 1706745600,
       EndDate: 1709251200
     } as CourseUnit
   ]));
-  getUcStudents = jasmine.createSpy('getUcStudents').and.returnValue(of([
+  getCourseUnitStudents = jasmine.createSpy('getCourseUnitStudents').and.returnValue(of([
     { Id: 'students-1', FirstName: 'Ana', LastName: 'Silva', Email: 'ana@test.com', Phone: '123', IsActive: true } as Student
   ]));
   getClasses = jasmine.createSpy('getClasses').and.returnValue(of([
@@ -90,7 +90,7 @@ describe('EducationClassDetailComponent', () => {
     paramMapSubject.next(convertToParamMap({ id: 'class-1', ucId: '27535' }));
     createComponent();
 
-    expect(educationService.getUcStudents).toHaveBeenCalledWith(27535);
+    expect(educationService.getCourseUnitStudents).toHaveBeenCalledWith(27535);
     expect(component.students.length).toBe(1);
   });
 
@@ -98,7 +98,7 @@ describe('EducationClassDetailComponent', () => {
     paramMapSubject.next(convertToParamMap({ id: 'class-1' }));
     createComponent();
 
-    expect(educationService.getUcStudents).not.toHaveBeenCalled();
+    expect(educationService.getCourseUnitStudents).not.toHaveBeenCalled();
     expect(component.students.length).toBe(0);
   });
 

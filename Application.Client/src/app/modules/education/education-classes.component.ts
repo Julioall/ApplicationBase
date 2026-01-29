@@ -56,7 +56,7 @@ export class EducationClassesComponent implements OnInit, OnDestroy {
   }
 
   trackByUc(_: number, uc: CourseUnit): string | number {
-    return uc.Id || uc.EadId;
+    return uc.Id || uc.MoodleId;
   }
 
   getGroupMeta(group: { category: string; items: CourseUnit[] }): string {
