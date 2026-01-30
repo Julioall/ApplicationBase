@@ -1,5 +1,6 @@
 using Application.Domain.Model.Dtos;
-using Application.Domain.Validator;
+using Application.Domain.Model.Dtos.User;
+using Application.Domain.Validation.User;
 
 namespace Application.Tests.Validator
 {
