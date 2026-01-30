@@ -11,10 +11,6 @@ namespace Application.Domain.Model
         public const string ManageEmail = "manage:email";
         public const string ManageWhatsApp = "manage:whatsapp";
         public const string ManageWhatsAppSelf = "manage:whatsapp-self";
-        public const string ViewStudents = "view:students";
-        public const string ManageStudents = "manage:students";
-        public const string ViewEducation = "view:education";
-        public const string ManageEducation = "manage:education";
         public const string ViewTodo = "view:todo";
         public const string ManageTodo = "manage:todo";
 
@@ -24,8 +20,6 @@ namespace Application.Domain.Model
             ViewProfile,
             ManageServices,
             ManageWhatsAppSelf,
-            ViewEducation,
-            ManageEducation,
             ViewTodo,
             ManageTodo
         };
@@ -39,10 +33,6 @@ namespace Application.Domain.Model
             ManageEmail,
             ManageWhatsApp,
             ManageWhatsAppSelf,
-            ViewStudents,
-            ManageStudents,
-            ViewEducation,
-            ManageEducation,
             ViewTodo,
             ManageTodo
         };
@@ -56,10 +46,6 @@ namespace Application.Domain.Model
             ManageEmail,
             ManageWhatsApp,
             ManageWhatsAppSelf,
-            ViewStudents,
-            ManageStudents,
-            ViewEducation,
-            ManageEducation,
             ViewTodo,
             ManageTodo
         };

@@ -119,7 +119,6 @@
     },
     "primaryNav": {
       "panel": "Painel",
-      "classes": "Turmas",
       "metrics": "Indicadores",
       "todo": "Tarefas"
     },
@@ -559,338 +558,11 @@
     "profile": "Perfil",
     "admin": "Admin",
     "theme": "Tema",
-    "logout": "Sair",
-    "students": "Alunos",
-    "education": "Cursos"
+    "logout": "Sair"
   },
   "modal": {
     "confirm": "Confirmar",
     "cancel": "Cancelar"
-  },
-  "students": {
-    "category": "Registros",
-    "common": {
-      "error": "Erro"
-    },
-    "list": {
-      "eyebrow": "Catálogo",
-      "title": "Alunos",
-      "subtitle": "Gerencie os cadastros de alunos sem login ou credenciais.",
-      "add": "Novo aluno",
-      "export": "Exportar planilha",
-      "exportFilenamePrefix": "alunos",
-      "exportError": "Não foi possível exportar os alunos.",
-      "searchPlaceholder": "Busque por nome, e-mail ou matrícula",
-      "searchAria": "Buscar alunos",
-      "statusFilter": "Status",
-      "statusAll": "Todos",
-      "statusActive": "Ativo",
-      "statusInactive": "Inativo",
-      "columnsFilter": "Colunas",
-      "columnsFilterTitle": "Selecionar colunas visíveis",
-      "columns": {
-        "name": "Nome completo",
-        "email": "E-mail",
-        "idNumber": "Matrícula/CPF",
-        "phone": "Telefone",
-        "status": "Status",
-        "actions": "Ações",
-        "lastAccess": "Último acesso"
-      },
-      "loading": "Carregando alunos...",
-      "empty": "Nenhum aluno encontrado.",
-      "noInstitution": "Sem instituição",
-      "edit": "Editar",
-      "delete": "Excluir",
-      "confirmDelete": "Inativar {{name}}?",
-      "deleteSuccess": "Aluno inativado.",
-      "deleteError": "Não foi possível remover o aluno.",
-      "loadError": "Não foi possível carregar os alunos.",
-      "missingId": "ID do aluno ausente.",
-      "prev": "Anterior",
-      "next": "Próxima",
-      "pageXofY": "Página {{page}} de {{total}}"
-    },
-    "form": {
-      "eyebrow": "Cadastro",
-      "titleCreate": "Cadastrar aluno",
-      "titleEdit": "Editar aluno",
-      "subtitle": "Guarde dados de contato, idioma e fuso horário de cada aluno.",
-      "back": "Voltar",
-      "save": "Salvar aluno",
-      "saving": "Salvando...",
-      "firstName": "Primeiro nome",
-      "lastName": "Sobrenome",
-      "email": "E-mail",
-      "idNumber": "Matrícula / CPF",
-      "phone": "Telefone",
-      "institution": "Instituição",
-      "lang": "Idioma",
-      "langSelectPlaceholder": "Selecione o idioma",
-      "langOptions": {
-        "pt": "Português",
-        "en": "Inglês",
-        "es": "Espanhol"
-      },
-      "timeZone": "Fuso horário",
-      "isActive": "Aluno está ativo",
-      "address": {
-        "street": "Rua",
-        "number": "Número",
-        "district": "Bairro",
-        "city": "Cidade",
-        "state": "Estado",
-        "postalCode": "CEP",
-        "country": "País",
-        "countryDefault": "Brasil",
-        "searchCep": "Buscar CEP",
-        "searchingCep": "Buscando...",
-        "cepSuccess": "Endereço preenchido pelo CEP"
-      },
-      "errors": {
-        "firstNameRequired": "Primeiro nome é obrigatório.",
-        "firstNameLength": "Informe entre 2 e 100 caracteres.",
-        "lastNameRequired": "Sobrenome é obrigatório.",
-        "lastNameLength": "Informe entre 2 e 100 caracteres.",
-        "email": "Informe um e-mail válido.",
-        "idNumber": "Máximo de 20 caracteres.",
-        "lang": "Use códigos como pt ou en_US.",
-        "cepInvalid": "Informe um CEP válido com 8 dígitos.",
-        "cepNotFound": "CEP não encontrado."
-      },
-      "createSuccess": "Aluno criado com sucesso.",
-      "updateSuccess": "Aluno atualizado com sucesso.",
-      "saveError": "Não foi possível salvar o aluno.",
-      "loadError": "Não foi possível carregar o aluno.",
-      "lastAccess": "Último acesso",
-      "status": "Estado"
-    },
-    "status": {
-      "active": "Ativo",
-      "suspended": "Suspenso",
-      "notCurrently": "Inativo"
-    }
-  },
-  "education": {
-    "category": "Educação",
-    "header": {
-      "eyebrow": "Cursos",
-      "title": "Cursos",
-      "subtitle": "Explore escolas, cursos e turmas em um só lugar. Abra a turma para ver as unidades."
-    },
-    "syncStatus": {
-      "readOnly": "Somente leitura via cache do Moodle",
-      "lastSync": "Última sincronização",
-      "never": "Nunca sincronizado",
-      "loading": "Carregando..."
-    },
-    "sync": {
-      "buttonLabel": "Sincronizar Moodle",
-      "triggerSuccessTitle": "Sincronização iniciada",
-      "triggerSuccessDetail": "A sincronização com o Moodle foi enfileirada e executará em breve.",
-      "triggerError": "Não foi possível iniciar a sincronização com o Moodle."
-    },
-    "actions": {
-      "refresh": "Recarregar dados"
-    },
-    "filters": {
-      "button": "Filtros",
-      "school": "Escola",
-      "program": "Curso",
-      "search": "Busca",
-      "searchPlaceholder": "Busque turmas pelo nome",
-      "selectPlaceholder": "Selecione"
-    },
-    "labels": {
-      "school": "Escola",
-      "program": "Curso",
-      "class": "Turma",
-      "period": "Período",
-      "periodUnknown": "Período indisponível",
-      "error": "Erro",
-      "submitted": "Enviada",
-      "corrected": "Corrigida",
-      "grade": "Nota",
-      "close": "Fechar",
-      "viewCourse": "Abrir curso",
-      "viewLabel": "Visualizar",
-      "viewLink": "Abrir turma"
-    },
-    "empty": {
-      "title": "Nenhuma turma para exibir",
-      "subtitle": "Escolha uma escola e um curso para listar turmas. Abra a turma para ver as unidades."
-    },
-    "errors": {
-      "loadSchools": "Não foi possível carregar as escolas.",
-      "loadPrograms": "Não foi possível carregar os cursos.",
-      "loadClasses": "Não foi possível carregar as turmas.",
-      "loadUcs": "Não foi possível carregar as CourseUnits.",
-      "loadSyncStatus": "Não foi possível carregar o status de sincronização."
-    },
-    "pagination": {
-      "page": "Página {{current}} de {{total}}",
-      "prev": "Anterior",
-      "next": "Próxima"
-    },
-    "classes": {
-      "count": "{{count}} turmas",
-      "open": "Abrir turma",
-      "loadingUnits": "Carregando unidades...",
-      "emptyUnits": "Nenhuma unidade cadastrada para esta turma."
-    },
-    "classDetail": {
-      "title": "Turma",
-      "subtitle": "Veja todas as unidades da turma e acesse os links.",
-      "back": "Voltar",
-      "searchPlaceholder": "Filtre unidades pelo nome",
-      "unitsCount": "{{count}} unidade(s)"
-    },
-    "ucDetail": {
-      "title": "Unidade curricular",
-      "subtitle": "Detalhes da unidade selecionada.",
-      "notFound": "Nao foi possivel localizar a unidade selecionada.",
-      "studentsTitle": "Alunos vinculados",
-      "studentsSubtitle": "Lista de alunos vinculados a esta unidade.",
-      "studentsLoading": "Carregando alunos...",
-      "studentsEmpty": "Nenhum aluno vinculado a esta unidade.",
-      "studentsName": "Nome",
-      "studentsEmail": "E-mail",
-      "studentsPhone": "Telefone",
-      "studentFallback": "Aluno",
-      "loadStudentsError": "Nao foi possivel carregar os alunos vinculados.",
-      "activityHidden": "Atividade ocultada",
-      "activityShown": "Atividade visível",
-      "toggleHiddenError": "Não foi possível alterar a visibilidade da atividade.",
-      "configure": "Configurar unidade",
-      "configureDescription": "Oculte ou exiba atividades para todos os alunos desta unidade.",
-      "hideActivity": "Ocultar atividade",
-      "showActivity": "Exibir atividade"
-    }
-  },
-  "moodle": {
-    "category": "Moodle",
-    "header": {
-      "eyebrow": "Moodle",
-      "title": "Cursos Moodle",
-      "subtitle": "Explore categorias, programas e turmas sincronizados do Moodle."
-    },
-    "syncStatus": {
-      "readOnly": "Somente leitura via cache do Moodle",
-      "lastSync": "Última sincronização",
-      "never": "Nunca sincronizado",
-      "loading": "Carregando..."
-    },
-    "sync": {
-      "buttonLabel": "Sincronizar Moodle",
-      "triggerSuccessTitle": "Sincronização iniciada",
-      "triggerSuccessDetail": "A sincronização com o Moodle foi enfileirada e executará em breve.",
-      "triggerError": "Não foi possível iniciar a sincronização com o Moodle."
-    },
-    "actions": {
-      "refresh": "Recarregar dados"
-    },
-    "filters": {
-      "button": "Filtros",
-      "category": "Categoria",
-      "courseCategory": "Programa",
-      "cohort": "Turma",
-      "search": "Busca",
-      "searchPlaceholder": "Busque cursos pelo nome",
-      "selectPlaceholder": "Selecione"
-    },
-    "labels": {
-      "category": "Categoria",
-      "courseCategory": "Programa",
-      "cohort": "Turma",
-      "course": "Curso",
-      "period": "Período",
-      "periodUnknown": "Período indisponível",
-      "error": "Erro",
-      "submitted": "Enviada",
-      "corrected": "Corrigida",
-      "grade": "Nota",
-      "close": "Fechar",
-      "viewCourse": "Abrir curso",
-      "viewLabel": "Visualizar",
-      "viewLink": "Abrir curso"
-    },
-    "empty": {
-      "title": "Nenhum curso para exibir",
-      "subtitle": "Escolha uma categoria e um programa para listar cursos."
-    },
-    "errors": {
-      "loadCategories": "Não foi possível carregar as categorias.",
-      "loadCourseCategories": "Não foi possível carregar os programas.",
-      "loadCohorts": "Não foi possível carregar as turmas.",
-      "loadCourses": "Não foi possível carregar os cursos.",
-      "loadSyncStatus": "Não foi possível carregar o status de sincronização."
-    },
-    "pagination": {
-      "page": "Página {{current}} de {{total}}",
-      "prev": "Anterior",
-      "next": "Próxima"
-    },
-    "cohorts": {
-      "count": "{{count}} turmas",
-      "open": "Abrir turma",
-      "loadingCourses": "Carregando cursos...",
-      "emptyCourses": "Nenhum curso cadastrado para esta turma."
-    },
-    "courseDetail": {
-      "title": "Curso",
-      "subtitle": "Detalhes do curso selecionado.",
-      "notFound": "Não foi possível localizar o curso selecionado.",
-      "studentsTitle": "Alunos matriculados",
-      "studentsSubtitle": "Lista de alunos matriculados neste curso.",
-      "studentsLoading": "Carregando alunos...",
-      "studentsEmpty": "Nenhum aluno matriculado neste curso.",
-      "studentsName": "Nome",
-      "studentsEmail": "E-mail",
-      "studentsPhone": "Telefone",
-      "studentFallback": "Aluno",
-      "loadStudentsError": "Não foi possível carregar os alunos matriculados.",
-      "activityHidden": "Atividade ocultada",
-      "activityShown": "Atividade visível",
-      "toggleHiddenError": "Não foi possível alterar a visibilidade da atividade.",
-      "configure": "Configurar curso",
-      "configureDescription": "Oculte ou exiba atividades para todos os alunos deste curso.",
-      "hideActivity": "Ocultar atividade",
-      "showActivity": "Exibir atividade"
-    }
-  },
-  "classes": {
-    "eyebrow": "Turmas",
-    "title": "Turmas",
-    "subtitle": "Veja todas as unidades e os alunos vinculados a cada uma.",
-    "searchPlaceholder": "Buscar unidades",
-    "classesTitle": "Turmas",
-    "classesSubtitle": "Selecione uma turma para abrir a aba de unidades.",
-    "openUnits": "Abrir unidades",
-    "countLabel": "{{count}} unidades",
-    "detailsTitle": "Detalhes da turma",
-    "classInfoTitle": "Informacoes da turma",
-    "unitInfoTitle": "Informacoes da unidade",
-    "schoolLabel": "Escola",
-    "programLabel": "Curso",
-    "periodLabel": "Periodo",
-    "unitLabel": "Unidade",
-    "viewLabel": "Acesso",
-    "viewLink": "Abrir unidade",
-    "periodFallback": "Periodo indisponivel",
-    "groupLabel": "Categoria",
-    "uncategorized": "Sem categoria",
-    "studentsTitle": "Alunos vinculados",
-    "studentsCount": "{{count}} alunos",
-    "selectUnit": "Selecione uma unidade para ver os alunos vinculados.",
-    "emptyClasses": "Nenhuma turma encontrada.",
-    "emptyUnits": "Nenhuma unidade encontrada.",
-    "emptyStudents": "Nenhum aluno vinculado a esta unidade.",
-    "loadingUnits": "Carregando unidades...",
-    "loadingStudents": "Carregando alunos...",
-    "errors": {
-      "loadUnits": "NÇœo foi possÇðvel carregar as unidades.",
-      "loadStudents": "NÇœo foi possÇðvel carregar os alunos vinculados."
-    }
   },
   "todo": {
     "category": "Gerenciamento",
@@ -907,9 +579,9 @@
     "detail": "Detalhes da tarefa",
     "newTask": "Nova tarefa",
     "loading": "Carregando tarefas...",
-  "emptyColumn": "Nada aqui ainda.",
-  "defaultTag": "Tarefa",
-  "completedAt": "Concluida",
+    "emptyColumn": "Nada aqui ainda.",
+    "defaultTag": "Tarefa",
+    "completedAt": "Concluida",
     "steps": {
       "title": "Etapas",
       "subtitle": "Arraste para reordenar ou clique para editar.",
@@ -951,14 +623,14 @@
       "create": "Criar tarefa",
       "cancel": "Cancelar",
       "close": "Fechar",
-    "archive": "Arquivar",
-    "delete": "Excluir",
-    "edit": "Editar",
-    "save": "Salvar",
-    "removeCategory": "Remover categoria",
-    "removeAssignee": "Remover responsável",
-    "addCard": "Adicionar card"
-  },
+      "archive": "Arquivar",
+      "delete": "Excluir",
+      "edit": "Editar",
+      "save": "Salvar",
+      "removeCategory": "Remover categoria",
+      "removeAssignee": "Remover responsável",
+      "addCard": "Adicionar card"
+    },
     "notifications": {
       "created": "Tarefa criada",
       "updated": "Tarefa atualizada",

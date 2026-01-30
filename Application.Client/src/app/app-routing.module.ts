@@ -11,8 +11,6 @@ const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', loadChildren: () => import('./page/home/home.module').then(m => m.HomeModule), canActivate: [AuthGuard, PermissionGuard], data: { permissions: ['view:home'] } },
   { path: 'profile', loadChildren: () => import('./page/profile/profile.module').then(m => m.ProfileModule), canActivate: [AuthGuard, PermissionGuard], data: { permissions: ['view:profile'] } },
-  { path: 'students', loadChildren: () => import('./modules/students/students.module').then(m => m.StudentsModule), canActivate: [AuthGuard, PermissionGuard], data: { permissions: ['view:students'] } },
-  { path: 'education', loadChildren: () => import('./modules/education/education.module').then(m => m.EducationModule), canActivate: [AuthGuard, PermissionGuard], data: { permissions: ['view:education'] } },
   { path: 'todo', loadChildren: () => import('./modules/todo/todo.module').then(m => m.TodoModule), canActivate: [AuthGuard, PermissionGuard], data: { permissions: ['view:todo'] } },
   { path: 'admin', loadChildren: () => import('./page/admin/admin.module').then(m => m.AdminModule), canActivate: [AuthGuard, PermissionGuard], data: { permissions: ['manage:services', 'manage:users'] } },
   { path: 'auth', component: AuthComponent },

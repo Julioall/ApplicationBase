@@ -15,17 +15,11 @@ import { User } from '../../model/User';
 import {
   ADMIN_PERMISSION,
   MANAGE_SERVICES_PERMISSION,
-  MANAGE_STUDENTS_PERMISSION,
-  VIEW_STUDENTS_PERMISSION,
   VIEW_TODO_PERMISSION,
   MANAGE_TODO_PERMISSION,
-  VIEW_EDUCATION_PERMISSION,
 } from '../../model/permissions';
 import { Notification as AppNotification } from '../../model/notification';
 import { NotificationApiService } from '../../service/notification/notification-api.service';
-import { NotificationService } from '../../service/notification/notification.service';
-import { EducationService } from '../../service/education/education.service';
-import { TranslateService } from '@ngx-translate/core';
 
 type NavItem = {
   icon: string;
@@ -47,13 +41,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   sectionState: Record<'admin', boolean> = { admin: false };
   primaryNav: NavItem[] = [
     { icon: 'fa-solid fa-compass', label: 'home.primaryNav.panel', path: '/home' },
-    { icon: 'fa-solid fa-school', label: 'navbar.education', path: '/education' },
-    {
-      icon: 'fa-solid fa-user-graduate',
-      label: 'navbar.students',
-      path: '/students',
-      permissions: [VIEW_STUDENTS_PERMISSION, MANAGE_STUDENTS_PERMISSION],
-    },
     {
       icon: 'fa-solid fa-user-shield',
       label: 'home.adminNav.users',
@@ -76,14 +63,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
   isNotificationsOpen = false;
   isLoadingNotifications = false;
   isMarkingNotifications = false;
-  isSyncingEducation = false;
   private notificationPolling?: Subscription;
   private routerSubscription?: Subscription;
   private hasLoadedUser = false;
   private isFetchingUser = false;
   private readonly defaultInitials = 'AB';
   hasAdminAccess = false;
-  hasEducationAccess = false;
 
   @ViewChild('profileMenu') profileMenu?: ElementRef<HTMLDivElement>;
   @ViewChild('notificationsMenu') notificationsMenu?: ElementRef<HTMLDivElement>;
@@ -95,9 +80,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private readonly themeService: ThemeService,
     private readonly userService: UserService,
     private readonly notificationApiService: NotificationApiService,
-    private readonly notificationService: NotificationService,
-    private readonly educationService: EducationService,
-    private readonly translateService: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -185,30 +167,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.isProfileMenuOpen = false;
   }
 
-  triggerEducationSync(event: Event): void {
-    event.stopPropagation();
-
-    if (!this.authService.isLoggedIn() || !this.hasEducationAccess || this.isSyncingEducation) {
-      return;
-    }
-
-    this.isSyncingEducation = true;
-    this.educationService.triggerSync().subscribe({
-      next: () => {
-        this.isSyncingEducation = false;
-        this.notificationService.showSuccess(
-          this.translateService.instant('education.sync.triggerSuccessDetail'),
-          this.translateService.instant('education.sync.triggerSuccessTitle'),
-        );
-      },
-      error: (err) => {
-        this.isSyncingEducation = false;
-        const detail = err?.detail || err?.title || err?.message || this.translateService.instant('education.sync.triggerError');
-        this.notificationService.showError(detail, this.translateService.instant('education.labels.error'));
-      },
-    });
-  }
-
   navigateToProfile(): void {
     this.closeProfileMenu();
     this.router.navigate(['/profile']);
@@ -219,17 +177,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.closeProfileMenu();
     this.refreshAdminAccess();
     this.resetUserMetadata();
-    this.isSyncingEducation = false;
     this.stopNotificationPolling();
     this.router.navigate(['/auth']);
   }
 
   get userInitials(): string {
     return this.userInitialsValue;
-  }
-
-  get canAccessStudents(): boolean {
-    return this.authService.hasAnyPermission([VIEW_STUDENTS_PERMISSION, MANAGE_STUDENTS_PERMISSION]);
   }
 
   isRouteActive(path?: string): boolean {
@@ -320,15 +273,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   private refreshAdminAccess(): void {
     this.hasAdminAccess = this.authService.hasPermission(ADMIN_PERMISSION);
-    this.hasEducationAccess = this.authService.hasPermission(VIEW_EDUCATION_PERMISSION);
   }
 
   isAdminShortcutVisible(link: NavItem): boolean {
     if (link.path === '/admin/services') {
       return this.authService.hasPermission(MANAGE_SERVICES_PERMISSION);
-    }
-    if (link.path === '/students') {
-      return this.canAccessStudents;
     }
     if (link.path === '/admin/users' || link.path === '/support') {
       return this.hasAdminAccess;

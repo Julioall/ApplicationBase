@@ -2,7 +2,6 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using Application.Api.Filters;
-using Application.Api.Background;
 using Application.Api.Health;
 using Application.Api.Middlewares;
 using Application.Domain;
@@ -10,7 +9,6 @@ using Application.Domain.Localization;
 using Application.Domain.Model;
 using Application.Infrastructure;
 using Application.Service;
-using Application.Shared.Background;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -172,11 +170,6 @@ public class Program
         // Registro do cache de sessão de token Moodle
         builder.Services.AddSingleton<Application.Shared.Session.ISessionTokenCache, Application.Shared.Session.SessionTokenCache>();
         
-        // Register Hangfire job for Moodle sync
-        builder.Services.AddScoped<IMoodleSyncJob, MoodleSyncHangfireJob>();
-        builder.Services.AddScoped<MoodleSyncHangfireJob>();
-
-
         var app = builder.Build();
 
         RunStartupValidation(app.Services);

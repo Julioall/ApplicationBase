@@ -4,10 +4,6 @@ export const MANAGE_SERVICES_PERMISSION = 'manage:services';
 export const MANAGE_EMAIL_PERMISSION = 'manage:email';
 export const MANAGE_WHATSAPP_PERMISSION = 'manage:whatsapp';
 export const MANAGE_WHATSAPP_SELF_PERMISSION = 'manage:whatsapp-self';
-export const VIEW_STUDENTS_PERMISSION = 'view:students';
-export const MANAGE_STUDENTS_PERMISSION = 'manage:students';
-export const VIEW_EDUCATION_PERMISSION = 'view:education';
-export const MANAGE_EDUCATION_PERMISSION = 'manage:education';
 export const VIEW_TODO_PERMISSION = 'view:todo';
 export const MANAGE_TODO_PERMISSION = 'manage:todo';
 export const ALL_PERMISSIONS = [
@@ -17,10 +13,6 @@ export const ALL_PERMISSIONS = [
   MANAGE_EMAIL_PERMISSION,
   MANAGE_WHATSAPP_PERMISSION,
   MANAGE_WHATSAPP_SELF_PERMISSION,
-  VIEW_STUDENTS_PERMISSION,
-  MANAGE_STUDENTS_PERMISSION,
-  VIEW_EDUCATION_PERMISSION,
-  MANAGE_EDUCATION_PERMISSION,
   VIEW_TODO_PERMISSION,
   MANAGE_TODO_PERMISSION,
 ];

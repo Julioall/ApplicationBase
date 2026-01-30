@@ -119,7 +119,6 @@
     },
     "primaryNav": {
       "panel": "Dashboard",
-      "classes": "Classes",
       "metrics": "Metrics",
       "todo": "Todo"
     },
@@ -544,334 +543,6 @@
       "updateError": "Could not update permissions."
     }
   },
-  "students": {
-    "category": "Records",
-    "common": {
-      "error": "Error"
-    },
-    "list": {
-      "eyebrow": "Directory",
-      "title": "Students",
-      "subtitle": "Manage student records without logins or credentials.",
-      "add": "New student",
-      "export": "Export",
-      "exportFilenamePrefix": "students",
-      "exportError": "Could not export students.",
-      "searchPlaceholder": "Search by name, email or ID number",
-      "searchAria": "Search students",
-      "statusFilter": "Status",
-      "statusAll": "All",
-      "statusActive": "Active",
-      "statusInactive": "Inactive",
-      "columnsFilter": "Columns",
-      "columnsFilterTitle": "Show columns",
-      "columns": {
-        "name": "Full name",
-        "email": "Email",
-        "idNumber": "ID number",
-        "phone": "Phone",
-        "status": "Status",
-        "actions": "Actions",
-        "lastAccess": "Last access"
-      },
-      "loading": "Loading students...",
-      "empty": "No students found.",
-      "noInstitution": "No institution",
-      "edit": "Edit",
-      "delete": "Delete",
-      "confirmDelete": "Inactivate {{name}}?",
-      "deleteSuccess": "Student inactivated.",
-      "deleteError": "Could not remove the student.",
-      "loadError": "Could not load students.",
-      "missingId": "Student ID is missing.",
-      "prev": "Previous",
-      "next": "Next",
-      "pageXofY": "Page {{page}} of {{total}}"
-    },
-    "form": {
-      "eyebrow": "Registration",
-      "titleCreate": "Create student",
-      "titleEdit": "Edit student",
-      "subtitle": "Store contact, language, and timezone preferences for each student.",
-      "back": "Back",
-      "save": "Save student",
-      "saving": "Saving...",
-      "firstName": "First name",
-      "lastName": "Last name",
-      "email": "Email",
-      "idNumber": "ID number / CPF",
-      "phone": "Phone",
-      "institution": "Institution",
-      "lang": "Language",
-      "langSelectPlaceholder": "Select a language",
-      "langOptions": {
-        "pt": "Portuguese",
-        "en": "English",
-        "es": "Spanish"
-      },
-      "timeZone": "Time zone",
-      "isActive": "Student is active",
-      "address": {
-        "street": "Street",
-        "number": "Number",
-        "district": "District",
-        "city": "City",
-        "state": "State",
-        "postalCode": "Postal code",
-        "country": "Country",
-        "countryDefault": "Brazil"
-      },
-      "errors": {
-        "firstNameRequired": "First name is required.",
-        "firstNameLength": "Enter between 2 and 100 characters.",
-        "lastNameRequired": "Last name is required.",
-        "lastNameLength": "Enter between 2 and 100 characters.",
-        "email": "Enter a valid email.",
-        "idNumber": "Maximum 20 characters.",
-        "lang": "Use codes like pt or en_US."
-      },
-      "createSuccess": "Student created successfully.",
-      "updateSuccess": "Student updated successfully.",
-      "saveError": "Could not save the student.",
-      "loadError": "Could not load the student.",
-      "lastAccess": "Last access",
-      "status": "Status"
-    },
-    "status": {
-      "active": "Active",
-      "suspended": "Suspended",
-      "notCurrently": "Inactive"
-    }
-  },
-  "education": {
-    "category": "Education",
-    "header": {
-      "eyebrow": "Courses",
-      "title": "Courses",
-      "subtitle": "Browse schools, courses, and classes in one place. Open a class to see its units."
-    },
-    "syncStatus": {
-      "readOnly": "Read-only from Moodle cache",
-      "lastSync": "Last sync",
-      "never": "Never synced",
-      "loading": "Loading..."
-    },
-    "sync": {
-      "buttonLabel": "Sync Moodle",
-      "triggerSuccessTitle": "Sync started",
-      "triggerSuccessDetail": "Moodle sync was queued and will run shortly.",
-      "triggerError": "Could not start Moodle sync."
-    },
-    "actions": {
-      "refresh": "Reload data"
-    },
-    "filters": {
-      "button": "Filters",
-      "school": "School",
-      "program": "Course",
-      "search": "Search",
-      "searchPlaceholder": "Search classes by name",
-      "selectPlaceholder": "Select"
-    },
-    "labels": {
-      "school": "School",
-      "program": "Course",
-      "class": "Class",
-      "period": "Period",
-      "periodUnknown": "Period not available",
-      "error": "Error",
-      "submitted": "Submitted",
-      "corrected": "Corrected",
-      "grade": "Grade",
-      "close": "Close",
-      "viewCourse": "Open course",
-      "viewLabel": "View",
-      "viewLink": "Open class"
-    },
-    "classes": {
-      "count": "{{count}} classes",
-      "open": "Open class",
-      "loadingUnits": "Loading units...",
-      "emptyUnits": "No units found for this class."
-    },
-    "classDetail": {
-      "title": "Class",
-      "subtitle": "See every unit inside the class and open course links.",
-      "back": "Back",
-      "searchPlaceholder": "Filter units by name",
-      "unitsCount": "{{count}} unit(s)"
-    },
-    "ucDetail": {
-      "title": "Curricular unit",
-      "subtitle": "Details of the selected unit.",
-      "notFound": "Could not find the selected unit.",
-      "studentsTitle": "Linked students",
-      "studentsSubtitle": "Students linked to this curricular unit.",
-      "studentsLoading": "Loading students...",
-      "studentsEmpty": "No students linked to this unit.",
-      "studentsName": "Name",
-      "studentsEmail": "Email",
-      "studentsPhone": "Phone",
-      "studentFallback": "Student",
-      "loadStudentsError": "Could not load linked students.",
-      "activityHidden": "Activity hidden",
-      "activityShown": "Activity visible",
-      "toggleHiddenError": "Could not change activity visibility.",
-      "configure": "Configure unit",
-      "configureDescription": "Hide or show activities for every student in this unit.",
-      "hideActivity": "Hide activity",
-      "showActivity": "Show activity"
-    },
-    "empty": {
-      "title": "No classes to show",
-      "subtitle": "Choose a school and course to list their classes. Open a class to view its units."
-    },
-    "import": {
-      "title": "Import courses",
-      "success": "{{created}} created, {{updated}} updated, {{linked}} linked.",
-      "warning": "{{count}} issues found during import.",
-      "errorRow": "{{course}} • {{name}}: {{message}}",
-      "queuedMessage": "The file was received and will be processed in the background. You will be notified when it finishes."
-    },
-    "errors": {
-      "loadSchools": "Could not load schools.",
-      "loadPrograms": "Could not load courses.",
-      "loadClasses": "Could not load classes.",
-      "loadUcs": "Could not load curricular units.",
-      "loadSyncStatus": "Could not load sync status.",
-      "import": "Could not import courses."
-    },
-    "pagination": {
-      "page": "Page {{current}} of {{total}}",
-      "prev": "Previous",
-      "next": "Next"
-    }
-  },
-  "moodle": {
-    "category": "Moodle",
-    "header": {
-      "eyebrow": "Moodle",
-      "title": "Moodle Courses",
-      "subtitle": "Browse categories, programs, and cohorts synced from Moodle."
-    },
-    "syncStatus": {
-      "readOnly": "Read-only from Moodle cache",
-      "lastSync": "Last sync",
-      "never": "Never synced",
-      "loading": "Loading..."
-    },
-    "sync": {
-      "buttonLabel": "Sync Moodle",
-      "triggerSuccessTitle": "Sync started",
-      "triggerSuccessDetail": "Moodle sync was queued and will run shortly.",
-      "triggerError": "Could not start Moodle sync."
-    },
-    "actions": {
-      "refresh": "Reload data"
-    },
-    "filters": {
-      "button": "Filters",
-      "category": "Category",
-      "courseCategory": "Program",
-      "cohort": "Cohort",
-      "search": "Search",
-      "searchPlaceholder": "Search courses by name",
-      "selectPlaceholder": "Select"
-    },
-    "labels": {
-      "category": "Category",
-      "courseCategory": "Program",
-      "cohort": "Cohort",
-      "course": "Course",
-      "period": "Period",
-      "periodUnknown": "Period not available",
-      "error": "Error",
-      "submitted": "Submitted",
-      "corrected": "Corrected",
-      "grade": "Grade",
-      "close": "Close",
-      "viewCourse": "Open course",
-      "viewLabel": "View",
-      "viewLink": "Open course"
-    },
-    "empty": {
-      "title": "No courses to show",
-      "subtitle": "Choose a category and program to list courses."
-    },
-    "errors": {
-      "loadCategories": "Could not load categories.",
-      "loadCourseCategories": "Could not load programs.",
-      "loadCohorts": "Could not load cohorts.",
-      "loadCourses": "Could not load courses.",
-      "loadSyncStatus": "Could not load sync status."
-    },
-    "pagination": {
-      "page": "Page {{current}} of {{total}}",
-      "prev": "Previous",
-      "next": "Next"
-    },
-    "cohorts": {
-      "count": "{{count}} cohorts",
-      "open": "Open cohort",
-      "loadingCourses": "Loading courses...",
-      "emptyCourses": "No courses found for this cohort."
-    },
-    "courseDetail": {
-      "title": "Course",
-      "subtitle": "Details of the selected course.",
-      "notFound": "Could not find the selected course.",
-      "studentsTitle": "Enrolled students",
-      "studentsSubtitle": "Students enrolled in this course.",
-      "studentsLoading": "Loading students...",
-      "studentsEmpty": "No students enrolled in this course.",
-      "studentsName": "Name",
-      "studentsEmail": "Email",
-      "studentsPhone": "Phone",
-      "studentFallback": "Student",
-      "loadStudentsError": "Could not load enrolled students.",
-      "activityHidden": "Activity hidden",
-      "activityShown": "Activity visible",
-      "toggleHiddenError": "Could not change activity visibility.",
-      "configure": "Configure course",
-      "configureDescription": "Hide or show activities for every student in this course.",
-      "hideActivity": "Hide activity",
-      "showActivity": "Show activity"
-    }
-  },
-  "classes": {
-    "eyebrow": "Classes",
-    "title": "Classes",
-    "subtitle": "See all units and the students linked to each one.",
-    "searchPlaceholder": "Search units",
-    "classesTitle": "Classes",
-    "classesSubtitle": "Select a class to open the units tab.",
-    "openUnits": "Open units",
-    "countLabel": "{{count}} units",
-    "detailsTitle": "Class details",
-    "classInfoTitle": "Class information",
-    "unitInfoTitle": "Unit information",
-    "schoolLabel": "School",
-    "programLabel": "Program",
-    "periodLabel": "Period",
-    "unitLabel": "Unit",
-    "viewLabel": "View",
-    "viewLink": "Open unit",
-    "periodFallback": "Period not available",
-    "groupLabel": "Category",
-    "uncategorized": "Uncategorized",
-    "studentsTitle": "Linked students",
-    "studentsCount": "{{count}} students",
-    "selectUnit": "Select a unit to view linked students.",
-    "emptyClasses": "No classes found.",
-    "emptyUnits": "No units found.",
-    "emptyStudents": "No students linked to this unit yet.",
-    "loadingUnits": "Loading units...",
-    "loadingStudents": "Loading students...",
-    "errors": {
-      "loadUnits": "Could not load units.",
-      "loadStudents": "Could not load linked students."
-    }
-  },
   "admin": {
     "pageTitle": "Admin"
   },
@@ -890,9 +561,9 @@
     "detail": "Task details",
     "newTask": "New task",
     "loading": "Loading tasks...",
-  "emptyColumn": "Nothing here yet.",
-  "defaultTag": "Task",
-  "completedAt": "Completed",
+    "emptyColumn": "Nothing here yet.",
+    "defaultTag": "Task",
+    "completedAt": "Completed",
     "steps": {
       "title": "Steps",
       "subtitle": "Drag to reorder or click to edit.",
@@ -930,18 +601,18 @@
       "inProgress": "In progress",
       "done": "Done"
     },
-      "actions": {
-        "create": "Create task",
-        "cancel": "Cancel",
-        "close": "Close",
-    "archive": "Archive",
-    "delete": "Delete",
-    "edit": "Edit",
-    "save": "Save",
-    "removeCategory": "Remove category",
-    "removeAssignee": "Remove assignee",
-    "addCard": "Add card"
-  },
+    "actions": {
+      "create": "Create task",
+      "cancel": "Cancel",
+      "close": "Close",
+      "archive": "Archive",
+      "delete": "Delete",
+      "edit": "Edit",
+      "save": "Save",
+      "removeCategory": "Remove category",
+      "removeAssignee": "Remove assignee",
+      "addCard": "Add card"
+    },
     "notifications": {
       "created": "Task created",
       "updated": "Task updated",
@@ -1002,9 +673,7 @@
     "profile": "Profile",
     "admin": "Admin",
     "theme": "Theme",
-    "logout": "Sign out",
-    "students": "Students",
-    "education": "Courses"
+    "logout": "Sign out"
   },
   "modal": {
     "confirm": "Confirm",

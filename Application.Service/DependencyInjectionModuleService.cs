@@ -19,12 +19,8 @@ namespace Application.Service
             services.AddHttpClient<EvolutionWhatsAppInstanceProvider>();
             services.AddScoped<IWhatsAppInstanceProvider, EvolutionWhatsAppInstanceProvider>();
             services.AddScoped<IWhatsAppInstanceService, WhatsAppInstanceService>();
-            services.AddScoped<IStudentService, StudentService>();
-            services.AddScoped<IEducationService, EducationService>();
-            services.AddScoped<IMoodleService, MoodleService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<ITodoService, TodoService>();
-            services.AddHttpClient<IMoodleCourseClient, MoodleCourseClient>();
             return services;
         }
     }

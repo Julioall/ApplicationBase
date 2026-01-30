@@ -1,37 +1,37 @@
-<?xml version="1.0" encoding="utf-8"?>
-<root>
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
-    <xsd:element name="root" msdata:IsDataSet="true">
-      <xsd:complexType>
-        <xsd:choice maxOccurs="unbounded">
-          <xsd:element name="metadata">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
-              </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="data">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-        </xsd:choice>
-      </xsd:complexType>
-    </xsd:element>
-  </xsd:schema>
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
   </resheader>
@@ -158,45 +158,6 @@
   <data name="UserUpdatedSuccessfully" xml:space="preserve">
     <value>User updated successfully.</value>
   </data>
-  <data name="StudentFirstNameRequired" xml:space="preserve">
-    <value>First name is required.</value>
-  </data>
-  <data name="StudentFirstNameLength" xml:space="preserve">
-    <value>First name must be between 2 and 100 characters.</value>
-  </data>
-  <data name="StudentLastNameRequired" xml:space="preserve">
-    <value>Last name is required.</value>
-  </data>
-  <data name="StudentLastNameLength" xml:space="preserve">
-    <value>Last name must be between 2 and 100 characters.</value>
-  </data>
-  <data name="StudentEmailInvalid" xml:space="preserve">
-    <value>Invalid email address.</value>
-  </data>
-  <data name="StudentIdNumberRequired" xml:space="preserve">
-    <value>Id number cannot be empty.</value>
-  </data>
-  <data name="StudentIdNumberMaxLength" xml:space="preserve">
-    <value>Id number must have at most 20 characters.</value>
-  </data>
-  <data name="StudentLangInvalid" xml:space="preserve">
-    <value>Language must follow the pattern "pt" or "en_US".</value>
-  </data>
-  <data name="StudentTimeZoneInvalid" xml:space="preserve">
-    <value>Invalid time zone.</value>
-  </data>
-  <data name="StudentIdNumberExists" xml:space="preserve">
-    <value>A student with id number {0} already exists.</value>
-  </data>
-  <data name="StudentNotFound" xml:space="preserve">
-    <value>Student with id {0} not found.</value>
-  </data>
-  <data name="StudentCreated" xml:space="preserve">
-    <value>Student created successfully.</value>
-  </data>
-  <data name="StudentUpdated" xml:space="preserve">
-    <value>Student updated successfully.</value>
-  </data>
   <data name="InvalidRequestDetail" xml:space="preserve">
     <value>The request payload is invalid.</value>
   </data>
@@ -265,19 +226,6 @@
     <value>Email password is stored as hash. Reconfigure SMTP credentials.</value>
   </data>
 
-  <data name="StudentExportHeaderFirstName" xml:space="preserve">
-    <value>First name</value>
-  </data>
-  <data name="StudentExportHeaderLastName" xml:space="preserve">
-    <value>Last name</value>
-  </data>
-  <data name="StudentExportHeaderLastAccess" xml:space="preserve">
-    <value>Last access</value>
-  </data>
-  <data name="StudentExportHeaderEmail" xml:space="preserve">
-    <value>Email address</value>
-  </data>
-
   <data name="EncryptionKeyNotConfigured" xml:space="preserve">
     <value>Encryption key not configured. Set env var {0}.</value>
   </data>
@@ -291,78 +239,6 @@
     <value>Failed to decrypt email password. Reconfigure SMTP credentials.</value>
   </data>
 
-  <data name="EducationReadOnly" xml:space="preserve">
-    <value>Education is in read-only mode. Imports and edits are disabled.</value>
-  </data>
-  <data name="EducationSyncAlreadyRunning" xml:space="preserve">
-    <value>A synchronization is already running. Please wait for it to finish.</value>
-  </data>
-  <data name="EducationSyncRateLimited" xml:space="preserve">
-    <value>Please wait {0} minute(s) before triggering a new synchronization.</value>
-  </data>
-  <data name="EducationSyncQueued" xml:space="preserve">
-    <value>Synchronization queued.</value>
-  </data>
-  <data name="EducationSyncRunning" xml:space="preserve">
-    <value>Synchronization in progress.</value>
-  </data>
-  <data name="EducationSyncCompleted" xml:space="preserve">
-    <value>Synchronization completed successfully.</value>
-  </data>
-  <data name="EducationSyncFailed" xml:space="preserve">
-    <value>Synchronization failed. Try again later.</value>
-  </data>
-  <data name="EducationSyncInvalidUserId" xml:space="preserve">
-    <value>Invalid user ID. The ID must be the Moodle user number.</value>
-  </data>
-  <data name="EducationSyncMissingToken" xml:space="preserve">
-    <value>Moodle token not configured. Set MOODLESETTINGS__FIXEDTOKEN or log in again.</value>
-  </data>
-  <data name="CourseImportFileMissing" xml:space="preserve">
-    <value>Import file not found.</value>
-  </data>
-  <data name="EducationSchoolRequired" xml:space="preserve">
-    <value>schoolId is required.</value>
-  </data>
-  <data name="EducationProgramRequired" xml:space="preserve">
-    <value>programId is required.</value>
-  </data>
-  <data name="EducationClassRequired" xml:space="preserve">
-    <value>classId is required.</value>
-  </data>
-  
-  <!-- Moodle terminology -->
-  <data name="MoodleReadOnly" xml:space="preserve">
-    <value>Moodle integration is in read-only mode. Edits are disabled.</value>
-  </data>
-  <data name="MoodleSyncAlreadyRunning" xml:space="preserve">
-    <value>A Moodle synchronization is already running. Please wait for it to finish.</value>
-  </data>
-  <data name="MoodleSyncRateLimited" xml:space="preserve">
-    <value>Please wait {0} minute(s) before triggering a new Moodle synchronization.</value>
-  </data>
-  <data name="MoodleSyncQueued" xml:space="preserve">
-    <value>Moodle synchronization queued.</value>
-  </data>
-  <data name="MoodleSyncRunning" xml:space="preserve">
-    <value>Moodle synchronization in progress.</value>
-  </data>
-  <data name="MoodleSyncCompleted" xml:space="preserve">
-    <value>Moodle synchronization completed successfully.</value>
-  </data>
-  <data name="MoodleSyncFailed" xml:space="preserve">
-    <value>Moodle synchronization failed. Try again later.</value>
-  </data>
-  <data name="MoodleCategoryRequired" xml:space="preserve">
-    <value>categoryId is required.</value>
-  </data>
-  <data name="MoodleCourseCategoryRequired" xml:space="preserve">
-    <value>courseCategoryId is required.</value>
-  </data>
-  <data name="MoodleCohortRequired" xml:space="preserve">
-    <value>cohortId is required.</value>
-  </data>
-  
   <data name="ImportNotFound" xml:space="preserve">
     <value>Import {0} not found.</value>
   </data>
@@ -371,9 +247,6 @@
 
   <data name="NotificationImportCompletedTitle" xml:space="preserve">
     <value>Import completed</value>
-  </data>
-  <data name="NotificationImportCompletedMessage" xml:space="preserve">
-    <value>File {0} processed {1} new UCs, {2} updated and {3} linked.</value>
   </data>
   <data name="NotificationImportFailedTitle" xml:space="preserve">
     <value>Import failed</value>
@@ -538,4 +411,3 @@
   </data>
 
 </root>
-

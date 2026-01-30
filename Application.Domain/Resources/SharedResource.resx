@@ -1,37 +1,37 @@
-<?xml version="1.0" encoding="utf-8"?>
-<root>
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
-    <xsd:element name="root" msdata:IsDataSet="true">
-      <xsd:complexType>
-        <xsd:choice maxOccurs="unbounded">
-          <xsd:element name="metadata">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
-              </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="data">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-        </xsd:choice>
-      </xsd:complexType>
-    </xsd:element>
-  </xsd:schema>
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="metadata">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" use="required" type="xsd:string" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+              <xs:attribute ref="xml:space" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
   </resheader>
@@ -155,45 +155,6 @@
   <data name="UserUpdatedSuccessfully" xml:space="preserve">
     <value>Usuário atualizado com sucesso.</value>
   </data>
-  <data name="StudentFirstNameRequired" xml:space="preserve">
-    <value>Primeiro nome e obrigatorio.</value>
-  </data>
-  <data name="StudentFirstNameLength" xml:space="preserve">
-    <value>Primeiro nome deve ter entre 2 e 100 caracteres.</value>
-  </data>
-  <data name="StudentLastNameRequired" xml:space="preserve">
-    <value>Sobrenome e obrigatorio.</value>
-  </data>
-  <data name="StudentLastNameLength" xml:space="preserve">
-    <value>Sobrenome deve ter entre 2 e 100 caracteres.</value>
-  </data>
-  <data name="StudentEmailInvalid" xml:space="preserve">
-    <value>E-mail invalido.</value>
-  </data>
-  <data name="StudentIdNumberRequired" xml:space="preserve">
-    <value>Numero de matricula/CPF nao pode ficar vazio.</value>
-  </data>
-  <data name="StudentIdNumberMaxLength" xml:space="preserve">
-    <value>Numero de matricula/CPF deve ter no maximo 20 caracteres.</value>
-  </data>
-  <data name="StudentLangInvalid" xml:space="preserve">
-    <value>Idioma deve seguir o padrao "pt" ou "en_US".</value>
-  </data>
-  <data name="StudentTimeZoneInvalid" xml:space="preserve">
-    <value>Fuso horario invalido.</value>
-  </data>
-  <data name="StudentIdNumberExists" xml:space="preserve">
-    <value>Ja existe um aluno com o numero {0}.</value>
-  </data>
-  <data name="StudentNotFound" xml:space="preserve">
-    <value>Aluno com id {0} nao encontrado.</value>
-  </data>
-  <data name="StudentCreated" xml:space="preserve">
-    <value>Aluno criado com sucesso.</value>
-  </data>
-  <data name="StudentUpdated" xml:space="preserve">
-    <value>Aluno atualizado com sucesso.</value>
-  </data>
   <data name="InvalidRequestDetail" xml:space="preserve">
     <value>A requisicao esta ausente ou invalida.</value>
   </data>
@@ -262,50 +223,7 @@
     <value>Senha de e-mail armazenada como hash. Reconfigure as credenciais SMTP.</value>
   </data>
 
-    <data name="StudentImportFileEmpty" xml:space="preserve">
-    <value>Arquivo de importacao vazio.</value>
-  </data>
-  <data name="StudentImportOnlyXlsx" xml:space="preserve">
-    <value>Apenas arquivos .xlsx ou .json sao suportados para importacao.</value>
-  </data>
-  <data name="StudentImportCourseIdMissing" xml:space="preserve">
-    <value>Nao foi possivel identificar o ID do curso pelo nome do arquivo.</value>
-  </data>
-  <data name="StudentImportInvalidJson" xml:space="preserve">
-    <value>Arquivo JSON invalido para importacao de participantes.</value>
-  </data>
-  <data name="StudentImportEmailRequired" xml:space="preserve">
-    <value>E-mail e obrigatorio para importacao de participantes.</value>
-  </data>
-  <data name="StudentImportWorksheetMissing" xml:space="preserve">
-    <value>Nenhuma planilha encontrada no arquivo enviado.</value>
-  </data>
-  <data name="StudentImportNamesRequired" xml:space="preserve">
-    <value>Primeiro nome e sobrenome sÇœo obrigatÇürios.</value>
-  </data>
-  <data name="StudentImportInvalidDate" xml:space="preserve">
-    <value>Valor de data invÇ­lido.</value>
-  </data>
-  <data name="StudentImportInvalidDateWithValue" xml:space="preserve">
-    <value>Valor de data invÇ­lido: "{0}".</value>
-  </data>
-  <data name="StudentImportMissingId" xml:space="preserve">
-    <value>Aluno existente sem identificador.</value>
-  </data>
-  <data name="StudentExportHeaderFirstName" xml:space="preserve">
-    <value>Nome</value>
-  </data>
-  <data name="StudentExportHeaderLastName" xml:space="preserve">
-    <value>Sobrenome</value>
-  </data>
-  <data name="StudentExportHeaderLastAccess" xml:space="preserve">
-    <value>Ultimo acesso</value>
-  </data>
-  <data name="StudentExportHeaderEmail" xml:space="preserve">
-    <value>EndereÇõo de e-mail</value>
-  </data>
-
-  <data name="EncryptionKeyNotConfigured" xml:space="preserve">
+    <data name="EncryptionKeyNotConfigured" xml:space="preserve">
     <value>Chave de criptografia nÇœo configurada. Defina a variÇ­vel de ambiente {0}.</value>
   </data>
   <data name="EncryptedDataInvalidBase64" xml:space="preserve">
@@ -318,99 +236,6 @@
     <value>Falha ao descriptografar senha de e-mail. Reconfigure as credenciais SMTP.</value>
   </data>
 
-  <data name="CourseImportFileEmpty" xml:space="preserve">
-    <value>O arquivo de cursos nÃ£o pode estar vazio.</value>
-  </data>
-  <data name="CourseImportOnlyJson" xml:space="preserve">
-    <value>Envie um arquivo .json com os cursos.</value>
-  </data>
-  <data name="CourseImportInvalidJson" xml:space="preserve">
-    <value>O arquivo de cursos estÃ¡ invÃ¡lido ou nÃ£o Ã© um JSON vÃ¡lido.</value>
-  </data>
-  <data name="CourseImportCoursesMissing" xml:space="preserve">
-    <value>Nenhuma lista de cursos encontrada em data.courses.</value>
-  </data>
-  <data name="CourseImportProgramMissing" xml:space="preserve">
-    <value>Curso macro nÃ£o encontrado no resumo.</value>
-  </data>
-  <data name="CourseImportSchoolMissing" xml:space="preserve">
-    <value>Escola nÃ£o encontrada no resumo.</value>
-  </data>
-  <data name="CourseImportFieldMissing" xml:space="preserve">
-    <value>Campo obrigatÃ³rio ausente: {0}.</value>
-  </data>
-  <data name="CourseImportFileMissing" xml:space="preserve">
-    <value>Arquivo de importação não encontrado.</value>
-  </data>
-  <data name="EducationReadOnly" xml:space="preserve">
-    <value>Educação está em modo somente leitura. Importações e edições foram desativadas.</value>
-  </data>
-  <data name="EducationSyncAlreadyRunning" xml:space="preserve">
-    <value>Já existe uma sincronização em andamento. Aguarde a conclusão.</value>
-  </data>
-  <data name="EducationSyncRateLimited" xml:space="preserve">
-    <value>Aguarde {0} minuto(s) antes de iniciar uma nova sincronização.</value>
-  </data>
-  <data name="EducationSyncQueued" xml:space="preserve">
-    <value>Sincronização enfileirada.</value>
-  </data>
-  <data name="EducationSyncRunning" xml:space="preserve">
-    <value>Sincronização em andamento.</value>
-  </data>
-  <data name="EducationSyncCompleted" xml:space="preserve">
-    <value>Sincronização concluída com sucesso.</value>
-  </data>
-  <data name="EducationSyncFailed" xml:space="preserve">
-    <value>Falha na sincronização. Tente novamente mais tarde.</value>
-  </data>
-  <data name="EducationSyncInvalidUserId" xml:space="preserve">
-    <value>ID do usuário inválido. O ID deve ser o número do usuário no Moodle.</value>
-  </data>
-  <data name="EducationSyncMissingToken" xml:space="preserve">
-    <value>Token do Moodle não configurado. Configure MOODLESETTINGS__FIXEDTOKEN ou faça login novamente.</value>
-  </data>
-  <data name="EducationSchoolRequired" xml:space="preserve">
-    <value>schoolId Ã© obrigatÃ³rio.</value>
-  </data>
-  <data name="EducationProgramRequired" xml:space="preserve">
-    <value>programId Ã© obrigatÃ³rio.</value>
-  </data>
-  <data name="EducationClassRequired" xml:space="preserve">
-    <value>classId Ã© obrigatÃ³rio.</value>
-  </data>
-  
-  <!-- Terminologia Moodle -->
-  <data name="MoodleReadOnly" xml:space="preserve">
-    <value>A integração Moodle está em modo somente leitura. Edições foram desativadas.</value>
-  </data>
-  <data name="MoodleSyncAlreadyRunning" xml:space="preserve">
-    <value>Já existe uma sincronização Moodle em andamento. Aguarde a conclusão.</value>
-  </data>
-  <data name="MoodleSyncRateLimited" xml:space="preserve">
-    <value>Aguarde {0} minuto(s) antes de iniciar uma nova sincronização Moodle.</value>
-  </data>
-  <data name="MoodleSyncQueued" xml:space="preserve">
-    <value>Sincronização Moodle enfileirada.</value>
-  </data>
-  <data name="MoodleSyncRunning" xml:space="preserve">
-    <value>Sincronização Moodle em andamento.</value>
-  </data>
-  <data name="MoodleSyncCompleted" xml:space="preserve">
-    <value>Sincronização Moodle concluída com sucesso.</value>
-  </data>
-  <data name="MoodleSyncFailed" xml:space="preserve">
-    <value>Falha na sincronização Moodle. Tente novamente mais tarde.</value>
-  </data>
-  <data name="MoodleCategoryRequired" xml:space="preserve">
-    <value>categoryId é obrigatório.</value>
-  </data>
-  <data name="MoodleCourseCategoryRequired" xml:space="preserve">
-    <value>courseCategoryId é obrigatório.</value>
-  </data>
-  <data name="MoodleCohortRequired" xml:space="preserve">
-    <value>cohortId é obrigatório.</value>
-  </data>
-  
   <data name="ImportNotFound" xml:space="preserve">
     <value>ImportaÃ§Ã£o {0} nÃ£o encontrada.</value>
   </data>
@@ -419,9 +244,6 @@
 
   <data name="NotificationImportCompletedTitle" xml:space="preserve">
     <value>Importação concluída</value>
-  </data>
-  <data name="NotificationImportCompletedMessage" xml:space="preserve">
-    <value>O arquivo {0} gerou {1} CourseUnits novas, {2} atualizadas e {3} vínculos.</value>
   </data>
   <data name="NotificationImportFailedTitle" xml:space="preserve">
     <value>Falha na importação</value>
@@ -585,7 +407,3 @@
   </data>
 
 </root>
-
-
-
-
