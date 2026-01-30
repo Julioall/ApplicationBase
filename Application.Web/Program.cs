@@ -11,6 +11,7 @@ using Application.Infrastructure;
 using Application.Service;
 using Hangfire;
 using Hangfire.PostgreSql;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Localization;
@@ -21,17 +22,37 @@ using Microsoft.IdentityModel.Tokens;
 using Application.Api.RateLimiting;
 using Application.Api.Hangfire;
 using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 
 public class Program
 {
     public static void Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        // Configure Serilog
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .Enrich.FromLogContext()
+            .Enrich.WithMachineName()
+            .Enrich.WithProperty("Environment", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production")
+            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}")
+            .WriteTo.File(
+                path: "logs/application-.txt",
+                rollingInterval: RollingInterval.Day,
+                retainedFileCountLimit: 30,
+                fileSizeLimitBytes: 10485760,
+                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}")
+            .CreateBootstrapLogger();
 
-        builder.Logging.ClearProviders();
-        builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
-        builder.Logging.AddConsole();
-        builder.Logging.AddDebug();
+        try
+        {
+            Log.Information("Iniciando aplicação...");
+            
+            var builder = WebApplication.CreateBuilder(args);
+            
+            // Use Serilog
+            builder.Host.UseSerilog(Log.Logger, dispose: true);
 
         builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
         builder.Services.AddMemoryCache();
@@ -55,6 +76,12 @@ public class Program
                 });
         });
         builder.Services.AddHangfireServer();
+
+        // Register MediatR
+        Log.Information("Registrando MediatR handlers...");
+        builder.Services.AddMediatR(options =>
+            options.RegisterServicesFromAssembly(typeof(Program).Assembly)
+        );
 
         // Service configuration
         builder.Services.AddScoped<ValidationProblemDetailsFilter>();
@@ -228,7 +255,17 @@ public class Program
         app.MapControllers();
         app.MapFallbackToFile("/index.html");
 
+        Log.Information("Aplicação iniciada com sucesso.");
         app.Run();
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Aplicação foi encerrada inesperadamente.");
+        }
+        finally
+        {
+            Log.CloseAndFlush();
+        }
     }
 
     private static void RunStartupValidation(IServiceProvider services)
