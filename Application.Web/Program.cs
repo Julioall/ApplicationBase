@@ -78,11 +78,24 @@ public class Program
         });
         builder.Services.AddHangfireServer();
 
-        // Register MediatR
-        Log.Information("Registrando MediatR handlers...");
+        // Register MediatR with Behaviors
+        Log.Information("Registrando MediatR handlers e behaviors...");
         builder.Services.AddMediatR(options =>
-            options.RegisterServicesFromAssembly(typeof(Program).Assembly)
-        );
+        {
+            options.RegisterServicesFromAssembly(typeof(Program).Assembly);
+            // Registrar behaviors na ordem: Caching -> Resiliência
+            // Caching é executado PRIMEIRO para validar se precisa executar o handler
+            options.AddOpenBehavior(typeof(Application.Service.Behaviors.CachingBehavior<,>));
+            // Resiliência é executada DEPOIS do caching
+            options.AddOpenBehavior(typeof(Application.Service.Behaviors.ResiliencePolicyBehavior<,>));
+        });
+
+        // Register Distributed Cache Service
+        // TODO: Implementar RedisDistributedCacheService em Phase 3
+        // Por enquanto, usar In-Memory Cache como fallback
+        builder.Services.AddMemoryCache();
+        builder.Services.AddScoped<Application.Service.Behaviors.IDistributedCacheService,
+            Application.Service.Behaviors.InMemoryCacheService>();
 
         // Service configuration
         builder.Services.AddScoped<ValidationProblemDetailsFilter>();
