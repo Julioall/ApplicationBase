@@ -7,7 +7,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { AdminUserDetailComponent } from './user-detail.component';
 import { NotificationService } from '../../service/notification/notification.service';
 import { UserService } from '../../service/user/user.service';
-import { User } from '../../model/User';
+import { User } from '../../model/user';
 
 class NotificationStub {
   showWarning = jasmine.createSpy('showWarning');

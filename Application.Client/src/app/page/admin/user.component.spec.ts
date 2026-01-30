@@ -6,7 +6,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { AdminUsersComponent } from './user.component';
 import { NotificationService } from '../../service/notification/notification.service';
 import { UserService } from '../../service/user/user.service';
-import { User } from '../../model/User';
+import { User } from '../../model/user';
 
 class NotificationStub {
   showError = jasmine.createSpy('showError');

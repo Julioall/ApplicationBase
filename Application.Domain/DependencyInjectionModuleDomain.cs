@@ -1,10 +1,11 @@
 using Application.Domain.Model.Dtos;
+using Application.Domain.Model.Dtos.User;
 using Application.Domain.Model.User;
 using Application.Domain.Model.Todo;
 using Application.Domain.Model.Todo.Dtos;
-using Application.Domain.Validator;
 using Application.Domain.Validation;
 using Application.Domain.Validation.Todo;
+using Application.Domain.Validation.User;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 

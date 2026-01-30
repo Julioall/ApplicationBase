@@ -32,7 +32,7 @@ namespace Application.Domain.Validation.Todo
                 .Must(HaveValidDates)
                 .WithMessage("TodoDateRangeInvalid");
 
-            RuleFor(t => t.Recurrence)
+            RuleFor(t => t.Recurrence!)
                 .SetValidator(new TodoRecurrenceValidator())
                 .When(t => t.Recurrence != null);
 
@@ -123,7 +123,7 @@ namespace Application.Domain.Validation.Todo
                 .Must(HaveValidDates)
                 .WithMessage("TodoDateRangeInvalid");
 
-            RuleFor(t => t.Recurrence)
+            RuleFor(t => t.Recurrence!)
                 .SetValidator(new TodoRecurrenceDtoValidator())
                 .When(t => t.Recurrence != null);
 
@@ -197,7 +197,7 @@ namespace Application.Domain.Validation.Todo
                 .Must(HaveValidDates)
                 .WithMessage("TodoDateRangeInvalid");
 
-            RuleFor(t => t.Recurrence)
+            RuleFor(t => t.Recurrence!)
                 .SetValidator(new TodoRecurrenceDtoValidator())
                 .When(t => t.Recurrence != null);
 

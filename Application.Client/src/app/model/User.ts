@@ -1,5 +1,5 @@
-import { UserAccount } from "./UserAccount";
-import { UserProfile } from "./UserProfile";
+import { UserAccount } from "./user-account";
+import { UserProfile } from "./user-profile";
 
 export class User {
     Id?: string;

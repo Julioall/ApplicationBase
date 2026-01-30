@@ -3,6 +3,7 @@ using Application.Domain.Interface;
 using Application.Domain.Localization;
 using Application.Domain.Model;
 using Application.Domain.Model.Dtos;
+using Application.Domain.Model.Dtos.User;
 using Application.Domain.Model.User;
 using Application.Service.Interface;
 using Application.Service.Service.Security;

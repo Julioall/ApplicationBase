@@ -4,7 +4,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { AuthService } from './auth.service';
 import { environment } from '../../environment/environment';
-import { User } from '../../model/User';
+import { User } from '../../model/user';
 
 class FakeLoader implements TranslateLoader {
   getTranslation(): any {

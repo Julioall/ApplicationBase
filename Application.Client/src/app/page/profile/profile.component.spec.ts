@@ -9,9 +9,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { ProfileComponent } from './profile.component';
 import { ChangePasswordPayload, UpdateProfilePayload, UserService } from '../../service/user/user.service';
 import { NotificationService } from '../../service/notification/notification.service';
-import { User } from '../../model/User';
-import { UserAccount } from '../../model/UserAccount';
-import { UserProfile } from '../../model/UserProfile';
+import { User } from '../../model/user';
+import { UserAccount } from '../../model/user-account';
+import { UserProfile } from '../../model/user-profile';
 import { AuthService } from '../../service/auth/auth.service';
 
 type TestHydratedUser = User & { Account: UserAccount; Profile: UserProfile };
