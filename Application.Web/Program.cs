@@ -229,7 +229,10 @@ public class Program
         builder.Services.AddHealthChecks()
             .AddCheck<StartupConfigurationHealthCheck>("startup_configuration", tags: new[] { "startup" })
             .AddCheck<RavenDbHealthCheck>("ravendb", tags: new[] { "database" })
+<<<<<<< HEAD
             .AddCheck<RedisHealthCheck>("redis", tags: new[] { "cache" })
+=======
+>>>>>>> a4dcc3ab62d54cdba49b1fcabb049f418653cfee
             .AddCheck<MoodleApiHealthCheck>("moodle_api", tags: new[] { "external" });
 
         // Register dependency injection modules
