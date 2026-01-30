@@ -1,6 +1,6 @@
-# Instruções de Trabalho para Agentes Autônomos (Feature Agent)
+# Instruções de Trabalho para Agentes (Feature Agent & Especialistas)
 
-Este documento fornece as instruções práticas e o contexto essencial para o `feature-agent` executar suas tarefas de forma autônoma.
+Este documento fornece as instruções práticas e o contexto essencial para os agentes executarem suas tarefas de forma coordenada.
 
 ## 1. Contexto do Projeto e Stack Tecnológica
 
@@ -19,41 +19,102 @@ O projeto é uma aplicação full-stack que segue o Contrato Arquitetural (`.git
 
 ## 2. Comandos Essenciais de Validação
 
-O `feature-agent` DEVE executar estes comandos para validar seu trabalho antes de solicitar a revisão:
+Todos os agentes DEVEM validar seu trabalho antes de entregar:
 
-| Ação | Comando (Exemplo) | Propósito |
+| Ação | Comando | Propósito |
 | :--- | :--- | :--- |
-| **Build** | `dotnet build` | Compilar o backend e verificar erros de sintaxe/referência. |
-| **Test** | `dotnet test` | Executar todos os testes unitários e de integração. |
-| **Lint** | `npm run lint` | (Assumindo um comando padrão para o Angular/TS) Verificar padrões de código e estilo. |
+| **Build** | `dotnet build` | Compilar backend e verificar erros. |
+| **Test** | `dotnet test` | Executar testes unitários e integração. |
+| **Lint** | `npm run lint` | Verificar padrões de código (Angular/TypeScript). |
 
-## 3. Critérios de Qualidade (Definition of Done)
+## 3. Papéis e Responsabilidades
 
-Um Pull Request só é considerado pronto para o `review-agent` se **TODOS** os critérios abaixo forem atendidos:
+### Feature-Agent (Orquestrador)
 
-1.  **Código Implementado:** A feature está funcional e implementada de ponta a ponta (UI, API, Dados).
-2.  **Testes Passando:** Todos os testes automatizados (unitários e de integração) foram escritos e estão passando (`dotnet test` sem falhas).
-3.  **Aderência Arquitetural:** O código respeita integralmente o `.github/architecture-contract.md`.
-4.  **Documentação Atualizada:** A documentação da feature foi criada ou atualizada em `docs/features/<feature-name>.md`.
-5.  **Tratamento de Erros:** O tratamento de erros no backend segue o padrão ProblemDetails (RFC 7807).
+**Não implementa direto.** Coordena especialistas:
 
-## 4. Invocação de Especialistas (Consultoria Sob Demanda)
+1. **Plan** - Analisa issue, entende escopo
+2. **Orquestre** - Invoca especialistas corretos
+3. **Reflect** - Valida entrega final
 
-O `feature-agent` deve invocar agentes especializados apenas para **consultoria** em pontos de decisão ou desafios complexos.
+**Fluxo típico:**
+```
+@business-analyst "Defina regras de negócio"
+  ↓
+@backend-architect "Desenhe API"
+  ↓
+@design-system-architect "Defina tokens e componentes"
+  ↓
+@dotnet-architect "Implemente backend"
+  ↓
+@frontend-developer "Implemente frontend"
+  ↓
+@tdd-orchestrator "Escreva testes"
+  ↓
+@code-reviewer "Valide código"
+  ↓
+Pull Request
+```
 
-| Agente Especialista | Exemplo de Invocação | Propósito |
-| :--- | :--- | :--- |
-| `@backend-architect` | `@backend-architect "Proponha um novo DTO para o endpoint /users/{id}/profile"` | Definição de contratos de API, padrões de microsserviços ou arquitetura de dados. |
-| `@tdd-orchestrator` | `@tdd-orchestrator "Analise este teste de integração e sugira melhorias de cobertura"` | Estratégias complexas de teste, depuração ou refatoração. |
-| `@dotnet-architect` | `@dotnet-architect "Como implementar um cache distribuído com Redis para o serviço de produtos?"` | Arquitetura e desenvolvimento de alto nível em ASP.NET Core e C#. |
-| `@typescript-pro` | `@typescript-pro "Refatore esta interface para usar Mapped Types e torná-la mais flexível."` | Tipagem avançada, generics e otimização de código TypeScript. |
-| `@javascript-pro` | `@javascript-pro "Sugira a melhor forma de lidar com múltiplas chamadas assíncronas em um componente React."` | Otimização de código JavaScript, padrões assíncronos e compatibilidade. |
-| `@monorepo-architect` | `@monorepo-architect "Qual a melhor estratégia de build caching para o nosso pipeline de CI?"` | Configuração de monorepo, otimização de build e gerenciamento de dependências. |
-| `@docs-architect` | `@docs-architect "Liste as documentações disponíveis sobre Moodle, endpoints read-only e variáveis de ambiente para Docker compose."` | Ajuda a localizar documentação e contexto operacional existente. |
-| `@code-reviewer` | `@code-reviewer "Revise este trecho de código para segurança e performance."` | Análise de segurança, performance e qualidade de código. |
-| `@docs-architect` | `@docs-architect "Qual a melhor estrutura para um manual técnico de 50 páginas sobre o sistema de autenticação?"` | Arquitetura de documentação técnica de longo prazo e manuais. |
-| `@tutorial-engineer` | `@tutorial-engineer "Crie um tutorial passo a passo para onboarding de novos desenvolvedores na camada de dados."` | Criação de tutoriais, guias de aprendizado e conteúdo educacional. |
-| `@mermaid-expert` | `@mermaid-expert "Gere um diagrama de sequência para o fluxo de login."` | Geração de diagramas (fluxo, sequência, ERD) em formato Mermaid. |
-| `@c4-context` | `@c4-context "Gere o diagrama de contexto C4 para o sistema, incluindo o usuário e o serviço de pagamento externo."` | Documentação arquitetural C4 (Contexto, Container, Componente, Código). |
-| `@graphql-architect` | `@graphql-architect "Proponha uma estratégia de paginação eficiente para a query de pedidos."` | Design de schema GraphQL, otimização de resolvers e padrões de API. |
-| `@temporal-python-pro` | `@temporal-python-pro "Qual o padrão de workflow Temporal mais adequado para uma saga de processamento de pedidos?"` | Design de workflows duráveis e arquitetura de orquestração com Temporal em Python. |
+### Especialistas (Executores)
+
+Cada especialista é invocado pelo feature-agent para sua atividade específica:
+
+- **business-analyst:** Requisitos, regras de negócio, modelagem
+- **backend-architect:** API design, padrões distribuídos, microsserviços
+- **dotnet-architect:** Implementação ASP.NET Core, C#, CQRS, DDD
+- **design-system-architect:** Design tokens, componentes, theming
+- **frontend-developer:** Implementação Angular 18, TypeScript, Tailwind
+- **tdd-orchestrator:** Testes unit, integration, E2E
+- **code-reviewer:** Segurança, performance, SOLID
+
+## 4. Critérios de Qualidade (Definition of Done)
+
+Um Pull Request só é pronto para merge se **TODOS** os critérios forem atendidos:
+
+2.  **Testes Passando:** Todos os testes (unitários e integração) passando (`dotnet test` sem falhas).
+3.  **Aderência Arquitetural:** Código respeita `architecture-contract.md`.
+4.  **Documentação Atualizada:** Documentação em `docs/features/<feature-name>.md`.
+5.  **Erro Handling:** Backend segue padrão ProblemDetails (RFC 7807).
+6.  **E2E Tests:** Fluxos críticos cobertos com Playwright.
+
+## 5. Como Feature-Agent Invoca Especialistas
+
+O **feature-agent** coordena assim:
+
+```
+@business-analyst "Defina as regras de negócio para [requisito]"
+```
+Retorna: Especificação de requisitos, DTOs, validadores
+
+```
+@backend-architect "Desenhe a API para [requisito]"
+```
+Retorna: Especificação de endpoints, padrões
+
+```
+@design-system-architect "Defina tokens e componentes para [requisito]"
+```
+Retorna: Design tokens, componentes reutilizáveis
+
+```
+@dotnet-architect "Implemente [command/query] com [requisitos]"
+```
+Retorna: Handler, Service, Repository, Testes
+
+```
+@frontend-developer "Crie [página/componente] com [requisitos]"
+```
+Retorna: Componentes, Serviços, Testes E2E
+
+```
+@tdd-orchestrator "Escreva testes para [fluxo]"
+```
+Retorna: Testes unit, integration, E2E
+
+```
+@code-reviewer "Revise código para segurança e performance"
+```
+Retorna: Feedback e aprovação
+
+## 6. Stack Tecnológico (Obrigatório)

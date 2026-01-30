@@ -9,6 +9,7 @@ using Application.Domain;
 using Application.Domain.Localization;
 using Application.Domain.Model;
 using Application.Infrastructure;
+using Application.Infrastructure.Service;
 using Application.Service;
 using Hangfire;
 using Hangfire.PostgreSql;
@@ -23,9 +24,11 @@ using Microsoft.IdentityModel.Tokens;
 using Application.Api.RateLimiting;
 using Application.Api.Hangfire;
 using Microsoft.Extensions.Logging;
+using Prometheus;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
+using StackExchange.Redis;
 
 public class Program
 {
@@ -60,6 +63,31 @@ public class Program
         builder.Services.Configure<RateLimitSettings>(builder.Configuration.GetSection("RateLimiting"));
         builder.Services.AddSingleton<IRateLimiter, MemoryRateLimiter>();
 
+        // Redis Configuration
+        var redisConnectionString = Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING") 
+            ?? "redis:6379";
+        Log.Information("Connecting to Redis at {RedisConnection}", redisConnectionString);
+        
+        var redisOptions = ConfigurationOptions.Parse(redisConnectionString);
+        redisOptions.AbortOnConnectFail = false; // Permite fallback para in-memory em caso de falha
+        
+        var redis = ConnectionMultiplexer.Connect(redisOptions);
+        builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
+        
+        // Registrar RedisDistributedCacheService
+        if (redis.IsConnected)
+        {
+            Log.Information("Redis connected successfully");
+            builder.Services.AddScoped<Application.Service.Behaviors.IDistributedCacheService,
+                RedisDistributedCacheService>();
+        }
+        else
+        {
+            Log.Warning("Redis connection failed, falling back to InMemoryCacheService");
+            builder.Services.AddScoped<Application.Service.Behaviors.IDistributedCacheService,
+                Application.Service.Behaviors.InMemoryCacheService>();
+        }
+
         var hangfireConnectionString = Environment.GetEnvironmentVariable(ApplicationConstants.HANGFIRE_CONNECTION_STRING_KEY);
         if (string.IsNullOrWhiteSpace(hangfireConnectionString))
         {
@@ -83,19 +111,18 @@ public class Program
         builder.Services.AddMediatR(options =>
         {
             options.RegisterServicesFromAssembly(typeof(Program).Assembly);
-            // Registrar behaviors na ordem: Caching -> Resiliência
-            // Caching é executado PRIMEIRO para validar se precisa executar o handler
+            // Registrar behaviors na ordem: Prometheus -> Caching -> Resiliência
+            // Prometheus PRIMEIRO para capturar todas as métricas
+            options.AddOpenBehavior(typeof(Application.Service.Behaviors.PrometheusMetricsBehavior<,>));
+            // Caching é executado DEPOIS de Prometheus
             options.AddOpenBehavior(typeof(Application.Service.Behaviors.CachingBehavior<,>));
-            // Resiliência é executada DEPOIS do caching
+            // Resiliência é executada POR ÚLTIMO
             options.AddOpenBehavior(typeof(Application.Service.Behaviors.ResiliencePolicyBehavior<,>));
         });
 
-        // Register Distributed Cache Service
-        // TODO: Implementar RedisDistributedCacheService em Phase 3
-        // Por enquanto, usar In-Memory Cache como fallback
-        builder.Services.AddMemoryCache();
-        builder.Services.AddScoped<Application.Service.Behaviors.IDistributedCacheService,
-            Application.Service.Behaviors.InMemoryCacheService>();
+        // Registrar Prometheus metrics
+        Log.Information("Registrando Prometheus metrics...");
+        builder.Services.AddSingleton<CollectorRegistry>(Metrics.DefaultRegistry);
 
         // Service configuration
         builder.Services.AddScoped<ValidationProblemDetailsFilter>();
@@ -202,6 +229,7 @@ public class Program
         builder.Services.AddHealthChecks()
             .AddCheck<StartupConfigurationHealthCheck>("startup_configuration", tags: new[] { "startup" })
             .AddCheck<RavenDbHealthCheck>("ravendb", tags: new[] { "database" })
+            .AddCheck<RedisHealthCheck>("redis", tags: new[] { "cache" })
             .AddCheck<MoodleApiHealthCheck>("moodle_api", tags: new[] { "external" });
 
         // Register dependency injection modules
@@ -219,6 +247,9 @@ public class Program
 
         var localizationOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value;
         app.UseRequestLocalization(localizationOptions);
+
+        app.UseMetricServer(); // Prometheus middleware para expor /metrics
+        app.UseHttpMetrics(); // Middleware para coletar métricas HTTP
 
         app.UseMiddleware<ProblemDetailsMiddleware>();
         app.UseMiddleware<MiddlewareServiceRavenDbStore>();
@@ -266,6 +297,13 @@ public class Program
 
                 await context.Response.WriteAsync(JsonSerializer.Serialize(payload));
             }
+        });
+
+        // Metrics endpoint para Prometheus
+        app.MapGet("/metrics", async context =>
+        {
+            context.Response.ContentType = "text/plain; charset=utf-8; version=0.0.4";
+            await Metrics.DefaultRegistry.CollectAndExportAsTextAsync(context.Response.Body);
         });
 
         app.MapControllers();

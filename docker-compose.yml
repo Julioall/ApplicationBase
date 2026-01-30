@@ -39,10 +39,15 @@ services:
       # Hangfire
       HANGFIRE_CONNECTION_STRING: "Host=application-postgres;Port=5432;Database=evolution;Username=evolution;Password=evolution"
 
+      # Redis Cache
+      REDIS_CONNECTION_STRING: "application-redis:6379"
+
     depends_on:
       application-ravendb:
         condition: service_healthy
       application-evolution:
+        condition: service_healthy
+      application-redis:
         condition: service_healthy
 
     restart: unless-stopped
@@ -122,6 +127,24 @@ services:
     networks:
       - backend-network
 
+  # Redis Cache (Phase 4)
+  application-redis:
+    image: redis:7-alpine
+    container_name: application-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 10s
+    volumes:
+      - redis-data:/data
+    networks:
+      - backend-network
+
 networks:
   backend-network:
     driver: bridge
@@ -131,3 +154,4 @@ volumes:
   evolution-store:
   evolution-instances:
   evolution-postgres:
+  redis-data:
