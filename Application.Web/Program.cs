@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using Application.Api.Filters;
 using Application.Api.Health;
+using Application.Web.Health;
 using Application.Api.Middlewares;
 using Application.Domain;
 using Application.Domain.Localization;
@@ -186,7 +187,9 @@ public class Program
         });
 
         builder.Services.AddHealthChecks()
-            .AddCheck<StartupConfigurationHealthCheck>("startup_configuration", tags: new[] { "startup" });
+            .AddCheck<StartupConfigurationHealthCheck>("startup_configuration", tags: new[] { "startup" })
+            .AddCheck<RavenDbHealthCheck>("ravendb", tags: new[] { "database" })
+            .AddCheck<MoodleApiHealthCheck>("moodle_api", tags: new[] { "external" });
 
         // Register dependency injection modules
         builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));

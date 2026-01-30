@@ -5,7 +5,9 @@ using Application.Domain.Localization;
 using Application.Domain.Model;
 using Application.Domain.Model.Dtos;
 using Application.Domain.Model.User;
+using Application.Service.Handlers;
 using Application.Service.Interface;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -26,17 +28,20 @@ namespace Application.Api.Controllers
         private readonly IStringLocalizer<SharedResource> _localizer;
         private readonly IRateLimiter _rateLimiter;
         private readonly RateLimitSettings _rateLimitSettings;
+        private readonly IMediator _mediator;
 
         public UserController(
             IUserService userService,
             IStringLocalizer<SharedResource> localizer,
             IRateLimiter rateLimiter,
-            IOptions<RateLimitSettings> rateLimitSettings)
+            IOptions<RateLimitSettings> rateLimitSettings,
+            IMediator mediator)
         {
             _userService = userService;
             _localizer = localizer;
             _rateLimiter = rateLimiter;
             _rateLimitSettings = rateLimitSettings.Value;
+            _mediator = mediator;
         }
 
         [AllowAnonymous]
@@ -73,9 +78,8 @@ namespace Application.Api.Controllers
                 return rateLimitResult;
             }
 
-            var user = MapToUser(request);
-
-            await _userService.AddAsync(user, account.Password);
+            // Use MediatR para enviar comando de criação de usuário
+            var user = await _mediator.Send(new CreateUserCommand(request));
             return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, new { message = _localizer["UserAddedSuccessfully"] });
         }
 
@@ -85,13 +89,13 @@ namespace Application.Api.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteUser(string id)
         {
-            var user = await _userService.GetByIdAsync(id);
+            var user = await _mediator.Send(new GetUserByIdQuery(id));
             if (user == null)
             {
                 throw new NotFoundException(_localizer["UserNotFoundById", id]);
             }
 
-            await _userService.DeleteAsync(id);
+            await _mediator.Send(new DeleteUserCommand(id));
             return NoContent();
         }
 
@@ -99,7 +103,7 @@ namespace Application.Api.Controllers
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
         {
-            var users = await _userService.GetAllAsync();
+            var users = await _mediator.Send(new GetAllUsersQuery());
             return Ok(users);
         }
 
@@ -109,7 +113,7 @@ namespace Application.Api.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<User>> GetUserById(string id)
         {
-            var user = await _userService.GetByIdAsync(id);
+            var user = await _mediator.Send(new GetUserByIdQuery(id));
             if (user == null)
             {
                 throw new NotFoundException(_localizer["UserNotFoundById", id]);
