@@ -64,7 +64,7 @@ namespace Application.Service.Handlers
                 .Select(p => p?.Trim().ToUpperInvariant())
                 .Where(p => !string.IsNullOrWhiteSpace(p))
                 .Distinct()
-                .ToList() ?? new List<string>();
+                .ToList() ?? new();
         }
     }
 

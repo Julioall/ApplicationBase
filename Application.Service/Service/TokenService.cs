@@ -254,7 +254,7 @@ namespace Application.Service.Service
             return new TokenResponseDto
             {
                 Token = accessToken,
-                RefreshToken = null,
+                RefreshToken = (string?)null,
                 ExpiresAt = jwtSecurityToken.ValidTo
             };
         }

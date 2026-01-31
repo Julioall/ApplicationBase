@@ -3,8 +3,12 @@
 Este contrato define **como** construir software neste repositório. Ele não define regras de negócio.
 Todos os agentes devem ler e respeitar este documento antes de planejar, implementar, testar ou revisar.
 
-**Última Atualização:** Phase 4 (30 de janeiro de 2026)  
-**Status:** Versão 2.0 - Inclui Redis, Prometheus, E2E Tests
+## 📋 Índice Rápido
+- [Stack](#stack) - Tecnologias usadas
+- [Handlers CQRS](#handlers-cqrs---padrão-consolidado) - Padrão único MediatR
+- [Arquitetura](#princípios-obrigatórios) - Clean Architecture
+- [E2E Tests](#e2e-tests-playwright) - Testes de integração
+- [Checklist](#checklist-de-implementação-para-agents) - Validação antes de PR
 
 ## Stack
 
@@ -225,6 +229,51 @@ Todas as métricas são coletadas automaticamente via `PrometheusMetricsBehavior
    - Handlers executando simultaneamente
    - Label: handler_name
 
+### Handlers CQRS - Padrão Consolidado
+
+### Padrão Único: MediatR IRequestHandler
+
+A partir de janeiro/2026, o projeto consolidou handlers em um **padrão único** usando MediatR:
+
+```csharp
+// ✅ ÚNICO PADRÃO: IRequestHandler do MediatR
+public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, UserDto>
+{
+    public async Task<UserDto> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+    {
+        // Lógica aqui
+    }
+}
+
+public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, UserDto?>
+{
+    public async Task<UserDto?> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
+    {
+        // Lógica aqui
+    }
+}
+```
+
+### Localização
+
+- **Path único:** `Application.Service/Handlers/`
+- **Subdivisão:** Organizado por domínio (User/, Todo/, etc.)
+- **DI:** Registrado em `DependencyInjectionModuleService.cs`
+
+### Por quê consolidamos?
+
+**Antes (Problema):**
+- Handlers em 2 pastas: `Handlers/` e `CQRS/Handlers/`
+- 2 interfaces diferentes: `IRequestHandler` e `IQueryHandler`
+- Confusão de padrões → dificuldade de manutenção
+- Inconsistência na equipe
+
+**Depois (Solução):**
+- ✅ Um padrão único (MediatR standard)
+- ✅ Uma pasta consolidada
+- ✅ Fácil onboarding para novos desenvolvedores
+- ✅ Melhor rastreabilidade via pipeline de behaviors
+
 ### Comportamentos MediatR - ORDEM CRÍTICA ⚠️
 
 A ordem de registro dos behaviors é **ESSENCIAL** para funcionamento correto:
@@ -390,7 +439,61 @@ API Response (DTO)
 - Sempre usar interfaces, nunca classes concretas
 - Respeitar ciclo de vida: Singleton → Scoped → Transient
 
-## Checklist de Implementação (Para Agents)
+## E2E Tests (Playwright)
+
+### Fluxos Críticos Testados
+
+Testes de ponta-a-ponta validam fluxos reais de usuários:
+
+```
+Application.Client/e2e/
+├── tests/
+│   ├── auth.spec.ts        # 6 testes: Login, Logout, Refresh Token, 401
+│   ├── user.spec.ts        # 9 testes: CRUD, Validações, Performance
+│   └── fixtures.ts         # Helpers compartilhados
+├── playwright.config.ts
+├── README.md               # Instruções detalhadas
+└── SETUP.md               # Guia de configuração
+```
+
+### Executar Testes E2E
+
+```bash
+cd Application.Client/e2e
+
+# Todos os testes
+npm test
+
+# Modo UI (desenvolvimento)
+npm run test:ui
+
+# Apenas auth
+npm run test:auth
+
+# Apenas user CRUD
+npm run test:user
+```
+
+### Cobertura Mínima Obrigatória
+
+Ao implementar novos fluxos, adicionar testes E2E para:
+
+1. **Happy Path** - Caso de sucesso principal
+2. **Validações** - Entrada inválida, constraints
+3. **Erros** - 400, 401, 403, 404, 409, 500
+4. **Performance** - Renderização, paginação, lazy loading
+
+**Exemplo:** Feature de "Criar Usuário"
+- ✅ Criar com dados válidos (201)
+- ✅ Email duplicado (409 Conflict)
+- ✅ Email inválido (400 Bad Request)
+- ✅ Senha fraca (400 Bad Request)
+- ✅ Mensagem de sucesso exibida
+- ✅ Redirecionamento após criação
+
+---
+
+
 
 Antes de fazer PR, validar:
 
@@ -437,6 +540,7 @@ Antes de fazer PR, validar:
   - [ ] Contrato de API documentado (DTOs, endpoints)
   - [ ] Impactos arquiteturais documentados
   - [ ] Exemplos de uso para features complexas
+  - [ ] E2E Tests para novos fluxos (ver [E2E Tests](#e2e-tests-playwright))
   
 - [ ] **Integração Moodle** (se aplicável)
   - [ ] Apenas endpoints GET (leitura)
@@ -451,6 +555,7 @@ Antes de fazer PR, validar:
 - Testes automatizados são **OBRIGATÓRIOS** para serviços/casos de uso críticos, endpoints e fluxos críticos de UI
 - Testes devem validar integração e comportamento esperado sem reimplementar regras de negócio
 - Mínimo 80% de cobertura em lógica crítica
+- **E2E Tests OBRIGATÓRIOS para fluxos críticos** (Login, CRUD principal, integração com externos)
 
 ### Tipos de Teste
 

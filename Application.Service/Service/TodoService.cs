@@ -642,7 +642,7 @@ namespace Application.Service.Service
                 return null;
             }
 
-            var sanitized = _htmlSanitizer.Sanitize(html);
+            var sanitized = _htmlSanitizer.Sanitize(html!);
             return string.IsNullOrWhiteSpace(sanitized) ? null : sanitized;
         }
 

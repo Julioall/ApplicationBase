@@ -1,0 +1,49 @@
+# Override para desenvolvimento local - Portas expõem localhost
+# Estende docker-compose.yml com configurações específicas do dev
+
+services:
+  # Redis em localhost:6379 para cache local
+  application-redis:
+    ports:
+      - "6379:6379"
+
+  # PostgreSQL em localhost:5432 para Hangfire
+  application-postgres:
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: evolution
+      POSTGRES_USER: evolution
+      POSTGRES_DB: evolution
+    volumes:
+      # Persiste dados entre restarts locais
+      - postgres_data_dev:/var/lib/postgresql/data
+
+  # RavenDB em localhost:8080 para banco principal
+  application-ravendb:
+    ports:
+      - "8080:8080"
+      - "38888:38888"
+    environment:
+      RAVEN_License: Development
+      RAVEN_Setup_Mode: Initial
+      RAVEN_Security_Certificate_Path: /certs/ravendb.pfx
+      RAVEN_Security_Certificate_Password: "changeme-ravendb-cert"
+      RAVEN_ServerUrl: "https://0.0.0.0:8080"
+      RAVEN_PublicServerUrl: "https://application-ravendb:8080"
+    volumes:
+      - ravendb_data_dev:/ravendb/data
+
+  # MailHog para testing de email em localhost:1025 (SMTP) / :8025 (UI)
+  application-mailhog:
+    image: mailhog/mailhog:latest
+    container_name: application-mailhog
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    networks:
+      - backend-network
+
+volumes:
+  postgres_data_dev:
+  ravendb_data_dev:

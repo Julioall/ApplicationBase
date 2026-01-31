@@ -34,6 +34,9 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        // Carregar variáveis de .env (desenvolvimento local)
+        LoadEnvironmentVariables();
+        
         // Configure Serilog
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
@@ -91,7 +94,16 @@ public class Program
         var hangfireConnectionString = Environment.GetEnvironmentVariable(ApplicationConstants.HANGFIRE_CONNECTION_STRING_KEY);
         if (string.IsNullOrWhiteSpace(hangfireConnectionString))
         {
-            throw new ArgumentNullException(nameof(hangfireConnectionString), SharedResourceProvider.GetString("EnvVarNotDefined", ApplicationConstants.HANGFIRE_CONNECTION_STRING_KEY));
+            if (builder.Environment.IsDevelopment())
+            {
+                // Fallback para desenvolvimento local
+                Log.Warning("HANGFIRE_CONNECTION_STRING não definida. Usando valor padrão para desenvolvimento.");
+                hangfireConnectionString = "Host=localhost;Port=5432;Database=evolution;Username=evolution;Password=evolution";
+            }
+            else
+            {
+                throw new ArgumentNullException(nameof(hangfireConnectionString), SharedResourceProvider.GetString("EnvVarNotDefined", ApplicationConstants.HANGFIRE_CONNECTION_STRING_KEY));
+            }
         }
 
         builder.Services.AddHangfire(config =>
@@ -229,10 +241,7 @@ public class Program
         builder.Services.AddHealthChecks()
             .AddCheck<StartupConfigurationHealthCheck>("startup_configuration", tags: new[] { "startup" })
             .AddCheck<RavenDbHealthCheck>("ravendb", tags: new[] { "database" })
-<<<<<<< HEAD
             .AddCheck<RedisHealthCheck>("redis", tags: new[] { "cache" })
-=======
->>>>>>> a4dcc3ab62d54cdba49b1fcabb049f418653cfee
             .AddCheck<MoodleApiHealthCheck>("moodle_api", tags: new[] { "external" });
 
         // Register dependency injection modules
@@ -343,6 +352,52 @@ public class Program
             }));
 
             throw new InvalidOperationException(SharedResourceProvider.GetString("StartupValidationFailed", details));
+        }
+    }
+
+    /// <summary>
+    /// Carrega variáveis de ambiente do arquivo .env
+    /// Útil para desenvolvimento local quando .env está no root do projeto
+    /// </summary>
+    private static void LoadEnvironmentVariables()
+    {
+        var envPath = ".env";
+        
+        // Tentar em diferentes locais
+        if (!File.Exists(envPath))
+            envPath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory())?.FullName ?? "", ".env");
+        
+        if (!File.Exists(envPath))
+            envPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".env");
+
+        if (File.Exists(envPath))
+        {
+            foreach (var line in File.ReadAllLines(envPath))
+            {
+                // Pular comentários e linhas vazias
+                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+                    continue;
+
+                var parts = line.Split('=', 2);
+                if (parts.Length == 2)
+                {
+                    var key = parts[0].Trim();
+                    var value = parts[1].Trim();
+                    
+                    // Remover aspas se existirem
+                    if ((value.StartsWith("\"") && value.EndsWith("\"")) ||
+                        (value.StartsWith("'") && value.EndsWith("'")))
+                    {
+                        value = value[1..^1];
+                    }
+                    
+                    // Apenas set se não está já definido
+                    if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable(key)))
+                    {
+                        Environment.SetEnvironmentVariable(key, value);
+                    }
+                }
+            }
         }
     }
 }

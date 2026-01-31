@@ -6,6 +6,18 @@ Current scope focuses on **authentication** (local + Moodle) and core platform m
 
 ---
 
+## 📚 Documentação Essencial
+
+| Documento | Propósito |
+|-----------|-----------|
+| [.github/architecture-contract.md](.github/architecture-contract.md) | **Padrões obrigatórios** - Clean Architecture, CQRS, Handlers, E2E Tests |
+| [QUALITY_ASSURANCE.md](QUALITY_ASSURANCE.md) | Resumo de qualidade - 69 tests, handlers consolidados |
+| [Application.Client/e2e/QUICKSTART.md](Application.Client/e2e/QUICKSTART.md) | **Guia rápido** - Como rodar E2E tests |
+| [Application.Client/e2e/README.md](Application.Client/e2e/README.md) | Guia completo E2E tests |
+| [E2E_FIX_COMPLETE.md](E2E_FIX_COMPLETE.md) | Correção de configuração Playwright |
+
+---
+
 ## Stack
 - ASP.NET Core 8, Angular 18, RavenDB
 - FluentValidation, JWT Bearer, ngx-translate, ngx-spinner, FontAwesome, Bootstrap

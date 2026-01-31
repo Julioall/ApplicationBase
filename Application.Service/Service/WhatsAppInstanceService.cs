@@ -87,7 +87,10 @@ namespace Application.Service.Service
             var instance = await GetInstanceForContextAsync(ownerUserId, id, isAdminContext);
 
             await _provider.DeactivateAsync(instance, cancellationToken);
-            await _repository.DeleteAsync(instance.Id);
+            if (instance.Id != null)
+            {
+                await _repository.DeleteAsync(instance.Id);
+            }
             return instance;
         }
 
