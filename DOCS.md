@@ -2,6 +2,46 @@
 
 Bem-vindo! A documentação foi organizada para facilitar a navegação. Escolha abaixo o que você precisa:
 
+---
+
+## 🎨 **Frontend - Angular 18 Organizado** ✨ NOVO!
+
+Pasta: [`/docs/features/`](./docs/features/) e [`/`](./root)
+
+### 📦 Arquitetura & Estrutura
+- **[FRONTEND_ORGANIZATION_REPORT.md](./FRONTEND_ORGANIZATION_REPORT.md)** 📊
+  - Relatório executivo da reorganização
+  - Componentes implementados
+  - Design system criado
+  - Validações realizadas
+
+- **[FRONTEND_STRUCTURE.md](./FRONTEND_STRUCTURE.md)** 🏗️
+  - Estrutura completa de pastas
+  - Padrões utilizados
+  - Componentes disponíveis
+  - Status final
+
+- **[FRONTEND_QUICK_REFERENCE.md](./FRONTEND_QUICK_REFERENCE.md)** ⚡
+  - Guia rápido de referência
+  - Snippets de código
+  - Checklist de boas práticas
+  - Troubleshooting
+
+### 📖 Documentação Detalhada
+- **[docs/features/frontend-organization.md](./docs/features/frontend-organization.md)** 📚
+  - Documentação técnica completa
+  - Padrões de design
+  - Guia de uso
+  - Boas práticas
+
+- **[src/app/shared/README.md](./Application.Client/src/app/shared/README.md)** 🎁
+  - Componentes reutilizáveis
+  - Design tokens
+  - Exemplos de uso
+  - Padrões implementados
+
+---
+
 ## 🚀 **Começando Rápido** (Setup)
 
 Pasta: [`/docs/setup/`](./docs/setup/)
