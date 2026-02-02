@@ -10,7 +10,6 @@ import { passwordValidators } from '../../shared/validators/password-rules';
 @Component({
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
-  styleUrls: ['./forgot-password.component.scss'],
 })
 export class ForgotPasswordComponent implements OnInit, OnDestroy {
   private static readonly CODE_LENGTH = 6;

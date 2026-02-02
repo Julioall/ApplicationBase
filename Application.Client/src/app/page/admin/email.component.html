@@ -1,23 +1,23 @@
-<section class="admin-page">
-  <header class="page-header">
+<section class="flex flex-col gap-5 p-4 sm:p-3 text-text-primary">
+  <header class="flex justify-between items-center gap-4 flex-wrap">
     <div>
-      <h2>{{ 'adminEmailSettings.title' | translate }}</h2>
-      <p class="subtitle">{{ 'adminEmailSettings.subtitle' | translate }}</p>
+      <h2 class="mt-1 mb-0 text-2xl font-semibold text-text-primary">{{ 'adminEmailSettings.title' | translate }}</h2>
+      <p class="mt-1 mb-0 text-text-subtle text-sm">{{ 'adminEmailSettings.subtitle' | translate }}</p>
     </div>
   </header>
 
-  <div class="card-grid">
-    <article class="card">
-      <div class="card-head">
+  <div class="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-4">
+    <article class="bg-surface border border-border-soft rounded-lg p-4 shadow-soft flex flex-col gap-3">
+      <div class="flex justify-between items-start gap-3">
         <div>
-          <p class="eyebrow">{{ 'adminEmailSettings.smtp.eyebrow' | translate }}</p>
-          <h3>{{ 'adminEmailSettings.smtp.title' | translate }}</h3>
-          <p class="muted">{{ 'adminEmailSettings.smtp.description' | translate }}</p>
+          <p class="uppercase tracking-wide text-xs text-text-subtle m-0">{{ 'adminEmailSettings.smtp.eyebrow' | translate }}</p>
+          <h3 class="mt-1 mb-0 text-lg font-medium text-text-primary">{{ 'adminEmailSettings.smtp.title' | translate }}</h3>
+          <p class="mt-1 mb-0 text-text-subtle text-sm">{{ 'adminEmailSettings.smtp.description' | translate }}</p>
         </div>
-        <span class="pill">{{ 'adminEmailSettings.smtp.comingSoon' | translate }}</span>
+        <span class="py-1 px-3 rounded-full bg-surface-alt text-text-primary border border-border-soft inline-flex items-center gap-2 font-bold text-sm">{{ 'adminEmailSettings.smtp.comingSoon' | translate }}</span>
       </div>
-      <div class="placeholder">
-        <i class="fa-regular fa-circle-dot"></i>
+      <div class="border border-dashed border-border-soft rounded-md p-3 flex gap-3 items-center text-text-subtle">
+        <i class="fa-regular fa-circle-dot text-accent-strong"></i>
         <div>
           <strong>{{ 'adminEmailSettings.smtp.placeholderTitle' | translate }}</strong>
           <p>{{ 'adminEmailSettings.smtp.placeholderDescription' | translate }}</p>
@@ -25,25 +25,25 @@
       </div>
     </article>
 
-    <article class="card">
-      <div class="card-head">
+    <article class="bg-surface border border-border-soft rounded-lg p-4 shadow-soft flex flex-col gap-3">
+      <div class="flex justify-between items-start gap-3">
         <div>
-          <p class="eyebrow">{{ 'adminEmailSettings.notifications.eyebrow' | translate }}</p>
-          <h3>{{ 'adminEmailSettings.notifications.title' | translate }}</h3>
-          <p class="muted">{{ 'adminEmailSettings.notifications.description' | translate }}</p>
+          <p class="uppercase tracking-wide text-xs text-text-subtle m-0">{{ 'adminEmailSettings.notifications.eyebrow' | translate }}</p>
+          <h3 class="mt-1 mb-0 text-lg font-medium text-text-primary">{{ 'adminEmailSettings.notifications.title' | translate }}</h3>
+          <p class="mt-1 mb-0 text-text-subtle text-sm">{{ 'adminEmailSettings.notifications.description' | translate }}</p>
         </div>
       </div>
-      <ul class="summary">
-        <li>
-          <i class="fa-solid fa-envelope-circle-check"></i>
+      <ul class="list-none m-0 p-0 grid gap-2">
+        <li class="grid grid-cols-[24px_1fr] gap-2 items-start text-text-primary">
+          <i class="fa-solid fa-envelope-circle-check text-accent-strong"></i>
           {{ 'adminEmailSettings.notifications.bullets.reliable' | translate }}
         </li>
-        <li>
-          <i class="fa-solid fa-plug-circle-bolt"></i>
+        <li class="grid grid-cols-[24px_1fr] gap-2 items-start text-text-primary">
+          <i class="fa-solid fa-plug-circle-bolt text-accent-strong"></i>
           {{ 'adminEmailSettings.notifications.bullets.integrations' | translate }}
         </li>
-        <li>
-          <i class="fa-solid fa-chart-line"></i>
+        <li class="grid grid-cols-[24px_1fr] gap-2 items-start text-text-primary">
+          <i class="fa-solid fa-chart-line text-accent-strong"></i>
           {{ 'adminEmailSettings.notifications.bullets.monitoring' | translate }}
         </li>
       </ul>

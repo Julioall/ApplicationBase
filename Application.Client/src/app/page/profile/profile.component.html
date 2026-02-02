@@ -1,9 +1,9 @@
-﻿<div class="profile-container">
+﻿<div class="w-full max-w-none m-0 p-0 text-text-primary block min-h-screen">
   <ng-container *ngIf="!isLoading">
     <ng-container *ngIf="user as currentUser; else profileFallback">
-      <div class="profile-column">
-        <section class="card profile-shell">
-          <div class="profile-head">
+      <div class="flex flex-col gap-5">
+          <section class="flex flex-col gap-5 rounded-xl p-6 bg-surface border border-border-soft shadow-soft">
+          <div class="flex flex-wrap items-center gap-5 p-4 rounded-lg bg-gradient-to-br from-surface-alt to-surface">
             <div class="photo-avatar">
               <div class="avatar-shell">
                 <div class="avatar" [class.has-image]="avatarPreview">

@@ -18,7 +18,7 @@ import { Directive, ChangeDetectionStrategy } from '@angular/core';
  * }
  */
 @Directive({
-  changeDetection: ChangeDetectionStrategy.OnPush
+  standalone: true
 })
 export abstract class BasePresentationalComponent {
   // Nenhuma lógica aqui, apenas apresentação

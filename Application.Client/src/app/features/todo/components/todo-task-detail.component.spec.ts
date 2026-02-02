@@ -66,8 +66,10 @@ describe('TodoTaskDetailComponent', () => {
   it('deve retornar variante correta para prioridade', () => {
     expect(component.getPriorityVariant()).toBe('error');
     
-    component.todo.priority = 'medium';
-    expect(component.getPriorityVariant()).toBe('warning');
+    if (component.todo) {
+      component.todo.priority = 'medium';
+      expect(component.getPriorityVariant()).toBe('warning');
+    }
   });
 
   it('deve usar OnPush change detection', () => {

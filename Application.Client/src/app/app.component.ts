@@ -8,7 +8,9 @@ import { ThemeService } from './service/theme/theme.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  host: {
+    'class': 'block bg-page text-text-primary'
+  }
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = 'Application Base';

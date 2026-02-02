@@ -11,7 +11,7 @@ import { interval, Subscription } from 'rxjs';
 import { AuthService } from '../../service/auth/auth.service';
 import { ThemeService } from '../../service/theme/theme.service';
 import { UserService } from '../../service/user/user.service';
-import { User } from '../../model/user';
+import { User } from '../../model/User';
 import {
   ADMIN_PERMISSION,
   MANAGE_SERVICES_PERMISSION,

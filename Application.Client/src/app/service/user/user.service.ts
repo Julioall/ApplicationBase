@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable, throwError } from "rxjs";
 import { catchError } from "rxjs/operators";
-import { User } from "../../model/user";
+import { User } from "../../model/User";
 import { environment } from "../../environment/environment";
 
 export interface UpdateProfilePayload {

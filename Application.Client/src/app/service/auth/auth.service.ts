@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { User } from '../../model/user';
+import { User } from '../../model/User';
 import { jwtDecode } from 'jwt-decode';
 import { environment } from '../../environment/environment';
 import { TranslateService } from '@ngx-translate/core';

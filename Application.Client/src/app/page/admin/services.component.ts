@@ -21,7 +21,7 @@ import {
 @Component({
   selector: 'app-services',
   templateUrl: './services.component.html',
-  styleUrls: ['./services.component.scss'],
+
 })
 export class AdminServicesComponent implements OnInit, OnDestroy {
   emailConfig: EmailSettings & { testEmail?: string } = {
