@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { User } from '../../model/user';
 import { ALL_PERMISSIONS, DEFAULT_USER_PERMISSIONS } from '../../model/permissions';
 import { NotificationService } from '../../service/notification/notification.service';
 import { UserService } from '../../service/user/user.service';
+import { User } from '../../model/user';
 
 @Component({
   selector: 'app-admin-user-detail',

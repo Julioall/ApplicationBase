@@ -1,4 +1,4 @@
-export class UserAccount {
+export interface UserAccount {
     Email?: string;
     Username?: string;
     MoodleId?: string;

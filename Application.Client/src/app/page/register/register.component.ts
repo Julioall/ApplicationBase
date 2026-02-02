@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { User } from '../../model/User';
+import { User } from '../../model/user';
 import { AuthService } from '../../service/auth/auth.service';
 import { NotificationService } from '../../service/notification/notification.service';
 import { ThemeService } from '../../service/theme/theme.service';

@@ -2,7 +2,7 @@ import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
-import { User } from '../../model/User';
+import { User } from '../../model/user';
 import { UserAccount } from '../../model/user-account';
 import { UserProfile } from '../../model/user-profile';
 import { ChangePasswordPayload, UpdateProfilePayload, UserService } from '../../service/user/user.service';

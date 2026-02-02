@@ -1,4 +1,4 @@
-export class UserProfile {
+export interface UserProfile {
     Name?: string;
     ProfilePictureUrl?: string | null;
     ProfilePictureOffsetX?: number;
