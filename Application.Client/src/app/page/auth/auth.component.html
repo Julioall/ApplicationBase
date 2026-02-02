@@ -1,13 +1,13 @@
 <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-gray-900 dark:text-white flex flex-col items-center justify-center px-4 py-6 sm:py-10 gap-8 transition-all duration-500 ease-out">
   <!-- Decorative Background Elements -->
   <div class="fixed inset-0 overflow-hidden pointer-events-none">
-    <div class="absolute top-10 left-10 w-32 h-32 bg-blue-500 opacity-20 rounded-full blur-3xl animate-pulse"></div>
-    <div class="absolute bottom-10 right-10 w-40 h-40 bg-indigo-500 opacity-15 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s"></div>
+    <div class="absolute top-10 left-10 w-32 h-32 bg-blue-500 opacity-20 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-10 right-10 w-40 h-40 bg-indigo-500 opacity-15 rounded-full blur-3xl"></div>
     <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500 opacity-5 rounded-full blur-3xl"></div>
   </div>
 
   <!-- Modern Card Container -->
-  <div class="w-full max-w-lg sm:max-w-xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md border border-white/20 dark:border-gray-700/20 rounded-2xl shadow-2xl p-8 animate-fade-in-up relative overflow-hidden">
+  <div class="w-full max-w-lg sm:max-w-xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md border border-white/20 dark:border-gray-700/20 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
     <!-- Decorative Card Elements -->
     <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
       <div class="absolute -top-4 -right-4 w-24 h-24 bg-blue-500 opacity-10 rounded-full blur-xl"></div>
@@ -16,11 +16,11 @@
 
     <!-- Header -->
     <header class="space-y-6 text-center mb-8 relative z-10">
-      <div class="w-16 h-16 mx-auto bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center shadow-xl animate-fade-in" style="animation-delay: 0.4s">
+      <div class="w-16 h-16 mx-auto bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center shadow-xl">
         <i class="fas fa-user-shield text-2xl text-white"></i>
       </div>
       
-      <div class="space-y-2 animate-fade-in" style="animation-delay: 0.6s">
+      <div class="space-y-2">
         <h1 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
           {{ 'auth.login.title' | translate }}
         </h1>
@@ -29,7 +29,7 @@
         </p>
       </div>
       
-      <div class="mt-6 inline-flex rounded-full bg-white/50 dark:bg-gray-800/50 p-1 border border-white/20 shadow-inner backdrop-blur-sm animate-fade-in" style="animation-delay: 0.8s">
+      <div class="mt-6 inline-flex rounded-full bg-white/50 dark:bg-gray-800/50 p-1 border border-white/20 shadow-inner backdrop-blur-sm">
         <button
           type="button"
           class="px-6 py-2 text-sm font-semibold rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -49,9 +49,9 @@
       </div>
     </header>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-6 animate-fade-in relative z-10" style="animation-delay: 1s">
+    <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-6 relative z-10">
       <!-- Email Field (Local Mode) -->
-      <div *ngIf="loginMode === 'local'" class="animate-fade-in" style="animation-delay: 0.2s">
+      <div *ngIf="loginMode === 'local'">
         <div class="relative">
           <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 z-10">
             <i class="fas fa-envelope"></i>
@@ -67,7 +67,7 @@
           </label>
         </div>
         <div *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.touched || loginSubmitted)" 
-             class="mt-2 text-sm text-red-500 animate-fade-in flex items-center">
+             class="mt-2 text-sm text-red-500 flex items-center">
           <i class="fas fa-exclamation-circle mr-1"></i>
           {{
             loginForm.get('email')?.hasError('required')
@@ -78,7 +78,7 @@
       </div>
 
       <!-- Username Field (Moodle Mode) -->
-      <div *ngIf="loginMode === 'moodle'" class="animate-fade-in" style="animation-delay: 0.2s">
+      <div *ngIf="loginMode === 'moodle'">
         <div class="relative">
           <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 z-10">
             <i class="fas fa-user"></i>
@@ -94,14 +94,14 @@
           </label>
         </div>
         <div *ngIf="loginForm.get('username')?.invalid && (loginForm.get('username')?.touched || loginSubmitted)"
-             class="mt-2 text-sm text-red-500 animate-fade-in flex items-center">
+             class="mt-2 text-sm text-red-500 flex items-center">
           <i class="fas fa-exclamation-circle mr-1"></i>
           {{ 'auth.login.usernameRequired' | translate }}
         </div>
       </div>
 
       <!-- Password Field -->
-      <div class="animate-fade-in" style="animation-delay: 0.3s">
+      <div>
         <div class="relative">
           <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 z-10">
             <i class="fas fa-lock"></i>
@@ -125,7 +125,7 @@
           </button>
         </div>
         <div *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.touched || loginSubmitted)"
-             class="mt-2 text-sm text-red-500 animate-fade-in flex items-center">
+             class="mt-2 text-sm text-red-500 flex items-center">
           <i class="fas fa-exclamation-circle mr-1"></i>
           {{
             loginForm.get('password')?.hasError('required')
@@ -136,7 +136,7 @@
       </div>
 
       <!-- Remember Me & Forgot Password -->
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-fade-in" style="animation-delay: 0.4s">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <label class="inline-flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300 cursor-pointer group">
           <input
             type="checkbox"
@@ -155,7 +155,7 @@
       </div>
 
       <!-- Login Button with Loading State -->
-      <div class="animate-fade-in" style="animation-delay: 0.5s">
+      <div>
         <button
           type="submit"
           [disabled]="loginForm.invalid && loginSubmitted || isLogging"
@@ -169,7 +169,7 @@
     </form>
 
     <!-- Footer -->
-    <footer class="flex flex-col sm:flex-row sm:items-center gap-3 text-sm text-center pt-8 border-t border-gray-200 dark:border-gray-700 animate-fade-in relative z-10" style="animation-delay: 0.6s">
+    <footer class="flex flex-col sm:flex-row sm:items-center gap-3 text-sm text-center pt-8 border-t border-gray-200 dark:border-gray-700 relative z-10">
       <span class="text-gray-600 dark:text-gray-300">{{ 'auth.login.noAccount' | translate }}</span>
       <button
         type="button"
@@ -195,8 +195,7 @@
   <!-- Theme Toggle Button -->
   <button
     type="button"
-    class="fixed right-6 bottom-6 h-14 w-14 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border border-white/20 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 animate-fade-in focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
-    style="animation-delay: 0.7s"
+  class="fixed right-6 bottom-6 h-14 w-14 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border border-white/20 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 flex items-center justify-center"
     (click)="toggleTheme()"
     [attr.aria-label]="activeTheme === 'dark' ? ('auth.login.switchToLight' | translate) : ('auth.login.switchToDark' | translate)"
   >
