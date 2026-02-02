@@ -68,6 +68,7 @@
       "usernameRequired": "Enter your Moodle username.",
       "moodleRecoveryNotAvailable": "Password recovery for Moodle accounts must be done in Moodle.",
       "submit": "Sign in",
+      "logging": "Signing in...",
       "noAccount": "Don't have an account?",
       "create": "Create account",
       "showPassword": "Show password",
@@ -93,6 +94,13 @@
       "confirmPasswordMismatch": "Passwords must match.",
       "updatesLabel": "I want to receive updates about the template.",
       "submit": "Register",
+      "registering": "Creating account...",
+      "passwordStrength": {
+        "weak": "Weak password",
+        "fair": "Fair password", 
+        "good": "Good password",
+        "strong": "Strong password"
+      },
       "footerText": "Already have an account?",
       "footerLink": "Log in"
     }

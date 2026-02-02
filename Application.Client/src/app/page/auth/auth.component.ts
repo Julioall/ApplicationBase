@@ -20,6 +20,7 @@ export class AuthComponent implements OnInit {
   activeTheme = this.themeService.getActiveTheme();
   showPassword = false;
   loginMode: 'local' | 'moodle' = 'local';
+  isLogging = false;
 
   constructor(
     private fb: FormBuilder,
@@ -106,6 +107,8 @@ export class AuthComponent implements OnInit {
       this.notificationService.showError(this.translateService.instant('auth.formError'));
       return;
     }
+
+    this.isLogging = true;
     const { email, username, password, rememberMe } = this.loginForm?.value;
 
     const login$ = this.loginMode === 'moodle'
@@ -118,10 +121,16 @@ export class AuthComponent implements OnInit {
           this.notificationService.showSuccess(this.translateService.instant('auth.loginSuccess'));
           this.loginForm?.reset({ rememberMe: true });
           this.showPassword = false;
-          this.router.navigate(['/home']);
+          
+          // Delayed navigation for smooth UX
+          setTimeout(() => {
+            this.router.navigate(['/home']);
+          }, 1000);
         }
+        this.isLogging = false;
       },
       error: () => {
+        this.isLogging = false;
         this.notificationService.showError(
           this.translateService.instant('auth.loginError')
         );

@@ -18,6 +18,7 @@ export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;
   submitted = false;
   activeTheme = this.themeService.getActiveTheme();
+  isRegistering = false;
   passwordVisibility = {
     password: false,
     confirmPassword: false,
@@ -63,6 +64,42 @@ export class RegisterComponent implements OnInit {
     this.passwordVisibility[field] = !this.passwordVisibility[field];
   }
 
+  getPasswordStrength(): number {
+    const password = this.registerForm.get('password')?.value || '';
+    let strength = 0;
+    
+    if (password.length >= 8) strength += 25;
+    if (/[A-Z]/.test(password)) strength += 25;
+    if (/[a-z]/.test(password)) strength += 25;
+    if (/[0-9]/.test(password) || /[^A-Za-z0-9]/.test(password)) strength += 25;
+    
+    return strength;
+  }
+
+  getPasswordStrengthClass(): string {
+    const strength = this.getPasswordStrength();
+    if (strength <= 25) return 'bg-red-500';
+    if (strength <= 50) return 'bg-orange-500';
+    if (strength <= 75) return 'bg-yellow-500';
+    return 'bg-green-500';
+  }
+
+  getPasswordStrengthText(): string {
+    const strength = this.getPasswordStrength();
+    if (strength <= 25) return 'auth.register.passwordStrength.weak';
+    if (strength <= 50) return 'auth.register.passwordStrength.fair';
+    if (strength <= 75) return 'auth.register.passwordStrength.good';
+    return 'auth.register.passwordStrength.strong';
+  }
+
+  getPasswordStrengthTextClass(): string {
+    const strength = this.getPasswordStrength();
+    if (strength <= 25) return 'text-red-500';
+    if (strength <= 50) return 'text-orange-500';
+    if (strength <= 75) return 'text-yellow-500';
+    return 'text-green-500';
+  }
+
   private buildErrorMessage(error: any): string {
     const generic = this.translateService.instant('auth.signupError');
     if (!error) {
@@ -93,6 +130,7 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
+    this.isRegistering = true;
     const { fullName, email, password } = this.registerForm.value;
 
     const newUser: User = {
@@ -112,9 +150,16 @@ export class RegisterComponent implements OnInit {
       next: () => {
         this.notificationService.showSuccess(this.translateService.instant('auth.signupSuccess'));
         this.passwordVisibility = { password: false, confirmPassword: false };
-        this.router.navigate(['/auth'], { queryParams: { email } });
+        
+        // Delayed navigation for smooth UX
+        setTimeout(() => {
+          this.router.navigate(['/auth'], { 
+            queryParams: { email: email, registered: 'true' } 
+          });
+        }, 1500);
       },
       error: (err) => {
+        this.isRegistering = false;
         const message = this.buildErrorMessage(err);
         this.notificationService.showError(message);
       },

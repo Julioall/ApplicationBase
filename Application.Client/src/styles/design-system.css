@@ -1,0 +1,482 @@
+/**
+ * DESIGN SYSTEM STYLES
+ * Componentes e utilitários CSS customizados para complementar Tailwind CSS
+ * Sistema moderno e elegante para auth screens
+ */
+
+/* ============================================
+   KEYFRAMES PERSONALIZADOS
+   ========================================== */
+
+@keyframes skeleton {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes morph {
+  0%, 100% { border-radius: 40% 60% 70% 30% / 40% 40% 60% 50%; }
+  34% { border-radius: 70% 30% 50% 50% / 30% 40% 70% 60%; }
+  67% { border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%; }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animação removida - causava movimento indesejado da direita para esquerda
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+*/
+
+/* ============================================
+   ANIMATION UTILITY CLASSES
+   ========================================== */
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out both;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out both;
+}
+
+/* Classe removida - animação slide-in-right comentada
+.animate-slide-in-right {
+  animation: slide-in-right 0.6s ease-out both;
+}
+*/
+
+/* ============================================
+   GLASSMORPHISM AVANÇADO
+   ========================================== */
+
+.glass-container {
+  position: relative;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background-color: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.125);
+  border-radius: 16px;
+}
+
+.glass-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  -webkit-mask-composite: xor;
+}
+
+.glass-container-dark {
+  background-color: rgba(17, 25, 40, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-container-dark::before {
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+}
+
+/* ============================================
+   FORM COMPONENTS AVANÇADOS
+   ========================================== */
+
+.form-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.floating-label {
+  position: relative;
+  display: block;
+}
+
+.floating-label input {
+  width: 100%;
+  padding: 1rem 1rem 0.5rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: transparent;
+  transition: all 0.2s ease-in-out;
+}
+
+.floating-label label {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  font-size: 1rem;
+  color: #6b7280;
+  transform: translateY(-50%);
+  transition: all 0.2s ease-in-out;
+  pointer-events: none;
+  background: white;
+  padding: 0 0.25rem;
+}
+
+.floating-label input:focus,
+.floating-label input:not(:placeholder-shown) {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+}
+
+.floating-label input:focus + label,
+.floating-label input:not(:placeholder-shown) + label {
+  top: 0;
+  font-size: 0.75rem;
+  color: #0ea5e9;
+  transform: translateY(-50%);
+}
+
+.floating-label.error input {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+}
+
+.floating-label.error input:focus + label,
+.floating-label.error input:not(:placeholder-shown) + label {
+  color: #ef4444;
+}
+
+/* Dark mode floating labels */
+.dark .floating-label label {
+  background: #1f2937;
+  color: #9ca3af;
+}
+
+.dark .floating-label input {
+  background: transparent;
+  border-color: #374151;
+  color: white;
+}
+
+.dark .floating-label input:focus,
+.dark .floating-label input:not(:placeholder-shown) {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2);
+}
+
+/* ============================================
+   BUTTON MICRO-INTERACTIONS
+   ========================================== */
+
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+  transform: translate3d(0, 0, 0);
+}
+
+.btn-ripple::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transition: width 0.6s, height 0.6s, top 0.6s, left 0.6s;
+  transform: translate(-50%, -50%);
+}
+
+.btn-ripple:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-magnetic {
+  transition: transform 0.2s ease-out;
+}
+
+.btn-magnetic:hover {
+  transform: translateY(-2px);
+}
+
+.btn-magnetic:active {
+  transform: translateY(0);
+}
+
+/* ============================================
+   LOADING STATES ELEGANTES
+   ========================================== */
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.pulse-ring {
+  position: relative;
+  display: inline-block;
+}
+
+.pulse-ring::before,
+.pulse-ring::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border: 2px solid #0ea5e9;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse-ring-animation 2s infinite;
+}
+
+.pulse-ring::after {
+  animation-delay: 1s;
+}
+
+@keyframes pulse-ring-animation {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+.dots-loading {
+  display: flex;
+  gap: 4px;
+}
+
+.dots-loading div {
+  width: 8px;
+  height: 8px;
+  background: currentColor;
+  border-radius: 50%;
+  animation: dots-bounce 1.4s ease-in-out infinite both;
+}
+
+.dots-loading div:nth-child(1) { animation-delay: -0.32s; }
+.dots-loading div:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes dots-bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+/* ============================================
+   ELEMENTOS DECORATIVOS
+   ========================================== */
+
+.morphing-blob {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(135deg, #0ea5e9, #d946ef, #22c55e);
+  filter: blur(40px);
+  opacity: 0.7;
+  animation: morph 8s ease-in-out infinite;
+}
+
+.floating-orb {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+}
+
+.mesh-gradient-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(at 40% 20%, rgba(14, 165, 233, 0.3) 0%, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(217, 70, 239, 0.3) 0%, transparent 50%),
+    radial-gradient(at 0% 50%, rgba(34, 197, 94, 0.3) 0%, transparent 50%),
+    radial-gradient(at 80% 50%, rgba(245, 158, 11, 0.3) 0%, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(239, 68, 68, 0.3) 0%, transparent 50%),
+    radial-gradient(at 80% 100%, rgba(14, 165, 233, 0.3) 0%, transparent 50%),
+    radial-gradient(at 0% 0%, rgba(217, 70, 239, 0.3) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ============================================
+   ANIMAÇÕES DE ENTRADA/SAÍDA
+   ========================================== */
+
+.fade-enter {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.fade-exit {
+  animation: fadeOut 0.3s ease-in forwards;
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-20px); }
+}
+
+.slide-enter-right {
+  animation: slideInRight 0.5s ease-out forwards;
+}
+
+.slide-enter-left {
+  animation: slideInLeft 0.5s ease-out forwards;
+}
+
+/* ============================================
+   ESTADOS DE ERRO/SUCESSO
+   ========================================== */
+
+.error-shake {
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.success-bounce {
+  animation: bounceSoft 0.6s ease-out;
+}
+
+.warning-pulse {
+  animation: pulseSoft 1s ease-in-out infinite;
+}
+
+/* ============================================
+   RESPONSIVIDADE CUSTOMIZADA
+   ========================================== */
+
+@media (max-width: 640px) {
+  .glass-container {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  
+  .floating-label input {
+    padding: 0.875rem;
+  }
+  
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* ============================================
+   DARK MODE ESPECÍFICO
+   ========================================== */
+
+.dark .morphing-blob {
+  opacity: 0.4;
+}
+
+.dark .floating-orb {
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.2) 0%, transparent 70%);
+}
+
+.dark .mesh-gradient-bg {
+  background: 
+    radial-gradient(at 40% 20%, rgba(14, 165, 233, 0.15) 0%, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(217, 70, 239, 0.15) 0%, transparent 50%),
+    radial-gradient(at 0% 50%, rgba(34, 197, 94, 0.15) 0%, transparent 50%),
+    radial-gradient(at 80% 50%, rgba(245, 158, 11, 0.15) 0%, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(239, 68, 68, 0.15) 0%, transparent 50%),
+    radial-gradient(at 80% 100%, rgba(14, 165, 233, 0.15) 0%, transparent 50%),
+    radial-gradient(at 0% 0%, rgba(217, 70, 239, 0.15) 0%, transparent 50%);
+}
+
+/* ============================================
+   ACESSIBILIDADE
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .morphing-blob {
+    animation: none;
+  }
+  
+  .floating-orb {
+    animation: none;
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ========================================== */
+
+@media print {
+  .glass-container,
+  .glass-container-dark {
+    background: white !important;
+    backdrop-filter: none !important;
+    border: 1px solid #e5e7eb !important;
+  }
+  
+  .morphing-blob,
+  .floating-orb,
+  .mesh-gradient-bg {
+    display: none !important;
+  }
+}

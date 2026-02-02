@@ -68,6 +68,7 @@
       "usernameRequired": "Informe seu usuário do Moodle.",
       "moodleRecoveryNotAvailable": "A recuperação de senha de contas Moodle deve ser feita no próprio Moodle.",
       "submit": "Entrar",
+      "logging": "Entrando...",
       "noAccount": "Não tem conta?",
       "create": "Criar conta",
       "showPassword": "Mostrar senha",
@@ -93,6 +94,13 @@
       "confirmPasswordMismatch": "As senhas precisam ser iguais.",
       "updatesLabel": "Quero receber novidades sobre evoluções do template.",
       "submit": "Registrar",
+      "registering": "Criando conta...",
+      "passwordStrength": {
+        "weak": "Senha fraca",
+        "fair": "Senha razoável",
+        "good": "Senha boa", 
+        "strong": "Senha forte"
+      },
       "footerText": "Já possui uma conta?",
       "footerLink": "Fazer login"
     }

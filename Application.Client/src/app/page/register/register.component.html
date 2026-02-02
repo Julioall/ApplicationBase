@@ -1,87 +1,134 @@
-<div
-  class="min-h-screen bg-page text-text-primary flex flex-col items-center justify-center px-4 py-6 sm:py-10 gap-8 transition-colors duration-300"
->
-  <div
-    class="w-full max-w-lg sm:max-w-xl bg-surface border border-border-soft rounded-2xl shadow-soft backdrop-blur-sm p-6 sm:p-8 md:p-10 space-y-6 transition-colors"
-  >
-    <header class="space-y-2">
-      <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">
-        {{ 'auth.register.title' | translate }}
-      </h1>
-      <p class="text-text-subtle text-sm sm:text-base md:text-lg">
-        {{ 'auth.register.subtitle' | translate }}
-      </p>
+<div class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-gray-900 dark:text-white flex flex-col items-center justify-center px-4 py-6 sm:py-10 gap-8 transition-all duration-500 ease-out">
+  <!-- Decorative Background Elements -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-20 right-20 w-28 h-28 bg-purple-500 opacity-20 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute bottom-20 left-20 w-36 h-36 bg-pink-500 opacity-15 rounded-full blur-3xl animate-pulse" style="animation-delay: 1.5s"></div>
+    <div class="absolute top-1/3 right-1/3 w-64 h-64 bg-indigo-500 opacity-5 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- Modern Card Container -->
+  <div class="w-full max-w-lg sm:max-w-xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-md border border-white/20 dark:border-gray-700/20 rounded-2xl shadow-2xl p-8 animate-fade-in-up relative overflow-hidden">
+    <!-- Decorative Card Elements -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+      <div class="absolute -top-4 -right-4 w-24 h-24 bg-purple-500 opacity-10 rounded-full blur-xl"></div>
+      <div class="absolute -bottom-4 -left-4 w-32 h-32 bg-pink-500 opacity-10 rounded-full blur-xl"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="space-y-6 text-center mb-8 relative z-10">
+      <div class="w-16 h-16 mx-auto bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-xl animate-fade-in" style="animation-delay: 0.4s">
+        <i class="fas fa-user-plus text-2xl text-white"></i>
+      </div>
+      
+      <div class="space-y-2 animate-fade-in" style="animation-delay: 0.6s">
+        <h1 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          {{ 'auth.register.title' | translate }}
+        </h1>
+        <p class="text-gray-600 dark:text-gray-300 text-base sm:text-lg">
+          {{ 'auth.register.subtitle' | translate }}
+        </p>
+      </div>
     </header>
 
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4 sm:space-y-5">
-      <label class="flex flex-col gap-2 text-sm font-semibold text-text-primary">
-        <span>{{ 'auth.register.fullNameLabel' | translate }}</span>
-        <input
-          type="text"
-          [placeholder]="'auth.register.fullNamePlaceholder' | translate"
-          formControlName="fullName"
-          class="w-full rounded-xl border border-border-soft bg-surface-alt px-4 py-3 text-base font-medium text-text-primary placeholder:text-text-muted shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.08)] focus:outline-none focus:ring-2 focus:ring-focus focus:border-transparent transition"
-        />
-        <small
-          class="text-xs text-danger font-medium"
-          *ngIf="registerForm.get('fullName')?.invalid && (registerForm.get('fullName')?.touched || submitted)"
-        >
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-6 animate-fade-in relative z-10" style="animation-delay: 0.8s">
+      <!-- Full Name Field -->
+      <div class="animate-fade-in" style="animation-delay: 0.2s">
+        <div class="relative">
+          <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-500 z-10">
+            <i class="fas fa-user"></i>
+          </div>
+          <input
+            type="text"
+            [placeholder]="'auth.register.fullNamePlaceholder' | translate"
+            formControlName="fullName"
+            class="w-full pl-10 pr-4 py-4 text-lg border-2 border-gray-200 dark:border-gray-600 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder-gray-400"
+          />
+          <label class="absolute left-10 -top-2 px-2 text-sm font-medium text-purple-600 bg-white dark:bg-gray-800 rounded">
+            {{ 'auth.register.fullNameLabel' | translate }}
+          </label>
+        </div>
+        <div *ngIf="registerForm.get('fullName')?.invalid && (registerForm.get('fullName')?.touched || submitted)" 
+             class="mt-2 text-sm text-red-500 animate-fade-in flex items-center">
+          <i class="fas fa-exclamation-circle mr-1"></i>
           {{
             registerForm.get('fullName')?.hasError('required')
               ? ('auth.register.fullNameRequired' | translate)
               : ('auth.register.fullNameMin' | translate)
           }}
-        </small>
-      </label>
+        </div>
+      </div>
 
-      <label class="flex flex-col gap-2 text-sm font-semibold text-text-primary">
-        <span>{{ 'auth.register.emailLabel' | translate }}</span>
-        <input
-          type="email"
-          [placeholder]="'auth.register.emailPlaceholder' | translate"
-          formControlName="email"
-          class="w-full rounded-xl border border-border-soft bg-surface-alt px-4 py-3 text-base font-medium text-text-primary placeholder:text-text-muted shadow-[inset_0_1px_0_rgba(var(--shadow-rgb),0.08)] focus:outline-none focus:ring-2 focus:ring-focus focus:border-transparent transition"
-        />
-        <small
-          class="text-xs text-danger font-medium"
-          *ngIf="registerForm.get('email')?.invalid && (registerForm.get('email')?.touched || submitted)"
-        >
+      <!-- Email Field -->
+      <div class="animate-fade-in" style="animation-delay: 0.3s">
+        <div class="relative">
+          <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-500 z-10">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <input
+            type="email"
+            [placeholder]="'auth.register.emailPlaceholder' | translate"
+            formControlName="email"
+            class="w-full pl-10 pr-4 py-4 text-lg border-2 border-gray-200 dark:border-gray-600 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder-gray-400"
+          />
+          <label class="absolute left-10 -top-2 px-2 text-sm font-medium text-purple-600 bg-white dark:bg-gray-800 rounded">
+            {{ 'auth.register.emailLabel' | translate }}
+          </label>
+        </div>
+        <div *ngIf="registerForm.get('email')?.invalid && (registerForm.get('email')?.touched || submitted)"
+             class="mt-2 text-sm text-red-500 animate-fade-in flex items-center">
+          <i class="fas fa-exclamation-circle mr-1"></i>
           {{
             registerForm.get('email')?.hasError('required')
               ? ('auth.register.emailRequired' | translate)
               : ('auth.register.emailInvalid' | translate)
           }}
-        </small>
-      </label>
+        </div>
+      </div>
 
-      <div class="grid gap-4 sm:gap-5 sm:grid-cols-2">
-        <label class="flex flex-col gap-2 text-sm font-semibold text-text-primary">
-          <span>{{ 'auth.register.passwordLabel' | translate }}</span>
-          <div class="relative flex items-center rounded-xl">
+      <!-- Password Fields Grid -->
+      <div class="grid gap-6 sm:grid-cols-2">
+        <!-- Password Field -->
+        <div class="animate-fade-in" style="animation-delay: 0.4s">
+          <div class="relative">
+            <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-500 z-10">
+              <i class="fas fa-lock"></i>
+            </div>
             <input
               [type]="passwordVisibility.password ? 'text' : 'password'"
               [placeholder]="'auth.register.passwordPlaceholder' | translate"
               formControlName="password"
               autocomplete="new-password"
-              class="w-full rounded-xl border border-border-soft bg-transparent px-4 py-3 pr-12 text-base font-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-focus focus:border-transparent"
+              class="w-full pl-10 pr-12 py-4 text-lg border-2 border-gray-200 dark:border-gray-600 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder-gray-400"
             />
+            <label class="absolute left-10 -top-2 px-2 text-sm font-medium text-purple-600 bg-white dark:bg-gray-800 rounded">
+              {{ 'auth.register.passwordLabel' | translate }}
+            </label>
             <button
               type="button"
-              class="absolute inset-y-0 right-3 inline-flex items-center justify-center text-text-muted hover:text-text-primary transition"
+              class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-purple-600 transition-colors z-10"
               (click)="togglePasswordVisibility('password')"
-              [attr.aria-label]="
-                passwordVisibility.password
-                  ? ('auth.login.hidePassword' | translate)
-                  : ('auth.login.showPassword' | translate)
-              "
             >
-              <i class="fa-solid" [ngClass]="passwordVisibility.password ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
+              <i [class]="passwordVisibility.password ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
             </button>
           </div>
-          <small
-            class="text-xs text-danger font-medium"
-            *ngIf="registerForm.get('password')?.invalid && (registerForm.get('password')?.touched || submitted)"
-          >
+          
+          <!-- Password Strength Indicator -->
+          <div class="mt-2 space-y-2" *ngIf="registerForm.get('password')?.value">
+            <div class="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+              <div 
+                class="h-2 rounded-full transition-all duration-300"
+                [class]="getPasswordStrengthClass()"
+                [style.width.%]="getPasswordStrength()"
+              ></div>
+            </div>
+            <p class="text-xs" [class]="getPasswordStrengthTextClass()">
+              {{ getPasswordStrengthText() | translate }}
+            </p>
+          </div>
+          
+          <div *ngIf="registerForm.get('password')?.invalid && (registerForm.get('password')?.touched || submitted)"
+               class="mt-2 text-sm text-red-500 animate-fade-in flex items-center">
+            <i class="fas fa-exclamation-circle mr-1"></i>
             {{
               registerForm.get('password')?.hasError('required')
                 ? ('auth.register.passwordRequired' | translate)
@@ -89,77 +136,103 @@
                   ? ('auth.register.passwordMin' | translate)
                   : ('profile.password.requirements' | translate)
             }}
-          </small>
-        </label>
+          </div>
+        </div>
 
-        <label class="flex flex-col gap-2 text-sm font-semibold text-text-primary">
-          <span>{{ 'auth.register.confirmPasswordLabel' | translate }}</span>
-          <div class="relative flex items-center rounded-xl">
+        <!-- Confirm Password Field -->
+        <div class="animate-fade-in" style="animation-delay: 0.5s">
+          <div class="relative">
+            <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-500 z-10">
+              <i class="fas fa-shield-alt"></i>
+            </div>
             <input
               [type]="passwordVisibility.confirmPassword ? 'text' : 'password'"
               [placeholder]="'auth.register.confirmPasswordPlaceholder' | translate"
               formControlName="confirmPassword"
               autocomplete="new-password"
-              class="w-full rounded-xl border border-border-soft bg-transparent px-4 py-3 pr-12 text-base font-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-focus focus:border-transparent"
+              class="w-full pl-10 pr-12 py-4 text-lg border-2 border-gray-200 dark:border-gray-600 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder-gray-400"
             />
+            <label class="absolute left-10 -top-2 px-2 text-sm font-medium text-purple-600 bg-white dark:bg-gray-800 rounded">
+              {{ 'auth.register.confirmPasswordLabel' | translate }}
+            </label>
             <button
               type="button"
-              class="absolute inset-y-0 right-3 inline-flex items-center justify-center text-text-muted hover:text-text-primary transition"
+              class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-purple-600 transition-colors z-10"
               (click)="togglePasswordVisibility('confirmPassword')"
-              [attr.aria-label]="
-                passwordVisibility.confirmPassword
-                  ? ('auth.login.hidePassword' | translate)
-                  : ('auth.login.showPassword' | translate)
-              "
             >
-              <i class="fa-solid" [ngClass]="passwordVisibility.confirmPassword ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
+              <i [class]="passwordVisibility.confirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
             </button>
           </div>
-          <small
-            class="text-xs text-danger font-medium"
-            *ngIf="(registerForm.get('confirmPassword')?.touched || submitted) && registerForm.hasError('passwordsMismatch')"
-          >
+          <div *ngIf="(registerForm.get('confirmPassword')?.touched || submitted) && registerForm.hasError('passwordsMismatch')"
+               class="mt-2 text-sm text-red-500 animate-fade-in flex items-center">
+            <i class="fas fa-exclamation-circle mr-1"></i>
             {{ 'auth.register.confirmPasswordMismatch' | translate }}
-          </small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Updates Checkbox -->
+      <div class="animate-fade-in" style="animation-delay: 0.6s">
+        <label class="inline-flex items-start gap-3 text-sm text-gray-600 dark:text-gray-300 cursor-pointer group">
+          <input
+            type="checkbox"
+            formControlName="updates"
+            class="mt-1 h-4 w-4 rounded border-2 border-purple-300 bg-white/50 text-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-0 transition-all duration-200 group-hover:border-purple-400"
+          />
+          <span class="group-hover:text-gray-900 dark:group-hover:text-white transition-colors">{{ 'auth.register.updatesLabel' | translate }}</span>
         </label>
       </div>
 
-      <label class="inline-flex items-start gap-3 text-sm text-text-subtle">
-        <input
-          type="checkbox"
-          formControlName="updates"
-          class="mt-1 h-4 w-4 rounded border-border-soft bg-surface-alt text-accent focus:ring-2 focus:ring-focus"
-        />
-        <span>{{ 'auth.register.updatesLabel' | translate }}</span>
-      </label>
-
-      <button
-        class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 text-text-inverse font-semibold shadow-soft hover:-translate-y-0.5 hover:bg-accent-strong transition focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-2 focus:ring-offset-surface disabled:opacity-70 disabled:cursor-not-allowed"
-        type="submit"
-        [disabled]="registerForm.invalid"
-      >
-        {{ 'auth.register.submit' | translate }}
-      </button>
+      <!-- Register Button with Loading State -->
+      <div class="animate-fade-in" style="animation-delay: 0.7s">
+        <button
+          type="submit"
+          [disabled]="registerForm.invalid || isRegistering"
+          class="w-full h-14 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-400 disabled:to-gray-500 text-white text-lg font-semibold rounded-xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 disabled:hover:translate-y-0 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:cursor-not-allowed flex items-center justify-center"
+        >
+          <div *ngIf="isRegistering" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+          <i *ngIf="!isRegistering" class="fas fa-user-plus mr-2"></i>
+          {{ isRegistering ? ('auth.register.registering' | translate) : ('auth.register.submit' | translate) }}
+        </button>
+      </div>
     </form>
 
-    <footer class="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-text-subtle">
-      <span>{{ 'auth.register.footerText' | translate }}</span>
+    <!-- Footer -->
+    <footer class="flex flex-col sm:flex-row sm:items-center gap-3 text-sm text-center pt-8 border-t border-gray-200 dark:border-gray-700 animate-fade-in relative z-10" style="animation-delay: 0.8s">
+      <span class="text-gray-600 dark:text-gray-300">{{ 'auth.register.footerText' | translate }}</span>
       <button
         type="button"
-        class="font-semibold text-accent hover:text-accent-strong transition underline-offset-4 hover:underline"
         (click)="goToLogin()"
+        class="font-semibold text-purple-600 hover:text-purple-700 transition-colors underline-offset-4 hover:underline focus:outline-none focus:ring-2 focus:ring-purple-500 rounded px-2 py-1"
       >
         {{ 'auth.register.footerLink' | translate }}
       </button>
     </footer>
   </div>
 
+  <!-- Loading Overlay -->
+  <div 
+    *ngIf="isRegistering"
+    class="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center"
+  >
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-xl flex flex-col items-center space-y-3">
+      <div class="flex space-x-1">
+        <div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div>
+        <div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+        <div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+      </div>
+      <span class="text-gray-600 dark:text-gray-300 font-medium">Criando conta...</span>
+    </div>
+  </div>
+
+  <!-- Theme Toggle Button -->
   <button
     type="button"
-    class="fixed right-4 bottom-4 sm:right-6 sm:bottom-6 h-12 w-12 rounded-full border border-border-soft bg-surface text-text-primary shadow-soft flex items-center justify-center hover:-translate-y-0.5 transition"
+    class="fixed right-6 bottom-6 h-14 w-14 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border border-white/20 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 animate-fade-in focus:outline-none focus:ring-2 focus:ring-purple-500 flex items-center justify-center"
+    style="animation-delay: 0.9s"
     (click)="toggleTheme()"
     [attr.aria-label]="activeTheme === 'dark' ? ('auth.login.switchToLight' | translate) : ('auth.login.switchToDark' | translate)"
   >
-    <i class="fa-solid" [ngClass]="activeTheme === 'dark' ? 'fa-moon' : 'fa-sun'" aria-hidden="true"></i>
+    <i class="text-xl" [ngClass]="activeTheme === 'dark' ? 'fas fa-moon text-yellow-400' : 'fas fa-sun text-orange-500'" aria-hidden="true"></i>
   </button>
 </div>
